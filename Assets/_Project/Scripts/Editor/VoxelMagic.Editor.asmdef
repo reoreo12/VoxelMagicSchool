@@ -1,0 +1,23 @@
+{
+    "name": "VoxelMagic.Editor",
+    "rootNamespace": "VoxelMagic.EditorTools",
+    "references": [
+        "VoxelMagic.Core",
+        "VoxelMagic.Gameplay",
+        "VoxelMagic.UI",
+        "Unity.TextMeshPro",
+        "Unity.InputSystem",
+        "UnityEngine.UI"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

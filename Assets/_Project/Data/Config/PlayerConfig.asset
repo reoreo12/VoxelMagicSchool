@@ -1,0 +1,21 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 764127d25702f914282bd438b6c80747, type: 3}
+  m_Name: PlayerConfig
+  m_EditorClassIdentifier: 
+  _moveSpeed: 4
+  _turnSpeedDegrees: 720
+  _interactRadius: 1.6
+  _cameraDistance: 14
+  _cameraPitch: 45
+  _cameraYaw: 45
+  _cameraFollowSharpness: 8
