@@ -44,6 +44,9 @@ namespace VoxelMagic.Core
         public const string TrackerCollapsed = "▶";
         public const string TrackerCompleted = "완료!";
 
+        public const string AcquiredFormat = "{0} 획득!";
+        public const string SizeFormat = "크기 {0:0.#}cm";
+
         public const string BiteMissed = "입질을 놓쳤다…";
         public const string FishEscaped = "물고기가 도망갔다…";
         public const string FishReleasedInventoryFull = "가방이 가득 차서 놓아줬다";

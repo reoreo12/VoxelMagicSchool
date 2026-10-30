@@ -21,5 +21,5 @@ MonoBehaviour:
   _creatureNote: 
   _produce: {fileID: 11400000, guid: 0f8a00c4c4e02f941afff640b76201b0, type: 2}
   _footprint: {x: 1, y: 1}
-  _sproutPrefab: {fileID: 0}
-  _grownPrefab: {fileID: 0}
+  _sproutPrefab: {fileID: 8908149154171474695, guid: 9ea3c10ad46b7074ba312cf1258abc4d, type: 3}
+  _grownPrefab: {fileID: 8880803195460584342, guid: 1a86b9c715ead54458e2a3514ac30131, type: 3}

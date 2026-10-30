@@ -35,6 +35,7 @@ namespace VoxelMagic.EditorTools
             var radishSeed = Seed("Radish", "radish_seed", "무 씨앗", radish, new Vector2Int(1, 1));
             var onionSeed = Seed("GreenOnion", "green_onion_seed", "대파 씨앗", onion, new Vector2Int(1, 2));
             var pumpkinSeed = Seed("Pumpkin", "pumpkin_seed", "호박 씨앗", pumpkin, new Vector2Int(2, 2));
+            AssignCropVisuals(radishSeed, onionSeed, pumpkinSeed);
 
             var crucian = Fish("Crucian", "crucian", "붕어", "연못 어디에나 있는 평범한 붕어.", new Color(0.75f, 0.65f, 0.35f),
                 10f, 25f, 0.45f, 1.2f, 2.2f, 0f, 2f,
@@ -144,6 +145,73 @@ namespace VoxelMagic.EditorTools
                     element.FindPropertyRelative("_fish").objectReferenceValue = fish[i];
                     element.FindPropertyRelative("_weight").floatValue = weights[i];
                 }
+            });
+        }
+
+        // ── 작물 모양 프리팹 (기본 도형) ─────────────────────
+
+        private const string CropFolder = "Assets/_Project/Prefabs/Crops";
+
+        private static void AssignCropVisuals(SeedDefinition radish, SeedDefinition onion, SeedDefinition pumpkin)
+        {
+            if (!AssetDatabase.IsValidFolder(CropFolder)) AssetDatabase.CreateFolder("Assets/_Project/Prefabs", "Crops");
+
+            var sprout = CropPrefab("Crop_Sprout", root =>
+            {
+                var green = PrototypeSceneBuilder.Mat("Sprout", new Color(0.45f, 0.85f, 0.35f));
+                PrototypeSceneBuilder.Prim(PrimitiveType.Cube, "Stem", root, new Vector3(0f, 0.25f, 0f), new Vector3(0.1f, 0.3f, 0.1f), green);
+                PrototypeSceneBuilder.Prim(PrimitiveType.Cube, "Leaf", root, new Vector3(0f, 0.4f, 0f), new Vector3(0.45f, 0.08f, 0.2f), green);
+            });
+            var leaf = PrototypeSceneBuilder.Mat("CropLeaf", new Color(0.3f, 0.7f, 0.25f));
+
+            var radishGrown = CropPrefab("Crop_Radish", root =>
+            {
+                PrototypeSceneBuilder.Prim(PrimitiveType.Cylinder, "Root", root, new Vector3(0f, 0.3f, 0f), new Vector3(0.5f, 0.25f, 0.5f),
+                    PrototypeSceneBuilder.Mat("Radish", new Color(0.97f, 0.97f, 0.95f)));
+                PrototypeSceneBuilder.Prim(PrimitiveType.Cube, "Leaves", root, new Vector3(0f, 0.75f, 0f), new Vector3(0.45f, 0.4f, 0.45f), leaf);
+            });
+            var onionGrown = CropPrefab("Crop_GreenOnion", root =>
+            {
+                var white = PrototypeSceneBuilder.Mat("OnionWhite", new Color(0.95f, 0.97f, 0.9f));
+                var green = PrototypeSceneBuilder.Mat("OnionGreen", new Color(0.35f, 0.75f, 0.3f));
+                foreach (float z in new[] { -0.5f, 0.5f })
+                {
+                    PrototypeSceneBuilder.Prim(PrimitiveType.Cylinder, "White", root, new Vector3(0f, 0.35f, z), new Vector3(0.28f, 0.25f, 0.28f), white);
+                    PrototypeSceneBuilder.Prim(PrimitiveType.Cylinder, "Green", root, new Vector3(0f, 1.05f, z), new Vector3(0.24f, 0.5f, 0.24f), green);
+                }
+            });
+            var pumpkinGrown = CropPrefab("Crop_Pumpkin", root =>
+            {
+                PrototypeSceneBuilder.Prim(PrimitiveType.Sphere, "Body", root, new Vector3(0f, 0.6f, 0f), new Vector3(1.3f, 1f, 1.3f),
+                    PrototypeSceneBuilder.Mat("Pumpkin", new Color(1f, 0.55f, 0.1f)));
+                PrototypeSceneBuilder.Prim(PrimitiveType.Cube, "Stem", root, new Vector3(0f, 1.2f, 0f), new Vector3(0.12f, 0.25f, 0.12f), leaf);
+            });
+
+            SetVisualsIfMissing(radish, sprout, radishGrown);
+            SetVisualsIfMissing(onion, sprout, onionGrown);
+            SetVisualsIfMissing(pumpkin, sprout, pumpkinGrown);
+        }
+
+        private static GameObject CropPrefab(string name, System.Action<Transform> build)
+        {
+            string path = $"{CropFolder}/{name}.prefab";
+            var existing = AssetDatabase.LoadAssetAtPath<GameObject>(path);
+            if (existing != null) return existing;
+
+            var root = new GameObject(name);
+            build(root.transform);
+            var prefab = PrefabUtility.SaveAsPrefabAsset(root, path);
+            Object.DestroyImmediate(root);
+            return prefab;
+        }
+
+        private static void SetVisualsIfMissing(SeedDefinition seed, GameObject sprout, GameObject grown)
+        {
+            if (seed.SproutPrefab != null && seed.GrownPrefab != null) return;
+            Edit(seed, so =>
+            {
+                so.FindProperty("_sproutPrefab").objectReferenceValue = sprout;
+                so.FindProperty("_grownPrefab").objectReferenceValue = grown;
             });
         }
 

@@ -151,7 +151,18 @@ namespace VoxelMagic.EditorTools
                     Prim(PrimitiveType.Cube, $"Cell_{x}_{y}", cells, local,
                         new Vector3(size * 0.94f, 0.1f, size * 0.94f), soil);
                 }
-            Group("Crops", field, FarmOrigin);
+            var crops = Group("Crops", field, FarmOrigin);
+
+            var farmField = field.gameObject.AddComponent<FarmField>();
+            field.gameObject.AddComponent<FarmFieldView>()
+                .SetRef("_field", farmField)
+                .SetRef("_cropRoot", crops);
+
+            var quad = Prim(PrimitiveType.Plane, "PlacementPreview", field, Vector3.zero, Vector3.one * 0.1f,
+                Mat("Preview", new Color(1f, 1f, 1f, 0.5f), transparent: true));
+            quad.AddComponent<PlacementPreview>()
+                .SetRef("_field", farmField)
+                .SetRef("_quad", quad.GetComponent<Renderer>());
         }
 
         private static void BuildPond(Transform parent)
@@ -278,6 +289,7 @@ namespace VoxelMagic.EditorTools
             BuildQuestTracker(canvas, font);
             BuildInventoryBar(canvas, font);
             BuildToast(canvas, font);
+            BuildAcquisitionPopup(canvas, font);
             BuildRequestBoardWindow(canvas, font);
             return ui;
         }
@@ -371,6 +383,31 @@ namespace VoxelMagic.EditorTools
             var text = Text("Text", toast, font, "", 26, TextAlignmentOptions.Center);
             Stretch(text.rectTransform);
             toast.gameObject.AddComponent<ToastView>().SetRef("_text", text);
+        }
+
+        private static void BuildAcquisitionPopup(Transform canvas, TMP_FontAsset font)
+        {
+            var popup = Panel("AcquisitionPopup", canvas, new Color(0.1f, 0.1f, 0.12f, 0.85f));
+            Place(popup, new Vector2(0.5f, 1f), new Vector2(0.5f, 1f), new Vector2(0f, -110f), new Vector2(560f, 130f));
+            popup.GetComponent<Image>().raycastTarget = false;
+
+            var icon = Panel("Icon", popup, Color.white);
+            Place(icon, new Vector2(0f, 0.5f), new Vector2(0f, 0.5f), new Vector2(20f, 0f), new Vector2(80f, 80f));
+            icon.GetComponent<Image>().raycastTarget = false;
+            var title = Text("Title", popup, font, "", 30, TextAlignmentOptions.TopLeft);
+            Place(title.rectTransform, new Vector2(0f, 1f), new Vector2(0f, 1f), new Vector2(118f, -12f), new Vector2(420f, 40f));
+            var description = Text("Description", popup, font, "", 20, TextAlignmentOptions.TopLeft);
+            description.color = new Color(0.85f, 0.85f, 0.85f);
+            Place(description.rectTransform, new Vector2(0f, 1f), new Vector2(0f, 1f), new Vector2(118f, -56f), new Vector2(420f, 30f));
+            var size = Text("Size", popup, font, "", 22, TextAlignmentOptions.TopLeft);
+            size.color = new Color(1f, 0.85f, 0.35f);
+            Place(size.rectTransform, new Vector2(0f, 1f), new Vector2(0f, 1f), new Vector2(118f, -88f), new Vector2(420f, 30f));
+
+            popup.gameObject.AddComponent<AcquisitionPopup>()
+                .SetRef("_icon", icon.GetComponent<Image>())
+                .SetRef("_title", title)
+                .SetRef("_description", description)
+                .SetRef("_size", size);
         }
 
         private static void BuildRequestBoardWindow(Transform canvas, TMP_FontAsset font)
@@ -475,7 +512,7 @@ namespace VoxelMagic.EditorTools
         }
 
         /// <summary>기본 도형 생성. localPosition은 부모 기준 좌표.</summary>
-        private static GameObject Prim(PrimitiveType type, string name, Transform parent, Vector3 localPosition, Vector3 scale,
+        internal static GameObject Prim(PrimitiveType type, string name, Transform parent, Vector3 localPosition, Vector3 scale,
             Material material, bool keepCollider = false)
         {
             var go = GameObject.CreatePrimitive(type);
@@ -511,7 +548,7 @@ namespace VoxelMagic.EditorTools
             rect.sizeDelta = size;
         }
 
-        private static Material Mat(string name, Color color, bool transparent = false, Color? emission = null)
+        internal static Material Mat(string name, Color color, bool transparent = false, Color? emission = null)
         {
             string path = $"{MaterialFolder}/M_{name}.mat";
             var material = AssetDatabase.LoadAssetAtPath<Material>(path);
