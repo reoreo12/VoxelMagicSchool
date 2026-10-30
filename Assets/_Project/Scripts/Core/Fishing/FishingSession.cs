@@ -65,13 +65,17 @@ namespace VoxelMagic.Core
             return true;
         }
 
-        /// <summary>낚시 중 E 입력: 입질이면 미니게임 시작, 결과 표시 중이면 다시 던지기.</summary>
+        /// <summary>낚시 중 E 입력: 입질이면 미니게임 시작, 입질 오기 전이면 거두기, 결과 표시 중이면 다시 던지기.</summary>
         public void PressInteract()
         {
             if (State == FishingState.Biting)
             {
                 Minigame = new FishingMinigame(_config, CurrentFish, _random);
                 Enter(FishingState.Minigame, 0f);
+            }
+            else if(State == FishingState.Casting || State == FishingState.Waiting)
+            {
+                Cancel();
             }
             else if (State == FishingState.Result)
             {

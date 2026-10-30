@@ -61,10 +61,11 @@ namespace VoxelMagic.EditorTools
             BuildTrees(world.transform);
             BuildRequestBoard(world.transform);
             BuildFarm(world.transform, farm);
-            BuildPond(world.transform);
+            var fishingDriver = BuildPond(world.transform);
             BuildCreature(world.transform);
 
             var playerRoot = BuildPlayer(out var interactor);
+            fishingDriver.SetRef("_wandTip", playerRoot.transform.Find("WandTip"));
             var camera = Camera.main;
             camera.gameObject.AddComponent<QuarterViewCamera>().SetRef("_target", playerRoot.transform);
 
@@ -165,7 +166,7 @@ namespace VoxelMagic.EditorTools
                 .SetRef("_quad", quad.GetComponent<Renderer>());
         }
 
-        private static void BuildPond(Transform parent)
+        private static FishingDriver BuildPond(Transform parent)
         {
             var pond = Group("Pond", parent, PondPosition);
             Prim(PrimitiveType.Cube, "Water", pond, new Vector3(0f, 0.03f, 0f),
@@ -189,7 +190,23 @@ namespace VoxelMagic.EditorTools
                 StoneAt(stones, stone, new Vector3(-hx, 0f, z), index++);
                 StoneAt(stones, stone, new Vector3(hx, 0f, z), index++);
             }
-            Group("Bobber", pond, PondPosition);
+
+            var pondArea = pond.gameObject.AddComponent<PondArea>().SetRef("_water", blocker);
+
+            var bobber = Prim(PrimitiveType.Sphere, "Bobber", pond, new Vector3(0f, 0.1f, 0f), Vector3.one * 0.25f,
+                Mat("Bobber", Color.white));
+            var line = new GameObject("FishingLine").AddComponent<LineRenderer>();
+            line.transform.SetParent(pond, false);
+            line.positionCount = 2;
+            line.startWidth = line.endWidth = 0.02f;
+            line.useWorldSpace = true;
+            line.sharedMaterial = Mat("FishingLine", new Color(0.95f, 0.95f, 0.95f));
+            line.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
+
+            return pond.gameObject.AddComponent<FishingDriver>()
+                .SetRef("_pond", pondArea)
+                .SetRef("_bobber", bobber.transform)
+                .SetRef("_line", line);
         }
 
         private static void StoneAt(Transform parent, Material material, Vector3 offset, int index)
@@ -212,6 +229,7 @@ namespace VoxelMagic.EditorTools
                 new Vector3(0.18f, 0.12f, 0.04f), eye);
             Prim(PrimitiveType.Cube, "EyeR", creature, new Vector3(0.22f, 0.65f, -0.51f),
                 new Vector3(0.18f, 0.12f, 0.04f), eye);
+            creature.gameObject.AddComponent<CreatureNpc>().SetRef("_area", area);
         }
 
         // ── 플레이어 ──────────────────────────────────────────
@@ -231,7 +249,18 @@ namespace VoxelMagic.EditorTools
                 Mat("Skin", new Color(1f, 0.8f, 0.65f)));
             Prim(PrimitiveType.Cube, "Tie", t, new Vector3(0f, 1.3f, 0.36f), new Vector3(0.1f, 0.4f, 0.04f),
                 Mat("Tie", new Color(0.85f, 0.12f, 0.15f)));
-            Group("WandTip", t, new Vector3(0.4f, 1.2f, 0.4f));
+            var wand = Prim(PrimitiveType.Cube, "Wand", t, new Vector3(0.35f, 1.15f, 0.4f), new Vector3(0.05f, 0.05f, 0.58f),
+                Mat("Wand", new Color(0.55f, 0.35f, 0.2f)));
+            wand.transform.localRotation = Quaternion.Euler(-31f, 0f, 0f);
+            Group("WandTip", t, new Vector3(0.35f, 1.3f, 0.65f));
+
+            var bite = Group("BiteIndicator", t, new Vector3(0f, 2.5f, 0f));
+            var mark = Group("Mark", bite, new Vector3(0f, 2.5f, 0f));
+            var yellow = Mat("BiteMark", new Color(1f, 0.85f, 0.1f), emission: new Color(1f, 0.8f, 0.1f) * 2f);
+            Prim(PrimitiveType.Cube, "Bar", mark, new Vector3(0f, 0.3f, 0f), new Vector3(0.14f, 0.42f, 0.14f), yellow);
+            Prim(PrimitiveType.Cube, "Dot", mark, new Vector3(0f, -0.04f, 0f), new Vector3(0.14f, 0.14f, 0.14f), yellow);
+            bite.gameObject.AddComponent<BiteIndicator>().SetRef("_visual", mark.gameObject);
+
             t.position = new Vector3(0f, 0.1f, 0f);
 
             var input = root.AddComponent<GameInputReader>()
@@ -267,15 +296,24 @@ namespace VoxelMagic.EditorTools
             hint.gameObject.AddComponent<ControlsHintView>().SetRef("_text", hint);
 
             // 상호작용 안내 (대상 근처)
-            var prompt = new GameObject("InteractionPrompt", typeof(RectTransform), typeof(Image));
+            // 문구 길이에 맞춰 상자 크기가 늘어나도록 레이아웃 + 크기 맞춤을 쓴다.
+            var prompt = new GameObject("InteractionPrompt", typeof(RectTransform), typeof(Image),
+                typeof(VerticalLayoutGroup), typeof(ContentSizeFitter));
             prompt.transform.SetParent(canvas, false);
             var promptRect = (RectTransform)prompt.transform;
-            Place(promptRect, Vector2.zero, new Vector2(0.5f, 0f), Vector2.zero, new Vector2(220f, 84f));
+            Place(promptRect, Vector2.zero, new Vector2(0.5f, 0f), Vector2.zero, new Vector2(200f, 84f));
             prompt.GetComponent<Image>().color = new Color(0f, 0f, 0f, 0.55f);
+            var promptLayout = prompt.GetComponent<VerticalLayoutGroup>();
+            promptLayout.padding = new RectOffset(18, 18, 4, 8);
+            promptLayout.childAlignment = TextAnchor.UpperCenter;
+            promptLayout.childControlWidth = promptLayout.childControlHeight = true;
+            promptLayout.childForceExpandWidth = promptLayout.childForceExpandHeight = false;
+            var promptFitter = prompt.GetComponent<ContentSizeFitter>();
+            promptFitter.horizontalFit = promptFitter.verticalFit = ContentSizeFitter.FitMode.PreferredSize;
             var key = Text("Key", promptRect, font, "E", 34, TextAlignmentOptions.Center);
-            Place(key.rectTransform, new Vector2(0.5f, 1f), new Vector2(0.5f, 1f), new Vector2(0f, -4f), new Vector2(200f, 40f));
             var action = Text("Action", promptRect, font, "", 24, TextAlignmentOptions.Center);
-            Place(action.rectTransform, new Vector2(0.5f, 0f), new Vector2(0.5f, 0f), new Vector2(0f, 6f), new Vector2(210f, 36f));
+            key.textWrappingMode = TextWrappingModes.NoWrap;
+            action.textWrappingMode = TextWrappingModes.NoWrap;
 
             var promptHolder = new GameObject("InteractionPromptView");
             promptHolder.transform.SetParent(canvas, false);
@@ -286,12 +324,64 @@ namespace VoxelMagic.EditorTools
                 .SetRef("_worldCamera", camera);
             prompt.SetActive(false);
 
+            BuildScoreHud(canvas, font);
             BuildQuestTracker(canvas, font);
             BuildInventoryBar(canvas, font);
             BuildToast(canvas, font);
             BuildAcquisitionPopup(canvas, font);
+            BuildFishingMinigame(canvas, font);
+            BuildCreatureDialog(canvas, font);
             BuildRequestBoardWindow(canvas, font);
             return ui;
+        }
+
+        private static void BuildScoreHud(Transform canvas, TMP_FontAsset font)
+        {
+            var panel = Panel("ScoreHud", canvas, new Color(0f, 0f, 0f, 0.45f));
+            Place(panel, new Vector2(0.5f, 1f), new Vector2(0.5f, 1f), new Vector2(0f, -16f), new Vector2(720f, 64f));
+            panel.GetComponent<Image>().raycastTarget = false;
+
+            var hud = panel.gameObject.AddComponent<ScoreHud>();
+            var so = new SerializedObject(hud);
+            ScoreRow(so.FindProperty("_practical"), "Practical", panel, font, 20f, new Color(0.45f, 0.75f, 1f));
+            ScoreRow(so.FindProperty("_written"), "Written", panel, font, 370f, new Color(1f, 0.8f, 0.3f));
+            so.ApplyModifiedPropertiesWithoutUndo();
+        }
+
+        private static void ScoreRow(SerializedProperty row, string name, RectTransform panel, TMP_FontAsset font, float x, Color fillColor)
+        {
+            var text = Text(name + "Text", panel, font, "", 24, TextAlignmentOptions.Left);
+            Place(text.rectTransform, new Vector2(0f, 0.5f), new Vector2(0f, 0.5f), new Vector2(x, 0f), new Vector2(150f, 40f));
+            var track = Panel(name + "Bar", panel, new Color(1f, 1f, 1f, 0.15f));
+            Place(track, new Vector2(0f, 0.5f), new Vector2(0f, 0.5f), new Vector2(x + 150f, 0f), new Vector2(170f, 18f));
+            var fill = Panel("Fill", track, fillColor);
+            fill.anchorMin = Vector2.zero;
+            fill.anchorMax = new Vector2(0f, 1f);
+            fill.offsetMin = fill.offsetMax = Vector2.zero;
+            row.FindPropertyRelative("Text").objectReferenceValue = text;
+            row.FindPropertyRelative("Fill").objectReferenceValue = fill;
+        }
+
+        private static void BuildCreatureDialog(Transform canvas, TMP_FontAsset font)
+        {
+            var panel = Panel("CreatureDialog", canvas, new Color(0.08f, 0.09f, 0.18f, 0.95f));
+            Place(panel, new Vector2(0.5f, 0f), new Vector2(0.5f, 0f), new Vector2(0f, 170f), new Vector2(1100f, 190f));
+            var next = panel.gameObject.AddComponent<Button>();
+
+            var speaker = Text("Speaker", panel, font, "", 26, TextAlignmentOptions.TopLeft);
+            speaker.color = new Color(1f, 0.85f, 0.25f);
+            Place(speaker.rectTransform, new Vector2(0f, 1f), new Vector2(0f, 1f), new Vector2(24f, -14f), new Vector2(400f, 36f));
+            var line = Text("Line", panel, font, "", 26, TextAlignmentOptions.TopLeft);
+            Place(line.rectTransform, new Vector2(0f, 1f), new Vector2(0f, 1f), new Vector2(24f, -58f), new Vector2(1052f, 90f));
+            var hint = Text("Hint", panel, font, "", 18, TextAlignmentOptions.BottomRight);
+            hint.color = new Color(1f, 1f, 1f, 0.6f);
+            Place(hint.rectTransform, new Vector2(1f, 0f), new Vector2(1f, 0f), new Vector2(-20f, 12f), new Vector2(300f, 26f));
+
+            panel.gameObject.AddComponent<CreatureDialogView>()
+                .SetRef("_speaker", speaker)
+                .SetRef("_line", line)
+                .SetRef("_hint", hint)
+                .SetRef("_nextButton", next);
         }
 
         private static void BuildQuestTracker(Transform canvas, TMP_FontAsset font)
@@ -408,6 +498,39 @@ namespace VoxelMagic.EditorTools
                 .SetRef("_title", title)
                 .SetRef("_description", description)
                 .SetRef("_size", size);
+        }
+
+        private static void BuildFishingMinigame(Transform canvas, TMP_FontAsset font)
+        {
+            var root = Panel("FishingMinigame", canvas, new Color(0.1f, 0.12f, 0.16f, 0.85f));
+            Place(root, new Vector2(1f, 0.5f), new Vector2(1f, 0.5f), new Vector2(-60f, -20f), new Vector2(200f, 500f));
+
+            var track = Panel("Track", root, new Color(0.25f, 0.45f, 0.75f, 0.9f));
+            Place(track, new Vector2(0f, 0.5f), new Vector2(0f, 0.5f), new Vector2(30f, -20f), new Vector2(80f, 400f));
+            var catchBar = Panel("CatchBar", track, new Color(0.4f, 1f, 0.45f, 0.6f));
+            Stretch(catchBar);
+            var fish = Panel("FishIcon", track, Color.white);
+            fish.anchorMin = fish.anchorMax = new Vector2(0.5f, 0.5f);
+            fish.pivot = new Vector2(0.5f, 0.5f);
+            fish.sizeDelta = new Vector2(50f, 28f);
+
+            var gauge = Panel("Gauge", root, new Color(0f, 0f, 0f, 0.6f));
+            Place(gauge, new Vector2(0f, 0.5f), new Vector2(0f, 0.5f), new Vector2(130f, -20f), new Vector2(36f, 400f));
+            var fill = Panel("Fill", gauge, Color.green);
+            fill.anchorMin = Vector2.zero;
+            fill.anchorMax = new Vector2(1f, 0.3f);
+            fill.offsetMin = fill.offsetMax = Vector2.zero;
+
+            var hint = Text("Hint", root, font, GameTexts.FishingHint, 18, TextAlignmentOptions.Center);
+            Place(hint.rectTransform, new Vector2(0.5f, 1f), new Vector2(0.5f, 1f), new Vector2(0f, -8f), new Vector2(190f, 52f));
+
+            root.gameObject.AddComponent<FishingMinigameView>()
+                .SetRef("_catchBar", catchBar)
+                .SetRef("_catchBarImage", catchBar.GetComponent<Image>())
+                .SetRef("_fishIcon", fish)
+                .SetRef("_fishImage", fish.GetComponent<Image>())
+                .SetRef("_gaugeFill", fill)
+                .SetRef("_gaugeImage", fill.GetComponent<Image>());
         }
 
         private static void BuildRequestBoardWindow(Transform canvas, TMP_FontAsset font)

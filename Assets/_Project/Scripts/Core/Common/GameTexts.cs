@@ -44,6 +44,17 @@ namespace VoxelMagic.Core
         public const string TrackerCollapsed = "▶";
         public const string TrackerCompleted = "완료!";
 
+        public const string PracticalLabel = "실기";
+        public const string WrittenLabel = "필기";
+        public const string ScoreFormat = "{0} {1}/{2}";
+
+        public const string CreatureName = "'그것'";
+        public const string DialogNext = "E / 클릭: 다음";
+        public const string DialogClose = "E / 클릭: 닫기";
+        public const string MaterialNoteFormat = "[{0}] {1}";
+
+        public const string FishingHint ="스크롤로 바를 움직여\n물고기를 잡아라!";
+
         public const string AcquiredFormat = "{0} 획득!";
         public const string SizeFormat = "크기 {0:0.#}cm";
 
