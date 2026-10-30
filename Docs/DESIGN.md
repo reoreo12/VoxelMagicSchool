@@ -34,7 +34,7 @@
 | `FishWeight`(연못 출현 가중치), `GameTexts`(한국어 문구 모음), `RequestTypes`(결과 열거형·진행 상황) 추가 | 출현 확률을 데이터로 조절하고, 문구를 한 파일에서 고칠 수 있게 |
 | `GameContext.Create(...)` 정적 생성 메서드 | 조립 순서를 Core 한 곳에 두어 부트스트랩을 얇게 유지 |
 | `PrototypeSceneBuilder` 에디터 도구 추가 (메뉴: VoxelMagic/프로토타입 씬 다시 만들기) | 그레이박스 배치를 코드로 남겨 언제든 같은 씬을 다시 만들 수 있게. 설정 에셋은 없을 때만 만든다 |
-| 한글 폰트 = OS 맑은 고딕을 참조하는 TMP **DynamicOS** 폰트 에셋 (`_Project/Fonts/MalgunGothic SDF.asset`) | 폰트 파일 복사·다운로드 없이 에디터와 실행 중 모두 한글 표시. 런타임 폰트 적용 컴포넌트가 필요 없어짐 |
+| ~~한글 폰트 = OS 맑은 고딕 TMP DynamicOS 폰트 에셋~~ → **Pretendard(OFL) 고정(Static) 폰트 에셋** (`_Project/Fonts/Pretendard SDF.asset`, 원본 `Fonts/Pretendard/`) | 동적 에셋은 플레이할 때마다 글자가 추가돼 파일이 바뀌고, 맑은 고딕은 게임에 넣어 배포할 수 없는 폰트라서 교체. 한글 2,350자·영문·기호 + 게임 문구·데이터에 쓰인 글자를 미리 구워 두어 플레이해도 파일이 바뀌지 않음. 다른 PC에 폰트가 없어도 표시됨 |
 | `RequestBoard` 상호작용(안내·창 열기 요청)을 6단계에서 먼저 구현 | 상호작용 시스템을 실제 대상으로 확인하기 위해. 게시판 창 UI는 7단계 |
 | 입질 오기 전(던지는 중·기다리는 중) E → 낚싯대 거두기 (`FishingSession.PressInteract`에서 `Cancel()`) | 스펙에는 이동 키로만 취소했지만, 연못 앞에 선 채로 바로 거둘 수 있게 하려고 추가 (사용자 직접 구현). 입질 중 E(미니게임 시작)와 결과 중 E(다시 던지기)는 그대로 |
 | 낚시 결과 유지 시간 = `GameBalanceConfig.AcquiredInfoSeconds` | 획득 정보 UI가 떠 있는 동안만 E로 다시 던지기가 되도록 두 값을 하나로 묶었다 |
@@ -167,7 +167,7 @@ VoxelMagic.Editor ─────► Core (+ 필요 시 Gameplay, UI)   ※ 에�
 
 | 이름 | 종류 | 어셈블리 | 한 줄 역할 |
 |---|---|---|---|
-| `KoreanFontAssetBuilder` | 에디터 클래스 | Editor | 맑은 고딕(OS 폰트)으로 TMP 동적 폰트 에셋을 만드는 메뉴. 다운로드 없음 |
+| `KoreanFontAssetBuilder` | 에디터 클래스 | Editor | Pretendard로 TMP 고정 폰트 에셋을 굽는 메뉴(VoxelMagic/한글 폰트 다시 굽기). 다시 구워도 GUID 유지 |
 | `InventoryTests` | 테스트 | Tests | 겹쳐 쌓기, 가득 참, 제거, 선택 |
 | `FarmGridTests` | 테스트 | Tests | 1×1·1×2·2×2 배치, 격자 밖, 겹침, 뽑은 뒤 칸 비움 |
 | `RequestTrackerTests` | 테스트 | Tests | 동시 1개 제한, 씨앗 지급, 진행 계산, 전달 조건 |
