@@ -1,0 +1,54 @@
+// 복도 맵 설정: 이미지 임포트, 레이어 Z·정렬 순서, 패럴랙스, 카메라 따라가기, 디버그 표시.
+using UnityEngine;
+
+namespace VoxelMagic.Core
+{
+    [CreateAssetMenu(menuName = "VoxelMagic/SideScroll/Corridor Config", fileName = "CorridorConfig")]
+    public sealed class CorridorConfig : ScriptableObject
+    {
+        [Header("이미지 임포트 (바꾸면 메뉴로 다시 적용)")]
+        [SerializeField, Min(1f)] private float _pixelsPerUnit = 300f;
+        [SerializeField] private FilterMode _corridorFilter = FilterMode.Point;
+        [SerializeField] private FilterMode _backdropFilter = FilterMode.Point;
+        [SerializeField] private int _maxTextureSize = 4096;
+
+        [Header("레이어")]
+        [SerializeField] private float _corridorZ = 1f;
+        [SerializeField] private int _corridorSortingOrder = 0;
+        [SerializeField] private float _backdropZ = 5f;
+        [SerializeField] private int _backdropSortingOrder = -10;
+
+        [Header("창밖 배경")]
+        [Tooltip("1 = 복도와 함께 지나감, 0 = 화면에 붙어 안 움직임")]
+        [SerializeField, Range(0f, 1f)] private float _backdropParallax = 0.3f;
+        [SerializeField] private float _backdropOffsetY = 0f;
+        [SerializeField, Min(0.1f)] private float _backdropScale = 1f;
+        [SerializeField, Min(2)] private int _backdropCopies = 3;
+
+        [Header("이동 범위·카메라")]
+        [Tooltip("복도 양 끝에서 캐릭터가 멈추는 안쪽 거리 (유닛)")]
+        [SerializeField, Min(0f)] private float _endMargin = 2.56f;
+        [SerializeField] private float _cameraZ = -10f;
+        [SerializeField, Min(0f)] private float _cameraFollowTime = 0.15f;
+
+        [Header("디버그")]
+        [SerializeField] private bool _showStateDebug = true;
+
+        public float PixelsPerUnit => _pixelsPerUnit;
+        public FilterMode CorridorFilter => _corridorFilter;
+        public FilterMode BackdropFilter => _backdropFilter;
+        public int MaxTextureSize => _maxTextureSize;
+        public float CorridorZ => _corridorZ;
+        public int CorridorSortingOrder => _corridorSortingOrder;
+        public float BackdropZ => _backdropZ;
+        public int BackdropSortingOrder => _backdropSortingOrder;
+        public float BackdropParallax => _backdropParallax;
+        public float BackdropOffsetY => _backdropOffsetY;
+        public float BackdropScale => _backdropScale;
+        public int BackdropCopies => _backdropCopies;
+        public float EndMargin => _endMargin;
+        public float CameraZ => _cameraZ;
+        public float CameraFollowTime => _cameraFollowTime;
+        public bool ShowStateDebug => _showStateDebug;
+    }
+}

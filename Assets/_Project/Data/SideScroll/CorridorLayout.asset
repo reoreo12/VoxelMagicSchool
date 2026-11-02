@@ -1,0 +1,29 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7e4c75817e45f5a4d914940c65b3b86d, type: 3}
+  m_Name: CorridorLayout
+  m_EditorClassIdentifier: 
+  _tiles:
+  - _sprite: {fileID: 21300000, guid: cbf8238f76ce1f941b6fe891a5e50297, type: 3}
+    _flipX: 0
+  - _sprite: {fileID: 21300000, guid: 60ad5e3296b75774f90266f9eeba4e0b, type: 3}
+    _flipX: 0
+  - _sprite: {fileID: 21300000, guid: 1b914d458ddf5eb478c4fc77f80c334c, type: 3}
+    _flipX: 0
+  - _sprite: {fileID: 21300000, guid: 215df80095551ea4e96c29195cea679f, type: 3}
+    _flipX: 0
+  - _sprite: {fileID: 21300000, guid: 60ad5e3296b75774f90266f9eeba4e0b, type: 3}
+    _flipX: 0
+  - _sprite: {fileID: 21300000, guid: 1b914d458ddf5eb478c4fc77f80c334c, type: 3}
+    _flipX: 0
+  - _sprite: {fileID: 21300000, guid: cbf8238f76ce1f941b6fe891a5e50297, type: 3}
+    _flipX: 1

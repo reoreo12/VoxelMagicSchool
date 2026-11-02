@@ -1,0 +1,400 @@
+# 설계 문서 — 게임플레이 프로토타입 2 (2D 횡스크롤 복도 + 기본 도형 캐릭터)
+
+> 상태: **제작 중** (2026-11-02 "제작 시작" 승인. 1단계 복도 맵(임포트·복도·카메라·패럴랙스) 완료, 캐릭터 단계 대기)
+> 기준 문서: `CORRIDOR_SIDESCROLL_SPEC.md`
+> 작성일: 2026-11-02
+
+---
+
+## 0. 프로젝트 환경 (파일로 확인, 읽기만 함)
+
+| 항목 | 확인 결과 | 이번 작업에 주는 영향 |
+|---|---|---|
+| Unity | 6000.0.38f1 | — |
+| 렌더 파이프라인 | URP 17.0.3, `PC_Renderer` (Universal, 3D용 렌더러) | 3D 렌더러에서도 SpriteRenderer는 그대로 그려진다. 2D 렌더러로 바꾸지 않는다 (설정 변경 없음) |
+| 입력 | Both (구 Input Manager + Input System 1.13.0) | 새 Input System 그대로 사용 |
+| 입력 에셋 | `_Project/Input/GameControls.inputactions` — `Gameplay` 맵 1개 (Move 2D WASD·방향키, Interact E, Slot1~5, Scroll, ToggleTracker Q, Cancel Esc) | 아래 2-5에서 새 액션 맵 추가 제안 |
+| 어셈블리 | `VoxelMagic.Core` / `Gameplay`(→Core) / `UI`(→Core) / `Editor` / `Tests`(→Core) | **새 asmdef 없이** 하위 폴더만 추가 |
+| 정렬 레이어 (Sorting Layer) | `Default` 하나뿐 | 정렬 레이어를 새로 만들면 프로젝트 설정 변경이라, **`Default` + 정렬 순서 숫자만** 쓴다 |
+| 한글 폰트 | `Fonts/Pretendard SDF.asset` (고정 아틀라스) | 그대로 사용. 새 문구에 목록 밖 글자가 있으면 `VoxelMagic/한글 폰트 다시 굽기` |
+| 프로토타입 1 재사용 후보 | `ControlsHintView`(조작법 표시), `IGameContextBinder` 방식 조립, `UIPanel` | 2-6 참고 |
+
+### 확인 결과 (2026-11-02)
+- **MCP 연결**: `VoxelMagicSchool@2d926515` 지정, `Application.dataPath` = `C:/Unity_Project/NCAI/VoxelMagicSchool/Assets` 확인.
+- **이미지 5개** (파일을 직접 읽어 확인, 임포트 설정은 아직 기본값 그대로):
+
+| 파일 | 크기 | 알파 | 비고 |
+|---|---|---|---|
+| `tile_window_glass.png` | 1536×864 | 반투명 픽셀 384,796개, 알파 90 (=0.35) | 반투명은 위에서 95–530px 안에만 있음 (유리 영역) |
+| `tile_door_glass.png` | 1536×864 | 반투명 108,066개, 알파 0.35 | 같음 |
+| `tile_locker_glass.png` | 1536×864 | 반투명 278,167개, 알파 0.35 | 같음 |
+| `tile_wall.png` | 1536×864 | 모두 불투명 | — |
+| `bg_day_loop.png` | **2688×864** | 모두 불투명 | 오른쪽 끝 열과 왼쪽 첫 열의 색 차이(19.1)가 이웃한 두 열의 차이(18.3)와 비슷 → 이음매 없이 반복됨 |
+
+- 완전히 투명한 픽셀(알파 0)은 없다. 유리 밖(벽·바닥)은 모두 불투명.
+- **주의**: 현재 임포트 최대 크기가 기본 2048이라 **배경(폭 2688)이 줄어들어 들어온다.** 임포트 설정에서 최대 크기를 **4096**으로 올린다 (아래 4번에 반영).
+
+### 결정 사항 (2026-11-02 사용자)
+| 항목 | 결정 |
+|---|---|
+| 이미지 기준점 | **Bottom Center** |
+| 입력 | `GameControls.inputactions`에 **`SideScroll` 맵 추가 승인**. 기존 `Gameplay` 맵은 건드리지 않음 |
+| 조작법 안내 | **새 컴포넌트** `SideScrollHintView`. 프로토타입 1 안내와 합치는 방법은 9번 확장 지점에 적음 |
+| 정렬 레이어 | 추가하지 않음. `Default` + 정렬 순서 숫자 |
+| 폴더 | `Animations/SideScroll/` 추가 승인 |
+| 필터 | **Point로 시작.** 깜빡임이 보이면 ① 배경만 Bilinear ② 복도까지 Bilinear 두 경우를 비교해 보고 (필터는 이미지별 임포트 설정이라 코드 수정 없이 바꿈) |
+
+---
+
+## 0-1. 구현하며 바뀐 점
+
+| 변경 | 이유 |
+|---|---|
+| `ParallaxBackdrop`은 `ISideScrollBinder`가 아니고 카메라를 직접 참조 | 필요한 값이 카메라 위치·화면 폭뿐이고, 에디터 미리보기에서도 같은 코드로 위치를 정하려면 컨텍스트 없이 동작해야 한다 |
+| `CorridorConfig`에 필터(복도·배경 따로)와 최대 텍스처 크기 추가 | Point/Bilinear 비교를 코드 수정 없이 설정값 + 메뉴(`VoxelMagic/복도/이미지 임포트 설정 적용`)로 하기 위해 |
+| `SideScrollContext`는 지금 설정·복도 범위만 가짐 | 상태 머신·이동 계산기는 캐릭터 단계에서 추가 |
+| `CorridorBounds` 구조체 추가 (Core) | 카메라 제한과 캐릭터 이동 범위가 같은 값을 쓰도록 |
+| 씬 생성기는 새 씬을 연 **뒤에** 데이터 에셋을 읽음 | 새 씬을 열면 쓰지 않는 에셋이 메모리에서 내려가 미리 읽은 참조가 풀렸다 (설정 참조가 비어 복도가 안 만들어지던 문제) |
+
+## 1. 단위와 좌표 (모든 숫자는 설정 에셋에서 바뀜)
+
+- **PPU(Pixels Per Unit, 1유닛에 들어가는 픽셀 수) = 300** → 타일 1536×864px = **5.12 × 2.88 유닛**.
+- 복도 7칸 = **35.84 유닛**. 복도 바닥 왼쪽 끝을 월드 원점 (x=0, y=0)으로 둔다.
+- 타일 세로 띠를 바닥 기준(y, 유닛)으로 바꾸면:
+
+| 띠 | 이미지 px (위에서) | 월드 y (유닛) |
+|---|---|---|
+| 바닥 띠 | 788–864 | 0 – 0.253 |
+| 걸레받이 | 743–788 | 0.253 – 0.403 |
+| 징두리 | 541–743 | 0.403 – 1.077 |
+| 베이지 벽 | 33–541 | 1.077 – 2.770 |
+| 천장 띠 | 0–33 | 2.770 – 2.880 |
+| 창 유리 영역 | 100–523 | 1.137 – 2.547 |
+
+- 캐릭터 발 높이 **y = 0.12** (바닥 띠 가운데쯤. 벽 앞 바닥을 딛고 선 것처럼 보임) → `CharacterMoveConfig.GroundY`.
+- 방향: 카메라는 **+Z를 바라본다** (복도 정면). 화면 오른쪽 = +X, 위 = +Y, 멀리 = +Z.
+
+---
+
+## 2. 구조
+
+### 2-1. 클래스 목록
+
+**Core** (`Scripts/Core/SideScroll/`, 일반 C# + 데이터 SO, Unity 입력 장치를 모름)
+
+| 이름 | 종류 | 한 줄 역할 |
+|---|---|---|
+| `MoveIntent` | 구조체 | 한 프레임의 입력 값: 방향(-1/0/1), 달리기 여부. 입력 장치와 상태 머신 사이의 약속 |
+| `Facing` | 열거형 | `Left` / `Right` 두 값만 |
+| `CharacterStateId` | 열거형 | `Idle`, `Walk`, `Run` (나중에 `Jump`, `Interact`, `CastSpell` 추가) |
+| `ICharacterState` | 인터페이스 | `Id`, `Enter()`, `Tick(dt)`, `Exit()`, `Evaluate(intent)` → 다음 상태 Id |
+| `CharacterStateBase` | 추상 클래스 | 상태 공통: 이동 계산기·설정 참조, 기본 Enter/Exit(빈 동작) |
+| `IdleState` | 클래스 | 감속해 멈춤. 이동 입력이 오면 Walk/Run으로 |
+| `MoveStateBase` | 추상 클래스 | Walk/Run 공통: 목표 속도로 가속. 목표 속도만 자식이 정함 |
+| `WalkState` / `RunState` | 클래스 | 걷기 속도 / 달리기 속도. 서로 Shift로 오감 |
+| `CharacterStateMachine` | 클래스 | 상태 등록·전환. `StateChanged(이전, 다음)`, `FacingChanged(방향)` 이벤트 |
+| `SideScrollMotor` | 클래스 | x 위치·속도만 가진 이동 계산기. 가속·감속·양 끝 제한. **Y·Z를 아예 갖지 않음** |
+| `SideScrollMath` | 정적 클래스 | 패럴랙스 위치, 배경 반복 배치, 카메라 x 제한, 직교 크기 계산 (테스트 대상) |
+| `SideScrollContext` | 클래스 | 위 객체 묶음. 부트스트랩이 한 번 만들어 나눠 줌 (프로토타입 1의 `GameContext`와 같은 방식) |
+| `ISideScrollBinder` | 인터페이스 | `Bind(SideScrollContext)` — 컨텍스트를 받는 컴포넌트 표시 |
+| `SideScrollTexts` | 정적 클래스 | 조작법·상태 이름 한국어 문구 (프로토타입 1의 `GameTexts`는 건드리지 않음) |
+| `CorridorLayout` | ScriptableObject | 타일 목록: 항목마다 `Sprite`, `FlipX` |
+| `BackdropSet` | ScriptableObject | 창밖 배경 세트(낮/밤): 스프라이트, 하늘 대체 색 |
+| `CorridorConfig` | ScriptableObject | PPU, 레이어 Z·정렬 순서, 패럴랙스 계수, 배경 세로 오프셋·배율, 복사본 수, 양 끝 여유, 카메라 따라가기 시간, 상태 표시 켜기 |
+| `CharacterMoveConfig` | ScriptableObject | 걷기·달리기 속도, 가속·감속, 발 높이(GroundY), 캐릭터 Z, 좌우 회전 각도(±90) |
+| `CharacterAnimationConfig` | ScriptableObject | 상태별 팔·다리 각도, 한 주기 시간, 몸통 오르내림, 달리기 기울기, 전환 섞기 시간 |
+
+**Gameplay** (`Scripts/Gameplay/SideScroll/`, MonoBehaviour — Unity와 연결만)
+
+| 이름 | 한 줄 역할 |
+|---|---|
+| `CorridorBootstrap` | 조립 지점. 설정·데이터를 읽어 `SideScrollContext`를 만들고 `ISideScrollBinder`들에게 나눠 줌 |
+| `SideScrollInputReader` | 새 Input System의 `SideScroll` 맵을 읽어 `MoveIntent`로 바꾸는 유일한 곳. W/S는 읽지 않음 |
+| `SideScrollCharacter` | 캐릭터 루트. 매 프레임 입력 → 상태 머신 → x 위치 적용. 루트 회전을 ±90°로만 정함 |
+| `CharacterAnimatorView` | `StateChanged`를 받아 Animator 상태를 섞어 바꾸기만 함 (상태 결정 안 함) |
+| `CorridorBuilder` | `CorridorLayout`을 읽어 타일 SpriteRenderer를 타일 폭 간격으로 배치. 복도 범위(Bounds) 계산 |
+| `ParallaxBackdrop` | `BackdropSet` 스프라이트 복사본 N장을 패럴랙스 계수로 움직이고 화면 밖 장을 반대편으로 옮김 |
+| `SideScrollCamera` | 직교 크기를 복도 높이에 맞추고, x만 부드럽게 따라가며 복도 범위로 제한 |
+
+**UI** (`Scripts/UI/SideScroll/`)
+
+| 이름 | 한 줄 역할 |
+|---|---|
+| `StateDebugView` | 현재 상태 이름을 화면 구석에 표시 (`StateChanged` 구독, 설정으로 끔) |
+| `SideScrollHintView` | 왼쪽 아래 조작법 안내. 문구는 `SideScrollTexts.ControlsHint` (프로토타입 1의 `ControlsHintView`와 같은 모양) |
+
+**Editor** (`Scripts/Editor/SideScroll/`)
+
+| 이름 | 한 줄 역할 |
+|---|---|
+| `CorridorSpriteImportTool` | 메뉴: Art/Corridor·Art/Backdrop 이미지에 임포트 설정 일괄 적용 (PPU는 `CorridorConfig`에서 읽음) |
+| `SideScrollCharacterBuilder` | 메뉴: 기본 도형 캐릭터 프리팹 생성 (이미 있으면 덮어쓰지 않음) |
+| `CharacterAnimationBuilder` | 메뉴: `CharacterAnimationConfig`로 Idle/Walk/Run 클립과 Animator Controller 생성·갱신 |
+| `CorridorSceneBuilder` | 메뉴: `Corridor_SideScroll` 씬 생성 (프로토타입 1의 씬 생성기와 같은 방식) |
+
+**Tests** (`Tests/SideScroll/`, 기존 `VoxelMagic.Tests` 어셈블리에 폴더만 추가)
+
+| 이름 | 확인 내용 |
+|---|---|
+| `CharacterStateMachineTests` | Idle↔Walk↔Run 전이, 방향 즉시 전환, 양 끝에 막히면 Idle, 이벤트 발생 순서 |
+| `SideScrollMotorTests` | 가속·감속, 최고 속도, 양 끝 제한 |
+| `SideScrollMathTests` | 패럴랙스 계수 0/0.3/1, 배경 반복 배치에 빈틈 없음, 카메라 x 제한, 복도보다 화면이 넓을 때 |
+
+### 2-2. 상속·구현 구조도
+
+```
+ICharacterState (인터페이스)
+└─ CharacterStateBase (추상)                 ← 깊이 1
+   ├─ IdleState
+   └─ MoveStateBase (추상)                    ← 깊이 2 (최대)
+      ├─ WalkState
+      └─ RunState
+
+ScriptableObject
+├─ CorridorLayout, BackdropSet
+└─ CorridorConfig, CharacterMoveConfig, CharacterAnimationConfig
+
+MonoBehaviour
+├─ CorridorBootstrap
+├─ SideScrollInputReader
+├─ SideScrollCharacter          : ISideScrollBinder
+├─ CharacterAnimatorView        : ISideScrollBinder
+├─ CorridorBuilder
+├─ ParallaxBackdrop             : ISideScrollBinder (카메라 위치를 받기 위해)
+├─ SideScrollCamera             : ISideScrollBinder
+└─ StateDebugView (UI)          : ISideScrollBinder
+```
+
+### 2-3. 상태 머신
+
+**전이 다이어그램** (`dir` = 이동 방향 -1/0/1, `run` = Shift 누름, "막힘" = 복도 끝에서 그 방향으로 더 못 감)
+
+```
+              dir≠0, run 아님                  run
+   ┌────────┐ ─────────────────▶ ┌────────┐ ─────────▶ ┌────────┐
+   │  Idle  │                    │  Walk  │            │  Run   │
+   └────────┘ ◀───────────────── └────────┘ ◀───────── └────────┘
+       ▲  │      dir=0 또는 막힘                run 뗌        │
+       │  │                                                  │
+       │  └───────────── dir≠0, run ─────────────────────────▶│
+       └──────────────── dir=0 또는 막힘 ──────────────────────┘
+
+[Idle] --이동 입력 있음, Shift 아님--> [Walk]
+[Idle] --이동 입력 있음, Shift 누름--> [Run]     (Walk를 한 프레임 거치면 애니메이션이 깜빡여서 바로 감)
+[Walk] --Shift 누름--> [Run]
+[Run]  --Shift 뗌--> [Walk]
+[Walk/Run] --이동 입력 없음 또는 막힘--> [Idle]
+```
+
+**방향 전환**은 상태가 아니다. 상태 머신이 매 프레임 상태 판단 전에 처리한다: `dir≠0`이고 지금 방향과 다르면 즉시 `Facing`을 바꾸고 `FacingChanged`를 보낸다 → 루트 Y 회전이 그 프레임에 ±90°로 바뀐다 (보간 없음). Idle에서 A를 눌러도 같은 프레임에 돌고 Walk로 간다.
+
+**한 프레임 처리 순서** (`CharacterStateMachine.Update(intent, dt)`)
+1. 막힘 판정: 복도 끝에서 바깥쪽으로 누르면 `dir`을 0으로 본다 (방향 전환은 1단계 전에 원래 `dir`로 처리 → 끝에서도 돌아설 수 있음).
+2. 방향 전환 (위 설명).
+3. `next = Current.Evaluate(intent)` → 다르면 `Current.Exit()` → `next.Enter()` → `StateChanged` 이벤트.
+4. `Current.Tick(dt)` → 이동 계산기가 x를 갱신.
+
+**상태별 Enter / Tick / Exit**
+
+| 상태 | Enter | Tick(dt) | Exit |
+|---|---|---|---|
+| Idle | (없음) — 애니메이션은 이벤트를 받은 View가 바꿈 | 이동 계산기를 감속값으로 0까지 줄임 | (없음) |
+| Walk | (없음) | 목표 속도 = 방향 × 걷기 속도, 가속값으로 다가감 | (없음) |
+| Run | (없음) | 목표 속도 = 방향 × 달리기 속도, 가속값으로 다가감 | (없음) |
+
+Enter/Exit가 지금은 비어 있지만 남겨 두는 이유: Jump(Enter에서 위로 속도 주기), CastSpell(Enter에서 이동 잠그기, Exit에서 풀기)처럼 다음 상태들이 바로 쓴다.
+
+**A와 D를 동시에 누르면**: 서 있는다 (스펙 기본안). Input System의 1D Axis 합성 바인딩이 "둘 다 누르면 0"을 기본으로 지원해서 코드가 필요 없다. "마지막에 누른 키 따르기"는 키 순서를 따로 기록해야 해서 이번에는 넣지 않는다.
+
+### 2-4. 이동
+
+- `SideScrollMotor`는 x와 x 속도만 가진다. `SideScrollCharacter`는 매 프레임 `position = (motor.X, config.GroundY, config.Z)`로 **덮어써서** Y·Z가 바뀔 틈이 없다.
+- 회전도 매 프레임 `rotation = Euler(0, facing == Right ? +90 : -90, 0)`로 덮어쓴다. 다른 축은 코드 어디에서도 건드리지 않는다.
+- 이동 범위: `[복도 왼쪽 + 끝 여유, 복도 오른쪽 - 끝 여유]`. 끝 여유 기본 2.56 (= 문 타일 가운데, 문 앞에서 멈춤).
+
+### 2-5. 입력
+
+`GameControls.inputactions`에 새 액션 맵 `SideScroll` 추가 (기존 `Gameplay` 맵은 그대로):
+
+| 액션 | 종류 | 바인딩 |
+|---|---|---|
+| `Move` | Value(축 1개) | 1D Axis: 음수 A, ←  / 양수 D, → (둘 다 누르면 0) |
+| `Run` | Button | Left Shift (누르는 동안) |
+
+W/S/↑/↓는 이 맵에 **바인딩 자체가 없다** → "읽지 않는다"가 구조로 보장된다.
+
+### 2-6. 화면 구석 UI
+
+- 조작법 안내 (왼쪽 아래, 프로토타입 1과 같은 위치·크기·폰트): `A / ← 왼쪽` · `D / → 오른쪽` · `Shift 누르는 동안 달리기`
+- 상태 이름 (오른쪽 위, 작게): `상태: 걷기` — `CorridorConfig.ShowStateDebug`로 끔
+
+---
+
+## 3. 씬 계층 구조와 핵심 컴포넌트
+
+```
+Corridor_SideScroll.unity
+├─ CorridorBootstrap       [CorridorBootstrap] 설정·데이터 연결, 컨텍스트 조립·배포
+├─ Main Camera             [Camera: 직교, 배경색=하늘 대체 색] [SideScrollCamera] x 따라가기·범위 제한
+├─ Directional Light       [Light] 카메라 쪽에서 비스듬히 → 캐릭터의 보이는 옆면·윗면이 밝음. 그림자 끔
+├─ Input                   [SideScrollInputReader]
+├─ Backdrop  (z=+5)        [ParallaxBackdrop] 복사본 생성·이동
+│   └─ Copy_0..2           [SpriteRenderer] 정렬 순서 -10, 조명 없는 스프라이트 머테리얼
+├─ Corridor  (z=+1)        [CorridorBuilder] 플레이 시작 때 타일 생성 + 에디터 미리보기(씬에 저장 안 함)
+│   └─ Tile_0..6           [SpriteRenderer] 정렬 순서 0, 조명 없는 스프라이트 머테리얼, 마지막 문은 FlipX
+├─ Character (z=0)         프리팹 인스턴스
+└─ HUD Canvas              [Canvas: Screen Space Overlay] [CanvasScaler]
+    ├─ ControlsHint        [TMP 텍스트] [SideScrollHintView]
+    └─ StateLabel          [TMP 텍스트] [StateDebugView]
+```
+
+**캐릭터 프리팹** (`Prefabs/SideScroll/SideScrollCharacter.prefab`) — 로직 루트와 모델 자식을 분리
+
+```
+SideScrollCharacter (루트)  [SideScrollCharacter] [CharacterAnimatorView] [CapsuleCollider 하나만]
+└─ Model                    [Animator: Controller=SideScrollCharacter, Apply Root Motion 끔]  ← 복셀 모델로 교체할 부분
+   ├─ Hips (관절 피벗, y=0.46)
+   │   ├─ LegL_Pivot → Leg(회색) → Shoe(흰색)
+   │   └─ LegR_Pivot → Leg(회색) → Shoe(흰색)
+   └─ Body (피벗, y=0.46 — 숨쉬기 오르내림·달리기 기울기는 여기만)
+       ├─ Torso(남색 블레이저) · Shirt(흰 얇은 판) · Tie(짙은 빨강 얇은 판)
+       ├─ ArmL_Pivot (어깨) → Arm(남색) → Hand(살구색)
+       ├─ ArmR_Pivot (어깨) → Arm(남색) → Hand(살구색)
+       └─ Head_Pivot (목) → Head(살구색) · Hair(검정, 위·뒤) · EyeL · EyeR(검정)
+```
+
+- 모델은 로컬 **+Z를 앞**으로 만든다. 루트 Y 회전 +90° → 오른쪽(+X)을 봄, -90° → 왼쪽(-X)을 봄.
+- 팔·다리는 관절 피벗의 **로컬 X축 회전**만으로 앞뒤로 흔든다.
+- 비율 제안 (키 약 1.6, 머리가 큰 치비 비율):
+
+| 부위 | 크기 (폭 × 높이 × 앞뒤, 유닛) | 위치 |
+|---|---|---|
+| 다리 | 0.17 × 0.40 × 0.20 | 골반 아래 |
+| 운동화 | 0.18 × 0.06 × 0.26 | 다리 끝, 앞으로 살짝 |
+| 몸통(블레이저) | 0.44 × 0.50 × 0.28 | y 0.46–0.96 |
+| 셔츠 / 넥타이 | 0.16 × 0.30 × 0.02 / 0.06 × 0.26 × 0.03 | 몸통 앞면 |
+| 팔 / 손 | 0.13 × 0.40 × 0.15 / 0.13 × 0.11 × 0.13 | 어깨 피벗 아래 |
+| 머리 | 0.56 × 0.56 × 0.56 | y 0.98–1.54 |
+| 머리카락 | 위 0.60 × 0.08 × 0.60, 뒤 0.60 × 0.36 × 0.08 | 머리 위·뒤 → 맨 위 약 1.62 |
+| 눈 | 0.07 × 0.10 × 0.02 | 머리 앞면 |
+
+- 크기·색은 생성된 **프리팹에서 직접** 고친다 (생성기는 프리팹이 없을 때만 만듦). 머테리얼은 단색 URP Lit 6개(살구·검정·남색·흰색·빨강·회색)를 `Materials/SideScroll/`에 만든다.
+
+---
+
+## 4. 레이어 배치표
+
+| 레이어 | Z 위치 | 정렬 레이어 / 순서 | 패럴랙스 계수 | 이미지 | 머테리얼 |
+|---|---|---|---|---|---|
+| Backdrop | +5 | Default / -10 | **0.3** | `bg_day_loop` × 3장 (BackdropSet) | 조명 없는 스프라이트 (`Sprite-Unlit-Default`) |
+| Corridor | +1 | Default / 0 | 1 (월드에 고정, 컴포넌트 없음) | 타일 7칸 (CorridorLayout) | 조명 없는 스프라이트 |
+| Character | 0 | — (3D 메시) | — | 기본 도형 | URP Lit (조명 받음) |
+
+- **패럴랙스 계수**: 화면에서 보이는 이동량 = 카메라 이동량 × 계수. 1이면 복도와 같이 지나가고, 0이면 화면에 붙어 안 움직이고, 0.3이면 복도보다 훨씬 느리게 지나가 멀리 있는 산처럼 보인다.
+  계산: `레이어 x = 카메라 x × (1 − 계수) + 기준 x`.
+- **무한 반복**: 배경 한 장 폭 W(2688px → 8.96유닛)로, 카메라 기준 "지금 화면 왼쪽 끝을 덮는 장의 번호"를 계산해 3장을 `k·W` 간격으로 다시 놓는다. 화면 폭(16:9에서 5.12)보다 W가 넓어 2장이면 충분하지만, 넓은 화면을 위해 장 수는 설정값(기본 3).
+  계산식 하나로 매번 위치를 정하므로 "밀려서 틈이 생기는" 누적 오차가 없다.
+- **세로 위치**: 배경 아래쪽을 바닥(y=0)에 맞추면, 유리창(y 1.14–2.55)으로 배경의 위쪽 100–523px 부분(하늘 조금 + 숲)이 보인다. `BackdropOffsetY`·`BackdropScale`로 조절한다.
+- **그리는 순서**: 캐릭터(불투명 3D)가 먼저 그려지고, 스프라이트(반투명)는 정렬 순서대로 배경 → 복도 순으로 그려진다. 복도가 캐릭터보다 뒤(z=+1)라 깊이 검사에서 캐릭터 부분은 가려지지 않는다.
+- **유리 비침**: 유리는 이미지 자체 알파(약 35%)로 반투명 → 스프라이트 기본 알파 블렌딩만으로 뒤의 배경이 비친다. 별도 셰이더 없음.
+
+### 임포트 설정 (제작 시 메뉴로 일괄 적용)
+Sprite (2D and UI), Single, Full Rect, **PPU 300**(설정 에셋), **Pivot: Bottom Center**, Filter **Point**, 압축 None, Mip Map 끔, Alpha Is Transparency 켬, Wrap Clamp, **최대 크기 4096** (배경 폭 2688이 줄지 않게).
+
+---
+
+## 5. 카메라
+
+- **직교 크기(Orthographic Size, 화면 세로의 절반 길이) = 복도 높이 / 2 = 1.44**, 카메라 y = 1.44 고정. 직교 크기는 세로 기준이라 **화면 비율이 바뀌어도 위아래는 항상 꼭 맞고**, 가로로 보이는 폭만 달라진다 (16:9에서 5.12 = 타일 한 칸).
+- x는 캐릭터를 부드럽게 따라간다 (`SmoothDamp`, 따라가기 시간 설정값).
+- x 범위: `[복도 왼쪽 + 화면 반폭, 복도 오른쪽 − 화면 반폭]`. 화면 반폭은 매 프레임 `직교 크기 × 화면 비율`로 다시 계산해 창 크기를 바꿔도 맞다. 화면이 복도보다 넓으면 복도 가운데에 고정.
+
+---
+
+## 6. 애니메이션
+
+- **"지금 무슨 상태인가"는 Core 상태 머신만 정한다.** `CharacterAnimatorView`는 `StateChanged`를 받아 `Animator.CrossFadeInFixedTime(상태 이름, 섞기 시간)`만 부른다. Animator Controller에는 **전이 화살표·파라미터가 없다** (Animator가 따로 판단하면 상태가 둘이 돼서 어긋남).
+- 클립은 `CharacterAnimationBuilder`가 `CharacterAnimationConfig` 값으로 만든다. 값을 바꾸면 메뉴로 다시 만든다.
+
+| 상태 | 움직임 (기본값) | 한 주기 |
+|---|---|---|
+| Idle | Body y ±0.012 숨쉬기, 팔 ±2° | 2.4초 |
+| Walk | 팔·다리 ±25° (팔과 다리는 반대 방향, 왼쪽·오른쪽도 반대), Body y ±0.02 | 0.8초 |
+| Run | 팔·다리 ±45°, Body 앞으로 10° 기울기, Body y ±0.04 | 0.5초 |
+
+- 상태 전환 섞기 0.12초 (설정값).
+
+---
+
+## 7. 설계에서 고민한 선택지
+
+| 주제 | 고른 것 | 다른 방법 | 고른 이유 |
+|---|---|---|---|
+| 카메라 | **직교 + 스크립트 패럴랙스** | 원근 + 레이어를 실제 깊이에 배치 | 원근에서는 깊이마다 크기가 달라져 복도 타일 이음매와 픽셀 크기가 정확히 맞지 않는다. 직교는 계수 하나로 속도를 바로 조절할 수 있다 |
+| 이미지 표시 | **SpriteRenderer** | 텍스처 입힌 Quad | 알파, 정렬 순서, 좌우 반전(FlipX)이 기본 기능. Quad는 머테리얼·UV를 직접 다뤄야 한다 |
+| 캐릭터 애니메이션 | **Animator + 생성 도구로 만든 클립** | 코드로 팔다리 각도를 계산 (절차적) | 애니메이션 창에서 눈으로 확인·수정할 수 있고, 복셀 모델로 바꿀 때 클립만 교체하면 된다. 단점: 값을 바꾸면 메뉴로 클립을 다시 만들어야 한다 (절차적 방식은 플레이 중 바로 반영) |
+| 이동 처리 | **Transform 직접 이동 + 범위 제한** | Rigidbody (Z 이동·회전 고정) | 부딪힐 것이 복도 양 끝뿐이라 물리가 필요 없다. 물리 엔진은 미세한 밀림·회전이 생길 수 있어 "Y·Z 절대 불변" 보장이 오히려 어렵다. 충돌체는 나중 상호작용 감지용으로 루트에 하나만 둔다 |
+| 입력 맵 위치 (승인) | **기존 `GameControls`에 `SideScroll` 맵 추가** | 새 `.inputactions` 에셋 | 키 설정이 한 곳에 모여 나중에 키 변경 화면을 만들기 쉽다. 기존 `Gameplay` 맵은 건드리지 않아 프로토타입 1 동작은 그대로 |
+| 조작법 안내 (승인) | **새 작은 컴포넌트 `SideScrollHintView`** (UI/SideScroll) | `ControlsHintView`에 "문구 종류" 필드를 추가해 재사용 | 기존 컴포넌트는 `GameTexts.ControlsHint` 하나만 읽게 고정돼 있어 재사용하려면 프로토타입 1 스크립트를 고쳐야 한다. 코드가 짧아 고쳐서 얻는 이득이 작다. 겉모양(위치·크기·폰트)은 같게 만든다 |
+| 복도 생성 시점 | **플레이 시작 때 생성 + 에디터 미리보기** | 에디터 메뉴로 씬에 구워 두기 | 데이터(CorridorLayout)가 유일한 기준이 된다. 미리보기 오브젝트는 씬 파일에 저장하지 않아(HideFlags) 데이터와 씬이 어긋날 일이 없다 |
+| 이미지 기준점(Pivot) (승인) | **Bottom Center** (스펙 기본안 Bottom Left 대신) | Bottom Left | SpriteRenderer의 FlipX는 기준점을 축으로 뒤집는다. 왼쪽 아래 기준이면 반전된 마지막 문이 한 칸 왼쪽으로 튀어 위치 보정 코드가 필요하다. 가운데 아래 기준이면 `x = (i + 0.5) × 폭`으로 반전 여부와 관계없이 같은 계산 |
+| 정렬 레이어 (승인) | **Default + 정렬 순서 숫자** | Backdrop/Corridor 정렬 레이어 추가 | 정렬 레이어 추가는 프로젝트 설정 변경이다. 레이어가 둘뿐이라 숫자로 충분하다 |
+| 끝에서 바깥으로 누를 때 | **Idle (제자리 걸음 안 함)** | Walk 유지 | 벽에 대고 걷는 동작이 어색하다. 방향 전환은 그대로 되므로 반대쪽으로 바로 돌아설 수 있다 |
+| 필터 모드 (승인) | **Point로 시작** | Bilinear | 픽셀이 또렷하다. 단, 864px 이미지를 1080px 화면에 그리면 1.25배라 픽셀 크기가 고르지 않고, 느리게 움직이는 배경에서 미세한 깜빡임이 보일 수 있다. 보이면 ① 배경만 Bilinear ② 복도까지 Bilinear를 같은 장면 캡처로 비교해 보고한다 |
+
+---
+
+## 8. 디자인 패턴
+
+| 패턴 | 적용한 클래스 | 왜 썼는지 | 안 쓰면 생기는 문제 |
+|---|---|---|---|
+| **상태 패턴** (State, 상태마다 클래스를 두고 같은 인터페이스로 다룸) | `ICharacterState`, `IdleState`, `WalkState`, `RunState`, `CharacterStateMachine` | 상태별 동작과 전이 조건이 각 클래스에 모인다. 새 상태는 클래스 추가로 끝난다 | `switch`와 `if`가 한 메서드에 쌓여, Jump·CastSpell을 넣을 때마다 모든 분기를 다시 확인해야 한다 |
+| **템플릿 메서드** (공통 흐름은 부모, 다른 부분만 자식) | `MoveStateBase` → `WalkState`/`RunState` (목표 속도만 다름) | 가속·방향 처리 코드를 한 번만 쓴다 | 걷기·달리기에 같은 코드가 복사돼 한쪽만 고치는 실수가 생긴다 |
+| **옵저버 / 이벤트** (상태가 바뀌면 알리고, 관심 있는 쪽이 구독) | `StateChanged`, `FacingChanged` → `CharacterAnimatorView`, `StateDebugView`, `SideScrollCharacter` | 상태 결정(Core)과 표현(애니메이션·UI)을 분리. Core는 누가 듣는지 모른다 | 상태 머신이 Animator·UI를 직접 불러 Core가 Unity 화면 코드에 묶이고 단위 테스트가 불가능해진다 |
+| **어댑터** (다른 형태의 값을 우리 약속 형태로 바꿈) | `SideScrollInputReader` → `MoveIntent` | 입력 장치(키보드·패드)를 바꿔도 Core는 그대로. 테스트에서 가짜 입력을 바로 넣을 수 있다 | 상태 머신이 `Keyboard.current`를 직접 읽어 테스트할 수 없고, 키 변경이 로직 수정이 된다 |
+| **데이터 주도 설계** (동작을 코드가 아닌 데이터 에셋으로 정함) | `CorridorLayout`, `BackdropSet`, 설정 SO 3종 | 타일 순서, 밤 배경, 속도·계수를 코드 수정 없이 인스펙터에서 바꾼다 | 숫자와 순서가 코드에 박혀 바꿀 때마다 컴파일·코드 리뷰가 필요하다 |
+| **컴포지션 루트 + 의존성 주입** (객체 조립을 한 곳에서 하고 필요한 쪽에 넣어 줌) | `CorridorBootstrap`, `SideScrollContext`, `ISideScrollBinder` | 누가 무엇을 쓰는지 한 파일에서 보인다. `FindObjectOfType`·싱글턴이 없다 | 컴포넌트마다 서로를 찾아다녀 실행 순서 문제와 숨은 의존이 생긴다 |
+| **팩토리 / 빌더** (데이터를 보고 오브젝트를 만들어 냄) | `CorridorBuilder`, 에디터 생성 도구들 | 같은 데이터로 언제든 같은 결과를 다시 만든다 | 씬에 손으로 배치한 것과 데이터가 어긋난다 |
+| **재활용** (만든 오브젝트를 버리지 않고 위치만 옮겨 다시 씀 — 오브젝트 풀과 같은 발상) | `ParallaxBackdrop`의 배경 복사본 3장 | 무한히 이어지는 배경을 고정 개수로 처리. 생성·삭제 없음 | 걸어갈수록 배경 오브젝트를 새로 만들고 지워 끊김·메모리 낭비가 생긴다 |
+
+---
+
+## 9. 확장 지점
+
+| 나중에 할 일 | 고칠 곳 |
+|---|---|
+| **밤 배경으로 교체** | `BackdropSet` 에셋을 하나 더 만든다 (밤 스프라이트, 하늘 대체 색). `ParallaxBackdrop.SetBackdrop(set)`을 부르거나 부트스트랩에 연결된 세트를 바꾼다. 코드 수정 없음 |
+| **복도 끝 문 → 다른 맵** | `CorridorLayout` 항목에 "출구 Id" 필드 추가 → `CorridorBuilder`가 그 타일 위치에 문 상호작용 오브젝트(프로토타입 1의 `IInteractable` 재사용)를 놓는다. 이동 범위의 끝 여유를 문 앞으로 맞추고, 씬 이동 서비스 하나를 Core에 추가 |
+| **조작법 안내를 프로토타입 1과 합치기** | 문구를 "조작법 묶음" 데이터(SO, 줄 목록)로 옮기고, `ControlsHintView`와 `SideScrollHintView`를 하나의 `ControlsHintView(묶음 참조)`로 합친다. 씬마다 다른 묶음을 연결하면 된다. 합칠 때 프로토타입 1 씬의 안내 오브젝트에 묶음을 연결하는 작업이 필요 (프로토타입 1 수정이라 그때 승인) |
+| **복도 NPC·상호작용** | 프로토타입 1의 `IInteractable`/`InteractableBase`를 그대로 쓴다. 거리 계산이 이미 위치 기반이라 x만 쓰는 복도에서도 동작. 입력 맵에 `Interact` 추가 |
+| **Jump 상태 추가** | ① `CharacterStateId.Jump` ② `JumpState : CharacterStateBase` (Enter에서 위 속도, Tick에서 중력, 착지하면 Idle/Walk) ③ `MoveIntent`에 `JumpPressed` ④ Idle/Walk/Run의 `Evaluate`에 "점프 누름 → Jump" 한 줄씩 ⑤ 상태 머신 생성 시 등록 ⑥ `SideScrollMotor`에 y 속도 추가 (지금은 일부러 없음) ⑦ 애니메이션 클립 추가. 기존 상태 클래스 내부 로직은 그대로 |
+| **CastSpell·Interact 상태** | Jump와 같은 방식. Enter에서 이동 잠금, 끝나면 Idle로. 마법 연출은 `StateChanged` 구독자로 추가 |
+| **복셀 캐릭터로 교체** | 프리팹의 `Model` 자식만 바꾼다. 관절 이름(`ArmL_Pivot` 등)을 같게 하면 기존 클립 그대로, 다르면 새 Animator Controller만 연결. 루트의 로직 컴포넌트는 그대로 |
+| **다른 복도(층·건물)** | `CorridorLayout` 에셋을 새로 만들어 연결 |
+
+---
+
+## 10. 폴더
+
+```
+Assets/_Project/
+├─ Art/Corridor/, Art/Backdrop/      (사용자가 넣는 이미지 — 아직 없음)
+├─ Scripts/Core/SideScroll/           상태 머신·상태·이동 계산·계산식·데이터 SO
+├─ Scripts/Gameplay/SideScroll/       부트스트랩, 입력, 캐릭터, 애니메이션 표현, 카메라, 패럴랙스, 복도 빌더
+├─ Scripts/UI/SideScroll/             조작법 안내, 상태 표시
+├─ Scripts/Editor/SideScroll/         임포트 설정, 캐릭터 프리팹, 애니메이션, 씬 생성 도구
+├─ Tests/SideScroll/                  상태 전이·이동·계산 단위 테스트
+├─ Data/SideScroll/                   CorridorLayout, BackdropSet_Day, 설정 SO 3종
+├─ Animations/SideScroll/             클립 3개 + Animator Controller (생성 도구가 만듦)
+├─ Materials/SideScroll/              캐릭터 단색 머테리얼 6개
+├─ Prefabs/SideScroll/                캐릭터 프리팹
+└─ Scenes/Corridor_SideScroll.unity
+```
+
+- 프로토타입 1의 씬·스크립트는 수정하지 않는다. 예외는 승인받은 `GameControls.inputactions`의 `SideScroll` 맵 추가 하나.
+- `Animations/SideScroll/` 추가 승인됨.
+
+## 11. 제작 순서 (승인 후)
+1. 이미지 확인 → 임포트 설정 → 복도 빌더·레이어 → 카메라 → 패럴랙스 → 플레이 확인·보고
+2. 캐릭터 모델·프리팹 → 상태 머신·단위 테스트 → 이동·방향 전환 → 애니메이션 → 단계마다 보고
+3. 완료 기준 1~9 확인, 직접 플레이 안내

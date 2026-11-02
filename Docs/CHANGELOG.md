@@ -1,5 +1,18 @@
 # 변경 기록
 
+## 2026-11-02 — 프로토타입 2 제작 1단계: 복도 맵 (임포트 · 복도 · 카메라 · 패럴랙스)
+- 설계: `Docs/DESIGN_CORRIDOR.md` (사용자 결정 반영 후 "제작 시작" 승인)
+- 이미지 임포트 설정 (`Art/Corridor` 4장, `Art/Backdrop` 1장): Sprite·Single·Full Rect, PPU 300, 기준점 Bottom Center, Point 필터, 압축 없음, Mip Map 끔, Alpha Is Transparency, Clamp, 최대 크기 4096 (배경 폭 2688이 줄지 않게)
+- Core: `CorridorLayout`, `BackdropSet`, `CorridorConfig`(SO), `CorridorBounds`, `SideScrollMath`(패럴랙스·반복 배치·카메라 제한·직교 크기), `SideScrollContext`/`ISideScrollBinder`
+- Gameplay: `CorridorBootstrap`(조립), `CorridorBuilder`(타일 배치, 에디터 미리보기는 씬에 저장 안 함), `ParallaxBackdrop`(계수 0.3, 3장 반복), `SideScrollCamera`(직교 크기 1.44, x만 따라가기, 복도 범위 제한)
+- Editor: `CorridorSpriteImportTool`(메뉴 `VoxelMagic/복도/이미지 임포트 설정 적용`), `CorridorSceneBuilder`(메뉴 `VoxelMagic/복도/복도 씬 다시 만들기`)
+- 데이터: `Data/SideScroll/CorridorConfig`, `CorridorLayout`(문→창문→민벽→창문+사물함→창문→민벽→문(반전)), `BackdropSet_Day`
+- 씬: `Scenes/Corridor_SideScroll.unity`
+- Tests: `SideScrollMathTests` 10개 추가 (전체 38개 통과)
+- 플레이 확인: 복도 7칸 x 2.56~33.28 간격 5.12로 이음매 없음, 마지막 문 반전 / 화면 세로에 복도 높이 꼭 맞음(직교 크기 1.44) / 유리 뒤로 숲·하늘 비침, 하이라이트 점 보임 / 카메라 대상 x 15로 이동 시 배경 화면 이동량 = 카메라 이동량 × 0.3 (계산값과 일치), 빈틈 없음 / 양 끝에서 카메라 x 3.36·32.48로 제한, 복도 밖 안 보임 / 콘솔 에러·경고 0
+- 문제와 처리: 씬 생성 중 열려 있던 `Prototype_FarmFishing.unity`가 TMP 내부 값(m_TextStyleHashCode 등)만 바뀐 채 저장됨 → 의도한 변경이 아니라 git 원래 상태로 되돌림
+- 미확인: Point 필터 깜빡임은 캐릭터가 걸어 움직일 때 확인 예정 (지금은 에디터 비활성 상태라 연속 움직임을 볼 수 없음)
+
 ## 2026-10-30 — 한글 폰트를 Pretendard 고정 아틀라스로 교체
 - 이유: 맑은 고딕 동적(DynamicOS) 에셋은 플레이할 때마다 글자가 추가돼 Git 변경으로 잡히고, 맑은 고딕은 게임에 넣어 배포할 수 없는 폰트
 - 추가: `Fonts/Pretendard/Pretendard-Regular.otf`(v1.3.9, SIL OFL 1.1, 라이선스 `OFL.txt`), 문자 목록 `KoreanCharset.txt`(영문·숫자·기호, 한글 자모, KS X 1001 한글 2,350자)
