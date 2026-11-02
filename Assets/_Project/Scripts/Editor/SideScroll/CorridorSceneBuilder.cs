@@ -1,9 +1,13 @@
-// Corridor_SideScroll 씬을 다시 만드는 에디터 도구. 이미지 임포트 설정을 적용하고, 데이터 에셋은 없을 때만 만든다.
+// Corridor_SideScroll 씬을 다시 만드는 에디터 도구. 이미지 임포트 설정을 적용하고, 데이터 에셋·캐릭터 프리팹은 없을 때만 만든다.
+using TMPro;
 using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEngine;
+using UnityEngine.InputSystem;
+using UnityEngine.UI;
 using VoxelMagic.Core;
 using VoxelMagic.Gameplay;
+using VoxelMagic.UI;
 
 namespace VoxelMagic.EditorTools
 {
@@ -13,6 +17,7 @@ namespace VoxelMagic.EditorTools
         private const string DataFolder = "Assets/_Project/Data/SideScroll";
         private const string SpriteMaterialPath =
             "Packages/com.unity.render-pipelines.universal/Runtime/Materials/Sprite-Unlit-Default.mat";
+        private const string InputPath = "Assets/_Project/Input/GameControls.inputactions";
 
         // 기본 복도 순서: 문 → 창문 → 민벽 → 창문+사물함 → 창문 → 민벽 → 문(반전)
         private static readonly (string file, bool flip)[] DefaultTiles =
@@ -23,6 +28,7 @@ namespace VoxelMagic.EditorTools
         };
 
         private static readonly Vector3 LightEuler = new Vector3(30f, 20f, 0f);
+        private static readonly Color HudPanelColor = new Color(0f, 0f, 0f, 0.45f);
 
         [MenuItem("VoxelMagic/복도/복도 씬 다시 만들기")]
         private static void BuildFromMenu()
@@ -40,6 +46,10 @@ namespace VoxelMagic.EditorTools
             // 새 씬을 열면 쓰지 않는 에셋이 메모리에서 내려가 미리 읽은 참조가 풀리므로, 씬을 연 뒤에 읽는다.
             var scene = EditorSceneManager.NewScene(NewSceneSetup.DefaultGameObjects, NewSceneMode.Single);
             var config = LoadOrCreateConfig();
+            var moveConfig = LoadOrCreate<CharacterMoveConfig>("CharacterMoveConfig");
+            var animationConfig = LoadOrCreateAnimationConfig();
+            var characterPrefab = SideScrollCharacterBuilder.GetOrCreate(animationConfig);
+            var font = KoreanFontAssetBuilder.GetOrCreate();
             var layout = LoadOrCreateLayout();
             var day = LoadOrCreateBackdrop("BackdropSet_Day", "bg_day_loop");
             var spriteMaterial = AssetDatabase.LoadAssetAtPath<Material>(SpriteMaterialPath);
@@ -61,17 +71,29 @@ namespace VoxelMagic.EditorTools
             backdrop.SetRef("_config", config).SetRef("_camera", camera).SetRef("_spriteMaterial", spriteMaterial);
             backdrop.SetBackdrop(day);
 
+            var input = new GameObject("Input").AddComponent<SideScrollInputReader>();
+            input.SetRef("_actions", AssetDatabase.LoadAssetAtPath<InputActionAsset>(InputPath));
+
+            var character = (GameObject)PrefabUtility.InstantiatePrefab(characterPrefab);
+            character.transform.position = new Vector3(moveConfig.StartX, moveConfig.GroundY, moveConfig.Z);
+            character.transform.rotation = Quaternion.Euler(0f, moveConfig.FacingYaw, 0f);
+            character.GetComponent<SideScrollCharacter>().SetRef("_input", input);
+            camera.GetComponent<SideScrollCamera>().SetRef("_target", character.transform);
+
+            var hud = BuildHud(font);
+
             var bootstrap = new GameObject("_Bootstrap").AddComponent<CorridorBootstrap>();
             bootstrap.transform.SetAsFirstSibling();
             bootstrap.SetRef("_config", config)
+                .SetRef("_moveConfig", moveConfig)
                 .SetRef("_corridor", corridor)
-                .SetRefList("_bindRoots", new Object[] { camera.gameObject });
+                .SetRefList("_bindRoots", new Object[] { camera.gameObject, character, hud });
 
             // 에디터에서도 플레이 때와 같은 화면이 보이도록 카메라를 복도 왼쪽 끝에 맞춘다.
             var bounds = corridor.Bounds;
             camera.orthographicSize = SideScrollMath.OrthographicSizeFor(bounds.Height);
             camera.transform.SetPositionAndRotation(
-                new Vector3(SideScrollMath.ClampCameraX(bounds.MinX, bounds, camera.orthographicSize * camera.aspect),
+                new Vector3(SideScrollMath.ClampCameraX(moveConfig.StartX, bounds, camera.orthographicSize * camera.aspect),
                     bounds.Height * 0.5f, config.CameraZ),
                 Quaternion.identity);
             camera.backgroundColor = day.SkyColor;
@@ -81,6 +103,56 @@ namespace VoxelMagic.EditorTools
         }
 
         internal static CorridorConfig LoadOrCreateConfig() => LoadOrCreate<CorridorConfig>("CorridorConfig");
+
+        internal static CharacterAnimationConfig LoadOrCreateAnimationConfig() =>
+            LoadOrCreate<CharacterAnimationConfig>("CharacterAnimationConfig");
+
+        // 화면 구석 UI: 왼쪽 아래 조작법, 오른쪽 위 현재 상태 (밝은 벽 위에서도 읽히게 반투명 어두운 판을 깐다)
+        private static GameObject BuildHud(TMP_FontAsset font)
+        {
+            var canvasGo = new GameObject("HUD Canvas", typeof(RectTransform), typeof(Canvas), typeof(CanvasScaler));
+            canvasGo.GetComponent<Canvas>().renderMode = RenderMode.ScreenSpaceOverlay;
+            var scaler = canvasGo.GetComponent<CanvasScaler>();
+            scaler.uiScaleMode = CanvasScaler.ScaleMode.ScaleWithScreenSize;
+            scaler.referenceResolution = new Vector2(1920f, 1080f);
+            scaler.matchWidthOrHeight = 0.5f;
+
+            var hint = HudText("ControlsHint", canvasGo.transform, font, 22, TextAlignmentOptions.TopLeft,
+                Vector2.zero, new Vector2(24f, 24f), new Vector2(360f, 110f));
+            hint.gameObject.AddComponent<SideScrollHintView>().SetRef("_text", hint);
+
+            var state = HudText("StateLabel", canvasGo.transform, font, 22, TextAlignmentOptions.Center,
+                Vector2.one, new Vector2(-24f, -24f), new Vector2(220f, 48f));
+            state.gameObject.AddComponent<StateDebugView>().SetRef("_text", state);
+            return canvasGo;
+        }
+
+        private static TextMeshProUGUI HudText(string name, Transform canvas, TMP_FontAsset font, float size,
+            TextAlignmentOptions alignment, Vector2 corner, Vector2 offset, Vector2 panelSize)
+        {
+            var panel = new GameObject(name, typeof(RectTransform), typeof(Image));
+            panel.transform.SetParent(canvas, false);
+            panel.GetComponent<Image>().color = HudPanelColor;
+            var rect = (RectTransform)panel.transform;
+            rect.anchorMin = rect.anchorMax = rect.pivot = corner;
+            rect.anchoredPosition = offset;
+            rect.sizeDelta = panelSize;
+
+            var textGo = new GameObject("Text", typeof(RectTransform), typeof(TextMeshProUGUI));
+            textGo.transform.SetParent(panel.transform, false);
+            var textRect = (RectTransform)textGo.transform;
+            textRect.anchorMin = Vector2.zero;
+            textRect.anchorMax = Vector2.one;
+            textRect.offsetMin = new Vector2(14f, 8f);
+            textRect.offsetMax = new Vector2(-14f, -8f);
+            var text = textGo.GetComponent<TextMeshProUGUI>();
+            text.font = font;
+            text.fontSize = size;
+            text.alignment = alignment;
+            text.color = Color.white;
+            text.raycastTarget = false;
+            return text;
+        }
 
         private static CorridorLayout LoadOrCreateLayout()
         {

@@ -1,5 +1,17 @@
 # 변경 기록
 
+## 2026-11-02 — 프로토타입 2 제작 2단계: 캐릭터 (모델 · 상태 머신 · 이동 · 애니메이션 · HUD)
+- 입력: `GameControls.inputactions`에 `SideScroll` 맵 추가 (Move = 1D Axis A/D·←/→, 둘 다 누르면 0 / Run = Left Shift). 기존 `Gameplay` 맵은 그대로 (추가된 줄만 있음)
+- Core: `MoveIntent`·`Facing`·`CharacterStateId`, `ICharacterState`·`CharacterStateBase`·`IdleState`·`MoveStateBase`·`WalkState`·`RunState`, `CharacterStateMachine`(StateChanged·FacingChanged 이벤트), `SideScrollMotor`(x만), `CharacterMoveConfig`, `CharacterAnimationConfig`, `SideScrollTexts`. `SideScrollContext`에 이동 설정·상태 머신 추가
+- Gameplay: `SideScrollInputReader`, `SideScrollCharacter`(위치 Y·Z와 회전 Y ±90°를 매 프레임 덮어씀), `CharacterAnimatorView`(상태 이벤트 → CrossFade)
+- UI: `SideScrollHintView`(왼쪽 아래 조작법), `StateDebugView`(오른쪽 위 현재 상태, 설정으로 끔)
+- Editor: `SideScrollCharacterBuilder`(메뉴 `VoxelMagic/복도/캐릭터 프리팹 다시 만들기`), `CharacterAnimationBuilder`(메뉴 `VoxelMagic/복도/캐릭터 애니메이션 다시 만들기`), 씬 생성기에 캐릭터·입력·HUD 추가
+- 생성: `Prefabs/SideScroll/SideScrollCharacter.prefab`(키 1.6, 루트 = 로직 + 캡슐 충돌체 하나, `Model` 자식 = 큐브 모델 + Animator), `Animations/SideScroll/`(Idle·Walk·Run 클립, Controller — 전이 없음), `Materials/SideScroll/M_SS_*` 6개, `Data/SideScroll/CharacterMoveConfig`·`CharacterAnimationConfig`
+- Tests: `CharacterStateMachineTests` 12개, `SideScrollMotorTests` 6개 추가 (전체 56개 통과)
+- 플레이 확인 (상태 머신에 입력 값을 직접 넣어 진행): 오른쪽 걷기 Idle→Walk, 속도 1.6, 카메라 x 따라감 / Shift → Run 속도 3.6, 앞으로 기울기·팔다리 ±45° / A 한 프레임에 Y 회전 90 → 270(-90) 즉시 / 양 끝 x 2.56·33.28에서 Idle로 멈춤, 카메라 3.36·32.48로 제한 / 26초 이동 내내 캐릭터 Y 0.12·Z 0 고정, X·Z축 회전 0 / 상태 표시 문구 "상태: 걷기" 등으로 바뀜 / 콘솔 에러 0
+- 확인 방법 한계: 에디터가 포커스를 받지 않아 가상 키 입력이 입력 액션에 들어가지 않았다. 입력 바인딩(A/D·←/→·Shift만 있고 W/S 없음)은 설정을 읽어 확인했고, 실제 키 조작과 Point 필터 깜빡임은 직접 플레이로 확인 필요
+- 참고: 일시정지 상태로 캡처해 화면의 상태 글자가 갱신되지 않은 채 찍혔다 (값은 바뀐 것을 확인)
+
 ## 2026-11-02 — 프로토타입 2 제작 1단계: 복도 맵 (임포트 · 복도 · 카메라 · 패럴랙스)
 - 설계: `Docs/DESIGN_CORRIDOR.md` (사용자 결정 반영 후 "제작 시작" 승인)
 - 이미지 임포트 설정 (`Art/Corridor` 4장, `Art/Backdrop` 1장): Sprite·Single·Full Rect, PPU 300, 기준점 Bottom Center, Point 필터, 압축 없음, Mip Map 끔, Alpha Is Transparency, Clamp, 최대 크기 4096 (배경 폭 2688이 줄지 않게)

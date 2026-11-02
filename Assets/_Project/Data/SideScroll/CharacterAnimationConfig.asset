@@ -1,0 +1,31 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 946680dceffc6ae4887e098e2a2cbb6d, type: 3}
+  m_Name: CharacterAnimationConfig
+  m_EditorClassIdentifier: 
+  _idle:
+    _swingDegrees: 2
+    _bob: 0.012
+    _cycleSeconds: 2.4
+    _leanDegrees: 0
+  _walk:
+    _swingDegrees: 25
+    _bob: 0.02
+    _cycleSeconds: 0.8
+    _leanDegrees: 0
+  _run:
+    _swingDegrees: 45
+    _bob: 0.04
+    _cycleSeconds: 0.5
+    _leanDegrees: 10
+  _blendSeconds: 0.12
+  _keysPerCycle: 16

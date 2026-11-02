@@ -10,6 +10,7 @@ namespace VoxelMagic.Gameplay
     {
         [Header("설정")]
         [SerializeField] private CorridorConfig _config;
+        [SerializeField] private CharacterMoveConfig _moveConfig;
 
         [Header("연결")]
         [SerializeField] private CorridorBuilder _corridor;
@@ -21,7 +22,7 @@ namespace VoxelMagic.Gameplay
         private void Awake()
         {
             _corridor.Build();
-            Context = SideScrollContext.Create(_config, _corridor.Bounds);
+            Context = SideScrollContext.Create(_config, _moveConfig, _corridor.Bounds);
             foreach (var root in _bindRoots)
             {
                 if (root == null) continue;

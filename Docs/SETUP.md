@@ -19,6 +19,12 @@
 | 2026-10-30 | Pretendard 폰트 v1.3.9 (Regular) | `Assets/_Project/Fonts/Pretendard/` (원본 otf, `OFL.txt`) | 한글 TMP 고정 폰트 에셋의 원본. GitHub `orioncactus/pretendard` 저장소에서 받음. SIL OFL 1.1이라 게임에 넣어 배포 가능 | 사용자 승인 |
 | 2026-10-30 | TMP Essential Resources | `Assets/TextMesh Pro/` (Fonts, Resources, Shaders, Sprites) | 한글 TMP 폰트 사용. uGUI 2.0에 포함된 리소스를 가져온 것이라 외부 다운로드 없음 | 사용자 승인 |
 
+## 입력 액션
+
+| 날짜 | 변경 | 이유 | 승인 |
+|---|---|---|---|
+| 2026-11-02 | `Input/GameControls.inputactions`에 `SideScroll` 맵 추가 (Move: 1D Axis A/D·←/→, Run: Left Shift). 기존 `Gameplay` 맵은 그대로 | 복도 횡스크롤 조작. W/S는 바인딩 자체가 없음 | 사용자 승인 |
+
 ## 임포트 설정
 
 | 날짜 | 대상 | 설정 | 바꾸는 법 |
