@@ -48,7 +48,10 @@ namespace VoxelMagic.EditorTools
             var config = LoadOrCreateConfig();
             var moveConfig = LoadOrCreate<CharacterMoveConfig>("CharacterMoveConfig");
             var animationConfig = LoadOrCreateAnimationConfig();
-            var characterPrefab = SideScrollCharacterBuilder.GetOrCreate(animationConfig);
+            // 설정에 지정한 아바타 캐릭터가 있으면 그것을, 없으면 큐브 캐릭터를 쓴다.
+            var characterPrefab = config.CharacterPrefab != null
+                ? config.CharacterPrefab
+                : SideScrollCharacterBuilder.GetOrCreate(animationConfig);
             var font = KoreanFontAssetBuilder.GetOrCreate();
             var layout = LoadOrCreateLayout();
             var day = LoadOrCreateBackdrop("BackdropSet_Day", "bg_day_loop");

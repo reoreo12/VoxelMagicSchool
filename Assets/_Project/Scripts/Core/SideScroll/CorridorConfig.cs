@@ -31,6 +31,10 @@ namespace VoxelMagic.Core
         [SerializeField] private float _cameraZ = -10f;
         [SerializeField, Min(0f)] private float _cameraFollowTime = 0.15f;
 
+        [Header("캐릭터")]
+        [Tooltip("복도에 놓을 캐릭터 프리팹. 비어 있으면 큐브 캐릭터 (메뉴: VoxelMagic/아바타/3)")]
+        [SerializeField] private GameObject _characterPrefab;
+
         [Header("디버그")]
         [SerializeField] private bool _showStateDebug = true;
 
@@ -49,6 +53,7 @@ namespace VoxelMagic.Core
         public float EndMargin => _endMargin;
         public float CameraZ => _cameraZ;
         public float CameraFollowTime => _cameraFollowTime;
+        public GameObject CharacterPrefab => _characterPrefab;
         public bool ShowStateDebug => _showStateDebug;
     }
 }

@@ -1,5 +1,32 @@
 # 변경 기록
 
+## 2026-11-03 — 애니메이션 랩: 새 캐릭터 모델 자동 준비
+- 랩 시작·새로고침 때 `Art/Characters/` 아래에서 AvatarSetup이 없는 .fbx를 찾아 자동으로 준비(Humanoid·키 1.6 배율·텍스처·AvatarSetup·클립 자동 연결)하고 아바타 목록에 추가, 아래쪽에 "새 모델 N개를 준비해 목록에 추가했습니다" 표시
+- `AvatarPipeline.PrepareNewModels()`, `AnimationLabBridge.PrepareNewModels` 추가
+- 확인: 사용자가 넣은 `Student_Male_v04.fbx` → 플레이 시작 때 `Data/Avatars/Student_Male_v04` 생성, 목록 Student_Male / v03 / v04, v04 키 1.60·Humanoid 뼈 22개 / 콘솔 에러 0
+- 주의: `Art/Characters/` 안의 .fbx는 모두 캐릭터(Humanoid)로 처리된다. 소품 모델은 다른 폴더에 둔다
+
+## 2026-11-03 — 아바타 버전 비교 (Student_Male_v03)
+- 파일 (사용자): `Art/Characters/Student_Male/Student_Male_v03.fbx`, `Student_Male_v03_tex.png` (v02와 같은 폴더)
+- `AvatarPipeline` 이름 규칙: 이미 이 모델을 쓰는 AvatarSetup이 있으면 그것을 갱신, 없으면 폴더에 모델이 하나일 때 폴더 이름·여러 개일 때 파일 이름 → v03 준비가 기존 `Student_Male`(v02)을 덮어쓰지 않음
+- v03 준비: `Data/Avatars/Student_Male_v03` 생성, Humanoid, 배율 1.6 (키 1.6), 텍스처 Point, Idle/Walk/Run 자동 연결
+- 애니메이션 랩: 아바타를 바꿔도 클립·재생 시간·일시정지·카메라 유지 (확인: Run 0.40초 일시정지 상태로 v02 ↔ v03 전환, 카메라 이동 0)
+- 복도 캐릭터는 그대로 v02 (`SideScrollCharacter_Student_Male`)
+
+## 2026-11-03 — 프로토타입 2: 아바타 파이프라인 · 애니메이션 랩 · Student_Male 복도 적용
+- 파일 (사용자): `Art/Characters/Student_Male/`(Student_Male_v02.fbx, 텍스처 png), `Animations/Mixamo/`(Y Bot@Idle·Walking·Standard Run, Without Skin, In Place)
+- 임포트 설정: Mixamo 3개 Humanoid·반복 재생·루트 굽기, 클립 이름 Idle/Walking/Standard Run / Student_Male Humanoid, 배율 1.58 (키 1.012 → 1.6), 텍스처 Point·압축 없음·Mip Map 끔
+- Core: `AvatarSetup`(SO), `CorridorConfig`에 캐릭터 프리팹 필드
+- Gameplay: `AvatarAnimationSpeed`(상태별 재생 속도를 Animator 파라미터로, 플레이 중 반영)
+- Editor: `AvatarPipeline` 메뉴 `VoxelMagic/아바타/` 1~3 (모델 준비 / 애니메이션 Humanoid 임포트 / 복도 캐릭터 만들기). 복도 씬 생성기는 설정의 캐릭터 프리팹을 우선 사용
+- Sandbox(새 asmdef `VoxelMagic.Sandbox`, `VoxelMagic.Sandbox.Editor`): 애니메이션 랩 — `AnimationLab`, `LabClipPlayer`(Playable 재생·섞기·반복·시간 이동), `FootSlideMeter`, `LabCamera`, `AnimationLabBridge`, `AnimationLabConfig`, 씬 생성 메뉴 `VoxelMagic/아바타/애니메이션 랩 씬 다시 만들기`
+- 생성: `Data/Avatars/Student_Male`, `Animations/Avatars/Student_Male.controller`(Idle/Walk/Run + 속도 파라미터), `Prefabs/SideScroll/SideScrollCharacter_Student_Male`, `Scenes/Sandbox/AnimationLab.unity`, `Data/Sandbox/AnimationLabConfig`, `Materials/Sandbox/M_Lab_*`
+- 문서: `Docs/AVATAR_GUIDE.md`(새 아바타 넣는 순서)
+- 랩 확인: 키 1.60(큐브와 같음), Humanoid 뼈 22개 매핑 / Idle→Walk 섞기 진행률 표시 / 반복 끄면 끝(0.733초)에서 멈춤, 켜면 다시 반복 / 시간 이동 0.3초 + 1프레임 → 0.333초 / A↔B: Idle ↔ Walking / 디딤발 속도 걷기 약 1.0 m/s·달리기 약 2.15 m/s, 골반 이동 폭 0.03~0.06 m (제자리) / 한글 글자 빠짐 없음
+- 복도 확인 (상태 머신에 입력 값 직접): Idle→Walk→Run 애니메이션 상태 일치, A 한 프레임에 Y 270°, 양 끝 2.56·33.28에서 Idle, Y 0.12·Z 0 고정, Model 위치 (0,0,0) 유지 (루트 이동 없음) / 콘솔 에러·경고 0 / 단위 테스트 56개 통과
+- 문제와 처리: 랩 UI 생성 중 기본 폰트로 한글을 먼저 그려 `Assets/TextMesh Pro/.../LiberationSans SDF - Fallback.asset`이 바뀜 → git으로 되돌리고, 폰트를 먼저 지정하도록 수정
+- 미확인 (직접 확인 필요): 실제 키·마우스 조작, 재생 속도·이동 속도 자연스러움, 달리기 자세에서 바지·몸통 메시가 꺾여 보이는 정도 (모델 가중치 문제일 수 있음)
+
 ## 2026-11-02 — 프로토타입 2 제작 2단계: 캐릭터 (모델 · 상태 머신 · 이동 · 애니메이션 · HUD)
 - 입력: `GameControls.inputactions`에 `SideScroll` 맵 추가 (Move = 1D Axis A/D·←/→, 둘 다 누르면 0 / Run = Left Shift). 기존 `Gameplay` 맵은 그대로 (추가된 줄만 있음)
 - Core: `MoveIntent`·`Facing`·`CharacterStateId`, `ICharacterState`·`CharacterStateBase`·`IdleState`·`MoveStateBase`·`WalkState`·`RunState`, `CharacterStateMachine`(StateChanged·FacingChanged 이벤트), `SideScrollMotor`(x만), `CharacterMoveConfig`, `CharacterAnimationConfig`, `SideScrollTexts`. `SideScrollContext`에 이동 설정·상태 머신 추가

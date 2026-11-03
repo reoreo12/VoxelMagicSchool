@@ -1,6 +1,6 @@
 # 설계 문서 — 게임플레이 프로토타입 2 (2D 횡스크롤 복도 + 기본 도형 캐릭터)
 
-> 상태: **제작 중** (2026-11-02 "제작 시작" 승인. 1단계 복도 맵, 2단계 캐릭터(모델·상태 머신·이동·애니메이션·HUD) 완료. 완료 기준 전체 확인·직접 플레이 대기)
+> 상태: **제작 중** (2026-11-02 "제작 시작" 승인. 1단계 복도 맵, 2단계 캐릭터(모델·상태 머신·이동·애니메이션·HUD) 완료. 사용자 플레이 확인 완료. 12번 아바타 적용(파이프라인·애니메이션 랩·복도 교체) 완료, 사용자 확인 대기)
 > 기준 문서: `CORRIDOR_SIDESCROLL_SPEC.md`
 > 작성일: 2026-11-02
 
@@ -60,6 +60,11 @@
 | 눈은 머리 **옆면** 앞쪽에 붙임 (설계: 앞면) | 카메라가 옆모습을 보므로 앞면의 눈은 보이지 않는다. 양 옆면에 하나씩 → 어느 쪽을 봐도 눈 하나가 보임 |
 | 화면 구석 UI에 반투명 어두운 판 | 밝은 베이지 벽 위에서 흰 글자가 안 읽혀서 |
 | 상태 이름: Idle = "서 있기" | 화면 표시용 한국어 |
+| (아바타) 랩 이름 `AvatarTest` → **`AnimationLab`**, 코드 위치 `Scripts/Gameplay/Sandbox/` → **`Scripts/Sandbox/` + 새 asmdef** | 사용자 요청으로 툴 형태(목록·재생 조작·측정)가 되면서 커졌다. 게임 코드와 완전히 분리하고 폴더째 지울 수 있게 |
+| (아바타) 랩의 키·제자리 판정: 렌더러 경계 상자 → 메시를 구워 정점 높이, 골반 최대 거리 → 골반 앞뒤 이동 **폭**(허용 0.2m, 설정값) | 경계 상자는 여유가 붙어 1.72로 크게 나왔고, 걸음마다 생기는 골반 흔들림(약 6cm)까지 "In Place 아님"으로 잘못 표시했다 |
+| (아바타) 재생 속도 제안은 지금 클립이 연결된 상태(걷기/달리기)만 | 걷기 클립의 측정값으로 달리기 제안까지 보여 헷갈렸다 |
+| (아바타) 큐브 전용 .anim 클립은 랩 목록에 "이 아바타에 쓸 수 없음"으로 표시 | 모델 파일이 아니라 Humanoid로 다시 임포트할 수 없다 |
+| (아바타) 랩 UI 생성 시 글자보다 폰트를 먼저 지정 | 기본 폰트로 한글을 먼저 그리면 `Assets/TextMesh Pro`의 기본 폴백 폰트 파일이 바뀐다 (한 번 바뀐 것은 git으로 되돌림) |
 | 씬 생성기는 새 씬을 연 **뒤에** 데이터 에셋을 읽음 | 새 씬을 열면 쓰지 않는 에셋이 메모리에서 내려가 미리 읽은 참조가 풀렸다 (설정 참조가 비어 복도가 안 만들어지던 문제) |
 
 ## 1. 단위와 좌표 (모든 숫자는 설정 에셋에서 바뀜)
@@ -404,3 +409,100 @@ Assets/_Project/
 1. 이미지 확인 → 임포트 설정 → 복도 빌더·레이어 → 카메라 → 패럴랙스 → 플레이 확인·보고
 2. 캐릭터 모델·프리팹 → 상태 머신·단위 테스트 → 이동·방향 전환 → 애니메이션 → 단계마다 보고
 3. 완료 기준 1~9 확인, 직접 플레이 안내
+
+---
+
+## 12. 아바타 적용 — Student_Male + Mixamo (2026-11-03 승인)
+
+큐브 캐릭터의 **로직 루트는 그대로 두고 `Model` 자식만** 리깅된 Student_Male로 바꾼다. 상태 머신·이동·입력·카메라는 수정하지 않는다.
+
+### 12-1. 파일 확인 결과 (읽기만 함)
+
+| 파일 | 확인 내용 |
+|---|---|
+| `Art/Characters/Student_Male/Student_Male_v02.fbx` | 스킨 메시 1개(정점 12,986), 뼈 23개 + Root. 이름이 Mixamo식(`Hips`, `Spine`~`Spine2`, `Neck`, `Head`, `Left/RightShoulder·Arm·ForeArm·Hand`, `Left/RightUpLeg·Leg·Foot·ToeBase`, 접두사 없음). 손가락 뼈 없음. **정면 = +Z** (발끝 방향, 큐브 캐릭터와 같음). T자세. 실제 높이 **1.012** (발바닥 −0.012 ~ 머리 1.000), 팔 벌린 폭 1.0. 현재 Rig = Generic, 머테리얼은 파일 안에 포함(`voxel_palette_mat`, URP Lit, 텍스처 연결됨) |
+| `Student_Male_v02_tex.png` | 256×256 팔레트 텍스처. 현재 Bilinear + 압축 → 색 경계가 번질 수 있음 |
+| `Animations/Mixamo/Y Bot@Idle.fbx` | 클립 `Idle` 8.33초, 30fps |
+| `Y Bot@Walking.fbx` | 클립 `Walking` 1.03초 |
+| `Y Bot@Standard Run.fbx` | 클립 `Standard Run` 0.73초 |
+| 공통 (Mixamo 3개) | Y Bot 뼈대(`mixamorig:` 접두사, 손가락 포함 66개), cm 단위(파일 배율 0.01), Rig = Generic, 반복 재생 꺼짐. **Hips가 앞뒤로 이동하지 않음 → In Place 확인** |
+
+→ 뼈 이름은 다르지만(`Hips` vs `mixamorig:Hips`), 둘 다 **Humanoid**(Unity가 사람 뼈대를 표준 부위로 매핑해 다른 뼈대끼리 애니메이션을 옮겨 입히는 방식)로 바꾸면 그대로 옮겨 입힐 수 있다. Humanoid 필수 뼈(골반, 척추, 머리, 팔 3마디, 다리 3마디)가 모두 있다.
+
+### 12-2. 임포트 설정 (메뉴 도구로 적용, 값은 설정 에셋)
+
+| 대상 | 설정 | 이유 |
+|---|---|---|
+| Student_Male FBX | Rig **Humanoid**, Avatar = 이 모델로 생성. **크기 배율 = 목표 키 1.6 ÷ 실제 높이 1.012 ≈ 1.58** (도구가 메시 높이를 재서 계산) | 키를 큐브 캐릭터와 같게. 모델 자체 배율로 맞춰 아바타·충돌체·애니메이션이 같은 크기 기준을 씀 |
+| 팔레트 텍스처 | Filter **Point**, 압축 없음, Mip Map 끔 | 복셀 팔레트 색이 섞이지 않게 (복도 이미지와 같은 원칙) |
+| Mixamo 3개 | Rig **Humanoid**, Avatar = 각 파일(Y Bot)로 생성. 클립 이름 `Idle`/`Walk`/`Run`, **반복 재생 켬**, 루트 회전·높이·앞뒤 이동 **포즈에 굽기(Bake Into Pose)** | 이동은 코드가 하므로 애니메이션이 캐릭터를 옮기거나 돌리지 못하게 |
+
+### 12-3. 아바타 파이프라인 — "틀만 지키면 그대로 적용"
+
+**폴더 규칙 (틀)**
+```
+Art/Characters/<이름>/          모델 .fbx 1개 + 텍스처 .png (Humanoid로 쓸 수 있는 사람 뼈대)
+Animations/<아무 하위 폴더>/     애니메이션 .fbx (Mixamo Without Skin 등) / .anim
+```
+**메뉴 (VoxelMagic/아바타/)** — 모델·애니메이션을 Project 창에서 선택하고 실행
+| 순서 | 메뉴 | 하는 일 |
+|---|---|---|
+| 1 | 선택한 캐릭터 모델 준비 | Rig Humanoid, 목표 키(기본 1.6)에 맞춰 배율 자동 계산, 같은 폴더 텍스처 Point·압축 없음, `Data/Avatars/<이름>.asset`(AvatarSetup) 생성. 이름에 idle/walk/run이 들어간 Humanoid 클립을 찾아 Idle/Walk/Run에 자동 연결 |
+| 2 | 선택한 애니메이션 Humanoid로 임포트 | Rig Humanoid, 클립 이름 = 파일 이름의 `@` 뒤, 반복 재생 켬, 루트 회전·높이·앞뒤 이동 포즈에 굽기 (폴더를 선택하면 안의 파일 모두) |
+| 3 | 선택한 아바타로 복도 캐릭터 만들기 | Animator Controller(`Animations/Avatars/<이름>`, 상태 Idle/Walk/Run + 상태별 재생 속도 파라미터)와 프리팹(`Prefabs/SideScroll/SideScrollCharacter_<이름>`) 생성 → 복도 캐릭터로 지정 → 복도 씬 다시 만들기 |
+
+| 이름 | 종류 | 어셈블리 | 한 줄 역할 |
+|---|---|---|---|
+| `AvatarSetup` | ScriptableObject | Core | 아바타 한 벌: 모델, 목표 키, 충돌체 반지름, Idle/Walk/Run 클립, 상태별 재생 속도, 만든 Controller·프리팹 |
+| `AvatarAnimationSpeed` | MonoBehaviour | Gameplay | 아바타 Animator에 상태별 재생 속도를 매 프레임 넣음 → **플레이 중 AvatarSetup 값을 바꾸면 바로 반영** (복도에서 맞추기용) |
+| `AvatarPipeline` | 에디터 도구 | Editor | 위 메뉴 1~3 |
+| `CorridorConfig.CharacterPrefab` | 설정 값 | Core | 복도에 놓을 캐릭터. 비어 있으면 큐브 캐릭터 |
+
+### 12-4. 복도 캐릭터 프리팹 (Model만 교체)
+
+```
+SideScrollCharacter_<이름> (루트)  [SideScrollCharacter] [CharacterAnimatorView] [CapsuleCollider]  ← 큐브와 같음
+└─ Model (FBX 인스턴스)            [Animator: Avatar, Controller, Apply Root Motion 끔] [AvatarAnimationSpeed]
+```
+- Humanoid Avatar는 뼈 경로를 FBX 루트 기준으로 찾으므로, Animator는 FBX 인스턴스 자신(=Model)에 둔다.
+- Animator 상태 이름이 `CharacterStateId`와 같은 `Idle`/`Walk`/`Run`이라 **`CharacterAnimatorView`·상태 머신 수정 없음**.
+- 큐브 프리팹은 비교·대체용으로 남긴다.
+
+### 12-5. 재생 속도·이동 속도 맞추기 — 복도에서
+- 복도 씬을 플레이하면서 `Data/Avatars/<이름>`의 Idle/Walk/Run 재생 속도(또는 `CharacterMoveConfig`의 이동 속도)를 인스펙터에서 바꾸면 바로 보인다. ScriptableObject라 플레이를 멈춰도 값이 남는다.
+- 애니메이션 랩의 "디딤발 속도"가 시작값을 알려 준다: 재생 속도 ≈ 게임 이동 속도 ÷ 디딤발 속도.
+
+### 12-6. 애니메이션 랩 (테스트 씬, 툴 형태)
+`Scenes/Sandbox/AnimationLab.unity` — 앞으로 가져올 모든 아바타·애니메이션을 확인하는 도구. 이식 뒤에도 남긴다 (빌드 목록에 넣지 않음).
+
+| 영역 | 기능 |
+|---|---|
+| 아바타 (왼쪽 위) | 아바타 선택(`Data/Avatars`의 AvatarSetup), Humanoid 여부·키·뼈 수 표시, 키 비교 큐브(1.6) 켜기/끄기, 골반 이동량(제자리 여부) |
+| 상태 버튼 (위 가운데) | Idle / Walk / Run — AvatarSetup에 연결된 클립으로 섞어서 전환 (복도와 같은 전환 확인) |
+| 애니메이션 목록 (오른쪽) | `Assets/_Project/Animations` 아래 모든 클립. **새로고침**으로 새로 넣은 파일 바로 반영. Humanoid가 아닌 파일은 "Humanoid로 임포트" 버튼 (메뉴 2와 같은 처리) |
+| 재생 (아래) | 재생/일시정지, 한 프레임 앞/뒤, 시간 슬라이더(끌어서 이동), 시간·프레임 표시, **반복 재생 On/Off**, 재생 속도(0~2배), 섞기 시간(0~1초) |
+| 보간 테스트 | **A↔B 반복 전환**: 마지막에 재생한 두 클립을 정한 간격으로 계속 섞어 바꿈 → 보간 튐·발 꼬임 확인 |
+| 측정 (왼쪽 아래) | 디딤발 속도(m/s, 재생 속도 1 기준) → 걷기·달리기 이동 속도에 맞는 재생 속도 제안 |
+| 카메라 | 우클릭 드래그 회전, 휠 확대, 가운데 드래그 이동, 정면·옆·뒤·3/4 버튼 |
+| 단축키 | Space 재생/일시정지, ←/→ 한 프레임, 1/2/3 Idle/Walk/Run, L 반복 |
+
+- 클립 재생은 Animator Controller 없이 **Playable**(코드로 클립을 직접 섞어 재생하는 Unity 기능)로 한다 → 어떤 클립이든 상태를 만들지 않고 바로 재생·섞기·멈춤·시간 이동.
+- 반복 재생 On/Off는 임포트 설정을 바꾸지 않고 랩에서만 적용.
+
+**어셈블리**: 랩 코드는 `Scripts/Sandbox/`에 **새 asmdef `VoxelMagic.Sandbox`**(Core 참조)와 `Scripts/Sandbox/Editor/`의 `VoxelMagic.Sandbox.Editor`(에디터 전용)로 분리한다. 이유: 게임 코드가 랩을 참조할 수 없게 막고, 폴더째 지워도 다른 코드가 깨지지 않게. 랩만 키보드·마우스를 직접 읽는다. 파일 검색·임포트(에디터 기능)는 에디터 어셈블리가 연결해 주는 통로(`AnimationLabBridge`)로만 쓴다.
+
+### 12-7. 고민한 선택지
+
+| 주제 | 고른 것 | 다른 방법 | 이유 |
+|---|---|---|---|
+| 애니메이션 옮겨 입히기 | **Humanoid** | Generic + 뼈 이름 맞추기 | 뼈 이름(`mixamorig:` 접두사)·개수(66 vs 23)·비율이 달라 Generic으로는 바로 안 맞는다. Humanoid는 다른 아바타에도 같은 클립을 쓸 수 있다 |
+| 키 맞추기 | **FBX 임포트 배율 자동 계산** | 프리팹에서 Model 배율 조절 | 배율이 걸린 Transform 아래 Animator는 충돌체·뼈 위치 계산이 헷갈린다 |
+| 랩 재생 방식 | **Playable** | 클립마다 Animator 상태 만들기 | 새 클립을 넣을 때마다 Controller를 고칠 필요가 없다 |
+| 재생 속도 조절 위치 | **AvatarSetup + Animator 파라미터** | Animator 상태 속도 직접 수정 | 플레이 중 바로 바꿔 볼 수 있고, 아바타마다 따로 저장된다 |
+| 머테리얼 | **FBX에 포함된 것 그대로** | 파일로 꺼내기 | 이미 URP Lit + 텍스처 연결. 고칠 일이 생기면 그때 |
+
+### 12-8. 제작 순서
+1. 파이프라인(AvatarSetup, 메뉴 1~3) → Student_Male·Mixamo 3개 적용 → 크기·Humanoid 확인
+2. 애니메이션 랩 (런타임 + 씬·UI 생성) → 재생·반복·섞기·측정·카메라 확인 → 캡처로 보고
+3. 복도 캐릭터 교체 → 걷기·달리기·방향 전환·양 끝 확인 → 보고
+4. 문서·커밋 확인

@@ -31,6 +31,14 @@
 |---|---|---|---|
 | 2026-11-02 | `Art/Corridor/*.png`, `Art/Backdrop/*.png` | Sprite·Single·Full Rect, PPU 300, Bottom Center, Point, 압축 없음, Mip Map 끔, Alpha Is Transparency, Clamp, 최대 크기 4096 | `Data/SideScroll/CorridorConfig` 값 수정 → 메뉴 `VoxelMagic/복도/이미지 임포트 설정 적용` |
 
+## 아바타 임포트 설정 (메뉴 `VoxelMagic/아바타/`로 적용)
+
+| 날짜 | 대상 | 설정 |
+|---|---|---|
+| 2026-11-03 | `Animations/Mixamo/*.fbx` | Rig Humanoid (이 모델로 Avatar 생성), 클립 이름 = `@` 뒤, 반복 재생·Loop Pose 켬, 루트 회전·높이·앞뒤 이동 Bake Into Pose |
+| 2026-11-03 | `Art/Characters/Student_Male/Student_Male_v02.fbx` | Rig Humanoid, 배율 1.58 (목표 키 1.6, `Data/Avatars/Student_Male`) |
+| 2026-11-03 | `Art/Characters/Student_Male/*.png` | Point, 압축 없음, Mip Map 끔 |
+
 ## 어셈블리 (asmdef)
 
 | 이름 | 위치 | 참조 |
@@ -40,6 +48,8 @@
 | VoxelMagic.UI | `Assets/_Project/Scripts/UI` | Core, Unity.TextMeshPro, UnityEngine.UI |
 | VoxelMagic.Editor | `Assets/_Project/Scripts/Editor` (에디터 전용) | Core, Unity.TextMeshPro |
 | VoxelMagic.Tests | `Assets/_Project/Tests` (EditMode 테스트) | Core, Test Runner, NUnit |
+| VoxelMagic.Sandbox (2026-11-03) | `Assets/_Project/Scripts/Sandbox` (애니메이션 랩, 자동 참조 끔) | Core, Unity.InputSystem, Unity.TextMeshPro, UnityEngine.UI |
+| VoxelMagic.Sandbox.Editor (2026-11-03) | `Assets/_Project/Scripts/Sandbox/Editor` (에디터 전용) | Sandbox, Core, Gameplay, Editor, TMP, UI, InputSystem |
 
 ## 연결 메모
 - 한글 폰트: `Fonts/Pretendard SDF.asset`은 고정(Static) 아틀라스라 플레이해도 파일이 바뀌지 않는다. 문자 목록에 없는 글자를 쓰려면 `VoxelMagic/한글 폰트 다시 굽기`를 실행한다.
