@@ -43,6 +43,9 @@ namespace VoxelMagic.Sandbox
             public TMP_Text AbLabel;
             public TMP_Text MeterText;
             public Button[] CameraButtons = new Button[4];
+            public Toggle PixelToggle;
+            public Slider PixelSlider;
+            public TMP_Text PixelLabel;
             public TMP_Text Status;
         }
 
@@ -50,6 +53,7 @@ namespace VoxelMagic.Sandbox
         [SerializeField] private Transform _spawnPoint;
         [SerializeField] private GameObject _heightReference;
         [SerializeField] private LabCamera _camera;
+        [SerializeField] private LabPixelView _pixelView;
         [Tooltip("에디터 검색이 안 될 때(빌드) 쓰는 아바타 목록")]
         [SerializeField] private List<AvatarSetup> _fallbackAvatars = new List<AvatarSetup>();
         [SerializeField] private Ui _ui = new Ui();
@@ -80,6 +84,7 @@ namespace VoxelMagic.Sandbox
         private void Update()
         {
             HandleShortcuts();
+            RefreshPixelLabel();
             if (_player == null) return;
 
             if (_ui.AbToggle.isOn && _abFirst != null && _abSecond != null && !_player.Paused)
@@ -303,6 +308,23 @@ namespace VoxelMagic.Sandbox
                 var view = views[i];
                 _ui.CameraButtons[i].onClick.AddListener(() => _camera.SetView(view));
             }
+
+            _ui.PixelSlider.wholeNumbers = true;
+            _ui.PixelSlider.minValue = _config.PixelSizeRange.x;
+            _ui.PixelSlider.maxValue = _config.PixelSizeRange.y;
+            _ui.PixelSlider.SetValueWithoutNotify(_config.DefaultPixelSize);
+            _pixelView.SetPixelSize(_config.DefaultPixelSize);
+            _ui.PixelSlider.onValueChanged.AddListener(v => _pixelView.SetPixelSize(Mathf.RoundToInt(v)));
+            _ui.PixelToggle.onValueChanged.AddListener(_pixelView.SetOn);
+            _pixelView.SetOn(_ui.PixelToggle.isOn);
+        }
+
+        private void RefreshPixelLabel()
+        {
+            var resolution = _pixelView.Resolution;
+            _ui.PixelLabel.text = _pixelView.IsOn
+                ? string.Format(LabTexts.PixelOn, _pixelView.PixelSize, resolution.x, resolution.y)
+                : string.Format(LabTexts.PixelOff, _pixelView.PixelSize);
         }
 
         private void TogglePause()
@@ -321,6 +343,7 @@ namespace VoxelMagic.Sandbox
             if (keyboard.digit2Key.wasPressedThisFrame) PlayState(CharacterStateId.Walk);
             if (keyboard.digit3Key.wasPressedThisFrame) PlayState(CharacterStateId.Run);
             if (keyboard.lKey.wasPressedThisFrame) _ui.LoopToggle.isOn = !_ui.LoopToggle.isOn;
+            if (keyboard.pKey.wasPressedThisFrame) _ui.PixelToggle.isOn = !_ui.PixelToggle.isOn;
         }
 
         private void RefreshPlaybackUi()

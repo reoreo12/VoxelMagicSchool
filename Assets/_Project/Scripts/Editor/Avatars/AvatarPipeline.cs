@@ -94,13 +94,19 @@ namespace VoxelMagic.EditorTools
             return setup;
         }
 
-        /// <summary>Art/Characters 아래에서 아직 AvatarSetup이 없는 .fbx를 모두 준비한다 (애니메이션 랩 시작·새로고침 때).</summary>
+        /// <summary>Art/Characters 아래에서 AvatarSetup이 없거나 Humanoid가 풀린 .fbx를 모두 준비한다 (애니메이션 랩 시작·새로고침 때).
+        /// 모델 파일을 다시 복사해 넣으면 .meta가 기본값(Generic)으로 돌아갈 수 있어, 그런 모델도 다시 준비한다.</summary>
         public static List<AvatarSetup> PrepareNewModels()
         {
             var models = AssetDatabase.FindAssets("t:Model", new[] { CharactersRoot })
                 .Select(AssetDatabase.GUIDToAssetPath).Where(IsModel).Distinct().OrderBy(p => p);
-            return models.Where(p => FindSetupFor(p) == null).ToList().Select(PrepareModel).ToList();
+            return models.Where(NeedsPreparation).ToList().Select(PrepareModel).ToList();
         }
+
+        private static bool NeedsPreparation(string modelPath) =>
+            FindSetupFor(modelPath) == null ||
+            !(AssetImporter.GetAtPath(modelPath) is ModelImporter importer) ||
+            importer.animationType != ModelImporterAnimationType.Human;
 
         // ── 2. 애니메이션 임포트 ─────────────────────────────
 

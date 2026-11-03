@@ -1,5 +1,12 @@
 # 변경 기록
 
+## 2026-11-03 — 애니메이션 랩: 도트 렌더링 On/Off
+- 설계: DESIGN_CORRIDOR.md 12-9 (A. 저해상도 렌더 텍스처, 프로젝트 설정·URP 렌더러 변경 없음) 승인 후 제작
+- Sandbox: `LabPixelView`(카메라를 화면 ÷ 도트 크기 해상도의 Point 필터 텍스처에 그려 화면 맨 뒤 RawImage로 확대, 창 크기 바뀌면 다시 생성), 랩 UI에 도트 렌더링 토글(P)·도트 크기 슬라이더(2~8, 기본 4)·해상도 표시, `AnimationLabConfig`에 도트 크기 범위·기본값, 재생 패널 폭 1320 → 1500
+- 확인: 켜면 1920×888 화면에서 480×222(4배)·240×111(8배)로 그려지고 UI는 선명 / 끄면 카메라가 화면에 직접 그림, RawImage 꺼짐 / 마우스 입력을 막지 않음(Raycast Target 끔) / 콘솔 에러 0
+- 참고: 바닥 격자 같은 가는 선은 도트가 클수록 끊겨 보인다 (확인용 화면 특성)
+- 아바타 자동 준비 보완: 아바타 데이터가 있어도 모델이 Humanoid가 아니면 다시 준비 (`Student_Male_v05.fbx`의 .meta가 기본값으로 다시 만들어져 Generic이 된 것을 발견 → 다시 준비해 Humanoid·배율 1.6 복구)
+
 ## 2026-11-03 — 애니메이션 랩: 새 캐릭터 모델 자동 준비
 - 랩 시작·새로고침 때 `Art/Characters/` 아래에서 AvatarSetup이 없는 .fbx를 찾아 자동으로 준비(Humanoid·키 1.6 배율·텍스처·AvatarSetup·클립 자동 연결)하고 아바타 목록에 추가, 아래쪽에 "새 모델 N개를 준비해 목록에 추가했습니다" 표시
 - `AvatarPipeline.PrepareNewModels()`, `AnimationLabBridge.PrepareNewModels` 추가

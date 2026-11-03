@@ -26,6 +26,11 @@ namespace VoxelMagic.Sandbox
         [Tooltip("재생 속도 제안에 쓸 게임 이동 속도")]
         [SerializeField] private CharacterMoveConfig _moveConfig;
 
+        [Header("도트 렌더링")]
+        [Tooltip("픽셀 크기 슬라이더 범위 (화면 픽셀 몇 개를 도트 하나로 그릴지)")]
+        [SerializeField] private Vector2Int _pixelSizeRange = new Vector2Int(2, 8);
+        [SerializeField, Min(1)] private int _defaultPixelSize = 4;
+
         [Header("카메라")]
         [SerializeField, Min(0.01f)] private float _orbitSpeed = 0.25f;
         [SerializeField, Min(0.01f)] private float _zoomSpeed = 0.002f;
@@ -47,6 +52,8 @@ namespace VoxelMagic.Sandbox
         public float MeterSmoothing => _meterSmoothing;
         public float InPlaceTolerance => _inPlaceTolerance;
         public CharacterMoveConfig MoveConfig => _moveConfig;
+        public Vector2Int PixelSizeRange => _pixelSizeRange;
+        public int DefaultPixelSize => _defaultPixelSize;
         public float OrbitSpeed => _orbitSpeed;
         public float ZoomSpeed => _zoomSpeed;
         public float PanSpeed => _panSpeed;

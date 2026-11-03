@@ -135,6 +135,20 @@ namespace VoxelMagic.Sandbox.EditorTools
             var canvas = canvasGo.transform;
             var ui = new Dictionary<string, Object>();
 
+            // 도트 렌더링 출력: 화면 맨 뒤 전체 화면. 마우스 입력(카메라 조작)을 막지 않게 Raycast Target 끔.
+            var pixelOutput = new GameObject("PixelOutput", typeof(RectTransform), typeof(RawImage));
+            pixelOutput.transform.SetParent(canvas, false);
+            var outputRect = (RectTransform)pixelOutput.transform;
+            outputRect.anchorMin = Vector2.zero;
+            outputRect.anchorMax = Vector2.one;
+            outputRect.offsetMin = outputRect.offsetMax = Vector2.zero;
+            var outputImage = pixelOutput.GetComponent<RawImage>();
+            outputImage.raycastTarget = false;
+            outputImage.enabled = false;
+            var pixelView = Camera.main.gameObject.AddComponent<LabPixelView>();
+            pixelView.SetRef("_output", outputImage);
+            lab.SetRef("_pixelView", pixelView);
+
             // 왼쪽 위: 아바타
             var avatarPanel = Panel("AvatarPanel", canvas, new Vector2(0f, 1f), new Vector2(20f, -20f), new Vector2(440f, 270f));
             Label("Title", avatarPanel, "아바타", 24, new Vector2(16f, -12f), new Vector2(400f, 32f), FontStyles.Bold);
@@ -184,7 +198,7 @@ namespace VoxelMagic.Sandbox.EditorTools
             ui["ClipButtonTemplate"] = template;
 
             // 아래: 재생
-            var playPanel = Panel("PlaybackPanel", canvas, new Vector2(0.5f, 0f), new Vector2(-660f, 20f), new Vector2(1320f, 170f));
+            var playPanel = Panel("PlaybackPanel", canvas, new Vector2(0.5f, 0f), new Vector2(-750f, 20f), new Vector2(1500f, 170f));
             ui["TimeSlider"] = MakeSlider("TimeSlider", playPanel, new Vector2(20f, -22f), new Vector2(900f, 24f));
             ui["TimeLabel"] = Label("TimeLabel", playPanel, "", 18, new Vector2(940f, -16f), new Vector2(370f, 32f));
             var play = MakeButton("PlayButton", playPanel, "일시정지", new Vector2(20f, -64f), new Vector2(150f, 44f), AccentColor);
@@ -200,6 +214,9 @@ namespace VoxelMagic.Sandbox.EditorTools
             ui["AbToggle"] = MakeToggle("AbToggle", playPanel, "A↔B 반복 전환", false, new Vector2(20f, -120f), new Vector2(200f, 36f));
             ui["AbSlider"] = MakeSlider("AbSlider", playPanel, new Vector2(230f, -128f), new Vector2(220f, 24f));
             ui["AbLabel"] = Label("AbLabel", playPanel, "", 18, new Vector2(466f, -120f), new Vector2(190f, 32f));
+            ui["PixelToggle"] = MakeToggle("PixelToggle", playPanel, LabTexts.PixelToggle, false, new Vector2(1120f, -68f), new Vector2(240f, 36f));
+            ui["PixelSlider"] = MakeSlider("PixelSlider", playPanel, new Vector2(1120f, -128f), new Vector2(160f, 24f));
+            ui["PixelLabel"] = Label("PixelLabel", playPanel, "", 18, new Vector2(1292f, -120f), new Vector2(200f, 32f));
 
             // 왼쪽 아래: 측정 + 카메라
             var meterPanel = Panel("MeterPanel", canvas, new Vector2(0f, 0f), new Vector2(20f, 240f), new Vector2(560f, 300f));
