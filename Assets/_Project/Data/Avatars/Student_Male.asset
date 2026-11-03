@@ -21,5 +21,6 @@ MonoBehaviour:
   _idleSpeed: 1
   _walkSpeed: 1
   _runSpeed: 1
+  _sprites: {fileID: 11400000, guid: 1116add3f36b4f4438a458fa6ae231a1, type: 2}
   _controller: {fileID: 9100000, guid: 3ed707516f309d1458044948964267c6, type: 2}
   _characterPrefab: {fileID: 6865248072325870992, guid: 34886671d2da3fa48a4b4bf95e67472a, type: 3}

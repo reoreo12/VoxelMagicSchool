@@ -441,7 +441,8 @@ Assets/_Project/
 
 **폴더 규칙 (틀)**
 ```
-Art/Characters/<이름>/          모델 .fbx 1개 + 텍스처 .png (Humanoid로 쓸 수 있는 사람 뼈대)
+Art/Characters/<캐릭터>/Model/   모델 .fbx + 텍스처 .png (Humanoid로 쓸 수 있는 사람 뼈대)
+Art/Characters/<캐릭터>/Sprites/ 2D 스프라이트
 Animations/<아무 하위 폴더>/     애니메이션 .fbx (Mixamo Without Skin 등) / .anim
 ```
 **메뉴 (VoxelMagic/아바타/)** — 모델·애니메이션을 Project 창에서 선택하고 실행
@@ -539,3 +540,70 @@ SideScrollCharacter_<이름> (루트)  [SideScrollCharacter] [CharacterAnimatorV
 - 상태는 Core의 `PixelRenderState`(켜짐·크기, 바뀌면 이벤트) 하나로, P 키와 패널이 같은 상태를 바꾼다. 공용 컴포넌트는 UI 어셈블리의 `PixelRenderView` (화면 출력이라 UI에 둠)
 - 설정(`CorridorConfig`): 시작할 때 켜기 여부, 도트 크기(기본 4)
 - 캐릭터 이동·카메라·패럴랙스·상태 머신은 그대로
+
+---
+
+## 13. 2D 스프라이트 캐릭터 + 2D/3D 전환 (2026-11-03 승인, 완료)
+
+복도 캐릭터에 사용자가 만든 2D 스프라이트(Idle/Walk/Run)를 입히고, **3D 아바타는 숨겨 두었다가 토글·단축키로 2D ↔ 3D를 바꾼다.** 상태 머신·이동·카메라·입력 구조는 그대로 두고 "보이는 것"만 바꾼다.
+
+### 13-1. 파일 확인 (읽기만 함)
+| 항목 | 값 |
+|---|---|
+| 파일 | `Art/Characters/Student_Male/Sprites/Student_Male_Idle·Walk·Run.png` (각 400×86) + `Student_Male_sprites.json` |
+| 칸 | 50×86 픽셀, 가로 한 줄 8프레임 (json에 칸 좌표가 있음) |
+| 기준점 | 발밑 가운데 (25, 2) — 3D 캐릭터와 같은 "발 = 위치" |
+| 방향 | 오른쪽을 보는 그림 |
+| 재생 | Idle 6fps · Walk 10fps · Run 12fps, 모두 반복 |
+| 실제 그림 높이 | Idle 82px (발 2 ~ 머리 83), Walk 80px, Run 74px. 반투명 픽셀 없음 (선명한 도트) |
+| PPU | json 권장 80 → 키 약 1.03. **3D와 같은 키 1.6에 맞추려면 PPU = 82 ÷ 1.6 ≈ 51** (도구가 Idle 그림 높이를 재서 계산, 목표 키는 설정값) |
+
+### 13-2. 구조
+| 이름 | 종류 | 어셈블리 | 한 줄 역할 |
+|---|---|---|---|
+| `SpriteCharacterSet` | ScriptableObject | Core | 2D 캐릭터 한 벌: 상태별 프레임(Sprite 배열)·fps·반복, 목표 키. json에서 자동 생성 |
+| `AvatarSetup._sprites` | 필드 추가 | Core | 이 아바타의 2D 버전 (없으면 2D 전환 불가) |
+| `CharacterViewState` | 일반 C# | Core | 지금 2D인지 3D인지 + 바뀌면 이벤트 (도트 렌더링의 `PixelRenderState`와 같은 방식). `SideScrollContext`에 추가 |
+| `SpriteFrameAnimator` | MonoBehaviour | Gameplay | 2D 자식에 붙음. 상태 머신의 `StateChanged`를 받아 해당 프레임 묶음을 fps로 재생. 방향은 `FlipX`로, 회전은 항상 카메라 정면 |
+| `CharacterViewSwitcher` | MonoBehaviour | Gameplay | 캐릭터 루트에 붙음. 상태에 따라 3D 모델의 렌더러와 2D 스프라이트를 켜고 끔 |
+| `CharacterViewPanel` | MonoBehaviour | UI | 복도 HUD의 도트 렌더링 패널 아래 **"2D 캐릭터 (V)"** 토글 |
+| `SpriteCharacterImporter` | 에디터 도구 | Editor | 메뉴 `VoxelMagic/아바타/선택한 2D 스프라이트 준비`: json을 읽어 PNG에 Point 필터·압축 없음·PPU를 적용하고, 칸마다 스프라이트를 만들어(기준점 포함) `SpriteCharacterSet` 안에 함께 저장, 같은 캐릭터 폴더의 아바타들에 연결. **(구현하며 바뀐 점)** Unity 6에서 텍스처 임포터로 칸을 자르는 옛 방법(spritesheet)이 제거됐고 2D Sprite 패키지도 없어서, PNG는 통째로 두고 칸 스프라이트를 데이터 에셋의 하위 에셋으로 만든다 (패키지 설치 없음) |
+
+**프리팹** (메뉴 3 "복도 캐릭터 만들기"가 2D 버전이 있으면 함께 만든다)
+```
+SideScrollCharacter_<이름> (루트)  [SideScrollCharacter] [CharacterAnimatorView] [CharacterViewSwitcher] [CapsuleCollider]
+├─ Model (3D FBX)                   [Animator] [AvatarAnimationSpeed]   ← 2D일 때 렌더러만 끔 (Animator는 계속 돌아 3D로 돌아오면 바로 이어짐)
+└─ Sprite2D                         [SpriteRenderer] [SpriteFrameAnimator]   ← 3D일 때 끔
+```
+
+### 13-3. 2D/3D 전환
+- **단축키 V** (`SideScroll` 입력 맵에 `ToggleCharacterView` 추가, P는 도트 렌더링), 화면 토글도 같은 상태를 바꿈
+- 시작 모드는 `CorridorConfig`의 "2D로 시작" (기본: **2D**, 요청대로 3D는 숨김)
+- 조작법 안내에 "V 2D/3D 캐릭터 바꾸기" 추가
+
+### 13-4. 2D 표시 방식
+| 항목 | 내용 |
+|---|---|
+| 방향 전환 | 캐릭터 루트는 지금처럼 Y ±90°로 돌지만, 스프라이트는 매 프레임 **회전을 정면으로 고정**하고 왼쪽을 볼 때 `FlipX`. 그림이 옆으로 누워 안 보이는 일이 없음 |
+| 재생 | 상태가 바뀌면 그 상태 프레임의 처음부터, fps는 json 값 (설정에서 상태별 배율로 조절). 2D 프레임 애니메이션은 섞기(보간)가 없음 |
+| 그리는 순서 | 복도 타일(정렬 순서 0)보다 앞인 정렬 순서 10, z = 0 |
+| 머테리얼 | 복도 이미지와 같은 **조명 없는 스프라이트** (2D 배경과 같은 느낌) |
+| 필터 | Point, 압축 없음, Mip Map 끔 (도트 유지) |
+
+### 13-5. 고민한 선택지
+| 주제 | 고른 것 | 다른 방법 | 이유 |
+|---|---|---|---|
+| 2D 재생 방식 | **코드로 프레임 넘기기** (`SpriteFrameAnimator`) | Animator + 스프라이트 클립 생성 | 프레임·fps가 데이터에 있어 코드가 단순하고, 새 캐릭터도 json만 있으면 된다. Animator 방식은 섞기가 안 되는 2D에서 이점이 적다 |
+| 3D 숨기기 | **렌더러만 끄기** | Model 오브젝트 끄기 | Animator가 꺼지면 `CharacterAnimatorView`가 상태를 바꿀 때 경고가 나고, 3D로 돌아올 때 자세가 처음부터 시작한다 |
+| 키 맞추기 | **PPU 자동 계산 (그림 높이 → 1.6)** | 오브젝트 배율 | 3D 아바타 파이프라인과 같은 방식. 배율을 쓰면 픽셀 크기와 위치 계산이 어긋나기 쉽다 |
+| 데이터 위치 | `Data/Avatars/<캐릭터>_2D.asset`, AvatarSetup에 연결 | 별도 설정 | 아바타 한 벌 = 3D + 2D로 함께 관리 |
+
+### 13-6. 알아 둘 점
+- 2D 캐릭터의 도트(1픽셀 ≈ 0.02유닛)는 복도 타일 도트(≈ 0.003유닛)보다 약 6배 크다. 둘 다 도트 그림이지만 크기가 달라 보일 수 있다 → 플레이 확인 후 판단 (키를 줄이거나 도트 렌더링과 함께 보기)
+- 애니메이션 랩의 2D 미리보기는 이번 범위 밖 (랩 브랜치에서 따로)
+- 작업 브랜치: `feature/prototype-corridor`
+
+### 13-7. 제작 순서 (승인 후)
+1. 2D 스프라이트 준비 도구 → Student_Male 스프라이트 자르기·PPU·데이터 생성
+2. 2D 재생·방향·전환 컴포넌트 + 입력(V)·HUD 토글 + 단위 테스트(전환 상태)
+3. 복도 프리팹 다시 만들기 → 2D로 걷기·달리기·방향 전환·양 끝, V로 3D 전환 확인 → 보고

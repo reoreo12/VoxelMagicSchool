@@ -5,10 +5,12 @@
 ## 1. 파일 넣기 (틀)
 ```
 Assets/_Project/
-├─ Art/Characters/<이름>/      모델 .fbx 1개 + 텍스처 .png  (폴더 이름 = 아바타 이름)
-└─ Animations/<아무 폴더>/      애니메이션 .fbx  (예: Mixamo/Y Bot@Walking.fbx)
+├─ Art/Characters/<캐릭터>/      한 캐릭터의 것은 전부 여기 (폴더 이름 = 아바타 이름)
+│  ├─ Model/                     3D 모델 .fbx + 텍스처 .png
+│  └─ Sprites/                   2D 스프라이트 (아틀라스 + .json)
+└─ Animations/<아무 폴더>/        애니메이션 .fbx (예: Mixamo/Y Bot@Walking.fbx) — 모든 캐릭터가 같이 씀
 ```
-- 한 폴더에 모델이 여러 개(버전 비교 등)면 아바타 이름은 **파일 이름**이 된다 (`Student_Male_v03.fbx` → `Data/Avatars/Student_Male_v03`). 이미 아바타가 있는 모델은 그 아바타를 갱신한다.
+- 한 캐릭터 폴더에 모델이 여러 개(버전 비교 등)면 아바타 이름은 **파일 이름**이 된다 (`Student_Male_v03.fbx` → `Data/Avatars/Student_Male_v03`). 이미 아바타가 있는 모델은 그 아바타를 갱신한다.
 - 모델: 사람 뼈대(골반·척추·머리·팔 3마디·다리 3마디)가 있어야 한다. 정면은 +Z. 이 폴더의 .fbx는 모두 캐릭터로 처리되므로 소품 모델은 다른 폴더에 둔다.
 - Mixamo 애니메이션: FBX for Unity, **Without Skin**, 30fps. 걷기·달리기는 **In Place** 체크.
 - 클립 이름은 파일 이름의 `@` 뒤가 된다 (`Y Bot@Walking.fbx` → `Walking`). 이름에 idle / walk / run(sprint, jog)이 들어가면 상태에 자동 연결된다.

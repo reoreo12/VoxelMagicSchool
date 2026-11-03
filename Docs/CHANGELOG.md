@@ -1,5 +1,24 @@
 # 변경 기록
 
+## 2026-11-03 — 복도: 2D 스프라이트 캐릭터 + 2D/3D 전환 (V)
+- 설계: DESIGN_CORRIDOR.md 13번 승인 후 제작
+- Core: `SpriteCharacterSet`(상태별 프레임·fps·반복·목표 키) + `SpriteClipMath`(시간 → 프레임), `AvatarSetup._sprites`(2D 버전 연결), `CharacterViewState`(2D/3D + 변경 이벤트), `SideScrollContext.CharacterView`, `CorridorConfig`에 2D로 시작(기본 켬)·스프라이트 정렬 순서(10), 조작법에 V 추가
+- 입력: `SideScroll` 맵에 `ToggleCharacterView`(V) 추가
+- Gameplay: `SpriteFrameAnimator`(상태 이벤트 → 프레임 재생, 회전 정면 고정, 왼쪽이면 좌우 반전), `CharacterViewSwitcher`(2D면 3D 렌더러 끄고 스프라이트 켬, Animator는 계속)
+- UI: `CharacterViewPanel` — 복도 HUD 도트 렌더링 패널 아래 "2D 캐릭터 (V)" 토글
+- Editor: `SpriteCharacterImporter`(메뉴 `VoxelMagic/아바타/선택한 2D 스프라이트 준비`), 복도 캐릭터 만들기(메뉴 3)가 2D 버전이 있으면 `Sprite2D` 자식과 전환 컴포넌트를 함께 넣음, 복도 HUD에 토글 패널
+- 생성: `Data/Avatars/Student_Male_2D`(Idle 8프레임 6fps · Walk 8프레임 10fps · Run 8프레임 12fps, PPU 51.25 = Idle 82px → 키 1.6), Student_Male v02~v05 아바타에 연결, v05 복도 프리팹·복도 씬 다시 생성. 스프라이트 PNG 임포트: Sprite·Point·압축 없음·Mip Map 끔
+- Tests: `CharacterViewTests` 9개 (전체 69개 통과)
+- 확인 (상태 머신에 입력 값 직접): 2D로 시작(3D 렌더러 꺼짐), 걷기 → Walk 프레임, 왼쪽 달리기 → Run 프레임·좌우 반전, 루트가 90° 돌아도 스프라이트 회전 (0,0,0), 발 y 0.08(바닥 띠 안), 정렬 순서 10 / V → 3D(애니메이션 Run 이어짐) → V → 2D / 콘솔 에러 0
+
+## 2026-11-03 — 폴더 구조 정리: 캐릭터별로 묶기
+- 사용자 요청: 3D 모델(`Art/Characters/`)과 2D 스프라이트(`Art/Sprites/Characters/`)가 따로 흩어져 복잡했음
+- 새 구조: `Art/Characters/<캐릭터>/Model/`(3D 모델·텍스처), `Art/Characters/<캐릭터>/Sprites/`(2D 아틀라스·json). `Animations/`는 모든 캐릭터가 같이 쓰는 클립이라 그대로 따로 둠
+- 이동 (Unity 안에서 옮겨 GUID 유지): Student_Male v02~v05 `.fbx`·`_tex.png` → `Model/`, 사용자가 넣은 `Student_Male_Idle/Walk/Run.png`·`Student_Male_sprites.json` → `Sprites/`. 빈 `Art/Sprites/` 갈래 삭제
+- `AvatarPipeline` 아바타 이름 규칙: 모델 폴더 이름 → **캐릭터 폴더 이름**(Art/Characters 바로 아래), 모델이 여러 개면 파일 이름 (기존과 같음)
+- 확인: 아바타 데이터 4개 모델 경로 새 위치, 복도 프리팹(v02·v05) 메시·아바타 연결 정상, PlayerConfig 아바타 정상, 새 모델 자동 준비 0개 / 콘솔 에러 0
+- 문서: AVATAR_GUIDE.md, DESIGN_CORRIDOR.md, SETUP.md 경로 갱신
+
 ## 2026-11-03 — 복셀 아바타 그림자 구멍 수정 (씬 조명 Normal Bias 0)
 - 원인: 복셀 메시는 면마다 정점이 따로라, URP 그림자 Normal Bias가 면을 법선 방향 안쪽으로 밀 때 면 사이가 벌어져 그림자에 구멍이 생김
 - 비교 (같은 위치·같은 카메라 7곳: 아바타·게시판·학교 벽·은행나무·연못 돌·텃밭·크리처, 현재 0.5 vs Normal 0): 바뀐 픽셀 0.03~0.46%, **모두 어두워지는 쪽**(밝아진 곳 0) — 아바타 그림자 구멍이 메워지고 다른 물체 그림자 가장자리가 한 줄 정도 넓어짐. 빛 받는 바닥·벽·돌 표면에 새 얼룩(Shadow Acne) 없음 → 롤백하지 않음

@@ -6,6 +6,17 @@
 - Unity 6000.0.38f1, URP 17.0.3
 - 입력 처리: Both (구 Input Manager + 새 Input System 1.13.0) — 변경하지 않음
 
+## Git 브랜치 (2026-11-03 사용자 결정)
+
+| 브랜치 | 올리는 작업 | 비고 |
+|---|---|---|
+| `feature/prototype-farm-fishing` | 프로토타입 1: 의뢰·농사·낚시 루프 (`Prototype_FarmFishing`) | 마지막 커밋 `4b9921f`. 이후 농장 맵 아바타·줌·그림자(`3c98754`)는 복도 브랜치에 들어가 있음 |
+| `feature/prototype-corridor` | 프로토타입 2: 횡스크롤 복도 (`Corridor_SideScroll`), 복도 캐릭터 | 지금 작업 중 |
+| `feature/tool-animation-lab` | 툴: 애니메이션 랩(`Scenes/Sandbox/AnimationLab`, `Scripts/Sandbox/`), 아바타 파이프라인 | `3c98754`에서 분기. **앞으로 랩 관련 변경은 여기에만** |
+
+- 세 브랜치는 공용 코드(Core, 아바타 파이프라인, 폰트 등)를 함께 쓴다. 한 브랜치의 공용 변경이 다른 브랜치에 필요하면 그때 병합 여부를 사용자에게 묻는다.
+- 커밋 전에 지금 브랜치가 작업 종류와 맞는지 확인하고, 다르면 브랜치를 바꿀지 먼저 묻는다.
+
 ## 패키지
 
 | 날짜 | 패키지 | 버전 / 출처 | 이유 | 승인 |
@@ -36,8 +47,8 @@
 | 날짜 | 대상 | 설정 |
 |---|---|---|
 | 2026-11-03 | `Animations/Mixamo/*.fbx` | Rig Humanoid (이 모델로 Avatar 생성), 클립 이름 = `@` 뒤, 반복 재생·Loop Pose 켬, 루트 회전·높이·앞뒤 이동 Bake Into Pose |
-| 2026-11-03 | `Art/Characters/Student_Male/Student_Male_v02.fbx` | Rig Humanoid, 배율 1.58 (목표 키 1.6, `Data/Avatars/Student_Male`) |
-| 2026-11-03 | `Art/Characters/Student_Male/*.png` | Point, 압축 없음, Mip Map 끔 |
+| 2026-11-03 | `Art/Characters/Student_Male/Model/Student_Male_v02.fbx` (11-03 폴더 정리로 Model/로 이동) | Rig Humanoid, 배율 1.58 (목표 키 1.6, `Data/Avatars/Student_Male`) |
+| 2026-11-03 | `Art/Characters/Student_Male/Model/*.png` | Point, 압축 없음, Mip Map 끔 |
 
 ## 조명 그림자 (씬별)
 

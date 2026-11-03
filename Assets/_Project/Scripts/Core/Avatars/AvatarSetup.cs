@@ -24,6 +24,9 @@ namespace VoxelMagic.Core
         [SerializeField, Range(0.1f, 3f)] private float _walkSpeed = 1f;
         [SerializeField, Range(0.1f, 3f)] private float _runSpeed = 1f;
 
+        [Header("2D 버전 (있으면 복도에서 2D/3D 전환)")]
+        [SerializeField] private SpriteCharacterSet _sprites;
+
         [Header("생성됨 (메뉴 3)")]
         [SerializeField] private RuntimeAnimatorController _controller;
         [SerializeField] private GameObject _characterPrefab;
@@ -31,6 +34,7 @@ namespace VoxelMagic.Core
         public GameObject Model => _model;
         public float TargetHeight => _targetHeight;
         public float ColliderRadius => _colliderRadius;
+        public SpriteCharacterSet Sprites => _sprites;
         public RuntimeAnimatorController Controller => _controller;
         public GameObject CharacterPrefab => _characterPrefab;
 

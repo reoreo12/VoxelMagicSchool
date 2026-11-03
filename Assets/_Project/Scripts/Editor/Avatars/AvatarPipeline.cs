@@ -1,4 +1,4 @@
-// 아바타 파이프라인 메뉴. 폴더 규칙(Art/Characters/<이름>/모델.fbx, Animations/**/애니메이션.fbx)만 지키면
+// 아바타 파이프라인 메뉴. 폴더 규칙(Art/Characters/<캐릭터>/Model/모델.fbx, Animations/**/애니메이션.fbx)만 지키면
 // 1) 모델 준비(Humanoid·키 배율·텍스처·AvatarSetup) 2) 애니메이션 Humanoid 임포트 3) 복도 캐릭터 프리팹 생성·지정까지 처리한다.
 using System.Collections.Generic;
 using System.IO;
@@ -187,6 +187,7 @@ namespace VoxelMagic.EditorTools
             root.AddComponent<CharacterAnimatorView>()
                 .SetRef("_animator", animator)
                 .SetRef("_config", CorridorSceneBuilder.LoadOrCreateAnimationConfig());
+            AddSprite2D(root, model, setup.Sprites);
 
             EnsureFolder(PrefabFolder);
             var prefab = PrefabUtility.SaveAsPrefabAsset(root, $"{PrefabFolder}/{root.name}.prefab");
@@ -196,6 +197,24 @@ namespace VoxelMagic.EditorTools
             AssetDatabase.SaveAssets();
             Debug.Log($"[AvatarPipeline] {prefab.name} 생성 완료");
             return prefab;
+        }
+
+        // 2D 버전이 있으면 Sprite2D 자식(스프라이트 + 프레임 재생)을 만들고, 루트에 2D/3D 전환을 붙인다. 시작 모드는 CorridorConfig.
+        private static void AddSprite2D(GameObject root, GameObject model, SpriteCharacterSet sprites)
+        {
+            GameObject sprite = null;
+            if (sprites != null)
+            {
+                var config = CorridorSceneBuilder.LoadOrCreateConfig();
+                sprite = new GameObject("Sprite2D");
+                sprite.transform.SetParent(root.transform, false);
+                var renderer = sprite.AddComponent<SpriteRenderer>();
+                renderer.sharedMaterial = AssetDatabase.LoadAssetAtPath<Material>(CorridorSceneBuilder.SpriteMaterialPath);
+                renderer.sortingOrder = config.CharacterSpriteSortingOrder;
+                renderer.sprite = sprites.ClipFor(CharacterStateId.Idle).IsEmpty ? null : sprites.ClipFor(CharacterStateId.Idle).Frames[0];
+                sprite.AddComponent<SpriteFrameAnimator>().SetRef("_renderer", renderer).SetRef("_set", sprites);
+            }
+            root.AddComponent<CharacterViewSwitcher>().SetRef("_model", model).SetRef("_sprite", sprite);
         }
 
         public static void UseInCorridor(GameObject prefab)
@@ -308,13 +327,16 @@ namespace VoxelMagic.EditorTools
             return ScanAvatars().FirstOrDefault(s => s.Model == model);
         }
 
-        // 폴더에 모델이 하나면 폴더 이름, 여러 개(버전 비교 등)면 파일 이름을 아바타 이름으로 쓴다.
+        // 캐릭터 폴더(Art/Characters 바로 아래, 예: Student_Male)에 모델이 하나면 캐릭터 폴더 이름,
+        // 여러 개(버전 비교 등)면 파일 이름을 아바타 이름으로 쓴다. 모델이 Model/ 같은 하위 폴더에 있어도 같다.
         private static string SetupNameFor(string modelPath)
         {
-            string folder = Path.GetDirectoryName(modelPath).Replace('\\', '/');
-            int models = AssetDatabase.FindAssets("t:Model", new[] { folder })
+            string relative = modelPath.Substring(CharactersRoot.Length + 1);
+            string character = relative.Split('/')[0];
+            string characterFolder = $"{CharactersRoot}/{character}";
+            int models = AssetDatabase.FindAssets("t:Model", new[] { characterFolder })
                 .Count(g => IsModel(AssetDatabase.GUIDToAssetPath(g)));
-            return models > 1 ? Path.GetFileNameWithoutExtension(modelPath) : Path.GetFileName(folder);
+            return models > 1 ? Path.GetFileNameWithoutExtension(modelPath) : character;
         }
 
         private static AvatarSetup LoadOrCreateSetup(string name)

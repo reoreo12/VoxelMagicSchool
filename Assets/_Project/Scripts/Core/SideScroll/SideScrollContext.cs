@@ -10,6 +10,7 @@ namespace VoxelMagic.Core
         public CorridorBounds Bounds { get; private set; }
         public CharacterStateMachine Character { get; private set; }
         public PixelRenderState PixelRender { get; private set; }
+        public CharacterViewState CharacterView { get; private set; }
 
         /// <summary>캐릭터 이동 범위는 복도 양 끝에서 끝 여유만큼 안쪽 (문 앞에서 멈춤).</summary>
         public static SideScrollContext Create(CorridorConfig config, CharacterMoveConfig moveConfig, CorridorBounds bounds)
@@ -22,7 +23,8 @@ namespace VoxelMagic.Core
                 Bounds = bounds,
                 Character = new CharacterStateMachine(motor, moveConfig),
                 PixelRender = new PixelRenderState(config.PixelOnAtStart, config.PixelSize,
-                    config.PixelSizeRange.x, config.PixelSizeRange.y)
+                    config.PixelSizeRange.x, config.PixelSizeRange.y),
+                CharacterView = new CharacterViewState(config.StartIn2D ? CharacterViewMode.TwoD : CharacterViewMode.ThreeD)
             };
         }
     }
