@@ -35,6 +35,12 @@ namespace VoxelMagic.Core
         [Tooltip("복도에 놓을 캐릭터 프리팹. 비어 있으면 큐브 캐릭터 (메뉴: VoxelMagic/아바타/3)")]
         [SerializeField] private GameObject _characterPrefab;
 
+        [Header("도트 렌더링 (화면 전체)")]
+        [SerializeField] private bool _pixelOnAtStart = false;
+        [Tooltip("화면 픽셀 몇 개를 도트 하나로 그릴지")]
+        [SerializeField, Min(1)] private int _pixelSize = 4;
+        [SerializeField] private Vector2Int _pixelSizeRange = new Vector2Int(2, 8);
+
         [Header("디버그")]
         [SerializeField] private bool _showStateDebug = true;
 
@@ -54,6 +60,9 @@ namespace VoxelMagic.Core
         public float CameraZ => _cameraZ;
         public float CameraFollowTime => _cameraFollowTime;
         public GameObject CharacterPrefab => _characterPrefab;
+        public bool PixelOnAtStart => _pixelOnAtStart;
+        public int PixelSize => _pixelSize;
+        public Vector2Int PixelSizeRange => _pixelSizeRange;
         public bool ShowStateDebug => _showStateDebug;
     }
 }

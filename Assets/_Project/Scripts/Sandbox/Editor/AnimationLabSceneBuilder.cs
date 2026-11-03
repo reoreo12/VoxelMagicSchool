@@ -9,6 +9,7 @@ using UnityEngine.EventSystems;
 using UnityEngine.InputSystem.UI;
 using UnityEngine.UI;
 using VoxelMagic.Core;
+using VoxelMagic.UI;
 using VoxelMagic.EditorTools;
 
 namespace VoxelMagic.Sandbox.EditorTools
@@ -145,7 +146,7 @@ namespace VoxelMagic.Sandbox.EditorTools
             var outputImage = pixelOutput.GetComponent<RawImage>();
             outputImage.raycastTarget = false;
             outputImage.enabled = false;
-            var pixelView = Camera.main.gameObject.AddComponent<LabPixelView>();
+            var pixelView = Camera.main.gameObject.AddComponent<PixelRenderView>();
             pixelView.SetRef("_output", outputImage);
             lab.SetRef("_pixelView", pixelView);
 

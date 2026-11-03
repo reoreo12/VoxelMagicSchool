@@ -5,6 +5,7 @@
         "VoxelMagic.Sandbox",
         "VoxelMagic.Core",
         "VoxelMagic.Gameplay",
+        "VoxelMagic.UI",
         "VoxelMagic.Editor",
         "Unity.TextMeshPro",
         "Unity.InputSystem",

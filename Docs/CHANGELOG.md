@@ -1,5 +1,22 @@
 # 변경 기록
 
+## 2026-11-03 — 복도 맵 도트 렌더링 On/Off (화면 전체)
+- 설계: DESIGN_CORRIDOR.md 12-10, 사용자가 B(화면 전체) + 토글·슬라이더 선택
+- 공용화: 랩의 `LabPixelView` → `UI/Rendering/PixelRenderView` (같은 .meta로 옮겨 기존 씬 참조 유지), 랩도 같은 컴포넌트 사용. `VoxelMagic.Sandbox`·`Sandbox.Editor` asmdef에 `VoxelMagic.UI` 참조 추가
+- Core: `PixelRenderState`(켜짐·도트 크기·범위 제한·변경 이벤트), `SideScrollContext.PixelRender`, `CorridorConfig`에 시작 시 켜기·도트 크기(4)·범위(2~8), 조작법 문구에 P 추가
+- 입력: `GameControls`의 `SideScroll` 맵에 `TogglePixel`(P) 추가 — 기존 `Gameplay` 맵은 그대로. `SideScrollInputReader`가 P로 상태 토글
+- UI: `PixelRenderPanel`(토글·슬라이더·표시 ↔ 상태 ↔ 뷰), 복도 HUD에 패널·EventSystem·GraphicRaycaster·전체 화면 출력 RawImage 추가
+- Tests: `PixelRenderStateTests` 4개 (전체 60개 통과)
+- 확인: P(상태 토글) → 켜짐·UI 토글 체크·480×222 (4배), 슬라이더 6 → 320×148, 글자 표시 갱신 / 화면 도트 렌더링 캡처 확인 / P 바인딩 `<Keyboard>/p`, 기존 Gameplay 맵 액션 10개 그대로 / 콘솔 에러 0 / TMP 폴백 폰트 변경 없음
+- 참고: 도트 모드에서 창틀·난간 일부에 분홍 선이 보임 — 원본 타일 이미지의 유리 경계 색이 낮은 해상도에서 드러나는 것으로 보임 (이미지 확인 필요)
+
+## 2026-11-03 — 복도 캐릭터를 Student_Male_v05로 교체
+- 애니메이션 랩에서 v05 + Idle/Walking/Standard Run 확인 후 (사용자), 메뉴 3과 같은 처리로 복도에 적용
+- 생성: `Animations/Avatars/Student_Male_v05.controller`(Idle/Walk/Run + 속도 파라미터), `Prefabs/SideScroll/SideScrollCharacter_Student_Male_v05.prefab`
+- `CorridorConfig` 캐릭터 프리팹 → `SideScrollCharacter_Student_Male_v05`, 복도 씬 다시 생성 (v02 프리팹·데이터는 그대로 남김)
+- 확인 (상태 머신에 입력 값 직접): Walk·Run 애니메이션 상태 일치, A 한 프레임에 Y 270°, 양 끝 2.56·33.28에서 Idle, Y 0.12·Z 0 고정, Model 위치 (0,0,0) 유지 / 콘솔 에러 0
+- 재생 속도는 아직 기본값 1 (`Data/Avatars/Student_Male_v05`에서 플레이 중 조절)
+
 ## 2026-11-03 — 애니메이션 랩: 도트 렌더링 On/Off
 - 설계: DESIGN_CORRIDOR.md 12-9 (A. 저해상도 렌더 텍스처, 프로젝트 설정·URP 렌더러 변경 없음) 승인 후 제작
 - Sandbox: `LabPixelView`(카메라를 화면 ÷ 도트 크기 해상도의 Point 필터 텍스처에 그려 화면 맨 뒤 RawImage로 확대, 창 크기 바뀌면 다시 생성), 랩 UI에 도트 렌더링 토글(P)·도트 크기 슬라이더(2~8, 기본 4)·해상도 표시, `AnimationLabConfig`에 도트 크기 범위·기본값, 재생 패널 폭 1320 → 1500

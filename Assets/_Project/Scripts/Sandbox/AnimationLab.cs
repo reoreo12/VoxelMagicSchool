@@ -8,6 +8,7 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.UI;
 using VoxelMagic.Core;
+using VoxelMagic.UI;
 
 namespace VoxelMagic.Sandbox
 {
@@ -53,7 +54,7 @@ namespace VoxelMagic.Sandbox
         [SerializeField] private Transform _spawnPoint;
         [SerializeField] private GameObject _heightReference;
         [SerializeField] private LabCamera _camera;
-        [SerializeField] private LabPixelView _pixelView;
+        [SerializeField] private PixelRenderView _pixelView;
         [Tooltip("에디터 검색이 안 될 때(빌드) 쓰는 아바타 목록")]
         [SerializeField] private List<AvatarSetup> _fallbackAvatars = new List<AvatarSetup>();
         [SerializeField] private Ui _ui = new Ui();

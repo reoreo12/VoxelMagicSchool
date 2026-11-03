@@ -3,7 +3,9 @@ using TMPro;
 using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.InputSystem;
+using UnityEngine.InputSystem.UI;
 using UnityEngine.UI;
 using VoxelMagic.Core;
 using VoxelMagic.Gameplay;
@@ -29,6 +31,7 @@ namespace VoxelMagic.EditorTools
 
         private static readonly Vector3 LightEuler = new Vector3(30f, 20f, 0f);
         private static readonly Color HudPanelColor = new Color(0f, 0f, 0f, 0.45f);
+        private static readonly Vector2 PixelPanelSize = new Vector2(280f, 112f);
 
         [MenuItem("VoxelMagic/복도/복도 씬 다시 만들기")]
         private static void BuildFromMenu()
@@ -83,14 +86,14 @@ namespace VoxelMagic.EditorTools
             character.GetComponent<SideScrollCharacter>().SetRef("_input", input);
             camera.GetComponent<SideScrollCamera>().SetRef("_target", character.transform);
 
-            var hud = BuildHud(font);
+            var hud = BuildHud(font, camera);
 
             var bootstrap = new GameObject("_Bootstrap").AddComponent<CorridorBootstrap>();
             bootstrap.transform.SetAsFirstSibling();
             bootstrap.SetRef("_config", config)
                 .SetRef("_moveConfig", moveConfig)
                 .SetRef("_corridor", corridor)
-                .SetRefList("_bindRoots", new Object[] { camera.gameObject, character, hud });
+                .SetRefList("_bindRoots", new Object[] { camera.gameObject, character, hud, input.gameObject });
 
             // 에디터에서도 플레이 때와 같은 화면이 보이도록 카메라를 복도 왼쪽 끝에 맞춘다.
             var bounds = corridor.Bounds;
@@ -111,24 +114,102 @@ namespace VoxelMagic.EditorTools
             LoadOrCreate<CharacterAnimationConfig>("CharacterAnimationConfig");
 
         // 화면 구석 UI: 왼쪽 아래 조작법, 오른쪽 위 현재 상태 (밝은 벽 위에서도 읽히게 반투명 어두운 판을 깐다)
-        private static GameObject BuildHud(TMP_FontAsset font)
+        private static GameObject BuildHud(TMP_FontAsset font, Camera camera)
         {
-            var canvasGo = new GameObject("HUD Canvas", typeof(RectTransform), typeof(Canvas), typeof(CanvasScaler));
+            var canvasGo = new GameObject("HUD Canvas", typeof(RectTransform), typeof(Canvas), typeof(CanvasScaler), typeof(GraphicRaycaster));
             canvasGo.GetComponent<Canvas>().renderMode = RenderMode.ScreenSpaceOverlay;
             var scaler = canvasGo.GetComponent<CanvasScaler>();
             scaler.uiScaleMode = CanvasScaler.ScaleMode.ScaleWithScreenSize;
             scaler.referenceResolution = new Vector2(1920f, 1080f);
             scaler.matchWidthOrHeight = 0.5f;
+            new GameObject("EventSystem", typeof(EventSystem), typeof(InputSystemUIInputModule));
+
+            // 도트 렌더링 출력: 화면 맨 뒤 전체 화면 (마우스 입력을 막지 않게 Raycast Target 끔)
+            var output = new GameObject("PixelOutput", typeof(RectTransform), typeof(RawImage));
+            output.transform.SetParent(canvasGo.transform, false);
+            var outputRect = (RectTransform)output.transform;
+            outputRect.anchorMin = Vector2.zero;
+            outputRect.anchorMax = Vector2.one;
+            outputRect.offsetMin = outputRect.offsetMax = Vector2.zero;
+            var outputImage = output.GetComponent<RawImage>();
+            outputImage.raycastTarget = false;
+            outputImage.enabled = false;
+            var pixelView = camera.gameObject.AddComponent<PixelRenderView>();
+            pixelView.SetRef("_output", outputImage);
 
             var hint = HudText("ControlsHint", canvasGo.transform, font, 22, TextAlignmentOptions.TopLeft,
-                Vector2.zero, new Vector2(24f, 24f), new Vector2(360f, 110f));
+                Vector2.zero, new Vector2(24f, 24f), new Vector2(360f, 140f));
             hint.gameObject.AddComponent<SideScrollHintView>().SetRef("_text", hint);
 
             var state = HudText("StateLabel", canvasGo.transform, font, 22, TextAlignmentOptions.Center,
                 Vector2.one, new Vector2(-24f, -24f), new Vector2(220f, 48f));
             state.gameObject.AddComponent<StateDebugView>().SetRef("_text", state);
+
+            BuildPixelPanel(canvasGo.transform, font, pixelView);
             return canvasGo;
         }
+
+        // 오른쪽 위 상태 표시 아래: 도트 렌더링 토글 + 도트 크기 슬라이더 + 표시 글자
+        private static void BuildPixelPanel(Transform canvas, TMP_FontAsset font, PixelRenderView view)
+        {
+            var panel = new GameObject("PixelPanel", typeof(RectTransform), typeof(Image));
+            panel.transform.SetParent(canvas, false);
+            panel.GetComponent<Image>().color = HudPanelColor;
+            var rect = (RectTransform)panel.transform;
+            rect.anchorMin = rect.anchorMax = rect.pivot = Vector2.one;
+            rect.anchoredPosition = new Vector2(-24f, -84f);
+            rect.sizeDelta = PixelPanelSize;
+
+            var resources = new DefaultControls.Resources
+            {
+                standard = BuiltinSprite("UISprite"), background = BuiltinSprite("Background"),
+                knob = BuiltinSprite("Knob"), checkmark = BuiltinSprite("Checkmark")
+            };
+
+            var toggleGo = DefaultControls.CreateToggle(resources);
+            toggleGo.name = "PixelToggle";
+            PlaceTopLeft(toggleGo.transform, panel.transform, new Vector2(14f, -10f), new Vector2(PixelPanelSize.x - 28f, 30f));
+            Object.DestroyImmediate(toggleGo.transform.Find("Label").gameObject);
+            PanelText("Label", toggleGo.transform, font, SideScrollTexts.PixelToggle, new Vector2(26f, -2f), new Vector2(PixelPanelSize.x - 54f, 28f));
+            var toggle = toggleGo.GetComponent<Toggle>();
+
+            var sliderGo = DefaultControls.CreateSlider(resources);
+            sliderGo.name = "PixelSlider";
+            PlaceTopLeft(sliderGo.transform, panel.transform, new Vector2(14f, -50f), new Vector2(PixelPanelSize.x - 28f, 20f));
+            var label = PanelText("SizeLabel", panel.transform, font, "", new Vector2(14f, -78f), new Vector2(PixelPanelSize.x - 28f, 28f));
+
+            panel.AddComponent<PixelRenderPanel>()
+                .SetRef("_view", view).SetRef("_toggle", toggle)
+                .SetRef("_slider", sliderGo.GetComponent<Slider>()).SetRef("_label", label);
+        }
+
+        private static TextMeshProUGUI PanelText(string name, Transform parent, TMP_FontAsset font, string content,
+            Vector2 position, Vector2 size)
+        {
+            var go = new GameObject(name, typeof(RectTransform), typeof(TextMeshProUGUI));
+            PlaceTopLeft(go.transform, parent, position, size);
+            var text = go.GetComponent<TextMeshProUGUI>();
+            // 글자보다 폰트를 먼저 정한다 (기본 폰트로 한글을 그리면 TMP 기본 폴백 폰트 파일이 바뀜).
+            text.font = font;
+            text.text = content;
+            text.fontSize = 20;
+            text.color = Color.white;
+            text.alignment = TextAlignmentOptions.MidlineLeft;
+            text.raycastTarget = false;
+            return text;
+        }
+
+        private static void PlaceTopLeft(Transform child, Transform parent, Vector2 position, Vector2 size)
+        {
+            child.SetParent(parent, false);
+            var rect = (RectTransform)child;
+            rect.anchorMin = rect.anchorMax = rect.pivot = new Vector2(0f, 1f);
+            rect.anchoredPosition = position;
+            rect.sizeDelta = size;
+        }
+
+        private static Sprite BuiltinSprite(string file) =>
+            AssetDatabase.GetBuiltinExtraResource<Sprite>($"UI/Skin/{file}.psd");
 
         private static TextMeshProUGUI HudText(string name, Transform canvas, TMP_FontAsset font, float size,
             TextAlignmentOptions alignment, Vector2 corner, Vector2 offset, Vector2 panelSize)

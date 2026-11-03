@@ -1,12 +1,12 @@
 // 도트 렌더링: 켜면 카메라를 화면의 1/픽셀 크기 해상도 텍스처에 그리고, Point 필터로 화면 가득 확대해 보여 준다.
-// 화면 크기가 바뀌면 텍스처를 다시 만든다. 프로젝트 설정·URP 렌더러는 건드리지 않는다 (랩 전용).
+// 화면 크기가 바뀌면 텍스처를 다시 만든다. 프로젝트 설정·URP 렌더러는 건드리지 않는다 (복도·애니메이션 랩 공용).
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace VoxelMagic.Sandbox
+namespace VoxelMagic.UI
 {
     [RequireComponent(typeof(Camera))]
-    public sealed class LabPixelView : MonoBehaviour
+    public sealed class PixelRenderView : MonoBehaviour
     {
         private const int DepthBits = 24;
 
@@ -62,7 +62,7 @@ namespace VoxelMagic.Sandbox
             }
 
             var size = Resolution;
-            _texture = new RenderTexture(size.x, size.y, DepthBits) { name = "LabPixelView", filterMode = FilterMode.Point };
+            _texture = new RenderTexture(size.x, size.y, DepthBits) { name = "PixelRenderView", filterMode = FilterMode.Point };
             _texture.Create();
             _camera.targetTexture = _texture;
             _output.texture = _texture;

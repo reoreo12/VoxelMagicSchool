@@ -21,5 +21,5 @@ MonoBehaviour:
   _idleSpeed: 1
   _walkSpeed: 1
   _runSpeed: 1
-  _controller: {fileID: 0}
-  _characterPrefab: {fileID: 0}
+  _controller: {fileID: 9100000, guid: 61d0c94c31d9b3243aac5ae193f22741, type: 2}
+  _characterPrefab: {fileID: 5748715137859855196, guid: 2d10c4b9c4f1afb4ca7c3fcc2164204c, type: 3}

@@ -27,5 +27,5 @@ MonoBehaviour:
   _endMargin: 2.56
   _cameraZ: -10
   _cameraFollowTime: 0.15
-  _characterPrefab: {fileID: 6865248072325870992, guid: 34886671d2da3fa48a4b4bf95e67472a, type: 3}
+  _characterPrefab: {fileID: 5748715137859855196, guid: 2d10c4b9c4f1afb4ca7c3fcc2164204c, type: 3}
   _showStateDebug: 1
