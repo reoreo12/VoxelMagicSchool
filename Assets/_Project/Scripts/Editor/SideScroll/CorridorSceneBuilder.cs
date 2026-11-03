@@ -17,7 +17,7 @@ namespace VoxelMagic.EditorTools
     {
         public const string ScenePath = "Assets/_Project/Scenes/Corridor_SideScroll.unity";
         private const string DataFolder = "Assets/_Project/Data/SideScroll";
-        private const string SpriteMaterialPath =
+        internal const string SpriteMaterialPath =
             "Packages/com.unity.render-pipelines.universal/Runtime/Materials/Sprite-Unlit-Default.mat";
         private const string InputPath = "Assets/_Project/Input/GameControls.inputactions";
 
@@ -146,6 +146,7 @@ namespace VoxelMagic.EditorTools
             state.gameObject.AddComponent<StateDebugView>().SetRef("_text", state);
 
             BuildPixelPanel(canvasGo.transform, font, pixelView);
+            BuildViewPanel(canvasGo.transform, font);
             return canvasGo;
         }
 
@@ -181,6 +182,29 @@ namespace VoxelMagic.EditorTools
             panel.AddComponent<PixelRenderPanel>()
                 .SetRef("_view", view).SetRef("_toggle", toggle)
                 .SetRef("_slider", sliderGo.GetComponent<Slider>()).SetRef("_label", label);
+        }
+
+        // 도트 렌더링 패널 아래: 2D/3D 캐릭터 토글
+        private static void BuildViewPanel(Transform canvas, TMP_FontAsset font)
+        {
+            var panel = new GameObject("CharacterViewPanel", typeof(RectTransform), typeof(Image));
+            panel.transform.SetParent(canvas, false);
+            panel.GetComponent<Image>().color = HudPanelColor;
+            var rect = (RectTransform)panel.transform;
+            rect.anchorMin = rect.anchorMax = rect.pivot = Vector2.one;
+            rect.anchoredPosition = new Vector2(-24f, -84f - PixelPanelSize.y - 8f);
+            rect.sizeDelta = new Vector2(PixelPanelSize.x, 50f);
+
+            var resources = new DefaultControls.Resources
+            {
+                standard = BuiltinSprite("UISprite"), background = BuiltinSprite("Background"), checkmark = BuiltinSprite("Checkmark")
+            };
+            var toggleGo = DefaultControls.CreateToggle(resources);
+            toggleGo.name = "ViewToggle";
+            PlaceTopLeft(toggleGo.transform, panel.transform, new Vector2(14f, -10f), new Vector2(PixelPanelSize.x - 28f, 30f));
+            Object.DestroyImmediate(toggleGo.transform.Find("Label").gameObject);
+            PanelText("Label", toggleGo.transform, font, SideScrollTexts.ViewToggle, new Vector2(26f, -2f), new Vector2(PixelPanelSize.x - 54f, 28f));
+            panel.AddComponent<CharacterViewPanel>().SetRef("_toggle", toggleGo.GetComponent<Toggle>());
         }
 
         private static TextMeshProUGUI PanelText(string name, Transform parent, TMP_FontAsset font, string content,

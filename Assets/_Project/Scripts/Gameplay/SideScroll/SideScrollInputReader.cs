@@ -1,4 +1,5 @@
-// 새 Input System의 SideScroll 맵(A/D·←/→, Shift, P)을 읽는 유일한 곳. 이동은 MoveIntent로 바꾸고, P는 도트 렌더링을 켜고 끈다.
+// 새 Input System의 SideScroll 맵(A/D·←/→, Shift, P, V)을 읽는 유일한 곳. 이동은 MoveIntent로 바꾸고,
+// P는 도트 렌더링, V는 2D/3D 캐릭터를 바꾼다.
 // W/S는 바인딩 자체가 없다.
 using UnityEngine;
 using UnityEngine.InputSystem;
@@ -26,6 +27,7 @@ namespace VoxelMagic.Gameplay
             _move = _map.FindAction("Move", true);
             _run = _map.FindAction("Run", true);
             _map.FindAction("TogglePixel", true).performed += _ => _context?.PixelRender.Toggle();
+            _map.FindAction("ToggleCharacterView", true).performed += _ => _context?.CharacterView.Toggle();
         }
 
         private void OnEnable() => _map?.Enable();

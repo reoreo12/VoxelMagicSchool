@@ -1,5 +1,16 @@
 # 변경 기록
 
+## 2026-11-03 — 복도: 2D 스프라이트 캐릭터 + 2D/3D 전환 (V)
+- 설계: DESIGN_CORRIDOR.md 13번 승인 후 제작
+- Core: `SpriteCharacterSet`(상태별 프레임·fps·반복·목표 키) + `SpriteClipMath`(시간 → 프레임), `AvatarSetup._sprites`(2D 버전 연결), `CharacterViewState`(2D/3D + 변경 이벤트), `SideScrollContext.CharacterView`, `CorridorConfig`에 2D로 시작(기본 켬)·스프라이트 정렬 순서(10), 조작법에 V 추가
+- 입력: `SideScroll` 맵에 `ToggleCharacterView`(V) 추가
+- Gameplay: `SpriteFrameAnimator`(상태 이벤트 → 프레임 재생, 회전 정면 고정, 왼쪽이면 좌우 반전), `CharacterViewSwitcher`(2D면 3D 렌더러 끄고 스프라이트 켬, Animator는 계속)
+- UI: `CharacterViewPanel` — 복도 HUD 도트 렌더링 패널 아래 "2D 캐릭터 (V)" 토글
+- Editor: `SpriteCharacterImporter`(메뉴 `VoxelMagic/아바타/선택한 2D 스프라이트 준비`), 복도 캐릭터 만들기(메뉴 3)가 2D 버전이 있으면 `Sprite2D` 자식과 전환 컴포넌트를 함께 넣음, 복도 HUD에 토글 패널
+- 생성: `Data/Avatars/Student_Male_2D`(Idle 8프레임 6fps · Walk 8프레임 10fps · Run 8프레임 12fps, PPU 51.25 = Idle 82px → 키 1.6), Student_Male v02~v05 아바타에 연결, v05 복도 프리팹·복도 씬 다시 생성. 스프라이트 PNG 임포트: Sprite·Point·압축 없음·Mip Map 끔
+- Tests: `CharacterViewTests` 9개 (전체 69개 통과)
+- 확인 (상태 머신에 입력 값 직접): 2D로 시작(3D 렌더러 꺼짐), 걷기 → Walk 프레임, 왼쪽 달리기 → Run 프레임·좌우 반전, 루트가 90° 돌아도 스프라이트 회전 (0,0,0), 발 y 0.08(바닥 띠 안), 정렬 순서 10 / V → 3D(애니메이션 Run 이어짐) → V → 2D / 콘솔 에러 0
+
 ## 2026-11-03 — 폴더 구조 정리: 캐릭터별로 묶기
 - 사용자 요청: 3D 모델(`Art/Characters/`)과 2D 스프라이트(`Art/Sprites/Characters/`)가 따로 흩어져 복잡했음
 - 새 구조: `Art/Characters/<캐릭터>/Model/`(3D 모델·텍스처), `Art/Characters/<캐릭터>/Sprites/`(2D 아틀라스·json). `Animations/`는 모든 캐릭터가 같이 쓰는 클립이라 그대로 따로 둠

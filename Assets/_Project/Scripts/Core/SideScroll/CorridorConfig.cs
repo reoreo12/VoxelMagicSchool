@@ -34,6 +34,10 @@ namespace VoxelMagic.Core
         [Header("캐릭터")]
         [Tooltip("복도에 놓을 캐릭터 프리팹. 비어 있으면 큐브 캐릭터 (메뉴: VoxelMagic/아바타/3)")]
         [SerializeField] private GameObject _characterPrefab;
+        [Tooltip("2D 버전이 있는 캐릭터면 2D 스프라이트로 시작 (V 키로 3D와 전환)")]
+        [SerializeField] private bool _startIn2D = true;
+        [Tooltip("2D 캐릭터 스프라이트의 정렬 순서 (복도 타일보다 커야 앞에 보임)")]
+        [SerializeField] private int _characterSpriteSortingOrder = 10;
 
         [Header("도트 렌더링 (화면 전체)")]
         [SerializeField] private bool _pixelOnAtStart = false;
@@ -60,6 +64,8 @@ namespace VoxelMagic.Core
         public float CameraZ => _cameraZ;
         public float CameraFollowTime => _cameraFollowTime;
         public GameObject CharacterPrefab => _characterPrefab;
+        public bool StartIn2D => _startIn2D;
+        public int CharacterSpriteSortingOrder => _characterSpriteSortingOrder;
         public bool PixelOnAtStart => _pixelOnAtStart;
         public int PixelSize => _pixelSize;
         public Vector2Int PixelSizeRange => _pixelSizeRange;

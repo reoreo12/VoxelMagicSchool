@@ -187,6 +187,7 @@ namespace VoxelMagic.EditorTools
             root.AddComponent<CharacterAnimatorView>()
                 .SetRef("_animator", animator)
                 .SetRef("_config", CorridorSceneBuilder.LoadOrCreateAnimationConfig());
+            AddSprite2D(root, model, setup.Sprites);
 
             EnsureFolder(PrefabFolder);
             var prefab = PrefabUtility.SaveAsPrefabAsset(root, $"{PrefabFolder}/{root.name}.prefab");
@@ -196,6 +197,24 @@ namespace VoxelMagic.EditorTools
             AssetDatabase.SaveAssets();
             Debug.Log($"[AvatarPipeline] {prefab.name} 생성 완료");
             return prefab;
+        }
+
+        // 2D 버전이 있으면 Sprite2D 자식(스프라이트 + 프레임 재생)을 만들고, 루트에 2D/3D 전환을 붙인다. 시작 모드는 CorridorConfig.
+        private static void AddSprite2D(GameObject root, GameObject model, SpriteCharacterSet sprites)
+        {
+            GameObject sprite = null;
+            if (sprites != null)
+            {
+                var config = CorridorSceneBuilder.LoadOrCreateConfig();
+                sprite = new GameObject("Sprite2D");
+                sprite.transform.SetParent(root.transform, false);
+                var renderer = sprite.AddComponent<SpriteRenderer>();
+                renderer.sharedMaterial = AssetDatabase.LoadAssetAtPath<Material>(CorridorSceneBuilder.SpriteMaterialPath);
+                renderer.sortingOrder = config.CharacterSpriteSortingOrder;
+                renderer.sprite = sprites.ClipFor(CharacterStateId.Idle).IsEmpty ? null : sprites.ClipFor(CharacterStateId.Idle).Frames[0];
+                sprite.AddComponent<SpriteFrameAnimator>().SetRef("_renderer", renderer).SetRef("_set", sprites);
+            }
+            root.AddComponent<CharacterViewSwitcher>().SetRef("_model", model).SetRef("_sprite", sprite);
         }
 
         public static void UseInCorridor(GameObject prefab)
