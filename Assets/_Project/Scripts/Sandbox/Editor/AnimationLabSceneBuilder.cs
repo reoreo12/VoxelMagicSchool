@@ -70,6 +70,7 @@ namespace VoxelMagic.Sandbox.EditorTools
             var light = Object.FindFirstObjectByType<Light>();
             light.transform.rotation = Quaternion.Euler(LightEuler);
             light.shadows = LightShadows.Soft;
+            VoxelShadowSettings.Apply(light);
 
             BuildGround();
             var spawn = new GameObject("SpawnPoint").transform;

@@ -39,6 +39,12 @@
 | 2026-11-03 | `Art/Characters/Student_Male/Student_Male_v02.fbx` | Rig Humanoid, 배율 1.58 (목표 키 1.6, `Data/Avatars/Student_Male`) |
 | 2026-11-03 | `Art/Characters/Student_Male/*.png` | Point, 압축 없음, Mip Map 끔 |
 
+## 조명 그림자 (씬별)
+
+| 날짜 | 씬 | 설정 | 이유 |
+|---|---|---|---|
+| 2026-11-03 | Prototype_FarmFishing, Sandbox/AnimationLab | 조명 그림자 보정을 파이프라인 대신 직접: Depth Bias 0.1, Normal Bias 0 (`Editor/VoxelShadowSettings`) | 복셀 아바타 그림자 구멍. 프로젝트 URP 설정(`PC_RPAsset`)은 그대로 |
+
 ## 어셈블리 (asmdef)
 
 | 이름 | 위치 | 참조 |

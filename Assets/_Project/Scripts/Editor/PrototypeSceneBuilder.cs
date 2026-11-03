@@ -1,6 +1,7 @@
 // 그레이박스 씬(Prototype_FarmFishing)을 기본 도형으로 다시 만드는 에디터 도구.
 // 배치를 코드로 남겨 두어 언제든 같은 씬을 재생성할 수 있게 한다. 설정 에셋은 없을 때만 만든다.
 using System.Collections.Generic;
+using System.Linq;
 using TMPro;
 using UnityEditor;
 using UnityEditor.SceneManagement;
@@ -48,6 +49,7 @@ namespace VoxelMagic.EditorTools
         {
             var scene = EditorSceneManager.NewScene(NewSceneSetup.DefaultGameObjects, NewSceneMode.Single);
             var font = KoreanFontAssetBuilder.GetOrCreate();
+            VoxelShadowSettings.Apply(Object.FindFirstObjectByType<Light>());
 
             var balance = LoadOrCreate<GameBalanceConfig>("GameBalanceConfig");
             var farm = LoadOrCreate<FarmConfig>("FarmConfig");
@@ -64,10 +66,11 @@ namespace VoxelMagic.EditorTools
             var fishingDriver = BuildPond(world.transform);
             BuildCreature(world.transform);
 
-            var playerRoot = BuildPlayer(out var interactor);
+            var playerRoot = BuildPlayer(player, out var interactor);
             fishingDriver.SetRef("_wandTip", playerRoot.transform.Find("WandTip"));
             var camera = Camera.main;
-            camera.gameObject.AddComponent<QuarterViewCamera>().SetRef("_target", playerRoot.transform);
+            camera.gameObject.AddComponent<QuarterViewCamera>().SetRef("_target", playerRoot.transform)
+                .SetRef("_input", playerRoot.GetComponent<GameInputReader>());
 
             var ui = BuildUI(font, camera);
 
@@ -234,7 +237,7 @@ namespace VoxelMagic.EditorTools
 
         // ── 플레이어 ──────────────────────────────────────────
 
-        private static GameObject BuildPlayer(out PlayerInteractor interactor)
+        private static GameObject BuildPlayer(PlayerConfig config, out PlayerInteractor interactor)
         {
             var root = new GameObject("Player");
             var controller = root.AddComponent<CharacterController>();
@@ -243,12 +246,20 @@ namespace VoxelMagic.EditorTools
             controller.radius = 0.35f;
 
             var t = root.transform;
-            Prim(PrimitiveType.Capsule, "Body", t, new Vector3(0f, 0.8f, 0f), new Vector3(0.7f, 0.8f, 0.7f),
-                Mat("Uniform", new Color(0.13f, 0.18f, 0.4f)));
-            Prim(PrimitiveType.Cube, "Head", t, new Vector3(0f, 1.85f, 0f), Vector3.one * 0.5f,
-                Mat("Skin", new Color(1f, 0.8f, 0.65f)));
-            Prim(PrimitiveType.Cube, "Tie", t, new Vector3(0f, 1.3f, 0.36f), new Vector3(0.1f, 0.4f, 0.04f),
-                Mat("Tie", new Color(0.85f, 0.12f, 0.15f)));
+            // 임시: 설정에 아바타가 있으면 몸통·머리·넥타이 도형 대신 아바타 모델을 입힌다 (DESIGN.md 11번).
+            var avatar = config.Avatar;
+            Animator avatarAnimator = null;
+            if (avatar != null && avatar.Model != null && avatar.Controller != null)
+                avatarAnimator = AddAvatarModel(t, avatar);
+            else
+            {
+                Prim(PrimitiveType.Capsule, "Body", t, new Vector3(0f, 0.8f, 0f), new Vector3(0.7f, 0.8f, 0.7f),
+                    Mat("Uniform", new Color(0.13f, 0.18f, 0.4f)));
+                Prim(PrimitiveType.Cube, "Head", t, new Vector3(0f, 1.85f, 0f), Vector3.one * 0.5f,
+                    Mat("Skin", new Color(1f, 0.8f, 0.65f)));
+                Prim(PrimitiveType.Cube, "Tie", t, new Vector3(0f, 1.3f, 0.36f), new Vector3(0.1f, 0.4f, 0.04f),
+                    Mat("Tie", new Color(0.85f, 0.12f, 0.15f)));
+            }
             var wand = Prim(PrimitiveType.Cube, "Wand", t, new Vector3(0.35f, 1.15f, 0.4f), new Vector3(0.05f, 0.05f, 0.58f),
                 Mat("Wand", new Color(0.55f, 0.35f, 0.2f)));
             wand.transform.localRotation = Quaternion.Euler(-31f, 0f, 0f);
@@ -267,7 +278,25 @@ namespace VoxelMagic.EditorTools
                 .SetRef("_actions", AssetDatabase.LoadAssetAtPath<InputActionAsset>(InputPath));
             root.AddComponent<PlayerMover>().SetRef("_input", input);
             interactor = root.AddComponent<PlayerInteractor>().SetRef("_input", input);
+            if (avatarAnimator != null)
+                root.AddComponent<PlayerAvatarAnimator>().SetRef("_animator", avatarAnimator);
             return root;
+        }
+
+        // Humanoid Avatar는 FBX 루트 기준으로 뼈를 찾으므로 Animator는 FBX 인스턴스(Model)에 둔다. 이동은 코드가 하므로 루트 이동 끔.
+        private static Animator AddAvatarModel(Transform parent, AvatarSetup avatar)
+        {
+            var model = (GameObject)PrefabUtility.InstantiatePrefab(avatar.Model);
+            model.name = "Model";
+            model.transform.SetParent(parent, false);
+            var animator = model.GetComponent<Animator>();
+            if (animator == null) animator = model.AddComponent<Animator>();
+            animator.avatar = AssetDatabase.LoadAllAssetsAtPath(AssetDatabase.GetAssetPath(avatar.Model))
+                .OfType<Avatar>().FirstOrDefault();
+            animator.runtimeAnimatorController = avatar.Controller;
+            animator.applyRootMotion = false;
+            animator.cullingMode = AnimatorCullingMode.AlwaysAnimate;
+            return animator;
         }
 
         // ── UI ───────────────────────────────────────────────

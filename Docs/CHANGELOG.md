@@ -1,5 +1,29 @@
 # 변경 기록
 
+## 2026-11-03 — 복셀 아바타 그림자 구멍 수정 (씬 조명 Normal Bias 0)
+- 원인: 복셀 메시는 면마다 정점이 따로라, URP 그림자 Normal Bias가 면을 법선 방향 안쪽으로 밀 때 면 사이가 벌어져 그림자에 구멍이 생김
+- 비교 (같은 위치·같은 카메라 7곳: 아바타·게시판·학교 벽·은행나무·연못 돌·텃밭·크리처, 현재 0.5 vs Normal 0): 바뀐 픽셀 0.03~0.46%, **모두 어두워지는 쪽**(밝아진 곳 0) — 아바타 그림자 구멍이 메워지고 다른 물체 그림자 가장자리가 한 줄 정도 넓어짐. 빛 받는 바닥·벽·돌 표면에 새 얼룩(Shadow Acne) 없음 → 롤백하지 않음
+- 적용: `Editor/VoxelShadowSettings`(씬 조명만 파이프라인 설정 대신 Depth Bias 0.1·Normal Bias 0), 프로토타입 씬·애니메이션 랩 씬 생성 도구에서 사용, 두 씬 다시 생성. 프로젝트 URP 설정은 그대로
+- Editor asmdef에 `Unity.RenderPipelines.Universal.Runtime` 참조 추가
+- 확인: 근접 캡처에서 아바타 그림자 꽉 참 / 콘솔 에러 0
+- 참고: 노말 맵은 화면에 그릴 때의 음영에만 쓰이고 그림자 모양에는 쓰이지 않아 이 문제와 관계없음. 근본 해결은 모델에서 정점 합치기(Weld)지만, 복셀의 각진 음영이 바뀔 수 있어 지금은 하지 않음
+
+## 2026-11-03 — 프로토타입 1: 마우스 스크롤 카메라 줌, 기본 거리 가깝게
+- `GameInputReader`: 스크롤은 낚시 미니게임 중이면 잡기 바, 창이 열려 있지 않은 평소에는 `ZoomRequested` 이벤트(카메라 줌)
+- `QuarterViewCamera`: 스크롤 위 = 가까이, 아래 = 멀리. 거리를 줌 범위로 제한하고 따라가기와 같은 부드러움으로 다가감
+- `PlayerConfig`: 카메라 기본 거리 14 → **8**, 줌 범위 4~16, 스크롤 한 칸 1 (에셋 값도 8로 변경)
+- 씬 다시 생성 (카메라에 입력 연결)
+- 확인: 시작 거리 8, 위로 10칸 → 4에서 멈춤, 아래로 20칸 → 16에서 멈춤, 부드럽게 4까지 다가감 / 콘솔 에러 0
+- 그림자 구멍 원인 확인: 아바타 메시(정점 20,122 · 삼각형 11,902)는 복셀 면마다 정점이 따로 있는 구조라, URP 그림자 Normal Bias(조명 0.4)가 면을 법선 방향으로 안쪽으로 밀 때 면 사이가 벌어져 구멍이 생긴다. 플레이 중 조명만 Normal Bias 0으로 바꾸자 구멍이 사라짐 (저장하지 않은 실험)
+
+## 2026-11-03 — 프로토타입 1: 플레이어를 아바타(Student_Male_v05)로 임시 교체
+- 설계: DESIGN.md 11번, 사용자가 이동 애니메이션 Walk 선택
+- Core: `PlayerConfig`에 아바타(AvatarSetup, 비우면 기본 도형)·Walk 기준 속도(1 m/s)·Walk 시작 속도(0.1)·섞기 시간(0.15초) 추가, 아바타 = `Student_Male_v05`
+- Gameplay: `PlayerAvatarAnimator`(움직이면 Walk, 멈추면 Idle — 농사·낚시·대화는 Idle. Walk 재생 속도 = 실제 이동 속도 ÷ 기준 속도)
+- Editor: `PrototypeSceneBuilder.BuildPlayer`가 아바타가 있으면 몸통·머리·넥타이 도형 대신 아바타 모델(`Model`, Animator = v05 Controller, 루트 이동 끔)을 넣음. 지팡이·지팡이 끝·입질 표시·CharacterController는 그대로. 프로토타입 씬 다시 생성
+- 확인: 시작 Idle → 4 m/s 이동 시 Walk(재생 속도 약 3.3~4배) → 멈추면 Idle, 낚시 상태 Idle, Model 위치 (0,0,0) 유지 / 콘솔 에러 0 / 단위 테스트 60개 통과
+- 참고: 아바타 키 1.6이라 기존 도형(머리까지 약 2.1)보다 작아 보임, 지팡이는 몸 앞 고정 위치. 되돌리려면 `PlayerConfig` 아바타를 비우고 `VoxelMagic/프로토타입 씬 다시 만들기`
+
 ## 2026-11-03 — 복도 맵 도트 렌더링 On/Off (화면 전체)
 - 설계: DESIGN_CORRIDOR.md 12-10, 사용자가 B(화면 전체) + 토글·슬라이더 선택
 - 공용화: 랩의 `LabPixelView` → `UI/Rendering/PixelRenderView` (같은 .meta로 옮겨 기존 씬 참조 유지), 랩도 같은 컴포넌트 사용. `VoxelMagic.Sandbox`·`Sandbox.Editor` asmdef에 `VoxelMagic.UI` 참조 추가
