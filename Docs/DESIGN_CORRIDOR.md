@@ -441,7 +441,8 @@ Assets/_Project/
 
 **폴더 규칙 (틀)**
 ```
-Art/Characters/<이름>/          모델 .fbx 1개 + 텍스처 .png (Humanoid로 쓸 수 있는 사람 뼈대)
+Art/Characters/<캐릭터>/Model/   모델 .fbx + 텍스처 .png (Humanoid로 쓸 수 있는 사람 뼈대)
+Art/Characters/<캐릭터>/Sprites/ 2D 스프라이트
 Animations/<아무 하위 폴더>/     애니메이션 .fbx (Mixamo Without Skin 등) / .anim
 ```
 **메뉴 (VoxelMagic/아바타/)** — 모델·애니메이션을 Project 창에서 선택하고 실행

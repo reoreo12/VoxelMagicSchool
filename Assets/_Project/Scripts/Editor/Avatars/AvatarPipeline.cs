@@ -1,4 +1,4 @@
-// 아바타 파이프라인 메뉴. 폴더 규칙(Art/Characters/<이름>/모델.fbx, Animations/**/애니메이션.fbx)만 지키면
+// 아바타 파이프라인 메뉴. 폴더 규칙(Art/Characters/<캐릭터>/Model/모델.fbx, Animations/**/애니메이션.fbx)만 지키면
 // 1) 모델 준비(Humanoid·키 배율·텍스처·AvatarSetup) 2) 애니메이션 Humanoid 임포트 3) 복도 캐릭터 프리팹 생성·지정까지 처리한다.
 using System.Collections.Generic;
 using System.IO;
@@ -308,13 +308,16 @@ namespace VoxelMagic.EditorTools
             return ScanAvatars().FirstOrDefault(s => s.Model == model);
         }
 
-        // 폴더에 모델이 하나면 폴더 이름, 여러 개(버전 비교 등)면 파일 이름을 아바타 이름으로 쓴다.
+        // 캐릭터 폴더(Art/Characters 바로 아래, 예: Student_Male)에 모델이 하나면 캐릭터 폴더 이름,
+        // 여러 개(버전 비교 등)면 파일 이름을 아바타 이름으로 쓴다. 모델이 Model/ 같은 하위 폴더에 있어도 같다.
         private static string SetupNameFor(string modelPath)
         {
-            string folder = Path.GetDirectoryName(modelPath).Replace('\\', '/');
-            int models = AssetDatabase.FindAssets("t:Model", new[] { folder })
+            string relative = modelPath.Substring(CharactersRoot.Length + 1);
+            string character = relative.Split('/')[0];
+            string characterFolder = $"{CharactersRoot}/{character}";
+            int models = AssetDatabase.FindAssets("t:Model", new[] { characterFolder })
                 .Count(g => IsModel(AssetDatabase.GUIDToAssetPath(g)));
-            return models > 1 ? Path.GetFileNameWithoutExtension(modelPath) : Path.GetFileName(folder);
+            return models > 1 ? Path.GetFileNameWithoutExtension(modelPath) : character;
         }
 
         private static AvatarSetup LoadOrCreateSetup(string name)

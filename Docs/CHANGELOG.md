@@ -1,5 +1,13 @@
 # 변경 기록
 
+## 2026-11-03 — 폴더 구조 정리: 캐릭터별로 묶기
+- 사용자 요청: 3D 모델(`Art/Characters/`)과 2D 스프라이트(`Art/Sprites/Characters/`)가 따로 흩어져 복잡했음
+- 새 구조: `Art/Characters/<캐릭터>/Model/`(3D 모델·텍스처), `Art/Characters/<캐릭터>/Sprites/`(2D 아틀라스·json). `Animations/`는 모든 캐릭터가 같이 쓰는 클립이라 그대로 따로 둠
+- 이동 (Unity 안에서 옮겨 GUID 유지): Student_Male v02~v05 `.fbx`·`_tex.png` → `Model/`, 사용자가 넣은 `Student_Male_Idle/Walk/Run.png`·`Student_Male_sprites.json` → `Sprites/`. 빈 `Art/Sprites/` 갈래 삭제
+- `AvatarPipeline` 아바타 이름 규칙: 모델 폴더 이름 → **캐릭터 폴더 이름**(Art/Characters 바로 아래), 모델이 여러 개면 파일 이름 (기존과 같음)
+- 확인: 아바타 데이터 4개 모델 경로 새 위치, 복도 프리팹(v02·v05) 메시·아바타 연결 정상, PlayerConfig 아바타 정상, 새 모델 자동 준비 0개 / 콘솔 에러 0
+- 문서: AVATAR_GUIDE.md, DESIGN_CORRIDOR.md, SETUP.md 경로 갱신
+
 ## 2026-11-03 — 복셀 아바타 그림자 구멍 수정 (씬 조명 Normal Bias 0)
 - 원인: 복셀 메시는 면마다 정점이 따로라, URP 그림자 Normal Bias가 면을 법선 방향 안쪽으로 밀 때 면 사이가 벌어져 그림자에 구멍이 생김
 - 비교 (같은 위치·같은 카메라 7곳: 아바타·게시판·학교 벽·은행나무·연못 돌·텃밭·크리처, 현재 0.5 vs Normal 0): 바뀐 픽셀 0.03~0.46%, **모두 어두워지는 쪽**(밝아진 곳 0) — 아바타 그림자 구멍이 메워지고 다른 물체 그림자 가장자리가 한 줄 정도 넓어짐. 빛 받는 바닥·벽·돌 표면에 새 얼룩(Shadow Acne) 없음 → 롤백하지 않음
