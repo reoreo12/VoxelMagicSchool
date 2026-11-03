@@ -46,7 +46,8 @@ namespace VoxelMagic.Sandbox
                 _graph.Connect(_previous, 0, _mixer, 1);
             }
             _current = AnimationClipPlayable.Create(_graph, clip);
-            _current.SetApplyFootIK(true);
+            // 실제 게임의 Animator Controller와 같은 조건(발 IK 꺼짐). 짧고 넓은 조각형 다리는 IK가 다리를 모아 X자로 만든다.
+            _current.SetApplyFootIK(false);
             _graph.Connect(_current, 0, _mixer, 0);
 
             Clip = clip;
