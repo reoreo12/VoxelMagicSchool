@@ -11,6 +11,9 @@ namespace VoxelMagic.Core
         public CharacterStateMachine Character { get; private set; }
         public PixelRenderState PixelRender { get; private set; }
         public CharacterViewState CharacterView { get; private set; }
+        public CameraFollowState CameraFollow { get; private set; }
+        public InteractionFocusState Interaction { get; private set; }
+        public TimeOfDayState TimeOfDay { get; private set; }
 
         /// <summary>캐릭터 이동 범위는 복도 양 끝에서 끝 여유만큼 안쪽 (문 앞에서 멈춤).</summary>
         public static SideScrollContext Create(CorridorConfig config, CharacterMoveConfig moveConfig, CorridorBounds bounds)
@@ -24,7 +27,10 @@ namespace VoxelMagic.Core
                 Character = new CharacterStateMachine(motor, moveConfig),
                 PixelRender = new PixelRenderState(config.PixelOnAtStart, config.PixelSize,
                     config.PixelSizeRange.x, config.PixelSizeRange.y),
-                CharacterView = new CharacterViewState(config.StartIn2D ? CharacterViewMode.TwoD : CharacterViewMode.ThreeD)
+                CharacterView = new CharacterViewState(config.StartIn2D ? CharacterViewMode.TwoD : CharacterViewMode.ThreeD),
+                CameraFollow = new CameraFollowState(config.CameraLockedAtStart ? CameraFollowMode.Locked : CameraFollowMode.Smooth),
+                Interaction = new InteractionFocusState(),
+                TimeOfDay = new TimeOfDayState(config.NightAtStart ? Core.TimeOfDay.Night : Core.TimeOfDay.Day)
             };
         }
     }

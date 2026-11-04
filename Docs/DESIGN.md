@@ -465,3 +465,37 @@ Result ──정보 UI 시간(3초) 경과──► Idle
 - 섞기 시간은 `PlayerConfig`의 애니메이션 섞기 시간(기본 0.15초)을 쓴다 (프로토타입 1이 복도 설정에 의존하지 않게).
 - 키: 아바타는 1.6, 기존 기본 도형은 약 2.1(머리 포함). 카메라·상호작용 반경은 그대로 둔다.
 - 지팡이는 지금처럼 몸에 고정된 위치에 둔다 (손에 쥐는 연출은 나중에).
+
+## 12. 플레이어 아바타를 칩비(Student_Chibi_v2)로 교체 + 필요한 애니메이션 정리 (2026-11-04)
+
+- `PlayerConfig` 아바타: `Student_Male_v05` → **`Student_Chibi_v2`** (복도와 같은 Controller: Idle/Walk/Run 연결). 씬 다시 생성. 동작은 11번 그대로 (움직이면 Walk, 멈추면 Idle)
+- 키는 아바타 기본값 1.6 (복도는 프리팹에서 0.8배로 줄였지만, 이 씬은 모델을 직접 넣어서 배율이 적용되지 않음)
+- 지팡이는 여전히 몸에 고정된 위치 (칩비 손 위치와 맞지 않을 수 있음)
+
+### 12-1. 지금 기능에 필요한 애니메이션
+칩비 특성: 팔·다리가 한 조각(무릎·팔꿈치 안 굽음), Neck 본 없음 → **쪼그려 앉기·무릎 꿇기는 어색**하므로 서서 하는 동작·상체 위주 동작을 고른다.
+
+| 순위 | 기능 (동작 흐름) | 애니메이션 | 반복 | Mixamo 검색어 예 |
+|---|---|---|---|---|
+| 있음 | 이동 | Idle, Walk (Run은 복도용) | 반복 | — |
+| 1 | 낚시: 던지기 (Casting) | **Cast** — 지팡이를 앞으로 휘둘러 던지기 | 한 번 | `Casting Spell`, `Throw` |
+| 1 | 낚시: 기다리기 (Waiting) | **Fish Idle** — 지팡이를 앞으로 든 채 대기 | 반복 | `Standing Idle`(팔 앞으로), `Holding` |
+| 1 | 낚시: 미니게임 (Minigame) | **Reel** — 지팡이를 당기며 버티기 | 반복 | `Pulling`, `Tug Of War` |
+| 1 | 낚시: 잡음 (Caught) | **Catch** — 들어 올리며 기뻐하기 | 한 번 | `Victory`, `Cheering` |
+| 1 | 물 주기 | **Water / Spell** — 지팡이를 앞으로 내밀어 마법 | 한 번 | `Standing 1H Magic Attack`, `Spell Casting` |
+| 2 | 심기 | **Plant** — 허리 숙여 손을 아래로 | 한 번 | `Picking Up`(서서 숙이기), `Plant A Plant` |
+| 2 | 뽑기 | **Harvest** — 숙여서 뽑아 올리기 | 한 번 | `Pulling`, `Pick Up` |
+| 2 | 낚시: 놓침 (Escaped) / 도망감 | **Disappointed** — 어깨 처짐 | 한 번 | `Disappointed`, `Defeated` |
+| 3 | 낚시: 입질 (Biting) | **Surprised** — 깜짝 놀라기 ("!"와 함께) | 한 번 | `Surprised`, `Startled` |
+| 3 | 크리처에게 전달 | **Give** — 앞으로 건네기 | 한 번 | `Giving`, `Handing` |
+| 3 | 크리처 대화 중 | **Talk Idle** — 고개 끄덕·손짓 | 반복 | `Talking`, `Nodding` |
+| 3 | 게시판 의뢰 보기 | **Read** — 앞을 들여다보기 | 반복 | `Looking`, `Reading` |
+
+- 순위: 1 = 낚시·물 주기처럼 지금 가장 오래 보는 장면, 2 = 농사, 3 = 연출 보강
+- 받는 방법은 복도와 같다: FBX for Unity, **Without Skin**, 30fps, 제자리(In Place). 넣은 뒤 애니메이션 랩에서 칩비로 확인
+
+### 12-2. 연결하려면 필요한 것 (나중에 설계)
+- 임포트: 지금 메뉴 2는 모든 클립을 **반복 재생**으로 만든다 → "한 번" 클립은 반복을 끄는 규칙이 필요 (예: 파일 이름 규칙 또는 AvatarSetup에 반복 여부)
+- 데이터: `AvatarSetup`이 Idle/Walk/Run만 갖고 있음 → 동작별 클립 목록(예: 행동 이름 → 클립) 확장
+- 코드: `PlayerAvatarAnimator`가 이동만 본다 → 낚시 상태(`FishingSession` 상태 변경 이벤트)·농사(`FarmGrid` Plant/Water/Remove)·전달 이벤트를 받아 동작 애니메이션을 재생하고, 끝나면 Idle/Walk로 복귀
+- 지팡이: 몸에 고정 → 오른손 본(`RightHand`)에 붙여야 던지기·물 주기 동작과 맞는다

@@ -750,6 +750,14 @@ namespace VoxelMagic.EditorTools
             return target;
         }
 
+        public static T SetString<T>(this T target, string field, string value) where T : Object
+        {
+            var so = new SerializedObject(target);
+            so.FindProperty(field).stringValue = value;
+            so.ApplyModifiedPropertiesWithoutUndo();
+            return target;
+        }
+
         public static T SetAmountList<T>(this T target, string field, IList<ItemDefinition> items, IList<int> amounts)
             where T : Object
         {
