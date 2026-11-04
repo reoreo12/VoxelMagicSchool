@@ -35,6 +35,13 @@
 | 날짜 | 변경 | 이유 | 승인 |
 |---|---|---|---|
 | 2026-11-02 | `Input/GameControls.inputactions`에 `SideScroll` 맵 추가 (Move: 1D Axis A/D·←/→, Run: Left Shift). 기존 `Gameplay` 맵은 그대로 | 복도 횡스크롤 조작. W/S는 바인딩 자체가 없음 | 사용자 승인 |
+| 2026-11-04 | `SideScroll` 맵에 `ToggleCameraFollow`(C), `Interact`(E) 추가 | 복도 카메라 고정/부드럽게 전환, 오른쪽 문 포털 | 사용자 승인 |
+
+## 빌드 씬 목록 (Build Settings)
+
+| 날짜 | 변경 | 이유 | 승인 |
+|---|---|---|---|
+| 2026-11-04 | `Scenes/Corridor_SideScroll.unity`, `Scenes/Prototype_FarmFishing.unity` 추가 (기존 `Assets/Scenes/SampleScene.unity`는 그대로 0번) | 복도 오른쪽 문 포털에서 실행 중 농장 씬을 열기 위해 (`SceneManager.LoadScene`은 목록에 있는 씬만 열 수 있음) | 사용자 승인 |
 
 ## 임포트 설정
 

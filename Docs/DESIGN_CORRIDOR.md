@@ -607,3 +607,78 @@ SideScrollCharacter_<이름> (루트)  [SideScrollCharacter] [CharacterAnimatorV
 1. 2D 스프라이트 준비 도구 → Student_Male 스프라이트 자르기·PPU·데이터 생성
 2. 2D 재생·방향·전환 컴포넌트 + 입력(V)·HUD 토글 + 단위 테스트(전환 상태)
 3. 복도 프리팹 다시 만들기 → 2D로 걷기·달리기·방향 전환·양 끝, V로 3D 전환 확인 → 보고
+
+## 14. 카메라 따라가기 방식 토글: 부드럽게 ↔ 고정 (2026-11-04 승인, 완료)
+
+지금 카메라는 플레이어를 **SmoothDamp(따라가기 시간 0.15초)**로 늦게 따라간다. 그래서 걷기 시작·멈출 때 캐릭터가 화면 안에서 앞뒤로 밀렸다 돌아오고, 배경이 다리보다 늦게 움직여 발이 미끄러져 보이는 느낌이 생길 수 있다. **플레이어 x를 화면 가운데에 딱 고정하는 방식**을 추가하고, 두 방식을 토글·단축키로 바꿔 비교한다.
+
+### 14-1. 동작
+| 방식 | 내용 |
+|---|---|
+| 부드럽게 (지금) | `SmoothDamp`로 늦게 따라감 (`CorridorConfig` 따라가기 시간) |
+| 고정 (추가) | 매 프레임 카메라 x = 플레이어 x. 지연 없음 |
+| 공통 | 복도 양 끝에서는 지금처럼 카메라가 멈춰(복도 밖을 비추지 않음) 플레이어가 가운데에서 벗어남 |
+| 전환 순간 | 고정 → 부드럽게: 지금 위치에서 이어서 따라감 (속도 0부터) / 부드럽게 → 고정: 바로 플레이어 위치로 (한 번 툭 맞춰짐) |
+
+### 14-2. 구조 (2D/3D 토글과 같은 방식)
+| 이름 | 종류 | 어셈블리 | 한 줄 역할 |
+|---|---|---|---|
+| `CameraFollowState` | 일반 C# | Core | 지금 고정인지 부드럽게인지 + 바뀌면 이벤트. `SideScrollContext`에 추가 |
+| `CorridorConfig` | 필드 추가 | Core | "카메라 고정으로 시작" (기본: **켬**, 요청한 방식을 먼저 보기), 조작법에 C 추가 |
+| `SideScrollCamera` | 수정 | Gameplay | 상태가 고정이면 플레이어 x로 바로, 아니면 지금처럼 SmoothDamp |
+| `SideScrollInputReader` + 입력 맵 | 수정 | Gameplay | `SideScroll` 맵에 `ToggleCameraFollow` (**C** 키). P 도트, V 2D/3D와 나란히 |
+| `CameraFollowPanel` | MonoBehaviour | UI | 복도 HUD의 "2D 캐릭터 (V)" 아래 **"카메라 고정 (C)"** 토글 |
+| `CorridorSceneBuilder` | 수정 | Editor | HUD에 토글 추가 (복도 씬 다시 만들기) |
+| 테스트 | EditMode | Tests | 상태 토글·같은 값이면 알리지 않음 |
+
+### 14-3. 알아 둘 점
+- 고정 방식은 배경이 플레이어 속도와 정확히 같이 흐르므로, 발 미끄러짐이 남아 있다면 그건 **애니메이션 재생 속도와 이동 속도 차이**다 → `Data/Avatars/<이름>`의 Walk/Run 재생 속도로 맞춘다
+- 도트 렌더링(P)을 켠 채 고정 카메라로 움직이면, 화면 전체가 한 픽셀씩 움직여 배경 가장자리가 반짝이는 느낌이 날 수 있다 (픽셀 단위로 맞추는 처리는 이번 범위 밖, 플레이 후 판단)
+- 작업 브랜치: `feature/prototype-corridor`
+
+### 14-4. 제작 순서 (승인 후)
+1. Core 상태 + 설정 + 단위 테스트
+2. 카메라·입력(C)·HUD 토글 → 복도 씬 다시 만들기
+3. 플레이 모드에서 고정/부드럽게 전환, 양 끝 정지 확인 → 보고
+
+## 15. 오른쪽 문 포털: E로 농장·낚시 맵 이동 (2026-11-04 승인, 완료)
+
+> 구현하며 바뀐 점: 안내 UI 이름은 `SideScrollPromptView`, 안내 문구 상태는 Core `InteractionFocusState`(UI가 Gameplay를 참조하지 않도록 `SideScrollContext.Interaction`으로 전달). 상호작용 감지는 캐릭터가 옮겨진 뒤에 검사하도록 실행 순서 100.
+
+복도 맨 오른쪽 문 앞에 **플레이어보다 작은 반투명 원기둥**을 세우고, 플레이어 중심이 원기둥 콜라이더 안에 들어오면 **E**로 `Prototype_FarmFishing` 씬으로 넘어간다.
+
+### 15-1. 동작
+| 항목 | 내용 |
+|---|---|
+| 위치 | 오른쪽 끝에서 플레이어가 멈추는 지점(끝 여유 2.56 안쪽) = 문 앞. x는 설정값(오른쪽 끝에서 안쪽 거리) |
+| 모양 | 반투명 원기둥 (기본 키 1.0 · 지름 0.6, 색·투명도 설정). 그림자 없음, 조명 없는 머테리얼 |
+| 범위 | 원기둥의 **CapsuleCollider(트리거)** 반지름·높이로 조절 (인스펙터에서 바로 바꿔 보기 가능). 플레이어 **발 위치(중심)**가 콜라이더 안이면 범위 안 |
+| 안내 | 범위 안이면 화면 아래 가운데 "E 농장으로 가기" 표시 |
+| 실행 | E → 씬 이동 (`SceneManager.LoadScene`) |
+| 돌아오기 | 이번 범위 밖 (농장에서 복도로 오는 길은 나중에) |
+
+### 15-2. 구조
+| 이름 | 종류 | 어셈블리 | 한 줄 역할 |
+|---|---|---|---|
+| `ScenePortal` | MonoBehaviour, **`IInteractable`** | Gameplay | 프로토타입 1과 같은 상호작용 계약. 안내 문구·이동할 씬 이름을 갖고, Interact에서 씬을 연다 |
+| `SideScrollInteractor` | MonoBehaviour | Gameplay | 캐릭터 위치에서 겹친 트리거 중 `IInteractable`을 찾아 지금 대상으로 두고(바뀌면 이벤트), E 입력 때 실행 |
+| `InteractionPromptView` (복도용) | MonoBehaviour | UI | 대상이 있으면 안내 문구 표시 |
+| `CorridorConfig` | 필드 추가 | Core | 포털 켜기·이동할 씬 이름(`Prototype_FarmFishing`)·위치(오른쪽 끝에서 거리)·원기둥 크기·콜라이더 반지름·색 |
+| `SideScrollTexts` | 문구 추가 | Core | "E 농장으로 가기", 조작법에 E |
+| 입력 맵 | 수정 | — | `SideScroll` 맵에 `Interact`(**E**) 추가 (프로토타입 1 `Gameplay` 맵은 그대로) |
+| `CorridorSceneBuilder` | 수정 | Editor | 포털 오브젝트·반투명 머테리얼(`Art/Materials/`)·안내 UI 생성 |
+| 테스트 | EditMode | Tests | 범위 안/밖 판정(대상 바뀜 이벤트) |
+
+### 15-3. 확인이 필요한 설정 변경
+- **Build Settings 씬 목록**: 실행 중 다른 씬을 열려면 두 씬이 Build Settings에 있어야 한다. 지금은 `Assets/Scenes/SampleScene.unity` 하나뿐 → `Corridor_SideScroll`, `Prototype_FarmFishing`을 추가 (프로젝트 설정 변경, SETUP.md·CHANGELOG.md 기록)
+
+### 15-4. 고민한 선택지
+| 주제 | 고른 것 | 다른 방법 | 이유 |
+|---|---|---|---|
+| 범위 판정 | **트리거 콜라이더 겹침 검사** (`Physics.OverlapSphere`, 트리거 포함) | OnTriggerEnter | 캐릭터는 Rigidbody 없이 위치로만 움직여 트리거 이벤트가 안 온다. 겹침 검사는 Rigidbody 없이 되고, 콜라이더 크기를 바꾸면 범위가 그대로 바뀐다 |
+| 상호작용 계약 | **기존 `IInteractable` 재사용** | 복도 전용 인터페이스 | 프로젝트 규칙(상호작용 대상은 `IInteractable`로 통일). 복도에서는 들고 있는 아이템이 없어 null로 넘긴다 |
+
+### 15-5. 제작 순서 (승인 후)
+1. Build Settings에 두 씬 추가 (허락 받은 뒤) + 기록
+2. 설정·문구·입력(E) + 포털·상호작용·안내 UI + 테스트
+3. 복도 씬 다시 만들기 → 범위 안/밖 안내, E로 농장 맵이 열리는지 확인 → 보고

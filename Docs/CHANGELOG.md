@@ -1,5 +1,33 @@
 # 변경 기록
 
+## 2026-11-04 — 복도: 오른쪽 문 포털 (E → 농장·낚시 맵)
+- 설계: DESIGN_CORRIDOR.md 15번 승인 후 제작
+- 설정 변경 (사용자 승인): Build Settings 씬 목록에 `Corridor_SideScroll`, `Prototype_FarmFishing` 추가 → SETUP.md
+- Core: `InteractionFocusState`(지금 대상의 안내 문구 + 변경 이벤트), `SideScrollContext.Interaction`, `CorridorConfig` 포털 설정(켜기·씬 이름·오른쪽 끝에서 거리 2.56·키 1.0·지름 0.6·트리거 반지름 0.2·색·검사 높이 0.5), 문구 "농장으로 가기"·조작법에 E
+- 입력: `SideScroll` 맵에 `Interact`(E) 추가 (프로토타입 1 `Gameplay` 맵은 그대로)
+- Gameplay: `ScenePortal`(`IInteractable`, 트리거 CapsuleCollider, 목록에 없는 씬이면 에러 로그), `SideScrollInteractor`(발 + 0.5 높이 점의 트리거 겹침 검사 → 대상·안내, E로 실행), `SideScrollInputReader.InteractPressed`
+- UI: `SideScrollPromptView` — 화면 아래 가운데 "E  농장으로 가기" (대상이 있을 때만)
+- Editor: 복도 씬 생성 도구가 포털(루트: 포털 + 트리거, 자식 Visual: 반투명 원기둥)·머테리얼 `Art/Materials/CorridorPortal.mat`(URP Unlit 반투명)·안내 UI 생성, 조작법 글상자 높이 200. `SetString` 확장 메서드 추가
+- Tests: `InteractionFocusTests` 1개 (전체 71개 통과)
+- 확인 (한 프레임씩 진행): x 32.987(범위 밖) 안내 없음 → x 33.28(포털 중심) "E  농장으로 가기" 표시 → E(상호작용 실행) → `Prototype_FarmFishing` 열림(플레이어·UI 정상) / 콘솔 에러 0
+
+## 2026-11-04 — 복도: 카메라 따라가기 토글 (고정 ↔ 부드럽게, C)
+- 설계: DESIGN_CORRIDOR.md 14번 승인 후 제작
+- Core: `CameraFollowState`(고정/부드럽게 + 변경 이벤트), `SideScrollContext.CameraFollow`, `CorridorConfig` "카메라 고정으로 시작"(기본 켬), 조작법에 C 추가
+- 입력: `SideScroll` 맵에 `ToggleCameraFollow`(C) 추가
+- Gameplay: `SideScrollCamera` — 고정이면 매 프레임 플레이어 x로 바로(복도 끝 제한은 그대로), 부드럽게면 기존 SmoothDamp
+- UI: `CameraFollowPanel` — "2D 캐릭터 (V)" 아래 "카메라 고정 (C)" 토글. 씬 생성 도구는 토글 패널을 같은 함수로 쌓도록 정리, 조작법 글상자 높이 140 → 170
+- 칩비 크기: 사용자가 씬에서 Model 배율 0.8로 줄인 것을 프리팹(`SideScrollCharacter_Student_Chibi_v2`)으로 옮김 (씬을 다시 만들어도 유지. 메뉴 3을 다시 실행하면 1로 돌아감)
+- Tests: `CameraFollowTests` 1개 (전체 70개 통과)
+- 확인 (한 프레임씩 진행): 부드럽게 → 캐릭터 7.08 / 카메라 6.03(늦게 따라감), 고정 → 캐릭터 8.563 = 카메라 8.563, 오른쪽 끝 → 카메라 32.481(허용 최대값)에서 멈춤, 토글 표시 일치 / 콘솔 에러 0
+
+## 2026-11-04 — 복도: 플레이어 3D 모델을 칩비(Student_Chibi_v2)로 교체, 2D 끔
+- 메뉴 1·2는 건너뜀 (v2는 랩에서 이미 Humanoid로 준비됨, 직접 고친 Hips 매핑 유지), 메뉴 3 기능(`BuildCharacter` + `UseInCorridor`) 실행
+- 생성: `Animations/Avatars/Student_Chibi_v2.controller`, `Prefabs/SideScroll/SideScrollCharacter_Student_Chibi_v2.prefab` (2D 버전 없음 → `Sprite2D` 없이 3D만)
+- `CorridorConfig`: 캐릭터 프리팹 v05 → Student_Chibi_v2, 2D로 시작 켬 → 끔. 복도 씬 다시 생성
+- 확인 (상태 머신에 입력 값 직접): 키 약 1.63(렌더러 범위), Idle → Walk(오른쪽 1.52 m/s) → Run(왼쪽) → 왼쪽 끝 2.56에서 멈춤·Idle, 2D 상태 꺼짐 / 콘솔 에러 0
+- 되돌리기: `CorridorConfig` 캐릭터 프리팹을 `SideScrollCharacter_Student_Male_v05`로, 2D로 시작 켜고 복도 씬 다시 만들기
+
 ## 2026-11-03 — 복도: 2D 스프라이트 캐릭터 + 2D/3D 전환 (V)
 - 설계: DESIGN_CORRIDOR.md 13번 승인 후 제작
 - Core: `SpriteCharacterSet`(상태별 프레임·fps·반복·목표 키) + `SpriteClipMath`(시간 → 프레임), `AvatarSetup._sprites`(2D 버전 연결), `CharacterViewState`(2D/3D + 변경 이벤트), `SideScrollContext.CharacterView`, `CorridorConfig`에 2D로 시작(기본 켬)·스프라이트 정렬 순서(10), 조작법에 V 추가

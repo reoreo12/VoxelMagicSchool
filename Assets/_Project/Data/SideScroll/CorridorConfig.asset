@@ -27,5 +27,10 @@ MonoBehaviour:
   _endMargin: 2.56
   _cameraZ: -10
   _cameraFollowTime: 0.15
-  _characterPrefab: {fileID: 5748715137859855196, guid: 2d10c4b9c4f1afb4ca7c3fcc2164204c, type: 3}
+  _characterPrefab: {fileID: 1271594051816042358, guid: dc822f3a60ada7b4cabe46fa0aa56ed0, type: 3}
+  _startIn2D: 0
+  _characterSpriteSortingOrder: 10
+  _pixelOnAtStart: 0
+  _pixelSize: 4
+  _pixelSizeRange: {x: 2, y: 8}
   _showStateDebug: 1
