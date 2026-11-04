@@ -1,5 +1,29 @@
 # 변경 기록
 
+## 2026-11-04 — 복도 밤 조명 나누기: 바닥 빛 그림 + 천장 조명(칩비)
+- 설계: DESIGN_CORRIDOR.md 17번 (사용자 결정: 미리보기는 빼고 조명만 분리)
+- 이유: 사용자가 점 조명을 바닥으로 내려 쓰니(간격 5.7, 높이 −0.5, 세기 1.3) 바닥 빛 모양은 맞지만 칩비를 아래에서 올려 비추고, 쿠키 진하기를 따로 조절할 수 없었음
+- `Lamp_i` 아래 `FloorGlow`(조명이 아닌 도트 원 스프라이트, 더하기 합성) + `CeilingLight`(천장 스포트, 아래로 보다가 벽 쪽으로 25° 기울여 칩비 앞면까지)
+- `CorridorConfig`: 점 조명 항목 → 바닥 빛(가운데 높이 0.2·벽 앞 0.05·가로 2.4·세로 0.4·색·진하기 0.35·도트 32픽셀·4단계) + 천장 조명(높이 2.7·z −0.8·기울기 25·각도 60·거리 4·세기 4·색) + 벽이 천장 조명 받는 배율(기본 0). 간격·끝 여유는 그대로(사용자 값 5.7 → 7개), 색·쿠키 크기·단계는 이름만 바뀌어 값 이어짐
+- Core: `SideScrollMath.DotCircleLevel`(계단식 도트 원 밝기, 테스트 1개 → 전체 76개 통과)
+- 셰이더: 새 `Shaders/SpriteAdditive.shader`(조명 없는 더하기 합성, 머테리얼 `Art/Materials/CorridorFloorGlow.mat`), `SpriteLit3D`에 `_CorridorLampOnWall` 배율
+- 고침: 두 셰이더가 Unity 6 스프라이트 색·좌우 반전(`unity_SpriteColor`·`UnityFlipSprite`)을 반영하지 않아 바닥 빛이 흰색으로 진하게 나옴 → URP `Core2D.hlsl` 사용
+- `CorridorLighting`: 밤에 바닥 빛·천장 조명 켜고, 벽 배율 전역 값 설정. 쿠키 그림 `lamp_dot_cookie.png` 삭제 → `Art/Lights/lamp_floor_glow.png`
+- 사용자가 플레이하며 정한 최종 값 (`CorridorConfig`): 끝 여유 2.5, 바닥 빛 높이 0.1·세로 0.2·진하기 0.15·도트 80픽셀·6단계, 천장 조명 세기 6 (나머지는 위 기본값)
+- 확인 (한 프레임씩 진행): 밤 — 칩비 발밑에 따뜻한 계단식 도트 타원, 칩비가 천장 조명으로 밝아짐, 벽에는 추가 빛 없음, 창밖 밤 배경 그대로 / 낮 — 바닥 빛·천장 조명 꺼짐, 오른쪽 문 정상 / 콘솔 에러 0
+
+## 2026-11-04 — 복도: 낮/밤 전환(N) + 밤 배경 + 도트 점 조명 (3D 조명)
+- 설계: DESIGN_CORRIDOR.md 16번. 처음 설계(2D Renderer + Sprite Light)는 사용자 결정으로 **3D 조명**으로 바꿈 → URP·프로젝트 설정 변경 없음
+- 셰이더: `Shaders/SpriteLit3D.shader` (`VoxelMagic/Sprite Lit 3D`) — 스프라이트 그림 × (전역 `_CorridorAmbient` + 3D 추가 조명, Forward+·쿠키 지원). 해는 쓰지 않아 낮 화면은 이전과 같음. 머테리얼 `Art/Materials/CorridorSpriteLit.mat`을 복도 타일에 사용, 창밖 배경은 계속 조명 없는 스프라이트
+- Core: `TimeOfDayState`(낮/밤 + 이벤트), `SideScrollContext.TimeOfDay`, `SideScrollMath.LampPositions`(간격 이하로 고르게, 양 끝 여유), `CorridorConfig` 낮/밤(밤으로 시작 끔, 낮/밤 배경 세트, 복도 밝기 색 낮 흰색·밤 (0.12, 0.14, 0.26), 밤 해 ×0.15·주변광 ×0.3)·점 조명(간격 4, 끝 여유 1.5, 높이 1.9, z −2, 각도 34, 거리 6, 세기 5, 따뜻한 색, 쿠키 32픽셀·4단계), 문구 "밤 (N)"·조작법에 N
+- 데이터: `BackdropSet_Night`(bg_night_loop, 하늘 대체 색 남색). 이미지 임포트는 기존 배경 설정 그대로
+- 입력: `SideScroll` 맵에 `ToggleNight`(N) 추가
+- Gameplay: `CorridorLighting` — 배경 세트 교체, 전역 복도 밝기, 해 세기·주변광(3D 캐릭터), 점 조명 켜고 끄기. 플레이를 멈추면 낮 값으로 되돌림
+- UI: `NightTogglePanel` — "카메라 고정 (C)" 아래 "밤 (N)" 토글
+- Editor: 복도 씬 생성 도구가 타일 조명 머테리얼, 점 조명(스포트, 그림자 없음) 10개, 도트 원 쿠키 `Art/Lights/lamp_dot_cookie.png`(Cookie·Point·압축 없음)·밤 배경 세트, HUD 토글을 만듦. 조작법 글상자 높이 230
+- Tests: `TimeOfDayTests` 4개 (전체 75개 통과)
+- 확인 (한 프레임씩 진행): 낮 화면이 이전과 같음 → 밤: 창밖 밤 배경, 복도 어두워짐, 벽에 빛 원 10개(첫 값 각도 60은 원이 겹쳐 34로 줄이고 세기 3 → 5), 해 0.15, 토글 표시 일치, 도트 렌더링(P)과 함께 빛 원 가장자리도 도트 / 콘솔 에러 0. 밤으로 처음 바꿀 때 에디터가 셰이더 변형을 컴파일하는 몇 프레임 동안 화면이 하늘색으로 보임 (에디터 전용, 빌드에는 없음)
+
 ## 2026-11-04 — 농장 맵: 플레이어 아바타를 칩비(Student_Chibi_v2)로 교체
 - 브랜치: `feature/prototype-farm-fishing`에 `feature/prototype-corridor` 병합 (빨리 감기, 충돌 없음)
 - `PlayerConfig` 아바타 `Student_Male_v05` → `Student_Chibi_v2` (복도와 같은 Controller, Idle/Walk만 사용), 메뉴 `VoxelMagic/프로토타입 씬 다시 만들기`로 씬 다시 생성

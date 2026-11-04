@@ -27,10 +27,44 @@ MonoBehaviour:
   _endMargin: 2.56
   _cameraZ: -10
   _cameraFollowTime: 0.15
+  _cameraLockedAtStart: 1
   _characterPrefab: {fileID: 1271594051816042358, guid: dc822f3a60ada7b4cabe46fa0aa56ed0, type: 3}
   _startIn2D: 0
   _characterSpriteSortingOrder: 10
   _pixelOnAtStart: 0
   _pixelSize: 4
   _pixelSizeRange: {x: 2, y: 8}
+  _portalEnabled: 1
+  _portalSceneName: Prototype_FarmFishing
+  _portalInsetFromRight: 2.56
+  _portalHeight: 1
+  _portalDiameter: 0.6
+  _portalTriggerRadius: 0.2
+  _portalColor: {r: 0.45, g: 0.8, b: 1, a: 0.35}
+  _interactProbeHeight: 0.5
+  _nightAtStart: 0
+  _dayBackdrop: {fileID: 11400000, guid: e76c9dee7ec0d6b46ac9a564694e8199, type: 2}
+  _nightBackdrop: {fileID: 11400000, guid: 4a7c2de5dbb0c964a83d3fc2ea1cb496, type: 2}
+  _dayCorridorAmbient: {r: 1, g: 1, b: 1, a: 1}
+  _nightCorridorAmbient: {r: 0.12, g: 0.14, b: 0.26, a: 1}
+  _nightSunScale: 0.15
+  _nightAmbientScale: 0.3
+  _lampSpacing: 5.7
+  _lampInset: 2.5
+  _glowCenterY: 0.1
+  _glowOffsetZ: 0.05
+  _glowWidth: 2.4
+  _glowHeight: 0.2
+  _glowColor: {r: 1, g: 0.82, b: 0.55, a: 1}
+  _glowOpacity: 0.15
+  _glowTextureSize: 80
+  _glowSteps: 6
+  _ceilingLightHeight: 2.7
+  _ceilingLightZ: -0.8
+  _ceilingLightTilt: 25
+  _ceilingLightAngle: 60
+  _ceilingLightRange: 4
+  _ceilingLightIntensity: 6
+  _ceilingLightColor: {r: 1, g: 0.85, b: 0.65, a: 1}
+  _lampOnWall: 0
   _showStateDebug: 1
