@@ -24,6 +24,12 @@
 - Tests: `TimeOfDayTests` 4개 (전체 75개 통과)
 - 확인 (한 프레임씩 진행): 낮 화면이 이전과 같음 → 밤: 창밖 밤 배경, 복도 어두워짐, 벽에 빛 원 10개(첫 값 각도 60은 원이 겹쳐 34로 줄이고 세기 3 → 5), 해 0.15, 토글 표시 일치, 도트 렌더링(P)과 함께 빛 원 가장자리도 도트 / 콘솔 에러 0. 밤으로 처음 바꿀 때 에디터가 셰이더 변형을 컴파일하는 몇 프레임 동안 화면이 하늘색으로 보임 (에디터 전용, 빌드에는 없음)
 
+## 2026-11-04 — 농장 맵: 플레이어 아바타를 칩비(Student_Chibi_v2)로 교체
+- 브랜치: `feature/prototype-farm-fishing`에 `feature/prototype-corridor` 병합 (빨리 감기, 충돌 없음)
+- `PlayerConfig` 아바타 `Student_Male_v05` → `Student_Chibi_v2` (복도와 같은 Controller, Idle/Walk만 사용), 메뉴 `VoxelMagic/프로토타입 씬 다시 만들기`로 씬 다시 생성
+- 확인: 플레이어 Model = Student_Chibi_v2.fbx, Humanoid, 키 1.63(렌더러 범위), 시작 Idle, 움직임 감지 시 Walk 재생 속도 파라미터 갱신 / 콘솔 에러 0
+- 문서: DESIGN.md 12번 (칩비 교체 + 지금 기능에 필요한 애니메이션 목록, 연결에 필요한 작업)
+
 ## 2026-11-04 — 복도: 오른쪽 문 포털 (E → 농장·낚시 맵)
 - 설계: DESIGN_CORRIDOR.md 15번 승인 후 제작
 - 설정 변경 (사용자 승인): Build Settings 씬 목록에 `Corridor_SideScroll`, `Prototype_FarmFishing` 추가 → SETUP.md

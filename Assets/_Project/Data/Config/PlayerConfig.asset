@@ -21,7 +21,7 @@ MonoBehaviour:
   _cameraPitch: 45
   _cameraYaw: 45
   _cameraFollowSharpness: 8
-  _avatar: {fileID: 11400000, guid: 82426b912c3295d4aa581200eb8307f9, type: 2}
+  _avatar: {fileID: 11400000, guid: 0ee861e8c3cac8244bbefedbad045110, type: 2}
   _walkAnimationReferenceSpeed: 1
   _walkStartSpeed: 0.1
   _animationBlendSeconds: 0.15
