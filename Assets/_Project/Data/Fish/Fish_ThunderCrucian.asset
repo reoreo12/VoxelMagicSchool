@@ -1,0 +1,31 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 10fa6b091a066ca41bb411019a0c4894, type: 3}
+  m_Name: Fish_ThunderCrucian
+  m_EditorClassIdentifier: 
+  _id: thunder_crucian
+  _displayName: "\uBC88\uAC1C \uBD95\uC5B4"
+  _description: "\uB108\uBB34 \uBE68\uB77C\uC11C \uC544\uBB34\uB3C4 \uBABB \uC7A1\uB294\uB2E4\uB294
+    \uBD95\uC5B4."
+  _iconColor: {r: 1, g: 0.95, b: 0.3, a: 1}
+  _maxStack: 99
+  _creatureNote: "\uBC88\uAC1C \uBD95\uC5B4\uB97C \uC7A1\uC558\uB2E4\uACE0? \u2026\uAC70\uC9D3\uB9D0\uC774\uC9C0?
+    \uB098\uB3C4 \uBABB \uC7A1\uC558\uB294\uB370."
+  _sizeRangeCm:
+    _min: 8
+    _max: 15
+  _moveSpeed: 1.3
+  _retargetIntervalSeconds:
+    _min: 0.25
+    _max: 0.7
+  _dartChance: 0.3
+  _dartSpeedMultiplier: 3

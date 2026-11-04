@@ -1,0 +1,31 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 10fa6b091a066ca41bb411019a0c4894, type: 3}
+  m_Name: Fish_Crucian
+  m_EditorClassIdentifier: 
+  _id: crucian
+  _displayName: "\uBD95\uC5B4"
+  _description: "\uC5F0\uBABB \uC5B4\uB514\uC5D0\uB098 \uC788\uB294 \uD3C9\uBC94\uD55C
+    \uBD95\uC5B4."
+  _iconColor: {r: 0.75, g: 0.65, b: 0.35, a: 1}
+  _maxStack: 99
+  _creatureNote: "\uBD95\uC5B4\uB294 \uAE30\uC5B5\uB825\uC774 3\uCD08\uB77C\uC11C
+    \uC800\uC8FC\uAC00 \uC548 \uAC78\uB824. \uBD80\uB7EC\uC6B4 \uB140\uC11D."
+  _sizeRangeCm:
+    _min: 10
+    _max: 25
+  _moveSpeed: 0.45
+  _retargetIntervalSeconds:
+    _min: 1.2
+    _max: 2.2
+  _dartChance: 0
+  _dartSpeedMultiplier: 2

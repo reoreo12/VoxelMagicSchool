@@ -1,0 +1,25 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 633fc3acc8de4d34399e6d92ce70239f, type: 3}
+  m_Name: Produce_GreenOnion
+  m_EditorClassIdentifier: 
+  _id: green_onion
+  _displayName: "\uB300\uD30C"
+  _description: "\uAE38\uCB49\uD558\uACE0 \uD5A5\uC774 \uC13C \uB300\uD30C."
+  _iconColor: {r: 0.4, g: 0.8, b: 0.35, a: 1}
+  _maxStack: 99
+  _creatureNote: "\uB300\uD30C\uB294 \uB9C8\uB825 \uC804\uB3C4\uC728\uC774 \uB192\uC544.
+    \uC9C0\uD321\uC774 \uB300\uC2E0 \uC4F0\uB294 \uB188\uB3C4 \uC788\uC5C8\uC9C0.
+    \uB0C4\uC0C8 \uB54C\uBB38\uC5D0 \uD1F4\uD559\uB2F9\uD588\uC9C0\uB9CC."
+  _sizeRangeCm:
+    _min: 40
+    _max: 70

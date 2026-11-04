@@ -1,0 +1,32 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 393f682b9a88baa498a9dc62357b38c2, type: 3}
+  m_Name: FishingConfig
+  m_EditorClassIdentifier: 
+  _castSeconds: 0.6
+  _biteWaitSeconds:
+    _min: 2
+    _max: 6
+  _biteWindowSeconds: 1
+  _rewaitOnMissedBite: 1
+  _scrollSensitivity: 0.08
+  _catchBarSize: 0.25
+  _gaugeStart: 0.3
+  _gaugeFillPerSecond: 0.35
+  _gaugeDrainPerSecond: 0.25
+  _pondFish:
+  - _fish: {fileID: 11400000, guid: 22a9aaf902f918b46996f13b7ed2ff1b, type: 2}
+    _weight: 60
+  - _fish: {fileID: 11400000, guid: 2c3a7d50508108c4e954dc1963770b38, type: 2}
+    _weight: 30
+  - _fish: {fileID: 11400000, guid: 08e658153ed4e0a468db626085f61e3a, type: 2}
+    _weight: 10

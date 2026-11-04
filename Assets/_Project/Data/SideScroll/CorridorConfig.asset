@@ -1,0 +1,36 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 55567425bbccd2c499345734efaa9ac0, type: 3}
+  m_Name: CorridorConfig
+  m_EditorClassIdentifier: 
+  _pixelsPerUnit: 300
+  _corridorFilter: 0
+  _backdropFilter: 0
+  _maxTextureSize: 4096
+  _corridorZ: 1
+  _corridorSortingOrder: 0
+  _backdropZ: 5
+  _backdropSortingOrder: -10
+  _backdropParallax: 0.3
+  _backdropOffsetY: 0
+  _backdropScale: 1
+  _backdropCopies: 3
+  _endMargin: 2.56
+  _cameraZ: -10
+  _cameraFollowTime: 0.15
+  _characterPrefab: {fileID: 1271594051816042358, guid: dc822f3a60ada7b4cabe46fa0aa56ed0, type: 3}
+  _startIn2D: 0
+  _characterSpriteSortingOrder: 10
+  _pixelOnAtStart: 0
+  _pixelSize: 4
+  _pixelSizeRange: {x: 2, y: 8}
+  _showStateDebug: 1

@@ -1,0 +1,20 @@
+{
+    "name": "VoxelMagic.Sandbox",
+    "rootNamespace": "VoxelMagic.Sandbox",
+    "references": [
+        "VoxelMagic.Core",
+        "VoxelMagic.UI",
+        "Unity.InputSystem",
+        "Unity.TextMeshPro",
+        "UnityEngine.UI"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": false,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

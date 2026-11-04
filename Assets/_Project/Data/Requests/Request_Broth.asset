@@ -1,0 +1,28 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6e2e2f20d9b88964fa16d99bbf67be48, type: 3}
+  m_Name: Request_Broth
+  m_EditorClassIdentifier: 
+  _title: "\uAD6D\uBB3C \uC7AC\uB8CC\uAC00 \uD544\uC694\uD574"
+  _creatureLine: "\uAD6D\uBB3C\uC5D4 \uB300\uD30C\uB791 \uBD95\uC5B4\uC9C0. \uC774\uAC74
+    \uC0C1\uC2DD\uC774\uC57C. \uB9C8\uBC95 \uC0C1\uC2DD."
+  _requirements:
+  - _item: {fileID: 11400000, guid: e29e8f1d6d581ae47a60f46c7a85e088, type: 2}
+    _amount: 2
+  - _item: {fileID: 11400000, guid: 22a9aaf902f918b46996f13b7ed2ff1b, type: 2}
+    _amount: 1
+  _givenItems:
+  - _item: {fileID: 11400000, guid: bb37e7f2e02dfc1439b8c44b3a30e546, type: 2}
+    _amount: 2
+  _baseReward: 15
+  _completionLine: "\uD6C4\uB8E8\uB8E9\u2026 \uAD6D\uBB3C\uC5D0\uC11C \uC2DC\uD5D8
+    \uBB38\uC81C \uB9DB\uC774 \uB098."

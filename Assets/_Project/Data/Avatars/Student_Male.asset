@@ -1,0 +1,26 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7bf9f4c0c32fc8c4f938e5d06f70114c, type: 3}
+  m_Name: Student_Male
+  m_EditorClassIdentifier: 
+  _model: {fileID: 919132149155446097, guid: bc4958b420356cc479391fcf8a8c2bb5, type: 3}
+  _targetHeight: 1.6
+  _colliderRadius: 0.25
+  _idle: {fileID: -203655887218126122, guid: ba063cde4c3d1204b9fa1eb55d719041, type: 3}
+  _walk: {fileID: -203655887218126122, guid: b63d668a765ecc24290e2623d24c6ee3, type: 3}
+  _run: {fileID: -203655887218126122, guid: c8874b345012a1442b7ba09fee59f10c, type: 3}
+  _idleSpeed: 1
+  _walkSpeed: 1
+  _runSpeed: 1
+  _sprites: {fileID: 11400000, guid: 1116add3f36b4f4438a458fa6ae231a1, type: 2}
+  _controller: {fileID: 9100000, guid: 3ed707516f309d1458044948964267c6, type: 2}
+  _characterPrefab: {fileID: 6865248072325870992, guid: 34886671d2da3fa48a4b4bf95e67472a, type: 3}
