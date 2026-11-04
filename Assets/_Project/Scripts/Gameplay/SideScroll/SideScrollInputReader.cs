@@ -1,5 +1,5 @@
-// 새 Input System의 SideScroll 맵(A/D·←/→, Shift, P, V, C, E)을 읽는 유일한 곳. 이동은 MoveIntent로 바꾸고,
-// P는 도트 렌더링, V는 2D/3D 캐릭터, C는 카메라 고정/부드럽게를 바꾸며, E는 InteractPressed로 알린다.
+// 새 Input System의 SideScroll 맵(A/D·←/→, Shift, P, V, C, N, E)을 읽는 유일한 곳. 이동은 MoveIntent로 바꾸고,
+// P는 도트 렌더링, V는 2D/3D 캐릭터, C는 카메라 고정/부드럽게, N은 낮/밤을 바꾸며, E는 InteractPressed로 알린다.
 // W/S는 바인딩 자체가 없다.
 using System;
 using UnityEngine;
@@ -32,6 +32,7 @@ namespace VoxelMagic.Gameplay
             _map.FindAction("TogglePixel", true).performed += _ => _context?.PixelRender.Toggle();
             _map.FindAction("ToggleCharacterView", true).performed += _ => _context?.CharacterView.Toggle();
             _map.FindAction("ToggleCameraFollow", true).performed += _ => _context?.CameraFollow.Toggle();
+            _map.FindAction("ToggleNight", true).performed += _ => _context?.TimeOfDay.Toggle();
             _map.FindAction("Interact", true).performed += _ => InteractPressed?.Invoke();
         }
 

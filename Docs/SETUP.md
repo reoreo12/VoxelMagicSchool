@@ -36,6 +36,7 @@
 |---|---|---|---|
 | 2026-11-02 | `Input/GameControls.inputactions`에 `SideScroll` 맵 추가 (Move: 1D Axis A/D·←/→, Run: Left Shift). 기존 `Gameplay` 맵은 그대로 | 복도 횡스크롤 조작. W/S는 바인딩 자체가 없음 | 사용자 승인 |
 | 2026-11-04 | `SideScroll` 맵에 `ToggleCameraFollow`(C), `Interact`(E) 추가 | 복도 카메라 고정/부드럽게 전환, 오른쪽 문 포털 | 사용자 승인 |
+| 2026-11-04 | `SideScroll` 맵에 `ToggleNight`(N) 추가 | 복도 낮/밤 전환 | 사용자 승인 |
 
 ## 빌드 씬 목록 (Build Settings)
 
@@ -48,6 +49,7 @@
 | 날짜 | 대상 | 설정 | 바꾸는 법 |
 |---|---|---|---|
 | 2026-11-02 | `Art/Corridor/*.png`, `Art/Backdrop/*.png` | Sprite·Single·Full Rect, PPU 300, Bottom Center, Point, 압축 없음, Mip Map 끔, Alpha Is Transparency, Clamp, 최대 크기 4096 | `Data/SideScroll/CorridorConfig` 값 수정 → 메뉴 `VoxelMagic/복도/이미지 임포트 설정 적용` |
+| 2026-11-04 | `Art/Lights/lamp_floor_glow.png` (복도 씬 생성 도구가 그림, 흰색 + 계단식 알파 원) | Sprite·Single, PPU = 그림 크기(1유닛), 가운데 기준점, Point, Clamp, 압축 없음, Mip Map 끔 | `CorridorConfig` 바닥 빛 도트 크기·단계 수정 → 복도 씬 다시 만들기 |
 
 ## 아바타 임포트 설정 (메뉴 `VoxelMagic/아바타/`로 적용)
 
