@@ -1,5 +1,11 @@
 # 변경 기록
 
+## 2026-11-04 — 농장 맵: 플레이어 아바타를 칩비(Student_Chibi_v2)로 교체
+- 브랜치: `feature/prototype-farm-fishing`에 `feature/prototype-corridor` 병합 (빨리 감기, 충돌 없음)
+- `PlayerConfig` 아바타 `Student_Male_v05` → `Student_Chibi_v2` (복도와 같은 Controller, Idle/Walk만 사용), 메뉴 `VoxelMagic/프로토타입 씬 다시 만들기`로 씬 다시 생성
+- 확인: 플레이어 Model = Student_Chibi_v2.fbx, Humanoid, 키 1.63(렌더러 범위), 시작 Idle, 움직임 감지 시 Walk 재생 속도 파라미터 갱신 / 콘솔 에러 0
+- 문서: DESIGN.md 12번 (칩비 교체 + 지금 기능에 필요한 애니메이션 목록, 연결에 필요한 작업)
+
 ## 2026-11-04 — 복도: 오른쪽 문 포털 (E → 농장·낚시 맵)
 - 설계: DESIGN_CORRIDOR.md 15번 승인 후 제작
 - 설정 변경 (사용자 승인): Build Settings 씬 목록에 `Corridor_SideScroll`, `Prototype_FarmFishing` 추가 → SETUP.md
