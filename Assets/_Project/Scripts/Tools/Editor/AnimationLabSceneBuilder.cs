@@ -1,6 +1,7 @@
-// 애니메이션 랩 씬(Scenes/Tools/AnimationLab)을 만드는 에디터 도구: 원근 카메라, 격자 바닥, 키 비교 큐브, 툴 UI.
+// 애니메이션 랩 씬(Scenes/Tools/AnimationLab)을 만드는 에디터 도구: 원근 카메라, 격자 바닥, 키 비교 큐브, 툴 UI(접이식 패널·장착물 패널).
 // UI 배치는 1920×1080 기준. 설정·머테리얼은 없을 때만 만든다.
 using System.Collections.Generic;
+using System.Linq;
 using TMPro;
 using UnityEditor;
 using UnityEditor.SceneManagement;
@@ -36,7 +37,15 @@ namespace VoxelMagic.Tools.EditorTools
         private static readonly Color PanelColor = new Color(0.08f, 0.09f, 0.11f, 0.82f);
         private static readonly Color ButtonColor = new Color(0.24f, 0.27f, 0.32f);
         private static readonly Color AccentColor = new Color(0.25f, 0.45f, 0.75f);
+        private static readonly Color HeaderColor = new Color(1f, 1f, 1f, 0.05f);
         private static readonly Color TextColor = new Color(0.93f, 0.94f, 0.96f);
+
+        // 접이식 패널: 제목 줄 높이, 예전에 제목이 없던 패널의 내용 내림 높이, 왼쪽 세로 묶음 크기, 상태 메시지 위치
+        private const float HeaderHeight = 44f;
+        private const float ContentTop = 36f;
+        private const float LeftColumnWidth = 440f;
+        private const float LeftColumnHeight = 800f;
+        private const float StatusBottom = 236f;
 
         private static TMP_FontAsset _font;
         private static TMP_DefaultControls.Resources _tmpResources;
@@ -82,7 +91,8 @@ namespace VoxelMagic.Tools.EditorTools
                 .SetRef("_spawnPoint", spawn)
                 .SetRef("_heightReference", heightReference)
                 .SetRef("_camera", labCamera)
-                .SetRefList("_fallbackAvatars", AvatarPipeline.ScanAvatars().ConvertAll(a => (Object)a));
+                .SetRefList("_fallbackAvatars", AvatarPipeline.ScanAvatars().ConvertAll(a => (Object)a))
+                .SetRefList("_fallbackAttachments", AnimationLabEditorBridge.ScanAttachments().Select(a => (Object)a).ToList());
             BuildUi(lab);
             eventSystem.transform.SetAsLastSibling();
 
@@ -151,9 +161,17 @@ namespace VoxelMagic.Tools.EditorTools
             pixelView.SetRef("_output", outputImage);
             lab.SetRef("_pixelView", pixelView);
 
-            // 왼쪽 위: 아바타
-            var avatarPanel = Panel("AvatarPanel", canvas, new Vector2(0f, 1f), new Vector2(20f, -20f), new Vector2(440f, 270f));
-            Label("Title", avatarPanel, "아바타", 24, new Vector2(16f, -12f), new Vector2(400f, 32f), FontStyles.Bold);
+            // 왼쪽: 아바타 + 장착물 + 측정·카메라 (세로로 쌓여 위 패널을 접으면 아래 패널이 올라온다)
+            var leftColumn = new GameObject("LeftColumn", typeof(RectTransform), typeof(VerticalLayoutGroup));
+            Place(leftColumn.transform, canvas, new Vector2(20f, -20f), new Vector2(LeftColumnWidth, LeftColumnHeight));
+            var column = leftColumn.GetComponent<VerticalLayoutGroup>();
+            column.spacing = 10f;
+            column.childControlWidth = true;
+            column.childControlHeight = true;
+            column.childForceExpandWidth = true;
+            column.childForceExpandHeight = false;
+
+            var avatarPanel = FoldPanel("AvatarPanel", LabTexts.PanelAvatar, leftColumn.transform, new Vector2(0f, 1f), Vector2.zero, new Vector2(440f, 270f), 0f);
             var dropdown = TMP_DefaultControls.CreateDropdown(_tmpResources);
             dropdown.name = "AvatarDropdown";
             Place(dropdown.transform, avatarPanel, new Vector2(16f, -50f), new Vector2(408f, 40f));
@@ -161,8 +179,16 @@ namespace VoxelMagic.Tools.EditorTools
             ui["AvatarInfo"] = Label("AvatarInfo", avatarPanel, "", 18, new Vector2(16f, -100f), new Vector2(408f, 100f));
             ui["HeightReferenceToggle"] = MakeToggle("HeightReference", avatarPanel, "키 비교 큐브 (1.6)", true, new Vector2(16f, -216f), new Vector2(300f, 36f));
 
+            var equipmentPanel = FoldPanel("EquipmentPanel", LabTexts.PanelEquipment, leftColumn.transform, new Vector2(0f, 1f), Vector2.zero, new Vector2(440f, 180f), 0f);
+            var equipmentDropdown = TMP_DefaultControls.CreateDropdown(_tmpResources);
+            equipmentDropdown.name = "EquipmentDropdown";
+            Place(equipmentDropdown.transform, equipmentPanel, new Vector2(16f, -50f), new Vector2(408f, 40f));
+            ui["EquipmentDropdown"] = equipmentDropdown.GetComponent<TMP_Dropdown>();
+            ui["EquipmentVisibleToggle"] = MakeToggle("EquipmentVisible", equipmentPanel, LabTexts.EquipmentVisible, true, new Vector2(16f, -98f), new Vector2(300f, 36f));
+            ui["EquipmentInfo"] = Label("EquipmentInfo", equipmentPanel, "", 17, new Vector2(16f, -138f), new Vector2(408f, 40f));
+
             // 위 가운데: 상태 버튼 + 재생 중
-            var statePanel = Panel("StatePanel", canvas, new Vector2(0.5f, 1f), new Vector2(-300f, -20f), new Vector2(600f, 120f));
+            var statePanel = FoldPanel("StatePanel", LabTexts.PanelState, canvas, new Vector2(0.5f, 1f), new Vector2(-300f, -20f), new Vector2(600f, 120f), ContentTop);
             string[] states = { "1  Idle", "2  Walk", "3  Run" };
             var stateButtons = new Object[3];
             for (int i = 0; i < 3; i++)
@@ -170,9 +196,8 @@ namespace VoxelMagic.Tools.EditorTools
             ui["NowPlaying"] = Label("NowPlaying", statePanel, "", 18, new Vector2(16f, -66f), new Vector2(568f, 50f));
 
             // 오른쪽: 애니메이션 목록
-            var listPanel = Panel("ClipPanel", canvas, new Vector2(1f, 1f), new Vector2(-500f, -20f), new Vector2(480f, 820f));
-            Label("Title", listPanel, "애니메이션 목록", 24, new Vector2(16f, -12f), new Vector2(300f, 32f), FontStyles.Bold);
-            ui["RefreshButton"] = MakeButton("Refresh", listPanel, "새로고침", new Vector2(344f, -10f), new Vector2(120f, 38f), AccentColor);
+            var listPanel = FoldPanel("ClipPanel", LabTexts.PanelClips, canvas, new Vector2(1f, 1f), new Vector2(-500f, -20f), new Vector2(480f, 820f), 0f);
+            ui["RefreshButton"] = MakeButton("Refresh", listPanel, "새로고침", new Vector2(344f, -6f), new Vector2(120f, 34f), AccentColor);
             ui["ClipCount"] = Label("ClipCount", listPanel, "", 15, new Vector2(16f, -50f), new Vector2(448f, 26f));
             var scroll = DefaultControls.CreateScrollView(_uiResources);
             scroll.name = "ClipList";
@@ -199,8 +224,8 @@ namespace VoxelMagic.Tools.EditorTools
             templateLabel.richText = true;
             ui["ClipButtonTemplate"] = template;
 
-            // 아래: 재생
-            var playPanel = Panel("PlaybackPanel", canvas, new Vector2(0.5f, 0f), new Vector2(-750f, 20f), new Vector2(1500f, 170f));
+            // 아래: 재생 (접으면 아래로 내려앉음)
+            var playPanel = FoldPanel("PlaybackPanel", LabTexts.PanelPlayback, canvas, new Vector2(0.5f, 0f), new Vector2(-750f, 20f), new Vector2(1500f, 170f), ContentTop);
             ui["TimeSlider"] = MakeSlider("TimeSlider", playPanel, new Vector2(20f, -22f), new Vector2(900f, 24f));
             ui["TimeLabel"] = Label("TimeLabel", playPanel, "", 18, new Vector2(940f, -16f), new Vector2(370f, 32f));
             var play = MakeButton("PlayButton", playPanel, "일시정지", new Vector2(20f, -64f), new Vector2(150f, 44f), AccentColor);
@@ -220,12 +245,11 @@ namespace VoxelMagic.Tools.EditorTools
             ui["PixelSlider"] = MakeSlider("PixelSlider", playPanel, new Vector2(1120f, -128f), new Vector2(160f, 24f));
             ui["PixelLabel"] = Label("PixelLabel", playPanel, "", 18, new Vector2(1292f, -120f), new Vector2(200f, 32f));
 
-            // 왼쪽 아래: 측정 + 카메라
-            var meterPanel = Panel("MeterPanel", canvas, new Vector2(0f, 0f), new Vector2(20f, 240f), new Vector2(560f, 300f));
-            Label("Title", meterPanel, "측정 · 카메라", 24, new Vector2(16f, -12f), new Vector2(400f, 32f), FontStyles.Bold);
-            ui["MeterText"] = Label("MeterText", meterPanel, "", 17, new Vector2(16f, -50f), new Vector2(528f, 120f));
+            // 왼쪽 세로 묶음 맨 아래: 측정 + 카메라
+            var meterPanel = FoldPanel("MeterPanel", LabTexts.PanelMeter, leftColumn.transform, new Vector2(0f, 1f), Vector2.zero, new Vector2(LeftColumnWidth, 300f), 0f);
+            ui["MeterText"] = Label("MeterText", meterPanel, "", 17, new Vector2(16f, -50f), new Vector2(408f, 120f));
             string[] views = { "정면", "옆 (복도 시점)", "뒤", "3/4" };
-            float[] widths = { 100f, 170f, 100f, 100f };
+            float[] widths = { 80f, 150f, 80f, 80f };
             var cameraButtons = new Object[4];
             float x = 16f;
             for (int i = 0; i < 4; i++)
@@ -233,14 +257,14 @@ namespace VoxelMagic.Tools.EditorTools
                 cameraButtons[i] = MakeButton($"View{i}", meterPanel, views[i], new Vector2(x, -180f), new Vector2(widths[i], 40f), ButtonColor);
                 x += widths[i] + 8f;
             }
-            Label("CameraHelp", meterPanel, LabTexts.CameraHelp, 15, new Vector2(16f, -230f), new Vector2(528f, 60f)).color = new Color(0.7f, 0.73f, 0.78f);
+            Label("CameraHelp", meterPanel, LabTexts.CameraHelp, 15, new Vector2(16f, -230f), new Vector2(408f, 60f)).color = new Color(0.7f, 0.73f, 0.78f);
 
             // 상태 메시지 (아래 가운데)
             var status = Label("Status", canvas, "", 18, Vector2.zero, new Vector2(1320f, 32f));
             var statusRect = status.rectTransform;
             statusRect.anchorMin = statusRect.anchorMax = new Vector2(0.5f, 0f);
             statusRect.pivot = new Vector2(0.5f, 0f);
-            statusRect.anchoredPosition = new Vector2(0f, 196f);
+            statusRect.anchoredPosition = new Vector2(0f, StatusBottom);
             status.alignment = TextAlignmentOptions.Center;
             status.color = new Color(1f, 0.85f, 0.5f);
             ui["Status"] = status;
@@ -251,18 +275,45 @@ namespace VoxelMagic.Tools.EditorTools
             lab.SetRefList("_ui.StateButtons", stateButtons).SetRefList("_ui.CameraButtons", cameraButtons);
         }
 
-        // 화면 아래쪽에 붙는 패널은 position.y가 아래 여백이다.
-        private static RectTransform Panel(string name, Transform parent, Vector2 anchor, Vector2 position, Vector2 size)
+        // 접이식 패널: 제목 줄(누르면 접기/펼치기) + 내용. 반환값은 내용 영역이고, 요소는 그 왼쪽 위 기준으로 놓는다.
+        // contentTop: 내용을 제목 줄 아래로 내리는 높이 (예전에 제목이 없던 패널). 그만큼 패널이 커진다.
+        // 화면 아래쪽에 붙는 패널은 position.y가 아래 여백이고, 접으면 아래로 내려앉는다.
+        private static RectTransform FoldPanel(string name, string title, Transform parent, Vector2 anchor, Vector2 position, Vector2 size, float contentTop)
         {
-            var go = new GameObject(name, typeof(RectTransform), typeof(Image));
+            size.y += contentTop;
+            var go = new GameObject(name, typeof(RectTransform), typeof(Image), typeof(LayoutElement));
             go.transform.SetParent(parent, false);
             go.GetComponent<Image>().color = PanelColor;
             var rect = (RectTransform)go.transform;
             rect.anchorMin = rect.anchorMax = anchor;
-            rect.pivot = new Vector2(0f, 1f);
-            rect.anchoredPosition = position + new Vector2(0f, anchor.y < 0.5f ? size.y : 0f);
+            rect.pivot = new Vector2(0f, anchor.y < 0.5f ? 0f : 1f);
+            rect.anchoredPosition = position;
             rect.sizeDelta = size;
-            return rect;
+            go.GetComponent<LayoutElement>().preferredHeight = size.y;
+
+            var header = MakeButton("Header", rect, title, Vector2.zero, new Vector2(size.x, HeaderHeight), HeaderColor);
+            var headerLabel = header.GetComponentInChildren<TMP_Text>();
+            headerLabel.fontSize = 22;
+            headerLabel.fontStyle = FontStyles.Bold;
+            headerLabel.alignment = TextAlignmentOptions.MidlineLeft;
+            headerLabel.margin = new Vector4(16f, 0f, 16f, 0f);
+
+            var content = new GameObject("Content", typeof(RectTransform)).GetComponent<RectTransform>();
+            content.SetParent(rect, false);
+            content.anchorMin = Vector2.zero;
+            content.anchorMax = Vector2.one;
+            content.pivot = new Vector2(0f, 1f);
+            content.offsetMin = Vector2.zero;
+            content.offsetMax = new Vector2(0f, -contentTop);
+
+            go.AddComponent<LabFoldout>()
+                .SetRef("_header", header)
+                .SetRef("_headerLabel", headerLabel)
+                .SetRef("_content", content.gameObject)
+                .SetString("_title", title)
+                .SetFloat("_expandedHeight", size.y)
+                .SetFloat("_collapsedHeight", HeaderHeight);
+            return content;
         }
 
         // 부모 왼쪽 위 기준으로 놓는다.

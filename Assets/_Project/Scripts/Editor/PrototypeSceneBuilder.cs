@@ -68,6 +68,9 @@ namespace VoxelMagic.EditorTools
 
             var playerRoot = BuildPlayer(player, out var interactor);
             fishingDriver.SetRef("_wandTip", playerRoot.transform.Find("WandTip"));
+            // 지팡이는 오른손 소켓에 든다 (기본 데이터가 없으면 만들고, 몸에 붙은 Wand는 끈다). DESIGN_CHARACTER.md
+            CharacterSocketSetup.EnsureDefaultAssets();
+            CharacterSocketSetup.AttachTo(playerRoot, fishingDriver);
             var camera = Camera.main;
             camera.gameObject.AddComponent<QuarterViewCamera>().SetRef("_target", playerRoot.transform)
                 .SetRef("_input", playerRoot.GetComponent<GameInputReader>());

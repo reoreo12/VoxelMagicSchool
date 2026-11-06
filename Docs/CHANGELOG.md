@@ -1,5 +1,25 @@
 # 변경 기록
 
+## 2026-11-06 — 캐릭터 공용 시스템 단계 1-b: 애니메이션 랩 장착물 패널 + 모든 패널 접이식
+- 설정: `VoxelMagic.Tools.asmdef` 참조에 `VoxelMagic.Gameplay` 추가 (사용자 승인, SETUP.md 어셈블리 표). 랩은 농장과 같은 `HumanoidSocketSource`·`SocketHost`·`CharacterEquipment`를 그대로 씀 — 랩 전용 소켓 코드 없음
+- Tools: `LabFoldout`(제목 줄을 누르면 내용 숨기고 높이를 제목 줄만큼, `-`/`+` 표시. ▼▶ 기호는 한글 폰트에 있는지 확인하려면 폰트 에셋이 바뀌어서 ASCII로), `AnimationLab` 장착물 처리(새 모델마다 부품을 붙이고 같은 장착물 다시 적용, 목록 "없음"+모든 `AttachmentDefinition`, 보이기 토글·단축키 E, 소켓 프로필 없음/소켓 없음 안내), `AnimationLabBridge.ScanAttachments`(에디터 검색, 빌드용 `_fallbackAttachments`), `AnimationLabConfig._equipFirstAttachmentOnStart`(기본 켬), `LabTexts` 문구
+- 랩 씬 생성 도구: 패널 6개(아바타 / 장착물 / 측정·카메라 / 상태 / 애니메이션 목록 / 재생) 모두 접이식 제목 줄, 왼쪽 세로 묶음(아바타 → 장착물 → 측정·카메라, 위를 접으면 아래가 올라옴), 아래 재생 패널은 접으면 아래로 내려앉음. 측정 패널을 왼쪽 묶음으로 옮김(게임 뷰가 낮을 때 장착물 패널과 겹치던 것 해결). 예전 제목 글자 3개는 제목 줄로 대체
+- 랩 씬 다시 만듦 (사용자 승인). 이전 씬과 오브젝트 이름 목록 비교: 사라진 것은 `Title` 3개뿐, 조명·카메라·배경 값 같음
+- 확인 (플레이): Student_Chibi_v2 오른손에 임시 지팡이, 정보 "소켓: 오른손 · 장착: 임시 지팡이" / 아바타 패널 접기 → 장착물 패널 y −280 → −54로 올라옴, 제목 "+  아바타" / 보이기 끄기·켜기, "없음"·다시 지팡이 / v05(프로필 없음) 안내 → v2로 돌아오면 지팡이 다시 듦 / Walk 0.5초 옆 화면에서 손에 쥔 모습 / 콘솔 에러 0
+- 추가 (사용자 보고: 랩 첫 아바타 `Student_Chibi`에서 지팡이가 안 보임): `Data/Avatars/Student_Chibi`에도 `SocketProfile_Chibi` 연결. 랩에서 v1·v2의 Idle 손 본 위치·회전을 재 보니 같음(손 회전 (354.8, 91.6, 172.1), 위치 차이 3mm) → 프로필 공유. 확인: 랩 시작 시 v1 오른손에 지팡이, 정보 "소켓: 오른손 · 장착: 임시 지팡이", 콘솔 에러 0
+- 알아 둘 점: Student_Male(v02~v05)는 아직 소켓 프로필이 없어 안내만 나옴 — 손 크기·각도가 칩비와 달라 따로 맞춰야 함
+
+## 2026-11-06 — 캐릭터 공용 시스템 단계 1-a: 농장 플레이어 오른손 소켓에 지팡이
+- 설계: `DESIGN_CHARACTER.md` (사용자 "제작 시작" 승인). CLAUDE.md 작업 표에 이 작업 줄 추가(사용자 승인)
+- Core `Characters/`: `SocketId`(소켓 이름표 SO), `SocketBinding`(본 + 위치·회전 보정), `SocketProfile`(아바타별 소켓 목록 SO), `AttachmentDefinition`(장착물 SO: 프리팹·소켓·놓는 위치·회전), `EquipmentState`(소켓별 장착, `Changed` 이벤트)
+- Core 변경: `AvatarSetup._socketProfile`, `ToolDefinition._attachment` 필드 추가
+- Gameplay `Characters/`: `ISocketSource`·`HumanoidSocketSource`·`TransformSocketSource`, `SocketHost`(처음 필요할 때 본 아래 소켓 한 번 생성·캐시), `AttachmentBase`(추상)·`WandAttachment`(Tip), `ITipProvider`, `ICastOrigin`, `CharacterEquipment`(장착물 인스턴스 캐시·켜고 끄기, 지팡이 끝을 낚싯줄 시작점으로 제공), `InventoryEquipmentLink`(지팡이 칸을 고를 때만 손에 듦)
+- `FishingDriver`: `_castOriginSource`(ICastOrigin) 추가 — 손에 든 지팡이 끝, 없으면 기존 `WandTip`. 찌·줄 위치를 `Update` → `LateUpdate`로 옮김 (애니메이션이 손을 움직인 뒤에 그려야 줄이 지팡이 끝에서 한 프레임 밀리지 않음 — 옮기기 전 3.3cm 차이 확인)
+- Editor: 메뉴 `VoxelMagic/캐릭터/기본 소켓·지팡이 데이터 만들기 (없는 것만)`, `VoxelMagic/캐릭터/농장 플레이어에 소켓·장착 붙이기`(지금 열린 씬에 부품 추가·낚시 연결·기존 Wand 끄기, 여러 번 실행해도 안전). `PrototypeSceneBuilder`도 같은 처리를 하도록 고침 (**실행하지 않음**)
+- 데이터·에셋: `Data/Characters/Sockets/Socket_RightHand`(오른손), `Data/Characters/SocketProfiles/SocketProfile_Chibi`(RightHand 본, 위치 (−0.016, 0.05, −0.007), 회전 (22.7, 87.2, 174.6) — Idle 자세에서 예전 지팡이처럼 앞으로 31° 들리게 계산), `Data/Characters/Attachments/Attachment_WandTemp`(임시 지팡이, 뒤쪽 1/4을 쥠), `Prefabs/Attachments/Wand_Temp`(예전 Wand와 같은 0.05×0.05×0.58 상자·`M_Wand`, 콜라이더 없음, 끝에 `Tip`). `Student_Chibi_v2`·`Tool_Wand`에 연결
+- 농장 씬: Player에 `SocketHost`·`CharacterEquipment`·`InventoryEquipmentLink`, Model에 `HumanoidSocketSource`, `FishingDriver._castOriginSource` 연결, 기존 `Wand` 비활성(삭제 안 함), `WandTip`은 대비용으로 둠. ⚠ 씬은 컴파일 새로 고침 중 에디터가 저장함 (diff는 위 변경뿐)
+- 확인: 단위 테스트 101개 통과(새 9개) / 플레이: 지팡이가 `RightHand/Socket_RightHand/Wand_Temp`에 붙음, Walk 6프레임 동안 손 기준 끝 위치 그대로, 1번 칸 → 2번 칸 → 1번 칸 선택 시 숨김·다시 보임(인스턴스 1개 재사용), 지팡이 없을 때 줄 시작점 = `WandTip`, 던지기(Casting) 중 걸으며 줄 시작점 = 지팡이 끝(차이 0) / 콘솔 에러 0
+
 ## 2026-11-06 — 애니메이션 랩을 Sandbox → Tools 폴더로 옮김 (타일 맵 에디터와 같은 곳)
 - 이동 (Unity 안에서 옮겨 GUID 유지): `Scenes/Sandbox/AnimationLab.unity` → `Scenes/Tools/`, `Scripts/Sandbox/` → `Scripts/Tools/`, `Data/Sandbox/` → `Data/Tools/`(AnimationLabConfig), `Materials/Sandbox/` → `Materials/Tools/`(M_Lab_*). 빈 `Scenes/Sandbox` 폴더 삭제
 - 어셈블리 이름: `VoxelMagic.Sandbox` → `VoxelMagic.Tools`, `VoxelMagic.Sandbox.Editor` → `VoxelMagic.Tools.Editor` (asmdef 파일 이름·참조 함께). 네임스페이스 `VoxelMagic.Sandbox(.EditorTools)` → `VoxelMagic.Tools(.EditorTools)`. 다른 어셈블리·에셋에는 이 이름을 쓰는 곳이 없었음

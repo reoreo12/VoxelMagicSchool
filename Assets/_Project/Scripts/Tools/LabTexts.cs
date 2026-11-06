@@ -36,9 +36,22 @@ namespace VoxelMagic.Tools
         public const string HipFormat = "\n골반 앞뒤 이동 폭 {0:0.000} m  {1}";
         public const string InPlace = "(제자리)";
         public const string NotInPlace = "<color=#e9a>(앞으로 이동함 - In Place 아님)</color>";
-        public const string CameraHelp = "우클릭 드래그 회전 · 휠 확대 · 가운데 드래그 이동\nSpace 재생/일시정지 · ←/→ 한 프레임 · 1/2/3 Idle/Walk/Run · L 반복 · P 도트";
+        public const string CameraHelp = "우클릭 드래그 회전 · 휠 확대 · 가운데 드래그 이동\nSpace 재생/일시정지 · ←/→ 한 프레임 · 1/2/3 Idle/Walk/Run · L 반복 · P 도트 · E 장착물";
         public const string PixelToggle = "도트 렌더링 (P)";
         public const string PixelOn = "도트 {0}배 · {1}×{2}";
         public const string PixelOff = "도트 {0}배 (꺼짐)";
+        public const string EquipmentVisible = "장착물 보이기 (E)";
+        public const string EquipmentNone = "없음";
+        public const string EquipmentInfo = "소켓: {0}  ·  장착: {1}";
+        public const string EquipmentHidden = "  <color=#9aa>(숨김)</color>";
+        public const string EquipmentNoProfile = "<color=#e9a>{0}: 소켓 프로필이 없어 장착물을 붙일 수 없습니다 (AvatarSetup의 소켓 프로필)</color>";
+        public const string EquipmentNoSocket = "<color=#e9a>{0}: 이 아바타의 소켓 프로필에 '{1}' 소켓이 없습니다</color>";
+        public const string EquipmentEmpty = "장착물 없음  ·  목록에서 고르면 손에 붙습니다";
+        public const string PanelAvatar = "아바타";
+        public const string PanelEquipment = "장착물";
+        public const string PanelState = "상태";
+        public const string PanelClips = "애니메이션 목록";
+        public const string PanelPlayback = "재생";
+        public const string PanelMeter = "측정 · 카메라";
     }
 }
