@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using VoxelMagic.Core;
 
-namespace VoxelMagic.Sandbox
+namespace VoxelMagic.Tools
 {
     public readonly struct LabClip
     {

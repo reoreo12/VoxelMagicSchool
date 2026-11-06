@@ -2,9 +2,9 @@
 using UnityEngine;
 using VoxelMagic.Core;
 
-namespace VoxelMagic.Sandbox
+namespace VoxelMagic.Tools
 {
-    [CreateAssetMenu(menuName = "VoxelMagic/Sandbox/Animation Lab Config", fileName = "AnimationLabConfig")]
+    [CreateAssetMenu(menuName = "VoxelMagic/Tools/Animation Lab Config", fileName = "AnimationLabConfig")]
     public sealed class AnimationLabConfig : ScriptableObject
     {
         [Header("재생")]

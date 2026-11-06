@@ -12,7 +12,7 @@
 |---|---|---|
 | `feature/prototype-farm-fishing` | 프로토타입 1: 의뢰·농사·낚시 루프 (`Prototype_FarmFishing`) | 마지막 커밋 `4b9921f`. 이후 농장 맵 아바타·줌·그림자(`3c98754`)는 복도 브랜치에 들어가 있음 |
 | `feature/prototype-corridor` | 프로토타입 2: 횡스크롤 복도 (`Corridor_SideScroll`), 복도 캐릭터 | 지금 작업 중 |
-| `feature/tool-animation-lab` | 툴: 애니메이션 랩(`Scenes/Sandbox/AnimationLab`, `Scripts/Sandbox/`), 아바타 파이프라인 | `3c98754`에서 분기. **앞으로 랩 관련 변경은 여기에만** |
+| `feature/tool-animation-lab` | 툴: 애니메이션 랩(`Scenes/Tools/AnimationLab`, `Scripts/Tools/`), 아바타 파이프라인 | `3c98754`에서 분기. **앞으로 랩 관련 변경은 여기에만** |
 
 - 세 브랜치는 공용 코드(Core, 아바타 파이프라인, 폰트 등)를 함께 쓴다. 한 브랜치의 공용 변경이 다른 브랜치에 필요하면 그때 병합 여부를 사용자에게 묻는다.
 - 커밋 전에 지금 브랜치가 작업 종류와 맞는지 확인하고, 다르면 브랜치를 바꿀지 먼저 묻는다.
@@ -66,7 +66,7 @@
 
 | 날짜 | 씬 | 설정 | 이유 |
 |---|---|---|---|
-| 2026-11-03 | Prototype_FarmFishing, Sandbox/AnimationLab | 조명 그림자 보정을 파이프라인 대신 직접: Depth Bias 0.1, Normal Bias 0 (`Editor/VoxelShadowSettings`) | 복셀 아바타 그림자 구멍. 프로젝트 URP 설정(`PC_RPAsset`)은 그대로 |
+| 2026-11-03 | Prototype_FarmFishing, Tools/AnimationLab (11-06 Sandbox에서 옮김) | 조명 그림자 보정을 파이프라인 대신 직접: Depth Bias 0.1, Normal Bias 0 (`Editor/VoxelShadowSettings`) | 복셀 아바타 그림자 구멍. 프로젝트 URP 설정(`PC_RPAsset`)은 그대로 |
 
 ## 어셈블리 (asmdef)
 
@@ -77,8 +77,8 @@
 | VoxelMagic.UI | `Assets/_Project/Scripts/UI` | Core, Unity.TextMeshPro, UnityEngine.UI |
 | VoxelMagic.Editor | `Assets/_Project/Scripts/Editor` (에디터 전용) | Core, Unity.TextMeshPro |
 | VoxelMagic.Tests | `Assets/_Project/Tests` (EditMode 테스트) | Core, Test Runner, NUnit |
-| VoxelMagic.Sandbox (2026-11-03) | `Assets/_Project/Scripts/Sandbox` (애니메이션 랩, 자동 참조 끔) | Core, Unity.InputSystem, Unity.TextMeshPro, UnityEngine.UI |
-| VoxelMagic.Sandbox.Editor (2026-11-03) | `Assets/_Project/Scripts/Sandbox/Editor` (에디터 전용) | Sandbox, Core, Gameplay, Editor, TMP, UI, InputSystem |
+| VoxelMagic.Tools (2026-11-03, 11-06 `VoxelMagic.Sandbox`에서 이름 변경) | `Assets/_Project/Scripts/Tools` (애니메이션 랩, 자동 참조 끔) | Core, Unity.InputSystem, Unity.TextMeshPro, UnityEngine.UI |
+| VoxelMagic.Tools.Editor (2026-11-03, 11-06 `VoxelMagic.Sandbox.Editor`에서 이름 변경) | `Assets/_Project/Scripts/Tools/Editor` (에디터 전용) | Tools, Core, Gameplay, Editor, TMP, UI, InputSystem |
 
 ## 연결 메모
 - 한글 폰트: `Fonts/Pretendard SDF.asset`은 고정(Static) 아틀라스라 플레이해도 파일이 바뀌지 않는다. 문자 목록에 없는 글자를 쓰려면 `VoxelMagic/한글 폰트 다시 굽기`를 실행한다.

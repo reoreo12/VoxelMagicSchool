@@ -3,7 +3,7 @@ using System.Linq;
 using UnityEditor;
 using VoxelMagic.EditorTools;
 
-namespace VoxelMagic.Sandbox.EditorTools
+namespace VoxelMagic.Tools.EditorTools
 {
     [InitializeOnLoad]
     internal static class AnimationLabEditorBridge

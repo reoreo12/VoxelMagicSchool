@@ -1,5 +1,11 @@
 # 변경 기록
 
+## 2026-11-06 — 애니메이션 랩을 Sandbox → Tools 폴더로 옮김 (타일 맵 에디터와 같은 곳)
+- 이동 (Unity 안에서 옮겨 GUID 유지): `Scenes/Sandbox/AnimationLab.unity` → `Scenes/Tools/`, `Scripts/Sandbox/` → `Scripts/Tools/`, `Data/Sandbox/` → `Data/Tools/`(AnimationLabConfig), `Materials/Sandbox/` → `Materials/Tools/`(M_Lab_*). 빈 `Scenes/Sandbox` 폴더 삭제
+- 어셈블리 이름: `VoxelMagic.Sandbox` → `VoxelMagic.Tools`, `VoxelMagic.Sandbox.Editor` → `VoxelMagic.Tools.Editor` (asmdef 파일 이름·참조 함께). 네임스페이스 `VoxelMagic.Sandbox(.EditorTools)` → `VoxelMagic.Tools(.EditorTools)`. 다른 어셈블리·에셋에는 이 이름을 쓰는 곳이 없었음
+- 코드 경로: 랩 씬 생성 도구의 씬·데이터·머테리얼 경로, 에셋 만들기 메뉴 `VoxelMagic/Sandbox/Animation Lab Config` → `VoxelMagic/Tools/...`
+- 문서: AVATAR_GUIDE.md, SETUP.md(브랜치 표·그림자 표·어셈블리 표), DESIGN_CORRIDOR.md(랩 위치·어셈블리). 이전 기록(CHANGELOG 옛 항목, 인수인계 문서)은 그때 상태라 그대로 둠
+
 ## 2026-11-06 — 타일 에디터: 구운 상태로 되돌리기 버튼
 - 설계: `DESIGN_TILEMAP.md` 11-11 (사용자 요청·승인)
 - Editor: `TileMapLibrary.RevertToBaked`/`BakedCellsOf` — 칠한 칸을 마지막 굽기 칸 데이터로 그 자리에서 바꿈 (Ctrl+Z 가능, 굽기 결과 파일은 읽기만). 도구 창 굽기 영역 "구운 상태로 되돌리기" (확인 창, 칸 데이터 없으면 꺼짐 + 이유 표시)

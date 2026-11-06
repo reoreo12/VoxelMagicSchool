@@ -26,7 +26,7 @@ Assets/_Project/
 - 키를 바꾸려면 `Data/Avatars/<이름>`의 목표 키를 고치고 ②를 다시 실행.
 - 큐브 캐릭터로 되돌리려면 `Data/SideScroll/CorridorConfig`의 캐릭터 프리팹을 비우고 `VoxelMagic/복도/복도 씬 다시 만들기`.
 
-## 3. 애니메이션 랩에서 확인 (`Scenes/Sandbox/AnimationLab.unity`)
+## 3. 애니메이션 랩에서 확인 (`Scenes/Tools/AnimationLab.unity`)
 - 플레이 → Game 뷰 클릭. 왼쪽 위에서 아바타 선택, 오른쪽 목록에서 클립 클릭.
 - **새 모델은 메뉴 없이도 된다**: `Art/Characters/` 아래에 아바타 데이터가 없는 .fbx가 있으면 랩을 시작할 때(또는 **새로고침**) 자동으로 ② 처리를 하고 왼쪽 위 목록에 추가한다. 아래쪽 안내에 추가된 이름이 뜬다.
 - 새 애니메이션 파일을 넣었으면 **새로고침**. Humanoid가 아닌 .fbx는 목록에서 눌러 바로 임포트할 수 있다.

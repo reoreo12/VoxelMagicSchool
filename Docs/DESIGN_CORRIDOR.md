@@ -474,7 +474,7 @@ SideScrollCharacter_<이름> (루트)  [SideScrollCharacter] [CharacterAnimatorV
 - 애니메이션 랩의 "디딤발 속도"가 시작값을 알려 준다: 재생 속도 ≈ 게임 이동 속도 ÷ 디딤발 속도.
 
 ### 12-6. 애니메이션 랩 (테스트 씬, 툴 형태)
-`Scenes/Sandbox/AnimationLab.unity` — 앞으로 가져올 모든 아바타·애니메이션을 확인하는 도구. 이식 뒤에도 남긴다 (빌드 목록에 넣지 않음).
+`Scenes/Tools/AnimationLab.unity` (2026-11-06 `Scenes/Sandbox/`에서 옮김) — 앞으로 가져올 모든 아바타·애니메이션을 확인하는 도구. 이식 뒤에도 남긴다 (빌드 목록에 넣지 않음).
 
 | 영역 | 기능 |
 |---|---|
@@ -490,7 +490,7 @@ SideScrollCharacter_<이름> (루트)  [SideScrollCharacter] [CharacterAnimatorV
 - 클립 재생은 Animator Controller 없이 **Playable**(코드로 클립을 직접 섞어 재생하는 Unity 기능)로 한다 → 어떤 클립이든 상태를 만들지 않고 바로 재생·섞기·멈춤·시간 이동.
 - 반복 재생 On/Off는 임포트 설정을 바꾸지 않고 랩에서만 적용.
 
-**어셈블리**: 랩 코드는 `Scripts/Sandbox/`에 **새 asmdef `VoxelMagic.Sandbox`**(Core 참조)와 `Scripts/Sandbox/Editor/`의 `VoxelMagic.Sandbox.Editor`(에디터 전용)로 분리한다. 이유: 게임 코드가 랩을 참조할 수 없게 막고, 폴더째 지워도 다른 코드가 깨지지 않게. 랩만 키보드·마우스를 직접 읽는다. 파일 검색·임포트(에디터 기능)는 에디터 어셈블리가 연결해 주는 통로(`AnimationLabBridge`)로만 쓴다.
+**어셈블리** (2026-11-06 `Sandbox` → `Tools`로 이름·폴더 변경: `Scripts/Tools/`, `VoxelMagic.Tools`, `VoxelMagic.Tools.Editor`, 네임스페이스 `VoxelMagic.Tools`): 처음에는 랩 코드를 `Scripts/Sandbox/`에 **새 asmdef `VoxelMagic.Sandbox`**(Core 참조)와 `Scripts/Sandbox/Editor/`의 `VoxelMagic.Sandbox.Editor`(에디터 전용)로 분리한다. 이유: 게임 코드가 랩을 참조할 수 없게 막고, 폴더째 지워도 다른 코드가 깨지지 않게. 랩만 키보드·마우스를 직접 읽는다. 파일 검색·임포트(에디터 기능)는 에디터 어셈블리가 연결해 주는 통로(`AnimationLabBridge`)로만 쓴다.
 
 ### 12-7. 고민한 선택지
 

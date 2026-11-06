@@ -4,7 +4,7 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.InputSystem;
 
-namespace VoxelMagic.Sandbox
+namespace VoxelMagic.Tools
 {
     public enum LabView
     {

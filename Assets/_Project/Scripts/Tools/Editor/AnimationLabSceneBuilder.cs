@@ -1,4 +1,4 @@
-// 애니메이션 랩 씬(Scenes/Sandbox/AnimationLab)을 만드는 에디터 도구: 원근 카메라, 격자 바닥, 키 비교 큐브, 툴 UI.
+// 애니메이션 랩 씬(Scenes/Tools/AnimationLab)을 만드는 에디터 도구: 원근 카메라, 격자 바닥, 키 비교 큐브, 툴 UI.
 // UI 배치는 1920×1080 기준. 설정·머테리얼은 없을 때만 만든다.
 using System.Collections.Generic;
 using TMPro;
@@ -12,13 +12,13 @@ using VoxelMagic.Core;
 using VoxelMagic.UI;
 using VoxelMagic.EditorTools;
 
-namespace VoxelMagic.Sandbox.EditorTools
+namespace VoxelMagic.Tools.EditorTools
 {
     public static class AnimationLabSceneBuilder
     {
-        private const string ScenePath = "Assets/_Project/Scenes/Sandbox/AnimationLab.unity";
-        private const string DataFolder = "Assets/_Project/Data/Sandbox";
-        private const string MaterialFolder = "Assets/_Project/Materials/Sandbox";
+        private const string ScenePath = "Assets/_Project/Scenes/Tools/AnimationLab.unity";
+        private const string DataFolder = "Assets/_Project/Data/Tools";
+        private const string MaterialFolder = "Assets/_Project/Materials/Tools";
         private const string MoveConfigPath = "Assets/_Project/Data/SideScroll/CharacterMoveConfig.asset";
         private const string AnimationConfigPath = "Assets/_Project/Data/SideScroll/CharacterAnimationConfig.asset";
 
@@ -349,7 +349,7 @@ namespace VoxelMagic.Sandbox.EditorTools
 
         private static AnimationLabConfig LoadOrCreateConfig()
         {
-            if (!AssetDatabase.IsValidFolder(DataFolder)) AssetDatabase.CreateFolder("Assets/_Project/Data", "Sandbox");
+            if (!AssetDatabase.IsValidFolder(DataFolder)) AssetDatabase.CreateFolder("Assets/_Project/Data", "Tools");
             string path = $"{DataFolder}/AnimationLabConfig.asset";
             var config = AssetDatabase.LoadAssetAtPath<AnimationLabConfig>(path);
             if (config != null) return config;
@@ -361,7 +361,7 @@ namespace VoxelMagic.Sandbox.EditorTools
 
         private static Material Mat(string name, Color color)
         {
-            if (!AssetDatabase.IsValidFolder(MaterialFolder)) AssetDatabase.CreateFolder("Assets/_Project/Materials", "Sandbox");
+            if (!AssetDatabase.IsValidFolder(MaterialFolder)) AssetDatabase.CreateFolder("Assets/_Project/Materials", "Tools");
             string path = $"{MaterialFolder}/M_Lab_{name}.mat";
             var material = AssetDatabase.LoadAssetAtPath<Material>(path);
             if (material != null) return material;
