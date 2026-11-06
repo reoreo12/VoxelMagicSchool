@@ -19,5 +19,12 @@ namespace VoxelMagic.Core
         public SocketId Socket => _socket;
         public Vector3 HoldPosition => _holdPosition;
         public Quaternion HoldRotation => Quaternion.Euler(_holdRotation);
+
+#if UNITY_EDITOR
+        /// <summary>에디터 전용: 인스펙터에서 값이 바뀌면 알린다 (플레이 중 손에 든 장착물에 바로 반영).</summary>
+        public event System.Action Edited;
+
+        private void OnValidate() => Edited?.Invoke();
+#endif
     }
 }

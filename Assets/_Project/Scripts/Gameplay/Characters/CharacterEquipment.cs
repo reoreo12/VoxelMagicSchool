@@ -1,5 +1,6 @@
 // Core의 EquipmentState를 보고 장착물 프리팹을 소켓에 붙이고 켜고 끈다 (한 번 만든 인스턴스는 캐시해 재사용).
 // 장착된 물건 중 끝(Tip)이 있는 것을 캐시해 낚싯줄 시작점(ICastOrigin)으로 제공한다.
+// 에디터에서는 플레이 중 장착물 정의의 놓는 위치·회전을 바꾸면 이미 만든 인스턴스에 바로 다시 적용한다.
 using System;
 using System.Collections.Generic;
 using UnityEngine;
@@ -17,6 +18,9 @@ namespace VoxelMagic.Gameplay
 
         private readonly Dictionary<AttachmentDefinition, AttachmentBase> _instances = new Dictionary<AttachmentDefinition, AttachmentBase>();
         private readonly Dictionary<SocketId, AttachmentBase> _active = new Dictionary<SocketId, AttachmentBase>();
+#if UNITY_EDITOR
+        private readonly Dictionary<AttachmentDefinition, Action> _editHandlers = new Dictionary<AttachmentDefinition, Action>();
+#endif
         private EquipmentState _state;
         private Transform _tip;
 
@@ -66,6 +70,10 @@ namespace VoxelMagic.Gameplay
         private void OnDestroy()
         {
             if (_state != null) _state.Changed -= OnChanged;
+#if UNITY_EDITOR
+            foreach (var pair in _editHandlers) pair.Key.Edited -= pair.Value;
+            _editHandlers.Clear();
+#endif
         }
 
         private void OnChanged(SocketId socket, AttachmentDefinition previous, AttachmentDefinition now)
@@ -103,8 +111,7 @@ namespace VoxelMagic.Gameplay
             }
             var instance = Instantiate(definition.Prefab, socket, false);
             instance.name = definition.Prefab.name;
-            instance.transform.localPosition = definition.HoldPosition;
-            instance.transform.localRotation = definition.HoldRotation;
+            ApplyHold(instance.transform, definition);
             var attachment = instance.GetComponent<AttachmentBase>();
             if (attachment == null)
             {
@@ -113,7 +120,18 @@ namespace VoxelMagic.Gameplay
                 return null;
             }
             _instances[definition] = attachment;
+#if UNITY_EDITOR
+            System.Action handler = () => { if (attachment != null) ApplyHold(attachment.transform, definition); };
+            definition.Edited += handler;
+            _editHandlers[definition] = handler;
+#endif
             return attachment;
+        }
+
+        private static void ApplyHold(Transform instance, AttachmentDefinition definition)
+        {
+            instance.localPosition = definition.HoldPosition;
+            instance.localRotation = definition.HoldRotation;
         }
 
         private void RefreshTip()

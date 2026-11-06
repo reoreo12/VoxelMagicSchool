@@ -15,7 +15,7 @@ MonoBehaviour:
   _bindings:
   - _socket: {fileID: 11400000, guid: f710d30bc1dd7d54480e126d0d4f5d4d, type: 2}
     _useHumanBone: 1
-    _humanBone: 18
+    _humanBone: 14
     _transformName: 
-    _positionOffset: {x: -0.016, y: 0.05, z: -0.007}
-    _rotationOffset: {x: 22.7, y: 87.2, z: 174.6}
+    _positionOffset: {x: 0, y: 0.35, z: -0.015}
+    _rotationOffset: {x: 25.2, y: 59.8, z: 171.8}

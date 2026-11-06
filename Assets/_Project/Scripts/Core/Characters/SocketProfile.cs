@@ -27,5 +27,12 @@ namespace VoxelMagic.Core
             binding = null;
             return false;
         }
+
+#if UNITY_EDITOR
+        /// <summary>에디터 전용: 인스펙터에서 값이 바뀌면 알린다 (플레이 중 소켓 위치에 바로 반영).</summary>
+        public event System.Action Edited;
+
+        private void OnValidate() => Edited?.Invoke();
+#endif
     }
 }

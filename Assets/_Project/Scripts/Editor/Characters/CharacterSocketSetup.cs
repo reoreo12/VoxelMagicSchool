@@ -111,7 +111,11 @@ namespace VoxelMagic.EditorTools
                 var binding = list.GetArrayElementAtIndex(0);
                 binding.FindPropertyRelative("_socket").objectReferenceValue = rightHand;
                 binding.FindPropertyRelative("_useHumanBone").boolValue = true;
-                binding.FindPropertyRelative("_humanBone").enumValueIndex = (int)HumanBodyBones.RightHand;
+                // 칩비형 아바타는 팔 메시가 위팔 본에만 붙어 있어(팔꿈치·손목이 안 굽음), 보이는 주먹을 따라가려면 위팔 본에 붙인다.
+                // 손 본에 붙이면 애니메이션의 손목·팔꿈치 회전을 지팡이만 따라가 Run에서 크게 어긋난다. DESIGN_CHARACTER.md 8번
+                binding.FindPropertyRelative("_humanBone").intValue = (int)HumanBodyBones.RightUpperArm;
+                binding.FindPropertyRelative("_positionOffset").vector3Value = new Vector3(0f, 0.35f, -0.015f);
+                binding.FindPropertyRelative("_rotationOffset").vector3Value = new Vector3(25.2f, 59.8f, 171.8f);
                 so.ApplyModifiedPropertiesWithoutUndo();
             });
 

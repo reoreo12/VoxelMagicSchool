@@ -1,5 +1,27 @@
 # 변경 기록
 
+## 2026-11-06 — 칩비 소켓을 위팔 본 기준으로 (Run에서 지팡이 틀어짐 수정)
+- 사용자 보고: Run에서 지팡이 위치·각도가 프레임마다 틀어짐 (Idle·Walk는 괜찮아 보임)
+- 원인 (측정): 칩비 팔 메시 `ArmR_Mesh`는 정점 전부가 `RightArm`(위팔) 본에만 붙어 있어 팔꿈치·손목이 안 보이는데, 소켓은 `RightHand` 본에 붙어 있어 애니메이션의 팔꿈치·손목 회전을 지팡이만 따라감. 보이는 팔 기준 소켓 어긋남(20프레임 최대): Idle 1.1°/0.1cm, Walk 28.6°/8.4cm, Run 124.5°/32.3cm
+- 수정 (데이터만): `SocketProfile_Chibi` 기준 본 `RightHand` → `RightUpperArm`, 보정 위치 (0, 0.35, −0.015)·회전 (25.2, 59.8, 171.8) — Idle에서 예전 소켓과 같은 자리(차이 0.04cm, 0°). `CharacterSocketSetup` 기본값도 같게
+- 확인: 랩 v2 Idle·Walk·Run 모두 보이는 팔 기준 어긋남 0.0°/0.0cm, Run 0.2초 옆 화면 / 농장: 소켓이 `RightArm` 아래, 낚싯줄 시작점 = Tip, 다른 칸 선택 시 숨김·다시 보임 / 콘솔 에러 0
+- 원칙 (사용자 결정): 앞으로 사람형·크리처 아바타 모두 칩비처럼 팔·다리가 한 조각인 형태로 만듦 → 소켓은 "보이는 손이 실제로 따라가는 본"(칩비형은 위팔)에 붙인다. DESIGN_CHARACTER.md 8번
+- 알아 둘 점: `Attachment_WandTemp` Hold Position이 지금 (0, −0.25, 0.181) — 사용자가 조절하던 값으로 그대로 둠. Y −0.25 때문에 지팡이가 주먹에서 약 31cm 떨어져 보임
+
+## 2026-11-06 — 소켓·장착물 값 플레이 중 바로 반영 (에디터 전용)
+- 사용자 요청: 플레이 중 `Attachment_WandTemp`의 Hold Position을 바꿔도 화면이 안 바뀜 (처음 붙일 때 한 번만 읽기 때문)
+- Core: `AttachmentDefinition`·`SocketProfile`에 에디터 전용 `Edited` 이벤트 (`OnValidate`에서 알림, `#if UNITY_EDITOR`라 빌드에는 없음)
+- Gameplay: `SocketHost`는 프로필 `Edited` 때 이미 만든 소켓 위치·회전을 다시 적용, `CharacterEquipment`는 장착물 정의 `Edited` 때 만든 인스턴스의 놓는 위치·회전을 다시 적용. 값이 바뀔 때만 실행(매 프레임 검사 없음), 오브젝트가 사라질 때 구독 해제. `SocketHost.Initialize`가 이전 프로필 구독을 먼저 풀도록 순서 수정
+- 확인 (인스펙터와 같은 `SerializedObject` 적용으로): 농장 — Hold z +0.1 → 지팡이 바로 이동, 소켓 회전 X −20 → 소켓 바로 회전, 인벤토리로 내렸다 다시 들어도 반영 / 랩 — v1에서 같은 확인, v2로 바꾼 뒤에도 반영 / 시험 값은 원래대로 되돌림 / 테스트 101개 통과, 콘솔 에러 0
+- 알아 둘 점: 플레이 중 프로필에 **새 소켓 항목을 추가**한 것은 다시 시작해야 생김 (값 변경만 바로 반영). 지금 `Attachment_WandTemp` Hold Position X가 −9.2 (사용자가 조절하던 값, 그대로 둠)
+
+## 2026-11-06 — 지팡이 메시: Magic_Staff_v2.fbx 적용
+- 에셋 (사용자 제공): `Art/Objects/Wand/Magic_Staff_v2.fbx`(복셀 32칸 길이 2.13, 메시 +Z 쪽이 굵은 연갈색 손잡이, −Z 쪽이 얇은 진갈색 자루), `staff_v2_palette.png`(32×8). 팔레트 임포트를 캐릭터 팔레트와 같게 Point·무압축·밉맵 끔으로 바꿈 (Bilinear면 이웃 색이 번짐)
+- `Prefabs/Attachments/Wand_Temp`: 상자 `Mesh` → FBX 인스턴스 `Mesh`(배율 0.2719로 길이 0.58 = 임시 지팡이와 같게, 사용자 결정. Y 180°로 굵은 손잡이가 뒤(−Z)·얇은 끝이 앞(+Z), 콜라이더 없음). `Tip`은 얇은 끝. 처음엔 굵은 쪽을 머리 장식으로 잘못 보고 반대로 붙였다가 사용자 지적으로 뒤집음. 농장·애니메이션 랩이 같은 프리팹이라 둘 다 바뀜
+- `Attachment_WandTemp` 놓는 위치 z 0.145 → 0.181: 손잡이 범위(프리팹 z −0.290 ~ −0.072)의 가운데를 쥠. 얇은 자루 전체가 손 위로 나옴 (사용자 요청: 손에 덜 잡히고 위로 더 올라오게)
+- 확인 (농장 플레이): 손에 FBX 지팡이, 경계 크기 (0.12, 0.39, 0.56), 손잡이를 쥐고 얇은 자루가 앞쪽 위로, 낚싯줄 시작점 = 얇은 끝 Tip, 콘솔 에러 0. 농장 씬 파일은 바뀌지 않음 (프리팹만 바뀜)
+- 이름: 프리팹·정의 이름은 아직 `Wand_Temp`·"임시 지팡이" 그대로
+
 ## 2026-11-06 — 캐릭터 공용 시스템 단계 1-b: 애니메이션 랩 장착물 패널 + 모든 패널 접이식
 - 설정: `VoxelMagic.Tools.asmdef` 참조에 `VoxelMagic.Gameplay` 추가 (사용자 승인, SETUP.md 어셈블리 표). 랩은 농장과 같은 `HumanoidSocketSource`·`SocketHost`·`CharacterEquipment`를 그대로 씀 — 랩 전용 소켓 코드 없음
 - Tools: `LabFoldout`(제목 줄을 누르면 내용 숨기고 높이를 제목 줄만큼, `-`/`+` 표시. ▼▶ 기호는 한글 폰트에 있는지 확인하려면 폰트 에셋이 바뀌어서 ASCII로), `AnimationLab` 장착물 처리(새 모델마다 부품을 붙이고 같은 장착물 다시 적용, 목록 "없음"+모든 `AttachmentDefinition`, 보이기 토글·단축키 E, 소켓 프로필 없음/소켓 없음 안내), `AnimationLabBridge.ScanAttachments`(에디터 검색, 빌드용 `_fallbackAttachments`), `AnimationLabConfig._equipFirstAttachmentOnStart`(기본 켬), `LabTexts` 문구
