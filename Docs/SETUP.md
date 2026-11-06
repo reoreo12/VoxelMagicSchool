@@ -22,6 +22,8 @@
 | 날짜 | 패키지 | 버전 / 출처 | 이유 | 승인 |
 |---|---|---|---|---|
 | 2026-10-30 | MCP for Unity (`com.coplaydev.unity-mcp`) | `https://github.com/CoplayDev/unity-mcp.git?path=/MCPForUnity#v10.3.0` | Claude Code가 에디터를 조작(씬 구성, 플레이 모드, 콘솔 확인)하기 위함. STT_Prototype과 같은 버전으로 고정 | 사용자 승인 |
+| 2026-11-05 | 2D Tilemap Editor (`com.unity.2d.tilemap`) | 1.0.0 (Unity 레지스트리, 6000.0.38f1에 맞는 유일한 버전) | 타일 에디터 테스트 씬: `Window > 2D > Tile Palette` 창으로 바닥 칠하기 (`DESIGN_TILEMAP.md`) | 사용자 승인 |
+| 2026-11-05 | 2D Tilemap Extras (`com.unity.2d.tilemap.extras`) | 4.1.2 (Unity 레지스트리 추천 버전. 최신 10.0.1은 이 에디터와 맞지 않음) | Rule Tile로 풀↔흙 경계 자동 배치 (`DESIGN_TILEMAP.md` 6장) | 사용자 승인 |
 
 ## 에셋 가져오기
 
@@ -50,6 +52,7 @@
 |---|---|---|---|
 | 2026-11-02 | `Art/Corridor/*.png`, `Art/Backdrop/*.png` | Sprite·Single·Full Rect, PPU 300, Bottom Center, Point, 압축 없음, Mip Map 끔, Alpha Is Transparency, Clamp, 최대 크기 4096 | `Data/SideScroll/CorridorConfig` 값 수정 → 메뉴 `VoxelMagic/복도/이미지 임포트 설정 적용` |
 | 2026-11-04 | `Art/Lights/lamp_floor_glow.png` (복도 씬 생성 도구가 그림, 흰색 + 계단식 알파 원) | Sprite·Single, PPU = 그림 크기(1유닛), 가운데 기준점, Point, Clamp, 압축 없음, Mip Map 끔 | `CorridorConfig` 바닥 빛 도트 크기·단계 수정 → 복도 씬 다시 만들기 |
+| 2026-11-05 | `Art/Map/Tile/**/*.png` (타일 팩 9개 테마 387장, 사용자 결정: 팩 전체) | Sprite·Single·Full Rect, PPU 32, 가운데 기준점, Point, 압축 없음, Mip Map 끔, Alpha Is Transparency, Clamp | `Data/Tiles/TileMapConfig`의 타일 픽셀 수정 → 메뉴 `VoxelMagic/타일 맵/타일 팩 임포트 설정 적용 (전체)` |
 
 ## 아바타 임포트 설정 (메뉴 `VoxelMagic/아바타/`로 적용)
 

@@ -1,0 +1,117 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 019ca8f883a633c4d8ed7a050d25a029, type: 3}
+  m_Name: GroundSurfaceTable
+  m_EditorClassIdentifier: 
+  _entries:
+  - Tile: {fileID: 11400000, guid: ec8bfc7f83ed2984e837abf844c2a564, type: 2}
+    Surface: {fileID: 11400000, guid: 81bd08442375d034fb7c80e6ccca587b, type: 2}
+  - Tile: {fileID: 11400000, guid: 94832aa211421a344bb5bd58c39c31fa, type: 2}
+    Surface: {fileID: 11400000, guid: ae0bbc6a310c99c468e109c5e11dfa64, type: 2}
+  - Tile: {fileID: 11400000, guid: 1c62661dbc90dd644a25c0f4e61bab64, type: 2}
+    Surface: {fileID: 11400000, guid: ca6e0dd2dd7655948990fe2b6c9c5ce0, type: 2}
+  - Tile: {fileID: 11400000, guid: 48a49ffe311e38f418cc3c5b1c211ad2, type: 2}
+    Surface: {fileID: 11400000, guid: ca6e0dd2dd7655948990fe2b6c9c5ce0, type: 2}
+  - Tile: {fileID: 11400000, guid: 681c66f60af18a145b00d8363563a8e7, type: 2}
+    Surface: {fileID: 11400000, guid: 237cd98e2b20bc6469585cb6f3b0995d, type: 2}
+  - Tile: {fileID: 11400000, guid: eef3928c14075e045bf4331b99532e13, type: 2}
+    Surface: {fileID: 11400000, guid: 237cd98e2b20bc6469585cb6f3b0995d, type: 2}
+  - Tile: {fileID: 11400000, guid: 13a36b2b504e75f45ac84995bf1ee19c, type: 2}
+    Surface: {fileID: 11400000, guid: 8e8356826be6ce2418a4e349b3d22962, type: 2}
+  - Tile: {fileID: 11400000, guid: d36178a22cd28884e922dc87c7878895, type: 2}
+    Surface: {fileID: 11400000, guid: 237cd98e2b20bc6469585cb6f3b0995d, type: 2}
+  - Tile: {fileID: 11400000, guid: 9de97ef5b09d51d45a6ba779911508a1, type: 2}
+    Surface: {fileID: 11400000, guid: 3077bbcaff301c24e83e65b47b4a729a, type: 2}
+  - Tile: {fileID: 11400000, guid: 3c425eb26a6095d4a8673668ad57ee77, type: 2}
+    Surface: {fileID: 11400000, guid: ae0bbc6a310c99c468e109c5e11dfa64, type: 2}
+  - Tile: {fileID: 11400000, guid: da23354f6657d8749b592b44a9e7229d, type: 2}
+    Surface: {fileID: 11400000, guid: 8e8356826be6ce2418a4e349b3d22962, type: 2}
+  - Tile: {fileID: 11400000, guid: 5c64ce48c4f4f894fb73a3c1ebc74d4f, type: 2}
+    Surface: {fileID: 11400000, guid: ca6e0dd2dd7655948990fe2b6c9c5ce0, type: 2}
+  - Tile: {fileID: 11400000, guid: 9aef543d4ce324b47a86e81cfc70924b, type: 2}
+    Surface: {fileID: 11400000, guid: ca6e0dd2dd7655948990fe2b6c9c5ce0, type: 2}
+  - Tile: {fileID: 11400000, guid: 91f98ba8fb3549a43b64e8d4665be247, type: 2}
+    Surface: {fileID: 11400000, guid: 3077bbcaff301c24e83e65b47b4a729a, type: 2}
+  - Tile: {fileID: 11400000, guid: 6e2b9b01f2a10804a9bc17fa286c9ca2, type: 2}
+    Surface: {fileID: 11400000, guid: 8e8356826be6ce2418a4e349b3d22962, type: 2}
+  - Tile: {fileID: 11400000, guid: cb98870ea213f3b4bb955d8e7e553c0f, type: 2}
+    Surface: {fileID: 11400000, guid: ca6e0dd2dd7655948990fe2b6c9c5ce0, type: 2}
+  - Tile: {fileID: 11400000, guid: c02e21935e7b4eb48ac627ad1dce3837, type: 2}
+    Surface: {fileID: 11400000, guid: ca6e0dd2dd7655948990fe2b6c9c5ce0, type: 2}
+  - Tile: {fileID: 11400000, guid: 0f7fbfb5c8f5cb24fb0636eb5db0969a, type: 2}
+    Surface: {fileID: 11400000, guid: ca6e0dd2dd7655948990fe2b6c9c5ce0, type: 2}
+  - Tile: {fileID: 11400000, guid: 765eba6afb744c24ebc45bb25bb5f168, type: 2}
+    Surface: {fileID: 11400000, guid: ca6e0dd2dd7655948990fe2b6c9c5ce0, type: 2}
+  - Tile: {fileID: 11400000, guid: 1b5b80214660fff44820a0c7a3c35aa9, type: 2}
+    Surface: {fileID: 11400000, guid: ca6e0dd2dd7655948990fe2b6c9c5ce0, type: 2}
+  - Tile: {fileID: 11400000, guid: 24f70ba40e6c7ce4b86117339025fa4b, type: 2}
+    Surface: {fileID: 11400000, guid: ca6e0dd2dd7655948990fe2b6c9c5ce0, type: 2}
+  - Tile: {fileID: 11400000, guid: 02e865263efc2ca4b9dc6c5807c3d9b1, type: 2}
+    Surface: {fileID: 11400000, guid: ca6e0dd2dd7655948990fe2b6c9c5ce0, type: 2}
+  - Tile: {fileID: 11400000, guid: f3d855beea2fbed44a7a8f61d79f7de7, type: 2}
+    Surface: {fileID: 11400000, guid: ca6e0dd2dd7655948990fe2b6c9c5ce0, type: 2}
+  - Tile: {fileID: 11400000, guid: cd8b3dc8215478644a8026a48627caee, type: 2}
+    Surface: {fileID: 11400000, guid: ca6e0dd2dd7655948990fe2b6c9c5ce0, type: 2}
+  - Tile: {fileID: 11400000, guid: b8c8f8838d9d08548b22a38c70d1d17a, type: 2}
+    Surface: {fileID: 11400000, guid: ca6e0dd2dd7655948990fe2b6c9c5ce0, type: 2}
+  - Tile: {fileID: 11400000, guid: 144bd6a4a5ab8134d96b503c45462af6, type: 2}
+    Surface: {fileID: 11400000, guid: ca6e0dd2dd7655948990fe2b6c9c5ce0, type: 2}
+  - Tile: {fileID: 11400000, guid: 3057cb5a6b9ca3b429786039ace44c11, type: 2}
+    Surface: {fileID: 11400000, guid: ca6e0dd2dd7655948990fe2b6c9c5ce0, type: 2}
+  - Tile: {fileID: 11400000, guid: b240f09132c1c26499f8083c206d008e, type: 2}
+    Surface: {fileID: 11400000, guid: 3077bbcaff301c24e83e65b47b4a729a, type: 2}
+  - Tile: {fileID: 11400000, guid: 1cf27efbf099f044ca034cb9fa4b1316, type: 2}
+    Surface: {fileID: 11400000, guid: 3077bbcaff301c24e83e65b47b4a729a, type: 2}
+  - Tile: {fileID: 11400000, guid: 51141aae2c6814c4c864642f87eaffd5, type: 2}
+    Surface: {fileID: 11400000, guid: 3077bbcaff301c24e83e65b47b4a729a, type: 2}
+  - Tile: {fileID: 11400000, guid: 875c9b2833f32374297f4dbd32ad43c8, type: 2}
+    Surface: {fileID: 11400000, guid: 3077bbcaff301c24e83e65b47b4a729a, type: 2}
+  - Tile: {fileID: 11400000, guid: 127c8f749aeae004d894beb53c979569, type: 2}
+    Surface: {fileID: 11400000, guid: 3077bbcaff301c24e83e65b47b4a729a, type: 2}
+  - Tile: {fileID: 11400000, guid: a04115a5aa7c4054a80deb0e5c25c323, type: 2}
+    Surface: {fileID: 11400000, guid: 3077bbcaff301c24e83e65b47b4a729a, type: 2}
+  - Tile: {fileID: 11400000, guid: e0dc8487ef51d9b419f38ffbc743981f, type: 2}
+    Surface: {fileID: 11400000, guid: 3077bbcaff301c24e83e65b47b4a729a, type: 2}
+  - Tile: {fileID: 11400000, guid: 26d39b72b7bde5b439e155e0f035519a, type: 2}
+    Surface: {fileID: 11400000, guid: 3077bbcaff301c24e83e65b47b4a729a, type: 2}
+  - Tile: {fileID: 11400000, guid: 0f9f03f924b019641b3c9efd19105f6d, type: 2}
+    Surface: {fileID: 11400000, guid: 3077bbcaff301c24e83e65b47b4a729a, type: 2}
+  - Tile: {fileID: 11400000, guid: f3998134dc273be43b75fa031614b0b3, type: 2}
+    Surface: {fileID: 11400000, guid: 3077bbcaff301c24e83e65b47b4a729a, type: 2}
+  - Tile: {fileID: 11400000, guid: c5b22bc920bdd3c4882f3b50da1f8f52, type: 2}
+    Surface: {fileID: 11400000, guid: 3077bbcaff301c24e83e65b47b4a729a, type: 2}
+  - Tile: {fileID: 11400000, guid: b44e0003c0ba51544845f9f05904d558, type: 2}
+    Surface: {fileID: 11400000, guid: 3077bbcaff301c24e83e65b47b4a729a, type: 2}
+  - Tile: {fileID: 11400000, guid: a3ab3605ed590d141a91f41cdaa99d48, type: 2}
+    Surface: {fileID: 11400000, guid: 8e8356826be6ce2418a4e349b3d22962, type: 2}
+  - Tile: {fileID: 11400000, guid: 8dc06cb66f1be024589edfd19a5d31f6, type: 2}
+    Surface: {fileID: 11400000, guid: 8e8356826be6ce2418a4e349b3d22962, type: 2}
+  - Tile: {fileID: 11400000, guid: ab7970e91383ab44ca4bd41e8aff9710, type: 2}
+    Surface: {fileID: 11400000, guid: 8e8356826be6ce2418a4e349b3d22962, type: 2}
+  - Tile: {fileID: 11400000, guid: fe46909689d168b44a879dc1aaf163d6, type: 2}
+    Surface: {fileID: 11400000, guid: 8e8356826be6ce2418a4e349b3d22962, type: 2}
+  - Tile: {fileID: 11400000, guid: a2932181429e3fc46ac5780ea5d3d1f7, type: 2}
+    Surface: {fileID: 11400000, guid: 8e8356826be6ce2418a4e349b3d22962, type: 2}
+  - Tile: {fileID: 11400000, guid: 49e91c836f98e2d4aafbb6eb689b4efa, type: 2}
+    Surface: {fileID: 11400000, guid: 8e8356826be6ce2418a4e349b3d22962, type: 2}
+  - Tile: {fileID: 11400000, guid: 3e55d7359fb988a4d97406836ad6ce79, type: 2}
+    Surface: {fileID: 11400000, guid: 8e8356826be6ce2418a4e349b3d22962, type: 2}
+  - Tile: {fileID: 11400000, guid: 6d380345eaf3a2d428a8361b5143d899, type: 2}
+    Surface: {fileID: 11400000, guid: 8e8356826be6ce2418a4e349b3d22962, type: 2}
+  - Tile: {fileID: 11400000, guid: ec7ff2f8d9f8f5146b3fc463959cdd06, type: 2}
+    Surface: {fileID: 11400000, guid: 8e8356826be6ce2418a4e349b3d22962, type: 2}
+  - Tile: {fileID: 11400000, guid: 51bbd96c9aed56445b0de20d3f4d39f1, type: 2}
+    Surface: {fileID: 11400000, guid: 8e8356826be6ce2418a4e349b3d22962, type: 2}
+  - Tile: {fileID: 11400000, guid: baa506a42adcefb44a1fb7df31eaa1fe, type: 2}
+    Surface: {fileID: 11400000, guid: 8e8356826be6ce2418a4e349b3d22962, type: 2}
+  - Tile: {fileID: 11400000, guid: 2bf3e9076493fac42a648f6f9e1b0e03, type: 2}
+    Surface: {fileID: 11400000, guid: 8e8356826be6ce2418a4e349b3d22962, type: 2}

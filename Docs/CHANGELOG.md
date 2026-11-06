@@ -1,5 +1,81 @@
 # 변경 기록
 
+## 2026-11-06 — 타일 에디터: 구운 상태로 되돌리기 버튼
+- 설계: `DESIGN_TILEMAP.md` 11-11 (사용자 요청·승인)
+- Editor: `TileMapLibrary.RevertToBaked`/`BakedCellsOf` — 칠한 칸을 마지막 굽기 칸 데이터로 그 자리에서 바꿈 (Ctrl+Z 가능, 굽기 결과 파일은 읽기만). 도구 창 굽기 영역 "구운 상태로 되돌리기" (확인 창, 칸 데이터 없으면 꺼짐 + 이유 표시)
+- 확인: 시험 맵 굽기 → 짚·바깥 칸으로 잘못 칠하기 → 되돌리기 → 구웠을 때와 모든 칸·결과 그림 같음, 맵 위치·구운 바닥 연결 그대로, 칸 데이터 파일 안 바뀜 / Ctrl+Z → 잘못 칠한 상태로 돌아감 / FarmSample은 칸 데이터가 없어 버튼 꺼짐 / 테스트 92개 통과, 콘솔 에러 0. 시험 맵·결과는 지움
+- 정리: 이전 시험 맵 `_SurfaceTest`가 에디터 다시 실행(Redo)으로 씬에 되살아나 있던 것을 지움 (굽기 결과는 이미 없어 프리팹이 빠진 상태였음)
+- 문서: 조작법 3장에 G 단축키 충돌(Shift+G 권장)·채우기 동작(실제 확인), 9장에 되돌리기
+
+## 2026-11-06 — 타일 에디터 여러 맵 4·5단계: 바닥 종류 정보 + 단계별 조작법
+- 설계: `DESIGN_TILEMAP.md` 11-10. 사용자 요청으로 4단계 뒤 확인 없이 조작법까지 한 번에 진행
+- Core: `Tiles/GroundSurface`(바닥 종류, 표시 이름), `GroundSurfaceTable`(타일 → 종류, 빠진 줄만 더하기), `GroundSurfaceMap`(칸마다 종류 1바이트 + 종류 목록, 칸·로컬 위치로 찾기) + 테스트 4개 (전체 92개 통과). `TileMapConfig`에 바닥 종류 표 참조
+- Gameplay: `GroundSurfaceSource`(구운 프리팹 루트, 월드 위치 → 종류), `GroundSurfaceQuery`(씬 전체 찾기 `TryGet`), `GroundSurfaceProbe`(확인용: 플레이 중 발밑 종류를 왼쪽 위에 표시, 에디터 씬 치비에 붙임)
+- Editor: `GroundSurfaceBuilder` — 메뉴 `VoxelMagic/타일 맵/바닥 종류 표 만들기·채우기 (farm)`: `Data/Tiles/Surfaces/Surface_{Grass,Soil,Mud,Straw,Stone,Wood}`(풀·흙·진흙·짚·돌·나무판) + `Data/Tiles/GroundSurfaceTable`(51줄: 바닥 12 + Rule Tile 3 + 경계 36, Rule Tile·경계는 재료 이름으로), 설정에 연결. `TileFloorBaker`가 `<맵>_Surfaces.asset` 저장 + 프리팹 루트에 `GroundSurfaceSource`, 표에 없는 타일은 경고. 도구 창에 바닥 종류 수·표 열기/만들기. 씬 생성 도구가 치비에 확인 표시를 붙임 (지금 씬에도 추가)
+- 확인: 표 다시 실행 → 새 줄 0 (고친 줄 보존) / 시험 맵(8×6 풀 + 흙·짚) 굽기 → 바닥 종류 3종, 표에 없는 칸 0, 795바이트 / 플레이 모드 찾기: 풀·흙 가운데·흙 경계 칸(흙)·짚 맞음, 맵 밖·옛 굽기(FarmSample) 위는 없음 / 10만 번 찾기 14 ms / 치비를 흙 위로 옮기면 "발밑 바닥: 흙" 표시(한글 정상) / 콘솔 에러 0. 시험 맵·결과·임시 캡처는 지움. `FarmSample`은 사용자 요청으로 다시 굽지 않음 (칸 데이터·바닥 종류 없음)
+- 문서: `TILEMAP_EDITOR_GUIDE.md`를 단계별 조작법으로 다시 씀 (처음 준비 · 씬 열기 · 새 맵 · 칠하기 · 여러 맵 · 칸 크기 · 굽기 · 바닥 종류 · 게임 씬 적용 · 다시 불러오기 · 확인 도구 · 문제 해결 · 메뉴)
+
+## 2026-11-06 — 타일 에디터 여러 맵 3단계: 칸 데이터 저장 · 구운 맵 다시 불러오기
+- 설계: `DESIGN_TILEMAP.md` 11-5·11-6
+- Core: `Tiles/TileMapCells` (칸 위치 → 칠한 타일, 같은 타일은 한 번만 두고 번호로) + 테스트 4개 (전체 88개 통과)
+- Editor: `TileFloorBaker`가 `<맵>_Cells.asset`도 저장 (Rule Tile 칸은 Rule Tile 자체로, 덮어쓰기 확인 문구에 칸 데이터 추가). `TileMapLibrary` — `LoadBakedMap`(칸 데이터대로 새 맵을 칠하고 구운 프리팹 연결, 칠하기 보기로 시작, 같은 이름이 씬에 있으면 그 맵을 돌려줌, 음수 칸이 있어도 다른 맵과 안 겹치게 배치, Ctrl+Z 한 번), `BakedMaps`, `FindCells`(프리팹·칸 데이터·폴더 어느 것을 골라도), `FindMap`. 도구 창 "구운 맵 불러오기" — 구운 맵 목록(칸 수 / 씬에 있음 → [선택] / 칸 데이터 없음), Project에서 고른 파일로 불러오기, 다른 맵 숨기기
+- 확인: 시험 맵(8×6 풀 + 흙·짚 Rule Tile + 음수 칸 + 경계 낱장, 50칸) 굽기 → 칸 데이터 50칸·4종 → 씬에서 지우고 불러오기 → **50칸 모두 타일·결과 그림까지 같음**, 구운 프리팹 연결, 칠하기 보기 / 같은 맵 다시 불러오기 → 새로 안 만듦 / 고친 뒤 다시 굽기 → 칸 데이터 갱신(흙 9 → 12칸), 구운 바닥 인스턴스 그대로 / 플레이 모드 정상, 콘솔 에러 0. 시험 맵과 결과는 지움
+- 남은 것: `FarmSample`은 칸 데이터가 없어 아직 불러오기 목록에서 "칸 데이터 없음" → 한 번 다시 구우면 생김 (기존 결과 덮어쓰기라 사용자 확인 후)
+
+## 2026-11-06 — 타일 에디터 여러 맵 2단계: 맵 목록 · 새 맵
+- 설계: `DESIGN_TILEMAP.md` 11-2~11-4
+- Core: `Tiles/TileMapPlacement` (새 맵 자리 = 기존 맵들 동쪽 끝 + 간격) + 테스트 4개 (전체 84개 통과). `TileMapConfig`에 새 맵 기본 크기 40×40·간격 4칸 추가
+- Editor: `TileMapLibrary` — `NewMap`(이름 검사, 겹치지 않게 배치, 바탕 타일 채우기, 다른 맵 숨기기, Ctrl+Z 한 번으로 취소), `SetVisible`, `AllMaps`, `SuggestName`. `TileMapEditorWindow` — 맵 목록(체크 = 보이기, ▶ 작업 대상, 칸 크기·구움 여부, [선택] = 보이기 + 선택 + 씬 뷰 맞춤), "작업 대상 말고 다른 맵 모두 숨기기", "새 맵"(이름·크기·바탕 타일·다른 맵 숨기기 → 만든 뒤 선택하고 칠하기 시작), 창 스크롤
+- 확인: 새 맵 40×40(풀) → (14, 0, 0)에 1,600칸, FarmSample 숨겨짐 / 두 번째 새 맵(8×6, 빈 맵) → (58, 0, 0), 숨긴 맵도 자리 계산에 들어감 / 같은 이름 거부 / Ctrl+Z 두 번 → 두 맵 모두 사라지고 FarmSample 다시 보임 / 창 그리기 에러 없음, 맵 선택 → 비교 오브젝트가 그 맵 가운데로 / 플레이 모드 정상, 콘솔 에러 0. 시험 맵은 지움
+- 참고: 컴파일 직후 콘솔에 Unity 내부 경고 `Assertion failed ... kDontSaveInEditor` 1번 (스택 없음). 이후 작업에서는 다시 안 나옴 — Tile Palette 창이 열린 채 다시 컴파일할 때 Unity가 내는 것으로 추정
+
+## 2026-11-06 — 타일 에디터 여러 맵 1단계: 맵 하나 = 루트 하나
+- 설계: `DESIGN_TILEMAP.md` 11-1·11-7 ("제작 시작" 승인)
+- 구조: `Maps/Map_<이름>`(TileMapDocument + TileGridScaler) > `Grid`(X 90°, 배율 = 칸 크기) > `Paint`, 구운 바닥은 맵 루트 아래. 비교 오브젝트는 `Compare`(TileMapCompareRig) > `Center`(카메라·치비·상자)·`East`(연못)
+- Gameplay: `TileMapDocument`(Grid·Paint 참조, 칠한 범위·칸 → 월드 위치), `TileGridScaler`(맵 루트로 옮김, 자기 Grid·구운 바닥 배율만, 위치는 안 건드림), 새 `TileMapCompareRig`(작업 대상 맵 가운데·동쪽 끝으로)
+- Editor: `TileFloorBaker`(맵 하나만 굽고 그 루트 아래에 놓음), `TileMapEditorWindow`(선택한 오브젝트가 속한 맵 = 작업 대상, 비교 오브젝트·Tile Palette 대상도 따라감), 새 `TileMapLibrary`(맵 만들기·이름 검사/바꾸기·옛 구조 옮기기 메뉴 `VoxelMagic/타일 맵/옛 구조 씬을 여러 맵 구조로 옮기기`), 씬 생성 도구도 새 구조로
+- 지금 씬: 다시 만들지 않고 구조만 옮김 (칠한 100칸·구운 바닥 그대로, Ctrl+Z 한 번으로 되돌릴 수 있게 묶음)
+- 확인: 맵 루트를 (20, 0, 3)으로 옮기면 칸·구운 바닥·비교 오브젝트가 같이 옮겨짐 / 칸 크기 2 → Grid·구운 바닥 배율 2 / 루트를 끄면 칠한 칸·구운 바닥 함께 숨겨짐 / 시험 맵(6×6)을 만들어 그것만 구움 → FarmSample 결과 파일 안 바뀜, 구운 바닥은 시험 맵 루트 아래 / 선택 기준 대상: 시험 맵 Paint 선택 → 시험 맵, FarmSample 조각 선택 → FarmSample / 같은 이름 거부 / 플레이 모드: 두 맵 모두 칠하기 층 꺼지고 구운 바닥 보임, 콘솔 에러 0 / 테스트 80개 통과. 시험 맵과 그 굽기 결과는 지움
+
+## 2026-11-05 — 타일 에디터 4단계: 굽기 방식 확정, 칠하기 편의, 사용법
+- 사용자 결정: 본 방식 = **굽기** (플레이 전에 한 번 구워 파일로 저장, 게임은 파일만 씀). 땅은 런타임에 바꾸지 않고, 물 주기 등 변화는 텃밭 칸 오브젝트(나중에 MagicaVoxel FBX)에서만 → `DESIGN_TILEMAP.md` 10장
+- 도구 창: "칠하기 시작"(Tile Palette 열기 + 팔레트 Farm + 대상 Paint 자동 선택 + 칠하기 보기), 에디터 씬이 아닐 때 "타일 맵 에디터 씬 열기" 버튼. 메뉴 `VoxelMagic/타일 맵/타일 맵 에디터 씬 열기` 추가
+- 문서: `Docs/TILEMAP_EDITOR_GUIDE.md` (사용법)
+- 확인: "칠하기 시작" → palette Farm · target Paint 선택됨, 기본 붓으로 칠하기 됨(시험 칸은 되돌림) / 구운 프리팹을 빈 씬에 놓으면 Transform·MeshFilter·MeshRenderer만으로 그대로 보임 (범위 (0,0,0)~(10,0,10)) / 콘솔 에러 0
+
+## 2026-11-05 — 타일 에디터 3단계: 굽기 + 바닥 프리팹 + 도구 창, 확인 1~4
+- 설계: `DESIGN_TILEMAP.md` 7·8장
+- Core: `Tiles/TileAtlasLayout` (아틀라스 배치·UV, 여백 제외) + 테스트 4개 (`TileAtlasLayoutTests`, 전체 80개 통과)
+- Gameplay: `TileMapDocument` (맵 이름·구운 칸 크기·구운 바닥, 플레이 중 구운 바닥 켬), `PaintOnlyTilemap` (플레이 중 칠하기 층 끔), `TileGridScaler`가 구운 바닥 배율도 맞춤
+- Editor: `TileFloorBaker` (칠한 칸 → 아틀라스 PNG·URP Lit 머티리얼·16칸 조각 메시·`<맵>_Floor.prefab`, 이전 결과가 있으면 덮어쓰기 전에 확인 창, 이번에 없는 조각 메시는 지움), `TileMapEditorWindow` (메뉴 `VoxelMagic/타일 맵/타일 맵 에디터 창`: 맵 이름, 칸 크기·후보 버튼, 굽기, 보기 전환, 해 높이·방향). 씬 생성 도구가 두 컴포넌트도 붙이게 함 (지금 씬에는 다시 만들지 않고 컴포넌트만 추가)
+- 결과: `Art/Map/Baked/FarmSample/` — 칸 100, 타일 24종, 조각 1, 아틀라스 180×180 (여백 2px), 프리팹 루트 배율 1 (= 칸 1 m)
+- 확인 1 (방향): 칸 (0,0) = 월드 (0.5, 0, 0.5), 위쪽 = +Z
+- 확인 2 (Tilemap + URP Lit): **예상과 달리 그림이 나오고 그림자도 받음**. 평균 색 차이는 작음 (구운 바닥 (115,129,72) / Lit Tilemap (117,131,78) / Unlit Tilemap (119,133,70)), 화소 28%가 조금씩 다름. 확인 후 원래 머티리얼(Sprite-Unlit-Default)로 되돌림
+- 확인 3 (그림자 줄무늬): 해 높이 50°·20°·10°에서 줄무늬 안 보임 (그림자만 길어짐)
+- 확인 4 (이음새): 여백 0px과 2px로 각각 구워 먼 시점·낮은 시점 비교 → 차이 화소 0~1개, 이음새 안 보임 (Point·밉 없음이라). 여백 2px는 안전 여유로 유지. 비교용 임시 결과 `_SeamTest_Pad0`은 지움
+- 플레이 모드: '칠하기' 보기로 두고 들어가도 칠하기 층 꺼지고 구운 바닥만 보임, 조각 렌더러 1개, 콘솔 에러 0. 칸 크기 2.133으로 바꾸면 구운 바닥도 바로 2.133배 (되돌림)
+
+## 2026-11-05 — 타일 에디터 2단계: 타일 맵 에디터 씬 + 10×10 샘플
+- 사용자 정리: 테스트 씬이 아니라 **타일 맵 에디터 씬** (칠하고 구워서 다른 게임 플레이 씬에 땅으로 씀) → `DESIGN_TILEMAP.md` 0·2·3·7장 반영
+- Gameplay: `Tiles/TileGridScaler` ([ExecuteAlways]) — `TileMapConfig.CellSize`를 FloorGrid 배율로 바로 반영, 샘플 가운데·동쪽 끝 기준점도 옮김
+- Editor: `Tiles/TileMapEditorSceneBuilder` — 메뉴 `VoxelMagic/타일 맵/타일 맵 에디터 씬 만들기` (씬이 있으면 덮어쓰기 전에 확인 창)
+- 씬: `Scenes/Tools/TileMapEditor.unity` — 해(농장과 같은 값), FloorGrid(X 90°) + Paint Tilemap 한 층, 10×10 샘플(흙 4×4·길 2칸 폭·짚 ㄱ자·1칸 폭 줄·대각선 칸), 치비(Student_Chibi_v2, 배율 1)·1 m 상자·연못(2, 2, 1.5)
+- 고침: 씬 생성 도구가 새 씬을 열기 전에 설정을 읽어, 씬 전환 때 에셋이 내려가며 설정 참조가 비던 문제 → 새 씬을 연 뒤 읽음
+- 확인: 칸 (0,0) 가운데 = 월드 (0.5, 0, 0.5), (9,9) = (9.5, 0, 9.5), 팔레트 위쪽 = +Z(북) / 칸 크기 1 → 2.133으로 바꾸면 Grid 배율·기준점이 바로 따라옴(씬 다시 만들기 불필요), 되돌림 / 플레이 모드: 칠한 칸 유지, 치비 Idle, 콘솔 에러 0 / Tilemap은 조명·그림자를 받지 않음(예상대로 → 굽기 단계에서 해결)
+
+## 2026-11-05 — 타일 에디터 1단계: 타일 팩 임포트 설정 + farm 타일·Rule Tile·팔레트
+- 브랜치: `feature/tool-tile-editor` · 설계: `DESIGN_TILEMAP.md` 5·6장 ("제작 시작" 승인)
+- Core: `TileMapConfig` (칸 크기 1 m, 후보 2.133/1.067/1, 타일 32 px, 샘플 10, 조각 16, 여백 2 px, 바뀌면 `Changed`) → `Data/Tiles/TileMapConfig.asset`
+- Editor: `Tiles/FarmTileSetBuilder` — 메뉴 `VoxelMagic/타일 맵/타일 팩 임포트 설정 적용 (전체)`, `VoxelMagic/타일 맵/farm 타일·Rule Tile·팔레트 만들기` (이미 있으면 덮어쓰기 전에 확인 창). `VoxelMagic.Editor.asmdef`에 `Unity.2D.Tilemap.Extras`·`Unity.2D.Tilemap.Editor` 참조 추가
+- 에셋: 타일 팩 387장 임포트 설정 변경(.meta 수정, GUID 유지), `Art/Map/TileAssets/farm/` (Tile 48 = 바닥 12 + 경계 36, Rule Tile 3), `Art/Map/TilePalettes/Farm.prefab` (54칸)
+- 확인: 387장 모두 설정 일치. 미리보기 장면(저장 안 됨)에서 Rule Tile이 바깥·안쪽 모서리·변을 맞게 고름, 경계는 칸 가운데라 칠한 영역이 둘레로 반 칸씩 줄어 보임, 1칸 폭 줄은 맞는 그림이 없어 경계 없이 끊김(4-3 예상대로) / 콘솔 에러 0. 씬이 아직 없어 플레이 모드 확인은 다음 단계에서
+
+## 2026-11-05 — 타일 에디터: 타일맵 패키지 2개 설치
+- 브랜치: `feature/tool-tile-editor`
+- 설계: `DESIGN_TILEMAP.md` (설계안, "제작 시작" 승인 전)
+- 패키지: 2D Tilemap Editor 1.0.0, 2D Tilemap Extras 4.1.2 설치 (`Packages/manifest.json`, `packages-lock.json`), 사용자 승인
+- 확인: 메뉴 `Window > 2D > Tile Palette` 열림, `RuleTile` 형식 있음, 콘솔 에러 0
+
 ## 2026-11-04 — 복도 밤 조명 나누기: 바닥 빛 그림 + 천장 조명(칩비)
 - 설계: DESIGN_CORRIDOR.md 17번 (사용자 결정: 미리보기는 빼고 조명만 분리)
 - 이유: 사용자가 점 조명을 바닥으로 내려 쓰니(간격 5.7, 높이 −0.5, 세기 1.3) 바닥 빛 모양은 맞지만 칩비를 아래에서 올려 비추고, 쿠키 진하기를 따로 조절할 수 없었음

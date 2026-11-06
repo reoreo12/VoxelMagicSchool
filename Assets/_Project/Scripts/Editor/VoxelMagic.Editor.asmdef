@@ -8,7 +8,9 @@
         "Unity.TextMeshPro",
         "Unity.InputSystem",
         "UnityEngine.UI",
-        "Unity.RenderPipelines.Universal.Runtime"
+        "Unity.RenderPipelines.Universal.Runtime",
+        "Unity.2D.Tilemap.Extras",
+        "Unity.2D.Tilemap.Editor"
     ],
     "includePlatforms": [
         "Editor"

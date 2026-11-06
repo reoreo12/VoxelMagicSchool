@@ -1,0 +1,26 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d994e7d629ad6e240ae51c20a8c393bd, type: 3}
+  m_Name: TileMapConfig
+  m_EditorClassIdentifier: 
+  _cellSize: 1
+  _cellSizePresets:
+  - 2.133
+  - 1.067
+  - 1
+  _tilePixels: 32
+  _sampleSize: 10
+  _chunkSize: 16
+  _atlasPadding: 2
+  _surfaceTable: {fileID: 11400000, guid: 4bdb5c3a0415c77469a03fda9a0ee32e, type: 2}
+  _newMapSize: {x: 40, y: 40}
+  _newMapGapCells: 4
