@@ -1,5 +1,14 @@
 # 변경 기록
 
+## 2026-11-06 — 복도: 칩비 2D 아틀라스 연결 (V로 3D ↔ 2D)
+- 파일 (사용자 제공 webp 1536×1024, Idle 4 · Walk 6 · Run 6, 오른쪽을 보는 그림): 압축으로 흐려진 알파를 정리(128 미만 → 투명, 이상 → 불투명)해 `Art/Characters/Student_Chibi/Sprites/Student_Chibi_sheet.png`로 저장, 칸 정보 `Student_Chibi_sprites.json`(칸 256×300, 줄마다 발바닥이 기준점 (140, 4)에 오게 잘라냄)
+- 칩비 전용 폴더에 둔 이유: Student_Male 폴더에 두면 기존 `Student_Male_2D`를 덮어쓰고 v02~v05에도 연결됨
+- `Data/Avatars/Student_Chibi_2D`: 목표 키 1.28(복도 칩비 0.8배와 같게) → PPU 210, Idle 3fps · Walk 8fps · Run 9fps(반복). 기존 2D 준비 도구(`SpriteCharacterImporter`)로 만들고, 같은 폴더에 모델이 없어 `Student_Chibi_v2` 아바타에 직접 연결
+- 칩비 복도 프리팹 다시 만듦(메뉴 3과 같은 처리) → `Sprite2D` 자식 + 2D/3D 전환 포함, Model 배율 0.8 다시 적용, 복도 씬 다시 만듦 (밤 조명·사용자 값 그대로). 시작은 3D("2D로 시작" 꺼짐)
+- 코드 변경 없음
+- 확인 (한 프레임씩 진행): V → 2D(3D 렌더러 꺼짐)·V → 3D, 오른쪽 걷기 Walk 프레임 진행·반전 없음, 왼쪽 걷기 반전(flipX), 달리기 Run 프레임 진행, 발 y 0.10(바닥 띠 안), 높이 1.43(칸 포함) / 콘솔 에러 0
+- 알아 둘 점: 2D 스프라이트는 조명 없는 머테리얼이라 **밤에도 밝게** 보임 (3D 칩비·복도는 어두워짐)
+
 ## 2026-11-06 — 타일 에디터: 구운 상태로 되돌리기 버튼
 - 설계: `DESIGN_TILEMAP.md` 11-11 (사용자 요청·승인)
 - Editor: `TileMapLibrary.RevertToBaked`/`BakedCellsOf` — 칠한 칸을 마지막 굽기 칸 데이터로 그 자리에서 바꿈 (Ctrl+Z 가능, 굽기 결과 파일은 읽기만). 도구 창 굽기 영역 "구운 상태로 되돌리기" (확인 창, 칸 데이터 없으면 꺼짐 + 이유 표시)
