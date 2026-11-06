@@ -5,7 +5,7 @@ using UnityEngine;
 using UnityEngine.Animations;
 using UnityEngine.Playables;
 
-namespace VoxelMagic.Sandbox
+namespace VoxelMagic.Tools
 {
     public sealed class LabClipPlayer : IDisposable
     {

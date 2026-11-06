@@ -1,5 +1,11 @@
 # 변경 기록
 
+## 2026-11-06 — 애니메이션 랩을 Sandbox → Tools 폴더로 옮김 (타일 맵 에디터와 같은 곳)
+- 이동 (Unity 안에서 옮겨 GUID 유지): `Scenes/Sandbox/AnimationLab.unity` → `Scenes/Tools/`, `Scripts/Sandbox/` → `Scripts/Tools/`, `Data/Sandbox/` → `Data/Tools/`(AnimationLabConfig), `Materials/Sandbox/` → `Materials/Tools/`(M_Lab_*). 빈 `Scenes/Sandbox` 폴더 삭제
+- 어셈블리 이름: `VoxelMagic.Sandbox` → `VoxelMagic.Tools`, `VoxelMagic.Sandbox.Editor` → `VoxelMagic.Tools.Editor` (asmdef 파일 이름·참조 함께). 네임스페이스 `VoxelMagic.Sandbox(.EditorTools)` → `VoxelMagic.Tools(.EditorTools)`. 다른 어셈블리·에셋에는 이 이름을 쓰는 곳이 없었음
+- 코드 경로: 랩 씬 생성 도구의 씬·데이터·머테리얼 경로, 에셋 만들기 메뉴 `VoxelMagic/Sandbox/Animation Lab Config` → `VoxelMagic/Tools/...`
+- 문서: AVATAR_GUIDE.md, SETUP.md(브랜치 표·그림자 표·어셈블리 표), DESIGN_CORRIDOR.md(랩 위치·어셈블리). 이전 기록(CHANGELOG 옛 항목, 인수인계 문서)은 그때 상태라 그대로 둠
+
 ## 2026-11-06 — 복도: 칩비 2D 아틀라스 연결 (V로 3D ↔ 2D)
 - 파일 (사용자 제공 webp 1536×1024, Idle 4 · Walk 6 · Run 6, 오른쪽을 보는 그림): 압축으로 흐려진 알파를 정리(128 미만 → 투명, 이상 → 불투명)해 `Art/Characters/Student_Chibi/Sprites/Student_Chibi_sheet.png`로 저장, 칸 정보 `Student_Chibi_sprites.json`(칸 256×300, 줄마다 발바닥이 기준점 (140, 4)에 오게 잘라냄)
 - 칩비 전용 폴더에 둔 이유: Student_Male 폴더에 두면 기존 `Student_Male_2D`를 덮어쓰고 v02~v05에도 연결됨

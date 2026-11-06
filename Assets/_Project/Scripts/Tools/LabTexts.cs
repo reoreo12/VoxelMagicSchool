@@ -1,5 +1,5 @@
 // 애니메이션 랩 화면 문구(한국어).
-namespace VoxelMagic.Sandbox
+namespace VoxelMagic.Tools
 {
     public static class LabTexts
     {

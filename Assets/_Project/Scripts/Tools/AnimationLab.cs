@@ -10,7 +10,7 @@ using UnityEngine.UI;
 using VoxelMagic.Core;
 using VoxelMagic.UI;
 
-namespace VoxelMagic.Sandbox
+namespace VoxelMagic.Tools
 {
     public sealed class AnimationLab : MonoBehaviour
     {

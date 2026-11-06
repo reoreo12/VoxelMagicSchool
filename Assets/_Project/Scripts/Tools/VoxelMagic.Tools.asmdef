@@ -1,6 +1,6 @@
 {
-    "name": "VoxelMagic.Sandbox",
-    "rootNamespace": "VoxelMagic.Sandbox",
+    "name": "VoxelMagic.Tools",
+    "rootNamespace": "VoxelMagic.Tools",
     "references": [
         "VoxelMagic.Core",
         "VoxelMagic.UI",

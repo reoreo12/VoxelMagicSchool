@@ -1,8 +1,8 @@
 {
-    "name": "VoxelMagic.Sandbox.Editor",
-    "rootNamespace": "VoxelMagic.Sandbox.EditorTools",
+    "name": "VoxelMagic.Tools.Editor",
+    "rootNamespace": "VoxelMagic.Tools.EditorTools",
     "references": [
-        "VoxelMagic.Sandbox",
+        "VoxelMagic.Tools",
         "VoxelMagic.Core",
         "VoxelMagic.Gameplay",
         "VoxelMagic.UI",

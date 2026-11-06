@@ -2,7 +2,7 @@
 // 재생 속도로 나눠 "재생 속도 1 기준" 값으로 맞추고, 골반이 앞뒤로 움직인 폭(최대-최소)으로 제자리 여부도 알려 준다.
 using UnityEngine;
 
-namespace VoxelMagic.Sandbox
+namespace VoxelMagic.Tools
 {
     public sealed class FootSlideMeter
     {

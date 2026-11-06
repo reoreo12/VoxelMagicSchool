@@ -1,9 +1,9 @@
-// 랩 씬 생성기 도우미: private [SerializeField] 필드를 채우는 확장 메서드와 기본 도형 생성 (Sandbox 폴더 안에서만 사용).
+// 랩 씬 생성기 도우미: private [SerializeField] 필드를 채우는 확장 메서드와 기본 도형 생성 (Tools 폴더의 랩 도구에서만 사용).
 using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
 
-namespace VoxelMagic.Sandbox.EditorTools
+namespace VoxelMagic.Tools.EditorTools
 {
     internal static class LabEditorExtensions
     {
