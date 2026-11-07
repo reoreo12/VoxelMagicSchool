@@ -15,5 +15,5 @@ MonoBehaviour:
   _displayName: "\uC784\uC2DC \uC9C0\uD321\uC774"
   _prefab: {fileID: 6440944831559221246, guid: 0deaa0ac48a9d834daf5a2c8a8436a07, type: 3}
   _socket: {fileID: 11400000, guid: f710d30bc1dd7d54480e126d0d4f5d4d, type: 2}
-  _holdPosition: {x: 0, y: -0.25, z: 0.181}
+  _holdPosition: {x: -0.03, y: 0.02, z: 0.32}
   _holdRotation: {x: 0, y: 0, z: 0}
