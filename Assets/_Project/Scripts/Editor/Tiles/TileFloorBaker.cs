@@ -1,5 +1,5 @@
 // 칠한 Tilemap을 굽는다: 사용한 타일만 모은 아틀라스(여백 + 가장자리 늘이기) + 조각 평면 메시(위 방향, 칸 단위) + URP Lit 머티리얼 + 바닥 프리팹.
-// 결과: Art/Map/Baked/<맵 이름>/ (+ 다시 불러오기용 칸 데이터 <맵>_Cells.asset, 발밑 찾기용 바닥 종류 <맵>_Surfaces.asset). 이전 결과가 있으면 덮어쓰기 전에 묻는다. 프리팹 루트 배율 = 구울 때의 칸 크기 (게임 씬에 그대로 놓음).
+// 결과: Art/Map/Baked/<맵 이름>/ (+ 칸 데이터 <맵>_Cells.asset, 바닥 종류 <맵>_Surfaces.asset, 선택하면 칠한 범위의 BoxCollider). 이전 결과가 있으면 덮어쓰기 전에 묻는다. 프리팹 루트 배율 = 구울 때의 칸 크기 (게임 씬에 그대로 놓음).
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -27,6 +27,8 @@ namespace VoxelMagic.EditorTools
         public sealed class Result
         {
             public int Cells, UniqueTiles, Chunks, RotatedCells, SurfaceKinds, UnmappedCells;
+            public bool HasCollider;
+            public Vector2 ColliderSizeMeters;
             public Vector2Int AtlasSize;
             public string PrefabPath;
         }
@@ -126,6 +128,7 @@ namespace VoxelMagic.EditorTools
             {
                 root.transform.localScale = Vector3.one * config.CellSize;
                 root.AddComponent<GroundSurfaceSource>().SetMap(surfaceMap);
+                if (document.BakeCollider) AddFloorCollider(root, paintedPositions, config, result);
                 foreach (var (key, mesh) in chunkMeshes)
                 {
                     var go = new GameObject($"Chunk_{key.x}_{key.y}", typeof(MeshFilter), typeof(MeshRenderer));
@@ -251,6 +254,24 @@ namespace VoxelMagic.EditorTools
             importer.maxTextureSize = Mathf.Max(32, Mathf.NextPowerOfTwo(Mathf.Max(layout.Width, layout.Height)));
             importer.SaveAndReimport();
             return AssetDatabase.LoadAssetAtPath<Texture2D>(path);
+        }
+
+        /// <summary>칠한 범위(칸)를 덮는 얇은 BoxCollider. 루트 배율 = 칸 크기라 로컬 단위 = 칸, 두께만 m → 칸으로 바꾼다. 윗면은 y = 0</summary>
+        private static void AddFloorCollider(GameObject root, List<Vector2Int> positions, TileMapConfig config, Result result)
+        {
+            int minX = int.MaxValue, minY = int.MaxValue, maxX = int.MinValue, maxY = int.MinValue;
+            foreach (var p in positions)
+            {
+                minX = Mathf.Min(minX, p.x); minY = Mathf.Min(minY, p.y);
+                maxX = Mathf.Max(maxX, p.x + 1); maxY = Mathf.Max(maxY, p.y + 1);
+            }
+            float width = maxX - minX, depth = maxY - minY;
+            float thickness = config.ColliderThickness / config.CellSize;
+            var box = root.AddComponent<BoxCollider>();
+            box.size = new Vector3(width, thickness, depth);
+            box.center = new Vector3(minX + width * 0.5f, -thickness * 0.5f, minY + depth * 0.5f);
+            result.HasCollider = true;
+            result.ColliderSizeMeters = new Vector2(width * config.CellSize, depth * config.CellSize);
         }
 
         private static GroundSurfaceMap SaveSurfaces(string path, GroundSurfaceTable table, List<Vector2Int> positions, List<TileBase> tiles, Result result)

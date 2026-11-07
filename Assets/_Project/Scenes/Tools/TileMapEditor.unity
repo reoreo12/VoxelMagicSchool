@@ -351,6 +351,7 @@ MonoBehaviour:
   _grid: {fileID: 1721716410}
   _paint: {fileID: 1504089367}
   _sizeHint: {x: 40, y: 40}
+  _bakeCollider: 1
   _bakedCellSize: 1
   _bakedFloor: {fileID: 2005228865}
 --- !u!4 &552558289
@@ -911,6 +912,7 @@ MonoBehaviour:
   _grid: {fileID: 2126671503}
   _paint: {fileID: 1690684773}
   _sizeHint: {x: 10, y: 10}
+  _bakeCollider: 1
   _bakedCellSize: 1
   _bakedFloor: {fileID: 1320599256}
 --- !u!4 &1247405309

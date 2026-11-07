@@ -266,6 +266,14 @@ namespace VoxelMagic.EditorTools
         private void DrawBake(TileMapDocument document)
         {
             EditorGUILayout.LabelField("굽기 (작업 대상 맵만)", EditorStyles.boldLabel);
+            EditorGUI.BeginChangeCheck();
+            bool bakeCollider = EditorGUILayout.ToggleLeft($"충돌체 함께 굽기 (칠한 범위의 BoxCollider, 두께 {_config.ColliderThickness:0.##} m) — 게임 씬에서 바로 밟고 걸을 수 있음", document.BakeCollider);
+            if (EditorGUI.EndChangeCheck())
+            {
+                Undo.RecordObject(document, "충돌체 함께 굽기");
+                document.SetBakeCollider(bakeCollider);
+                EditorUtility.SetDirty(document);
+            }
             if (GUILayout.Button($"굽기: {document.MapName}", GUILayout.Height(28)))
             {
                 var result = TileFloorBaker.Bake(document, _config, askBeforeOverwrite: true);
@@ -273,7 +281,8 @@ namespace VoxelMagic.EditorTools
                 {
                     TileFloorBaker.SetView(document, showBaked: true);
                     _lastResult = $"{document.MapName}: 칸 {result.Cells} · 타일 {result.UniqueTiles}종 · 조각 {result.Chunks} · 아틀라스 {result.AtlasSize.x}×{result.AtlasSize.y} · 바닥 종류 {result.SurfaceKinds}종" +
-                                  (result.UnmappedCells > 0 ? $" · 표에 없는 칸 {result.UnmappedCells} (콘솔 참고)" : "");
+                                  (result.UnmappedCells > 0 ? $" · 표에 없는 칸 {result.UnmappedCells} (콘솔 참고)" : "") +
+                                  (result.HasCollider ? $" · 충돌체 {result.ColliderSizeMeters.x:0.##}×{result.ColliderSizeMeters.y:0.##} m" : " · 충돌체 없음");
                 }
                 GUIUtility.ExitGUI();
             }

@@ -1,5 +1,12 @@
 # 변경 기록
 
+## 2026-11-08 — 타일 맵 에디터: 충돌체 함께 굽기
+- 사용자 요청 (설계 승인 절차 없이 바로 진행하라고 함, 브랜치 `feature/tool-tile-editor`): 구운 바닥이 충돌까지 맡아 게임 씬의 `Ground` 상자 없이 걸을 수 있게
+- Gameplay: `TileMapDocument`에 맵별 "충돌체 함께 굽기"(기본 켬). Core: `TileMapConfig`에 충돌체 두께 0.5 m
+- Editor: `TileFloorBaker`가 켜져 있으면 프리팹 루트에 **칠한 범위만 한 BoxCollider**(윗면 y = 0, 두께는 설정값)를 넣음, 끄면 안 넣음. 도구 창 굽기 영역에 체크박스, 결과 줄에 충돌체 크기
+- 확인: 시험 맵 10×8칸 굽기 → BoxCollider 10×0.5×8 m, 윗면 0 / 끄고 다시 굽기 → 프리팹에 충돌체 없음 / 플레이 모드에서 CharacterController(중력 적용)를 2 m 위에서 떨어뜨림 → 바닥 위에 섬(y 0.08 = 기본 skin width), 발밑 바닥 "흙", 3 m 걸어도 그대로 섬, 칠한 범위 밖으로 나가면 떨어짐(예상대로) / 테스트 92개 통과, 콘솔 에러 0. 시험 맵·결과는 지움
+- 이미 구운 맵(TestA, FarmSample)은 다시 굽기 전까지 충돌체 없음
+
 ## 2026-11-06 — 애니메이션 랩을 Sandbox → Tools 폴더로 옮김 (타일 맵 에디터와 같은 곳)
 - 이동 (Unity 안에서 옮겨 GUID 유지): `Scenes/Sandbox/AnimationLab.unity` → `Scenes/Tools/`, `Scripts/Sandbox/` → `Scripts/Tools/`, `Data/Sandbox/` → `Data/Tools/`(AnimationLabConfig), `Materials/Sandbox/` → `Materials/Tools/`(M_Lab_*). 빈 `Scenes/Sandbox` 폴더 삭제
 - 어셈블리 이름: `VoxelMagic.Sandbox` → `VoxelMagic.Tools`, `VoxelMagic.Sandbox.Editor` → `VoxelMagic.Tools.Editor` (asmdef 파일 이름·참조 함께). 네임스페이스 `VoxelMagic.Sandbox(.EditorTools)` → `VoxelMagic.Tools(.EditorTools)`. 다른 어셈블리·에셋에는 이 이름을 쓰는 곳이 없었음
