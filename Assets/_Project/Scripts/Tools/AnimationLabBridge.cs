@@ -1,4 +1,4 @@
-// 애니메이션 랩이 에디터 기능(파일 검색·Humanoid 임포트)을 쓰는 통로. 에디터 어셈블리가 연결하고, 빌드에서는 비어 있다.
+// 애니메이션 랩이 에디터 기능(파일·장착물 검색·Humanoid 임포트)을 쓰는 통로. 에디터 어셈블리가 연결하고, 빌드에서는 비어 있다.
 using System;
 using System.Collections.Generic;
 using UnityEngine;
@@ -30,6 +30,8 @@ namespace VoxelMagic.Tools
         public static Func<string, bool> ImportAsHumanoid;
         /// <summary>아직 아바타 데이터가 없는 캐릭터 모델을 준비하고, 새로 준비한 아바타 이름을 돌려준다.</summary>
         public static Func<IReadOnlyList<string>> PrepareNewModels;
+        /// <summary>프로젝트의 모든 장착물 정의 (장착물 패널 목록).</summary>
+        public static Func<IReadOnlyList<AttachmentDefinition>> ScanAttachments;
 
         public static bool IsConnected => ScanClips != null;
     }

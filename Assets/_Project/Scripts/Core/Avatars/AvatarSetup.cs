@@ -27,6 +27,9 @@ namespace VoxelMagic.Core
         [Header("2D 버전 (있으면 복도에서 2D/3D 전환)")]
         [SerializeField] private SpriteCharacterSet _sprites;
 
+        [Header("소켓 (손 등 장착 위치, 아바타별 보정)")]
+        [SerializeField] private SocketProfile _socketProfile;
+
         [Header("생성됨 (메뉴 3)")]
         [SerializeField] private RuntimeAnimatorController _controller;
         [SerializeField] private GameObject _characterPrefab;
@@ -35,6 +38,7 @@ namespace VoxelMagic.Core
         public float TargetHeight => _targetHeight;
         public float ColliderRadius => _colliderRadius;
         public SpriteCharacterSet Sprites => _sprites;
+        public SocketProfile SocketProfile => _socketProfile;
         public RuntimeAnimatorController Controller => _controller;
         public GameObject CharacterPrefab => _characterPrefab;
 

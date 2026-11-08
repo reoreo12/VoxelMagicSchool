@@ -1,0 +1,21 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b8652a552ae6d1c49b050e2f7c95411f, type: 3}
+  m_Name: SocketProfile_Chibi
+  m_EditorClassIdentifier: 
+  _bindings:
+  - _socket: {fileID: 11400000, guid: f710d30bc1dd7d54480e126d0d4f5d4d, type: 2}
+    _useHumanBone: 1
+    _humanBone: 14
+    _transformName: 
+    _positionOffset: {x: 0, y: 0.35, z: -0.015}
+    _rotationOffset: {x: 25.2, y: 59.8, z: 171.8}

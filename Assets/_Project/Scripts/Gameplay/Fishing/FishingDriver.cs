@@ -1,4 +1,5 @@
 // 매 프레임 FishingSession을 진행시키고, 상태에 맞게 찌와 낚싯줄을 연출한다 (던지기 포물선, 기다림 출렁임, 입질 가라앉음).
+// 낚싯줄 시작점은 손에 든 지팡이 끝(ICastOrigin), 없으면 기본 WandTip.
 using UnityEngine;
 using VoxelMagic.Core;
 
@@ -9,7 +10,10 @@ namespace VoxelMagic.Gameplay
         [SerializeField] private PondArea _pond;
         [SerializeField] private Transform _bobber;
         [SerializeField] private LineRenderer _line;
+        [Tooltip("시작점이 없을 때(지팡이를 안 들었을 때) 쓰는 기본 낚싯줄 시작점")]
         [SerializeField] private Transform _wandTip;
+        [Tooltip("ICastOrigin 구현 (플레이어의 CharacterEquipment). 손에 든 지팡이 끝을 시작점으로 쓴다")]
+        [SerializeField] private MonoBehaviour _castOriginSource;
         [Header("연출")]
         [SerializeField] private float _castArcHeight = 1.5f;
         [SerializeField] private float _bobAmplitude = 0.03f;
@@ -21,6 +25,12 @@ namespace VoxelMagic.Gameplay
         private float _castDuration;
         private float _stateTime;
         private Vector3 _castStart;
+        private ICastOrigin _castOrigin;
+
+        private void Awake() => _castOrigin = _castOriginSource as ICastOrigin;
+
+        private Vector3 LineStart() =>
+            _castOrigin != null && _castOrigin.TryGetOrigin(out var origin) ? origin : _wandTip.position;
 
         public void Bind(GameContext context)
         {
@@ -40,8 +50,8 @@ namespace VoxelMagic.Gameplay
             _stateTime = 0f;
             if (state == FishingState.Casting)
             {
-                _pond.UpdateCastPoint(_wandTip.position);
-                _castStart = _wandTip.position;
+                _castStart = LineStart();
+                _pond.UpdateCastPoint(_castStart);
             }
             bool visible = state != FishingState.Idle && state != FishingState.Result;
             _bobber.gameObject.SetActive(visible);
@@ -53,10 +63,15 @@ namespace VoxelMagic.Gameplay
             if (_session == null) return;
             _session.Tick(Time.deltaTime);
             _stateTime += Time.deltaTime;
-            if (!_bobber.gameObject.activeSelf) return;
+        }
+
+        // 손에 든 지팡이는 Update 뒤 애니메이션이 움직이므로, 줄은 그 다음(LateUpdate)에 그려야 한 프레임 밀리지 않는다.
+        private void LateUpdate()
+        {
+            if (_session == null || !_bobber.gameObject.activeSelf) return;
 
             _bobber.position = BobberPosition(_session.State);
-            _line.SetPosition(0, _wandTip.position);
+            _line.SetPosition(0, LineStart());
             _line.SetPosition(1, _bobber.position);
         }
 

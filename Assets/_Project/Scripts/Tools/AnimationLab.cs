@@ -1,4 +1,5 @@
-// 애니메이션 랩 본체: 아바타 선택·생성, 클립 목록(새로고침·Humanoid 임포트), 재생 조작, A↔B 반복 전환, 디딤발 측정, 단축키.
+// 애니메이션 랩 본체: 아바타 선택·생성, 클립 목록(새로고침·Humanoid 임포트), 재생 조작, A↔B 반복 전환, 디딤발 측정, 장착물, 단축키.
+// 장착물은 농장과 같은 소켓·장착 부품(Gameplay)을 모델에 붙여 보여 준다 (게임 기능 없이 모습만).
 // 화면 요소 참조는 씬 생성기가 채운다. 게임 코드는 이 클래스를 참조하지 않는다.
 using System;
 using System.Collections.Generic;
@@ -8,6 +9,7 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.UI;
 using VoxelMagic.Core;
+using VoxelMagic.Gameplay;
 using VoxelMagic.UI;
 
 namespace VoxelMagic.Tools
@@ -48,6 +50,9 @@ namespace VoxelMagic.Tools
             public Slider PixelSlider;
             public TMP_Text PixelLabel;
             public TMP_Text Status;
+            public TMP_Dropdown EquipmentDropdown;
+            public Toggle EquipmentVisibleToggle;
+            public TMP_Text EquipmentInfo;
         }
 
         [SerializeField] private AnimationLabConfig _config;
@@ -57,6 +62,8 @@ namespace VoxelMagic.Tools
         [SerializeField] private PixelRenderView _pixelView;
         [Tooltip("에디터 검색이 안 될 때(빌드) 쓰는 아바타 목록")]
         [SerializeField] private List<AvatarSetup> _fallbackAvatars = new List<AvatarSetup>();
+        [Tooltip("에디터 검색이 안 될 때(빌드) 쓰는 장착물 목록")]
+        [SerializeField] private List<AttachmentDefinition> _fallbackAttachments = new List<AttachmentDefinition>();
         [SerializeField] private Ui _ui = new Ui();
 
         private readonly List<AvatarSetup> _avatars = new List<AvatarSetup>();
@@ -69,6 +76,10 @@ namespace VoxelMagic.Tools
         private AnimationClip _abFirst;
         private AnimationClip _abSecond;
         private float _abTimer;
+        private readonly List<AttachmentDefinition> _attachments = new List<AttachmentDefinition>();
+        private AttachmentDefinition _selectedAttachment;
+        private bool _attachmentsListed;
+        private CharacterEquipment _equipment;
 
         private void Start()
         {
@@ -115,6 +126,7 @@ namespace VoxelMagic.Tools
             bool keepPaused = _player != null && _player.Paused;
             _player?.Dispose();
             _player = null;
+            _equipment = null;
             if (_instance != null) Destroy(_instance);
             if (_avatars.Count == 0)
             {
@@ -136,6 +148,7 @@ namespace VoxelMagic.Tools
             _animator.cullingMode = AnimatorCullingMode.AlwaysAnimate;
 
             _player = new LabClipPlayer(_animator) { Loop = _ui.LoopToggle.isOn, Speed = _ui.SpeedSlider.value };
+            AttachEquipment();
             float height = MeasureHeight(_instance);
             if (firstSpawn) _camera.Focus(_spawnPoint.position + Vector3.up * height * _config.FocusHeightRatio, height);
             _ui.AvatarInfo.text = string.Format(LabTexts.AvatarInfo, _setup.name, height, LabTexts.Yes, CountMappedBones(),
@@ -202,6 +215,7 @@ namespace VoxelMagic.Tools
             _ui.AvatarDropdown.ClearOptions();
             _ui.AvatarDropdown.AddOptions(_avatars.Select(a => a.name).ToList());
             _ui.AvatarDropdown.SetValueWithoutNotify(keep);
+            RefreshAttachments();
 
             foreach (var button in _clipButtons) Destroy(button);
             _clipButtons.Clear();
@@ -267,6 +281,81 @@ namespace VoxelMagic.Tools
             else Play(clip);
         }
 
+        // ── 장착물 ───────────────────────────────────────────
+
+        private void RefreshAttachments()
+        {
+            _attachments.Clear();
+            var found = AnimationLabBridge.ScanAttachments?.Invoke();
+            _attachments.AddRange(found != null && found.Count > 0 ? found : _fallbackAttachments.Where(a => a != null));
+            if (!_attachmentsListed)
+            {
+                _attachmentsListed = true;
+                if (_config.EquipFirstAttachmentOnStart && _attachments.Count > 0) _selectedAttachment = _attachments[0];
+            }
+            if (_selectedAttachment != null && !_attachments.Contains(_selectedAttachment)) _selectedAttachment = null;
+
+            var options = new List<string> { LabTexts.EquipmentNone };
+            options.AddRange(_attachments.Select(a => a.DisplayName));
+            _ui.EquipmentDropdown.ClearOptions();
+            _ui.EquipmentDropdown.AddOptions(options);
+            _ui.EquipmentDropdown.SetValueWithoutNotify(_selectedAttachment != null ? _attachments.IndexOf(_selectedAttachment) + 1 : 0);
+            ApplyEquipment();
+        }
+
+        private void SelectAttachment(int option)
+        {
+            _selectedAttachment = option > 0 && option <= _attachments.Count ? _attachments[option - 1] : null;
+            ApplyEquipment();
+        }
+
+        // 새 모델마다 농장과 같은 부품(HumanoidSocketSource·SocketHost·CharacterEquipment)을 붙인다. 아바타를 바꿔도 같은 장착물을 든다.
+        private void AttachEquipment()
+        {
+            _equipment = null;
+            if (_setup.SocketProfile != null)
+            {
+                var source = _instance.AddComponent<HumanoidSocketSource>();
+                var host = _instance.AddComponent<SocketHost>();
+                host.Initialize(_setup.SocketProfile, source);
+                _equipment = _instance.AddComponent<CharacterEquipment>();
+                _equipment.Initialize(host);
+                _equipment.SetVisible(_ui.EquipmentVisibleToggle.isOn);
+            }
+            ApplyEquipment();
+        }
+
+        private void ApplyEquipment()
+        {
+            if (_equipment != null)
+            {
+                var state = _equipment.State;
+                foreach (var pair in state.Equipped.ToList())
+                    if (pair.Value != _selectedAttachment) state.Unequip(pair.Key);
+                if (_selectedAttachment != null) state.Equip(_selectedAttachment);
+            }
+            RefreshEquipmentInfo();
+        }
+
+        private void SetEquipmentVisible(bool visible)
+        {
+            if (_equipment != null) _equipment.SetVisible(visible);
+            RefreshEquipmentInfo();
+        }
+
+        private void RefreshEquipmentInfo()
+        {
+            var profile = _setup != null ? _setup.SocketProfile : null;
+            var selected = _selectedAttachment;
+            string socketName = selected != null && selected.Socket != null ? selected.Socket.DisplayName : LabTexts.None;
+            if (_setup == null) _ui.EquipmentInfo.text = "";
+            else if (profile == null) _ui.EquipmentInfo.text = string.Format(LabTexts.EquipmentNoProfile, _setup.name);
+            else if (selected == null) _ui.EquipmentInfo.text = LabTexts.EquipmentEmpty;
+            else if (!profile.TryGet(selected.Socket, out _)) _ui.EquipmentInfo.text = string.Format(LabTexts.EquipmentNoSocket, _setup.name, socketName);
+            else _ui.EquipmentInfo.text = string.Format(LabTexts.EquipmentInfo, socketName, selected.DisplayName)
+                + (_ui.EquipmentVisibleToggle.isOn ? "" : LabTexts.EquipmentHidden);
+        }
+
         // ── UI ───────────────────────────────────────────────
 
         private void WireUi()
@@ -317,6 +406,8 @@ namespace VoxelMagic.Tools
             _pixelView.SetPixelSize(_config.DefaultPixelSize);
             _ui.PixelSlider.onValueChanged.AddListener(v => _pixelView.SetPixelSize(Mathf.RoundToInt(v)));
             _ui.PixelToggle.onValueChanged.AddListener(_pixelView.SetOn);
+            _ui.EquipmentDropdown.onValueChanged.AddListener(SelectAttachment);
+            _ui.EquipmentVisibleToggle.onValueChanged.AddListener(SetEquipmentVisible);
             _pixelView.SetOn(_ui.PixelToggle.isOn);
         }
 
@@ -345,6 +436,7 @@ namespace VoxelMagic.Tools
             if (keyboard.digit3Key.wasPressedThisFrame) PlayState(CharacterStateId.Run);
             if (keyboard.lKey.wasPressedThisFrame) _ui.LoopToggle.isOn = !_ui.LoopToggle.isOn;
             if (keyboard.pKey.wasPressedThisFrame) _ui.PixelToggle.isOn = !_ui.PixelToggle.isOn;
+            if (keyboard.eKey.wasPressedThisFrame) _ui.EquipmentVisibleToggle.isOn = !_ui.EquipmentVisibleToggle.isOn;
         }
 
         private void RefreshPlaybackUi()
