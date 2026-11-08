@@ -54,6 +54,8 @@
 | 2026-11-04 | `Art/Lights/lamp_floor_glow.png` (복도 씬 생성 도구가 그림, 흰색 + 계단식 알파 원) | Sprite·Single, PPU = 그림 크기(1유닛), 가운데 기준점, Point, Clamp, 압축 없음, Mip Map 끔 | `CorridorConfig` 바닥 빛 도트 크기·단계 수정 → 복도 씬 다시 만들기 |
 | 2026-11-05 | `Art/Map/Tile/**/*.png` (타일 팩 9개 테마 387장, 사용자 결정: 팩 전체) | Sprite·Single·Full Rect, PPU 32, 가운데 기준점, Point, 압축 없음, Mip Map 끔, Alpha Is Transparency, Clamp | `Data/Tiles/TileMapConfig`의 타일 픽셀 수정 → 메뉴 `VoxelMagic/타일 맵/타일 팩 임포트 설정 적용 (전체)` |
 | 2026-11-06 | `Art/Characters/Student_Chibi/Sprites/Student_Chibi_sheet.png` | Sprite·Single, PPU 210(키 1.28), Point, 압축 없음, Mip Map 끔, Alpha Is Transparency, Clamp (칸은 `Data/Avatars/Student_Chibi_2D` 안의 스프라이트) | 메뉴 `VoxelMagic/아바타/선택한 2D 스프라이트 준비` (json 선택) |
+| 2026-11-09 | `Art/Map/Farm/farm_grid.fbx`, `farm_grid.png` | FBX: 카메라·조명 가져오기 끔, 애니메이션 없음 / PNG: Point, Mip Map 끔, 압축 없음, Clamp | 모델 임포트 설정 (Inspector) |
+| 2026-11-09 | `Art/Map/Farm/Farm_Field_Dry.fbx`, `Farm_Field_Wet.fbx`, `farm_field_dry_palette.png`, `farm_field_wet_palette.png` (밭 칸, 지금 씬이 쓰는 것) | FBX: 카메라·조명 가져오기 끔, 애니메이션 없음(Animation Type None) / PNG: Point, Mip Map 끔, 압축 없음, Clamp | 모델 임포트 설정 (Inspector) |
 
 ## 아바타 임포트 설정 (메뉴 `VoxelMagic/아바타/`로 적용)
 

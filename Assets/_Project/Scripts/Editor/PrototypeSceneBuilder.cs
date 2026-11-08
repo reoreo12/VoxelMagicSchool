@@ -30,6 +30,9 @@ namespace VoxelMagic.EditorTools
         private static readonly Vector3 FarmOrigin = new Vector3(-10f, 0f, -6f);
         private static readonly Vector3 PondPosition = new Vector3(7f, 0f, -5f);
         private static readonly Vector2 PondSize = new Vector2(8f, 6f);
+        private const string FarmPlotModelPath = "Assets/_Project/Art/Map/Farm/Farm_Field_Dry.fbx";
+        private const string FarmPlotWetModelPath = "Assets/_Project/Art/Map/Farm/Farm_Field_Wet.fbx";
+        private const float PreviewLift = 0.02f;
         private static readonly Vector3 CreaturePosition = new Vector3(11f, 0f, 4f);
         private static readonly Vector3[] TreePositions =
         {
@@ -145,28 +148,59 @@ namespace VoxelMagic.EditorTools
         private static void BuildFarm(Transform parent, FarmConfig config)
         {
             var field = Group("FarmField", parent, FarmOrigin);
-            var cells = Group("Cells", field, FarmOrigin);
-            var soil = Mat("Soil", new Color(0.42f, 0.28f, 0.17f));
             float size = config.CellSize;
-            for (int x = 0; x < config.GridSize; x++)
-                for (int y = 0; y < config.GridSize; y++)
-                {
-                    var local = new Vector3((x + 0.5f) * size, 0.05f, (y + 0.5f) * size);
-                    Prim(PrimitiveType.Cube, $"Cell_{x}_{y}", cells, local,
-                        new Vector3(size * 0.94f, 0.1f, size * 0.94f), soil);
-                }
+            // 밭 한 칸 모델(바닥 한가운데 기준점)이 있으면 칸 크기에 맞춰 칸마다 놓고, 없으면 예전 기본 도형
+            var plotModel = AssetDatabase.LoadAssetAtPath<GameObject>(FarmPlotModelPath);
+            float plotTop = 0.1f;
+            if (plotModel != null)
+            {
+                var plots = Group("Plots", field, FarmOrigin);
+                var bounds = ModelBounds(plotModel);
+                float scale = size / bounds.size.x;
+                plotTop = bounds.size.y * scale;
+                for (int x = 0; x < config.GridSize; x++)
+                    for (int y = 0; y < config.GridSize; y++)
+                    {
+                        var plot = (GameObject)PrefabUtility.InstantiatePrefab(plotModel, plots);
+                        plot.name = $"Plot_{x}_{y}";
+                        plot.transform.localPosition = new Vector3((x + 0.5f) * size, 0f, (y + 0.5f) * size);
+                        plot.transform.localScale = Vector3.one * scale;
+                    }
+                // 물 준 칸은 Wet 모델로 바꿔 보여 준다
+                plots.gameObject.AddComponent<FarmSoilView>()
+                    .SetRef("_dryModel", plotModel)
+                    .SetRef("_wetModel", AssetDatabase.LoadAssetAtPath<GameObject>(FarmPlotWetModelPath));
+            }
+            else
+            {
+                var cells = Group("Cells", field, FarmOrigin);
+                var soil = Mat("Soil", new Color(0.42f, 0.28f, 0.17f));
+                for (int x = 0; x < config.GridSize; x++)
+                    for (int y = 0; y < config.GridSize; y++)
+                    {
+                        var local = new Vector3((x + 0.5f) * size, 0.05f, (y + 0.5f) * size);
+                        Prim(PrimitiveType.Cube, $"Cell_{x}_{y}", cells, local,
+                            new Vector3(size * 0.94f, 0.1f, size * 0.94f), soil);
+                    }
+            }
             var crops = Group("Crops", field, FarmOrigin);
 
             var farmField = field.gameObject.AddComponent<FarmField>();
+            var soilView = field.GetComponentInChildren<FarmSoilView>();
+            if (soilView != null) soilView.SetRef("_field", farmField);
             field.gameObject.AddComponent<FarmFieldView>()
                 .SetRef("_field", farmField)
                 .SetRef("_cropRoot", crops);
 
             var quad = Prim(PrimitiveType.Plane, "PlacementPreview", field, Vector3.zero, Vector3.one * 0.1f,
                 Mat("Preview", new Color(1f, 1f, 1f, 0.5f), transparent: true));
-            quad.AddComponent<PlacementPreview>()
+            var preview = quad.AddComponent<PlacementPreview>()
                 .SetRef("_field", farmField)
                 .SetRef("_quad", quad.GetComponent<Renderer>());
+            // 미리보기는 밭 윗면보다 살짝 위에
+            var previewSo = new SerializedObject(preview);
+            previewSo.FindProperty("_height").floatValue = plotTop + PreviewLift;
+            previewSo.ApplyModifiedPropertiesWithoutUndo();
         }
 
         private static FishingDriver BuildPond(Transform parent)
@@ -654,6 +688,21 @@ namespace VoxelMagic.EditorTools
         }
 
         // ── 도우미 ───────────────────────────────────────────
+
+        // 모델을 잠깐 꺼내 렌더러 범위를 잰다 (FBX 안의 배율까지 포함한 실제 크기).
+        private static Bounds ModelBounds(GameObject model)
+        {
+            var probe = (GameObject)Object.Instantiate(model);
+            var bounds = new Bounds();
+            bool first = true;
+            foreach (var renderer in probe.GetComponentsInChildren<Renderer>())
+            {
+                if (first) { bounds = renderer.bounds; first = false; }
+                else bounds.Encapsulate(renderer.bounds);
+            }
+            Object.DestroyImmediate(probe);
+            return bounds;
+        }
 
         private static Transform Group(string name, Transform parent, Vector3 worldPosition)
         {

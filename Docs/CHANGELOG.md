@@ -1,5 +1,23 @@
 # 변경 기록
 
+## 2026-11-09 — 농장 맵: 밭 칸을 새 FBX(Farm_Field_Dry/Wet)로 교체, 물 주면 Wet으로
+- 파일 (사용자): `Art/Map/Farm/Farm_Field_Dry.fbx`·`Farm_Field_Wet.fbx`(가로·세로 1.6 m, 높이 0.2 m, 바닥 한가운데 기준점, 메시 하나·카메라·조명 없음), 팔레트 `farm_field_dry_palette.png`·`farm_field_wet_palette.png`(64×8). UV가 팔레트 여러 칸을 씀 (Dry 6색, Wet 7색)
+- 임포트 설정: 이전과 같게 — FBX 카메라·조명 끔, 애니메이션 없음 / 텍스처 Point·Mip Map 끔·압축 없음·Clamp
+- 씬(`Prototype_FarmFishing`, 다시 만들지 않고 직접 수정·저장): `FarmField/Plots` 36칸을 `Farm_Field_Dry` 인스턴스로 교체 (이름·위치 그대로, 배율 1 ÷ 1.6 = 0.625, 윗면 0.125 m), 놓기 미리보기 높이 0.17 → 0.145. `Plots`에 `FarmSoilView` 추가
+- Gameplay: 새 `Farming/FarmSoilView` — `FarmGrid` 이벤트를 듣고, 물 준 작물이 차지한 칸의 메시·머티리얼을 Wet 모델 것으로, 뽑으면 Dry로 되돌림 (칸은 위치로 격자에 짝지음, 모델은 Inspector에서 바꿀 수 있음). Core 변경 없음
+- 씬 생성 도구: `FarmPlotModelPath` → `Farm_Field_Dry.fbx`, `FarmPlotWetModelPath` 추가, `Plots`에 `FarmSoilView` 연결
+- 확인 (플레이 모드, 함수 직접 호출): 호박(2×2)·무 심기, 격자 끝은 "칸이 부족해요", 심은 뒤 Wet 0칸 → 호박 물 주기 → 다 자람 + 그 4칸만 Wet(머티리얼도 Wet) → 뽑기 → 호박 획득, Wet 0칸 → 무 물 주기 → 그 칸 Wet / 화면: 젖은 칸이 진하게 보이고 작물이 밭 위에 놓임 / 콘솔 에러 0
+- 이전 `farm_grid.fbx`·`farm_grid.png`는 씬에서 쓰지 않지만 지우지 않음
+
+## 2026-11-09 — 농장 맵: 밭 칸을 사용자 FBX(farm_grid)로 교체
+- 파일 (사용자): `Art/Map/Farm/farm_grid.fbx`(가로·세로 2 m, 높이 0.3 m, 1복셀 0.1 m, 바닥 한가운데 기준점), `farm_grid.png`(256×1 팔레트)
+- 임포트 설정: FBX **카메라·조명 가져오기 끔**(Blender의 카메라·조명이 같이 들어 있어 칸마다 매우 밝은 조명이 생겨 화면이 하얗게 번졌음), 애니메이션 없음 / 텍스처 Point·Mip Map 끔·압축 없음·Clamp
+- 씬(`Prototype_FarmFishing`, 사용자가 고친 씬이라 다시 만들지 않고 직접 수정): `FarmField/Plots`에 6×6칸(`Plot_x_y`)을 칸 크기 1 m에 맞춰 배율 0.5로 배치(윗면 0.15 m), 예전 기본 도형 `Cells`는 꺼 둠(지우지 않음), 놓기 미리보기 높이 0.12 → 0.17(밭 윗면 위)
+- 기능 코드 변경 없음 (밭 칸은 보이는 모양일 뿐이고 심기·물 주기·뽑기는 `FarmField` 격자 계산 그대로)
+- 씬 생성 도구: 밭 모델이 있으면 같은 방식으로 배치(칸 크기 ÷ 모델 폭으로 배율, 미리보기 높이 = 윗면 + 0.02), 없으면 예전 기본 도형
+- 확인 (상호작용 함수 직접 호출): 대파·호박·무 심기, 격자 끝은 "칸이 부족해요", 물 주기 → 다 자람, 뽑기 → 대파 획득, 작물이 밭 위에 보임 / 콘솔 에러 0
+- 참고: 모델의 UV가 모두 팔레트 한 칸(68번, 갈색)을 가리킴 → 한 가지 색 + 음영으로 보임
+
 ## 2026-11-06 — 애니메이션 랩을 Sandbox → Tools 폴더로 옮김 (타일 맵 에디터와 같은 곳)
 - 이동 (Unity 안에서 옮겨 GUID 유지): `Scenes/Sandbox/AnimationLab.unity` → `Scenes/Tools/`, `Scripts/Sandbox/` → `Scripts/Tools/`, `Data/Sandbox/` → `Data/Tools/`(AnimationLabConfig), `Materials/Sandbox/` → `Materials/Tools/`(M_Lab_*). 빈 `Scenes/Sandbox` 폴더 삭제
 - 어셈블리 이름: `VoxelMagic.Sandbox` → `VoxelMagic.Tools`, `VoxelMagic.Sandbox.Editor` → `VoxelMagic.Tools.Editor` (asmdef 파일 이름·참조 함께). 네임스페이스 `VoxelMagic.Sandbox(.EditorTools)` → `VoxelMagic.Tools(.EditorTools)`. 다른 어셈블리·에셋에는 이 이름을 쓰는 곳이 없었음
