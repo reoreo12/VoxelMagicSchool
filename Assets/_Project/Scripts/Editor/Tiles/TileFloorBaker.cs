@@ -1,5 +1,5 @@
 // 칠한 Tilemap을 굽는다: 사용한 타일만 모은 아틀라스(여백 + 가장자리 늘이기) + 조각 평면 메시(위 방향, 칸 단위) + URP Lit 머티리얼 + 바닥 프리팹.
-// 결과: Art/Map/Baked/<맵 이름>/ (+ 칸 데이터 <맵>_Cells.asset, 바닥 종류 <맵>_Surfaces.asset, 선택하면 칠한 범위의 BoxCollider). 이전 결과가 있으면 덮어쓰기 전에 묻는다. 프리팹 루트 배율 = 구울 때의 칸 크기 (게임 씬에 그대로 놓음).
+// 결과: Art/Map/Baked/<맵 이름>/ (+ 칸 데이터 <맵>_Cells.asset, 바닥 종류 <맵>_Surfaces.asset, 선택하면 칠한 칸 모양대로 BoxCollider 여러 개). 이전 결과가 있으면 덮어쓰기 전에 묻는다. 프리팹 루트 배율 = 구울 때의 칸 크기 (게임 씬에 그대로 놓음).
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -28,7 +28,7 @@ namespace VoxelMagic.EditorTools
         {
             public int Cells, UniqueTiles, Chunks, RotatedCells, SurfaceKinds, UnmappedCells;
             public bool HasCollider;
-            public Vector2 ColliderSizeMeters;
+            public int ColliderCount;
             public Vector2Int AtlasSize;
             public string PrefabPath;
         }
@@ -256,22 +256,34 @@ namespace VoxelMagic.EditorTools
             return AssetDatabase.LoadAssetAtPath<Texture2D>(path);
         }
 
-        /// <summary>칠한 범위(칸)를 덮는 얇은 BoxCollider. 루트 배율 = 칸 크기라 로컬 단위 = 칸, 두께만 m → 칸으로 바꾼다. 윗면은 y = 0</summary>
+        /// <summary>칠한 칸 모양대로 얇은 BoxCollider 여러 개 (빈 칸은 덮지 않음). 칸을 가로로 길게 묶은 뒤 같은 폭의 아래 줄과 합쳐 직사각형을 만든다.
+        /// 루트 배율 = 칸 크기라 로컬 단위 = 칸, 두께만 m → 칸으로 바꾼다. 윗면은 y = 0</summary>
         private static void AddFloorCollider(GameObject root, List<Vector2Int> positions, TileMapConfig config, Result result)
         {
-            int minX = int.MaxValue, minY = int.MaxValue, maxX = int.MinValue, maxY = int.MinValue;
-            foreach (var p in positions)
-            {
-                minX = Mathf.Min(minX, p.x); minY = Mathf.Min(minY, p.y);
-                maxX = Mathf.Max(maxX, p.x + 1); maxY = Mathf.Max(maxY, p.y + 1);
-            }
-            float width = maxX - minX, depth = maxY - minY;
+            var remaining = new HashSet<Vector2Int>(positions);
             float thickness = config.ColliderThickness / config.CellSize;
-            var box = root.AddComponent<BoxCollider>();
-            box.size = new Vector3(width, thickness, depth);
-            box.center = new Vector3(minX + width * 0.5f, -thickness * 0.5f, minY + depth * 0.5f);
-            result.HasCollider = true;
-            result.ColliderSizeMeters = new Vector2(width * config.CellSize, depth * config.CellSize);
+            foreach (var start in positions.OrderBy(p => p.y).ThenBy(p => p.x))
+            {
+                if (!remaining.Contains(start)) continue;
+                int width = 1;
+                while (remaining.Contains(new Vector2Int(start.x + width, start.y))) width++;
+                int depth = 1;
+                while (RowFree(remaining, start.x, start.y + depth, width)) depth++;
+                for (int y = 0; y < depth; y++)
+                    for (int x = 0; x < width; x++) remaining.Remove(new Vector2Int(start.x + x, start.y + y));
+
+                var box = root.AddComponent<BoxCollider>();
+                box.size = new Vector3(width, thickness, depth);
+                box.center = new Vector3(start.x + width * 0.5f, -thickness * 0.5f, start.y + depth * 0.5f);
+                result.ColliderCount++;
+            }
+            result.HasCollider = result.ColliderCount > 0;
+        }
+
+        private static bool RowFree(HashSet<Vector2Int> cells, int x0, int y, int width)
+        {
+            for (int x = 0; x < width; x++) if (!cells.Contains(new Vector2Int(x0 + x, y))) return false;
+            return true;
         }
 
         private static GroundSurfaceMap SaveSurfaces(string path, GroundSurfaceTable table, List<Vector2Int> positions, List<TileBase> tiles, Result result)

@@ -282,7 +282,7 @@ namespace VoxelMagic.EditorTools
                     TileFloorBaker.SetView(document, showBaked: true);
                     _lastResult = $"{document.MapName}: 칸 {result.Cells} · 타일 {result.UniqueTiles}종 · 조각 {result.Chunks} · 아틀라스 {result.AtlasSize.x}×{result.AtlasSize.y} · 바닥 종류 {result.SurfaceKinds}종" +
                                   (result.UnmappedCells > 0 ? $" · 표에 없는 칸 {result.UnmappedCells} (콘솔 참고)" : "") +
-                                  (result.HasCollider ? $" · 충돌체 {result.ColliderSizeMeters.x:0.##}×{result.ColliderSizeMeters.y:0.##} m" : " · 충돌체 없음");
+                                  (result.HasCollider ? $" · 충돌체 {result.ColliderCount}개 (칸 모양)" : " · 충돌체 없음");
                 }
                 GUIUtility.ExitGUI();
             }

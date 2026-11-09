@@ -1,5 +1,12 @@
 # 변경 기록
 
+## 2026-11-09 — 타일 맵 굽기: 충돌체를 칠한 칸 모양대로 BoxCollider 여러 개로
+- 원인: 칠한 범위 전체를 감싸는 상자 하나라, 포탈 길(꼬리)을 빼면 옆의 빈 허공까지 덮어 플레이어가 허공을 걸었음
+- Editor: `TileFloorBaker.AddFloorCollider` — 칠한 칸을 가로로 묶고 같은 폭의 다음 줄과 합쳐 직사각형마다 BoxCollider 하나 (빈 칸은 덮지 않음). 결과 표시는 "충돌체 N개 (칸 모양)"
+- 다시 굽기: `FarmFishing` 380칸 → BoxCollider 7개. `FarmPond` 씬의 바닥은 프리팹이라 자동 갱신. `TileMapEditor` 씬은 저장하지 않음 (비교 장비가 자동으로 옮긴 위치가 저장되는 것을 막으려고 되돌림)
+- 확인: 아래로 레이 → 꼬리(80,-5)는 바닥, 꼬리 옆 빈 곳(72,-5)·(88,-5)·모서리(70.5,0.5)는 바닥 없음 / 콘솔 에러 0. 플레이 중 실제로 떨어지는지는 에디터 시간이 멈춰 있어 확인 못 함
+- 남은 점: 이제 맵 가장자리에서 떨어진다 → 가장자리 벽은 다음 작업
+
 ## 2026-11-09 — 정식 텃밭·연못 씬 `Scenes/FarmPond.unity` 추가 (브랜치 `FarmPond-Map`)
 - `Prototype_FarmFishing`에서 복사 (한 번에 같이 복제해 서로 참조 유지): `_Bootstrap`, Main Camera, Directional Light, Player, UI(EventSystem·HUDCanvas 전체), `World/` RequestBoard·FarmField·Pond·Creature. Ground·School·GinkgoTrees는 안 가져옴
 - `TileMapEditor`에서 복사: 구운 바닥 `World/FarmFishing_Floor`(프리팹 연결 유지, 위치 70,0,0), `SM_*` 25개 → 최상위 `Decor` 아래 (위치 그대로, `Decor`로 한 번에 켜고 끄기)
