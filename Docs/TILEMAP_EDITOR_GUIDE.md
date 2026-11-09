@@ -66,8 +66,21 @@ Compare                비교용: Center(카메라·치비·1 m 상자), East(�
    - 다른 맵을 선택하면 칠할 대상도 그 맵으로 바뀐다
 2. 팔레트 구성
    - **1줄**: 바닥 12종 (맨 앞 `meadow_grass` = 바탕 풀)
-   - **2줄**: **Rule Tile 3개** — 흙(`RT_dark_garden_soil`), 진흙 길(`RT_muddy_farm_path`), 짚(`RT_straw_covered_ground`)
-   - **아래 3줄**: 경계 낱장 (자동 경계가 마음에 안 드는 칸을 손으로 고칠 때)
+   - **2줄**: **Rule Tile 5개** — 바탕 풀에 따라 고른다
+     | 바탕 풀 | Rule Tile |
+     |---|---|
+     | `meadow_grass` (꽃 풀) | 흙 `RT_dark_garden_soil`, 진흙 길 `RT_muddy_farm_path`, 짚 `RT_straw_covered_ground` |
+     | `farm_grass` (민 풀) | 흙 `RT_farm_grass_to_dark_garden_soil`, 마른 흙길 `RT_farm_grass_to_dry_dirt_path` |
+     - Rule Tile의 경계 그림에는 그 바탕 풀이 그려져 있다 → **바탕 풀과 짝이 맞는 Rule Tile**을 쓴다 (meadow_grass 위에 farm_grass용을 칠하면 테두리만 민 풀로 보임)
+   - **아래 3줄**: 경계 낱장, 세트마다 5×3 블록 (자동 경계가 마음에 안 드는 칸을 손으로 고칠 때)
+
+### 경계 세트를 새로 추가할 때
+1. 그림 12장을 `Art/Map/Tile/farm/transitions/<바탕 풀>_to_<바닥>/`에 넣는다 (파일 이름 `<바탕 풀>_to_<바닥>_n.png` … `_n s e w ne nw se sw ine inw ise isw`, 32×32, 이름 방향 = 바닥이 있는 쪽)
+   - `<바탕 풀>`과 `<바닥>`은 `floors/`에 같은 이름의 그림이 있어야 한다 (가운데·바탕 칸으로 씀)
+2. 메뉴 `VoxelMagic/타일 맵/타일 팩 임포트 설정 적용 (전체)`
+3. 메뉴 `VoxelMagic/타일 맵/farm 타일·Rule Tile·팔레트 만들기` (이미 있으면 덮어쓸지 묻는다 → 덮어쓰기. 기존 타일은 같은 자리에서 갱신되어 칠한 맵은 그대로)
+4. 메뉴 `VoxelMagic/타일 맵/바닥 종류 표 만들기·채우기 (farm)` (새 타일 줄만 더함)
+5. 팔레트 2줄에 `RT_<바탕 풀>_to_<바닥>`이 생긴다
 3. 순서: 바탕 풀 위에 **Rule Tile로 흙·길·짚 영역만** 칠한다 → 경계는 저절로 붙는다
 4. 씬 뷰에서 쓰는 단축키
 

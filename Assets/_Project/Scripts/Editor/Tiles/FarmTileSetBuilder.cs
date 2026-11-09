@@ -1,5 +1,5 @@
 // 타일 팩 임포트 설정(팩 전체)과 farm 타일·Rule Tile·Tile Palette를 만든다. 이미 있으면 덮어쓰기 전에 묻는다.
-// 경계 이름 = 흙(풀이 아닌 쪽)이 있는 방향 (DESIGN_TILEMAP.md 1-3, 6-1).
+// 경계 세트 = transitions/<바탕 풀>_to_<바닥>/, 경계 이름 = 바닥(풀이 아닌 쪽)이 있는 방향 (DESIGN_TILEMAP.md 1-3, 6-1). 바탕 풀마다 Rule Tile 하나.
 using System.Collections.Generic;
 using System.IO;
 using UnityEditor;
@@ -20,7 +20,7 @@ namespace VoxelMagic.EditorTools
         private const string PaletteName = "Farm";
         public const string PalettePath = PaletteFolder + "/" + PaletteName + ".prefab";
         private const string BaseFloor = "meadow_grass";
-        private const string TransitionPrefix = BaseFloor + "_to_";
+        private const string TransitionMarker = "_to_";
         private const int SetColumnStride = 6;   // 팔레트에서 경계 세트 사이 간격 (5칸 + 빈칸 1)
         private const int TransitionTopRow = -3;
 
@@ -125,19 +125,29 @@ namespace VoxelMagic.EditorTools
             foreach (var path in PngsIn($"{FarmFolder}/floors"))
                 floors[Path.GetFileNameWithoutExtension(path)] = SaveTile(path, $"{TileAssetFolder}/floors");
 
+            // 경계 세트 = <바탕 풀>_to_<바닥>. 기본 바탕(meadow_grass) 세트를 먼저, 나머지는 이름순 (팔레트 배치가 바뀌지 않게)
+            var setFolders = new List<string>(AssetDatabase.GetSubFolders($"{FarmFolder}/transitions"));
+            setFolders.Sort((a, b) =>
+            {
+                bool aBase = Path.GetFileName(a).StartsWith(BaseFloor + TransitionMarker), bBase = Path.GetFileName(b).StartsWith(BaseFloor + TransitionMarker);
+                return aBase != bBase ? (aBase ? -1 : 1) : string.CompareOrdinal(a, b);
+            });
             var sets = new List<(string floor, Dictionary<string, Tile> tiles, RuleTile rule)>();
-            foreach (var setFolder in AssetDatabase.GetSubFolders($"{FarmFolder}/transitions"))
+            foreach (var setFolder in setFolders)
             {
                 string setName = Path.GetFileName(setFolder);
-                if (!setName.StartsWith(TransitionPrefix)) { Debug.LogWarning($"[타일 맵] 이름 규칙 밖 세트 건너뜀: {setName}"); continue; }
-                string floor = setName.Substring(TransitionPrefix.Length);
-                if (!floors.ContainsKey(floor)) { Debug.LogWarning($"[타일 맵] 가운데 바닥 없음: {floor}"); continue; }
+                int marker = setName.IndexOf(TransitionMarker, System.StringComparison.Ordinal);
+                if (marker <= 0) { Debug.LogWarning($"[타일 맵] 이름 규칙(<바탕>_to_<바닥>) 밖 세트 건너뜀: {setName}"); continue; }
+                string baseFloor = setName.Substring(0, marker);
+                string floor = setName.Substring(marker + TransitionMarker.Length);
+                if (!floors.ContainsKey(floor)) { Debug.LogWarning($"[타일 맵] {setName}: 가운데 바닥 floors/{floor} 없음"); continue; }
+                if (!floors.ContainsKey(baseFloor)) Debug.LogWarning($"[타일 맵] {setName}: 바탕 풀 floors/{baseFloor} 없음 (경계는 만들지만 바탕으로 칠할 타일이 없음)");
 
                 var tiles = new Dictionary<string, Tile>();
                 foreach (var path in PngsIn(setFolder))
                     tiles[Path.GetFileNameWithoutExtension(path).Substring(setName.Length + 1)] =
                         SaveTile(path, $"{TileAssetFolder}/transitions/{setName}");
-                sets.Add((floor, tiles, SaveRuleTile(floor, floors[floor].sprite, tiles)));
+                sets.Add((floor, tiles, SaveRuleTile(RuleTileName(baseFloor, floor), floors[floor].sprite, tiles)));
             }
 
             BuildPalette(palettePath, config, floors, sets);
@@ -164,11 +174,16 @@ namespace VoxelMagic.EditorTools
             return tile;
         }
 
-        private static RuleTile SaveRuleTile(string floor, Sprite center, Dictionary<string, Tile> edges)
+        /// <summary>Rule Tile 이름: 기본 바탕(meadow_grass)이면 RT_<바닥> (기존 이름 유지), 다른 바탕이면 RT_<바탕>_to_<바닥></summary>
+        public static string RuleTileName(string baseFloor, string floor) =>
+            baseFloor == BaseFloor ? $"RT_{floor}" : $"RT_{baseFloor}{TransitionMarker}{floor}";
+
+        private static RuleTile SaveRuleTile(string ruleName, Sprite center, Dictionary<string, Tile> edges)
         {
             string folder = $"{TileAssetFolder}/rules";
             EnsureFolder(folder);
-            string path = $"{folder}/RT_{floor}.asset";
+            string path = $"{folder}/{ruleName}.asset";
+            string floor = ruleName;
             var rule = AssetDatabase.LoadAssetAtPath<RuleTile>(path);
             if (rule == null)
             {

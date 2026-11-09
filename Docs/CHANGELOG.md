@@ -1,5 +1,11 @@
 # 변경 기록
 
+## 2026-11-09 — 타일 맵 에디터: farm_grass 바탕 경계 세트 2개 추가 (사용자 제작 그림)
+- 사용자가 `Art/Map/Tile/farm/transitions/`에 `farm_grass_to_dark_garden_soil`, `farm_grass_to_dry_dirt_path` (각 12장, 32 px, 기존과 같은 방향 이름 규칙 — 그림으로 확인)를 넣음
+- Editor: `FarmTileSetBuilder`가 `meadow_grass_to_` 세트만이 아니라 **`<바탕 풀>_to_<바닥>` 세트를 모두** 처리. Rule Tile 이름: 기본 바탕(meadow_grass)은 `RT_<바닥>` 그대로, 다른 바탕은 `RT_<바탕>_to_<바닥>`. 팔레트에서 기본 바탕 세트가 먼저 오게 정렬(기존 배치 유지). `GroundSurfaceBuilder`가 새 Rule Tile 이름에서 바닥 종류를 읽음
+- 실행: 임포트 설정(411장, 새 24장 포함) → farm 타일 72개(바닥 12 + 경계 60), Rule Tile 5개(새 `RT_farm_grass_to_dark_garden_soil`, `RT_farm_grass_to_dry_dirt_path`), 팔레트 Farm 82칸(Rule Tile 줄 5개, 경계 블록 5개) → 바닥 종류 표 77줄(새 26줄, 모두 "흙"). 기존 타일·Rule Tile·팔레트는 같은 자리에서 갱신 (GUID 그대로)
+- 확인: 미리보기 장면(저장 안 됨)에서 farm_grass 바탕 위 새 Rule Tile 2개 → 바깥·안쪽 모서리·변 경계가 자동으로 붙음 / 콘솔 에러 0
+
 ## 2026-11-09 — 농장 맵: 밭 칸을 새 FBX(Farm_Field_Dry/Wet)로 교체, 물 주면 Wet으로
 - 파일 (사용자): `Art/Map/Farm/Farm_Field_Dry.fbx`·`Farm_Field_Wet.fbx`(가로·세로 1.6 m, 높이 0.2 m, 바닥 한가운데 기준점, 메시 하나·카메라·조명 없음), 팔레트 `farm_field_dry_palette.png`·`farm_field_wet_palette.png`(64×8). UV가 팔레트 여러 칸을 씀 (Dry 6색, Wet 7색)
 - 임포트 설정: 이전과 같게 — FBX 카메라·조명 끔, 애니메이션 없음 / 텍스처 Point·Mip Map 끔·압축 없음·Clamp
