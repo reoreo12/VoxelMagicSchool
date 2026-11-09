@@ -1,5 +1,14 @@
 # 변경 기록
 
+## 2026-11-09 — 정식 텃밭·연못 씬 `Scenes/FarmPond.unity` 추가 (브랜치 `FarmPond-Map`)
+- `Prototype_FarmFishing`에서 복사 (한 번에 같이 복제해 서로 참조 유지): `_Bootstrap`, Main Camera, Directional Light, Player, UI(EventSystem·HUDCanvas 전체), `World/` RequestBoard·FarmField·Pond·Creature. Ground·School·GinkgoTrees는 안 가져옴
+- `TileMapEditor`에서 복사: 구운 바닥 `World/FarmFishing_Floor`(프리팹 연결 유지, 위치 70,0,0), `SM_*` 25개 → 최상위 `Decor` 아래 (위치 그대로, `Decor`로 한 번에 켜고 끄기)
+- 위치: Pond·FarmField는 에디터의 `Compare/East` 배치와 같은 월드 위치·회전 (Pond 74.61,0,10.59 / 회전 321, FarmField 82.6,0,4.94). Player (80,0.1,5), RequestBoard (80,0,9), Creature (80,0,-2)는 임시 위치
+- 참조 정리: `GameBootstrap._bindRoots[0]`이 원본 씬 World를 가리켜 새 World로 고침. 그 밖의 빈 칸(_promptAnchor·_area)은 원본도 비어 있음
+- 원본 두 씬은 저장하지 않고 닫음 (git 변경 없음). Build Settings·`CLAUDE.md` 표는 아직 안 바꿈
+- 확인 (플레이 모드): 콘솔 에러 0, 플레이어 발밑 = 구운 바닥 충돌체, 카메라가 플레이어 따라감, 밭 36칸, HUD 표시. 심기·낚시·의뢰·대화 직접 조작은 아직 확인 안 함
+- 남은 점: FarmField(82.6, 4.94)는 1 m 칸 격자에 딱 맞지 않음 (에디터 배치 그대로 둠)
+
 ## 2026-11-09 — 타일 맵 에디터: farm_grass 바탕 경계 세트 2개 추가 (사용자 제작 그림)
 - 사용자가 `Art/Map/Tile/farm/transitions/`에 `farm_grass_to_dark_garden_soil`, `farm_grass_to_dry_dirt_path` (각 12장, 32 px, 기존과 같은 방향 이름 규칙 — 그림으로 확인)를 넣음
 - Editor: `FarmTileSetBuilder`가 `meadow_grass_to_` 세트만이 아니라 **`<바탕 풀>_to_<바닥>` 세트를 모두** 처리. Rule Tile 이름: 기본 바탕(meadow_grass)은 `RT_<바닥>` 그대로, 다른 바탕은 `RT_<바탕>_to_<바닥>`. 팔레트에서 기본 바탕 세트가 먼저 오게 정렬(기존 배치 유지). `GroundSurfaceBuilder`가 새 Rule Tile 이름에서 바닥 종류를 읽음
