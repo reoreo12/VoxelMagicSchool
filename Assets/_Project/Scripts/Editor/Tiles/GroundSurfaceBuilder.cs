@@ -75,13 +75,19 @@ namespace VoxelMagic.EditorTools
             return (table, added);
         }
 
-        /// <summary>타일 에셋 경로 → 그 타일이 나타내는 바닥 이름 (floors/x → x, rules/RT_x → x, transitions/a_to_b/… → b)</summary>
+        /// <summary>타일 에셋 경로 → 그 타일이 나타내는 바닥 이름 (floors/x → x, rules/RT_x·RT_a_to_x → x, transitions/a_to_b/… → b)</summary>
         private static string FloorNameOf(string path)
         {
             string name = Path.GetFileNameWithoutExtension(path);
             string parent = Path.GetFileName(Path.GetDirectoryName(path));
             if (parent == "floors") return name;
-            if (parent == "rules") return name.StartsWith("RT_") ? name.Substring(3) : null;
+            if (parent == "rules")
+            {
+                if (!name.StartsWith("RT_")) return null;
+                string rest = name.Substring(3); // RT_<바닥> 또는 RT_<바탕>_to_<바닥>
+                int to = rest.IndexOf(TransitionMarker, System.StringComparison.Ordinal);
+                return to >= 0 ? rest.Substring(to + TransitionMarker.Length) : rest;
+            }
             int marker = parent.IndexOf(TransitionMarker, System.StringComparison.Ordinal);
             return marker >= 0 ? parent.Substring(marker + TransitionMarker.Length) : null;
         }

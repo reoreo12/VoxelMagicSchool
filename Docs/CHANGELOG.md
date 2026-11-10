@@ -1,5 +1,73 @@
 # 변경 기록
 
+## 2026-11-10 — 뒷산 바닥 복셀 FBX 9개 (브랜치 `Farm-pond-map`)
+- 설계: `Docs/DESIGN_MOUNTAIN_FLOOR.md`. 복셀 1칸 0.0667 m, 청크 16 × 16 m(입장 꼬리 T만 6 × 5 m), 윗면 y = 0 기준 절대 높이로 구움(길 높이 0 → 약 11 m)
+- 만든 것 (`Art/Map/Mountain/`): `Mountain_Floor_T/A1/A2/A3/B/C1/C2/C3/D.fbx`, `Mountain_palette.png`(256 × 1, Point·Mip 끔·무압축), `Mountain_Voxel.mat`(`M_Voxel` 복사 + 팔레트), `MountainFloor_All.prefab`(청크 9개를 (x, 0, z)에 조립한 확인용), `Source/`(청크별 메시 데이터 `.npz`, 생성 스크립트 `hf.py`·`gen_mesh.py` — 파이썬, 유니티는 무시). 확인 씬 `Scenes/Tools/MountainFloorPreview.unity`
+- 색: FarmPond 구운 아틀라스에서 읽은 길 `#8A5A36` + 외곽선 1복셀 `#4C321E`, 흙 `#6A4A33` 한 색, 연못 이끼색 `#507848` 덩어리. 연갈색 흙 없음. 바깥 둘레에 1.5 m(22복셀) 흙 단면 (윗 0.4 m 짙은 흙 + 그 아래 더 어두운 흙). 아랫면·안쪽 없음, 포획 구역이 붙을 B 북쪽 변은 단면 없이 열어 둠
+- 임포트: 배율 1·회전 0(축·단위 구움 처리), Read/Write 끔, 메시 압축 끔, 콜라이더 없음, 머티리얼은 `Mountain_Voxel` 하나를 모든 청크가 공유
+- 확인: 청크 경계 상자 (0~16, y, 0~16) 정확, 윗면 법선 전부 위, 윗면 면적 = 칸 수, 이웃 칸 단차 2복셀 이하, 삼각형 청크당 약 4만~5만 (총 약 38만). 이음새 틈 없음(화면 확인)
+- 도구: 높이장 → 청크 greedy 메시(`.npz`) → Blender에서 FBX. MagicaVoxel로 고치고 싶으면 `gen_mesh.py`가 청크별 `.vox`도 만든다 (청크당 약 5 MB라 프로젝트에는 넣지 않음)
+- FarmPond 씬·기존 에셋은 건드리지 않음 (`MountainFloorPreview`는 새 씬)
+
+## 2026-11-09 — 씬 이동: 복도 ↔ FarmPond, 보이지 않는 트리거 + 픽셀 계단 원형 페이드
+- Core: `SceneFlow/SceneTravel`(이동 중 여부·도착 지점 ID·이벤트, 정적), `IScreenFade` / `Data/Config/SceneTransitionConfig`(페이드 아웃·멈춤·인 0.4·0.05·0.4초, 블록 12 px@1080p, 디더 3블록, 색, 원 중심 = 플레이어, 정렬 순서 500) → `Data/Config/SceneTransitionConfig.asset`
+- Gameplay: `SceneFlow/SceneTransitionDirector`(씬마다 하나: 입력 막기 → 페이드 아웃 → 비동기 로드 → 새 씬 진행자가 가린 채 시작 → 페이드 인 → 입력 풀기), `SceneTransitionTrigger`(보이지 않는 BoxCollider 범위에 플레이어 발 + 0.2 m 점이 들어오는 순간 이동. 물리 이벤트가 아니라 쿼터뷰·횡스크롤 공용), `SceneSpawnPoint`(도착 ID가 맞으면 부트스트랩보다 먼저 플레이어를 옮김, 횡스크롤은 이동 계산기 x도). `SideScrollMotor.Teleport` 추가
+- 입력 막기: `GameInputReader`·`SideScrollInputReader`가 이동 중에는 게임플레이 액션 맵을 끔. 페이드 판이 클릭도 막음. 환경설정 UI는 다른 액션 맵 + 더 높은 정렬 순서로 만들면 영향 없음
+- UI: `SceneFlow/PixelCircleFadeView` + 셰이더 `Art/Shaders/PixelCircleFade.shader`(화면을 블록으로 잘라 원 밖을 칠하고 테두리는 4×4 Bayer 디더) + `Art/Materials/UI_PixelCircleFade.mat`. 이미지 시퀀스 대신 셰이더로 (해상도 무관, 숫자로 조절)
+- Editor: `SceneFlow/SceneTransitionRigBuilder`(진행자+페이드 캔버스, 트리거, 도착 지점 만들기). `CorridorSceneBuilder`는 원기둥 포털 대신 트리거 + 돌아올 도착 지점(`FromFarm`, 포털 왼쪽 1.2 m)을 만들고 부트스트랩 연결 맨 앞에 넣음
+- `CorridorConfig` 포털: 이동 씬 `FarmPond`, 도착 ID `FromCorridor`, 트리거 폭 0.4 m 추가 / 지름·트리거 반지름·색 삭제. `ScenePortal.cs` 삭제 (`Art/Materials/CorridorPortal.mat`은 안 쓰지만 남겨 둠)
+- 씬: 복도 — 원기둥 포털 지우고 `Portal_FarmPond`(트리거 x 33.28, 도착 `FromFarm` x 32.08) + `SceneTransition`. FarmPond — `World/Portal_Corridor`(꼬리 길 끝 트리거 (80, 1, −7.5) 4×2×1 m, 도착 `FromCorridor` (80, 0.1, −4.5)) + `SceneTransition`
+- Build Settings: `FarmPond` 추가 (`SETUP.md`)
+- 확인 (플레이 모드, 프레임 한 칸씩 진행): FarmPond 꼬리 끝 → 원형 픽셀 페이드 → 복도 x 32.08 도착 → 입력 다시 켜짐 / 복도 포털 → FarmPond (80, −4.5) 도착, 게임플레이 키 켜짐 / 화면: 블록 계단 + 디더 테두리 원이 플레이어 중심으로 좁아짐 / 콘솔 에러 0
+- 처음엔 복도 캐릭터 발 높이가 트리거 바닥과 똑같아 잡히지 않아서, 발 + 0.2 m 점으로 검사하게 고침
+
+## 2026-11-09 — 타일 맵 굽기: 충돌체를 칠한 칸 모양대로 BoxCollider 여러 개로
+- 원인: 칠한 범위 전체를 감싸는 상자 하나라, 포탈 길(꼬리)을 빼면 옆의 빈 허공까지 덮어 플레이어가 허공을 걸었음
+- Editor: `TileFloorBaker.AddFloorCollider` — 칠한 칸을 가로로 묶고 같은 폭의 다음 줄과 합쳐 직사각형마다 BoxCollider 하나 (빈 칸은 덮지 않음). 결과 표시는 "충돌체 N개 (칸 모양)"
+- 다시 굽기: `FarmFishing` 380칸 → BoxCollider 7개. `FarmPond` 씬의 바닥은 프리팹이라 자동 갱신. `TileMapEditor` 씬은 저장하지 않음 (비교 장비가 자동으로 옮긴 위치가 저장되는 것을 막으려고 되돌림)
+- 확인: 아래로 레이 → 꼬리(80,-5)는 바닥, 꼬리 옆 빈 곳(72,-5)·(88,-5)·모서리(70.5,0.5)는 바닥 없음 / 콘솔 에러 0. 플레이 중 실제로 떨어지는지는 에디터 시간이 멈춰 있어 확인 못 함
+- 남은 점: 이제 맵 가장자리에서 떨어진다 → 가장자리 벽은 다음 작업
+
+## 2026-11-09 — 정식 텃밭·연못 씬 `Scenes/FarmPond.unity` 추가 (브랜치 `FarmPond-Map`)
+- `Prototype_FarmFishing`에서 복사 (한 번에 같이 복제해 서로 참조 유지): `_Bootstrap`, Main Camera, Directional Light, Player, UI(EventSystem·HUDCanvas 전체), `World/` RequestBoard·FarmField·Pond·Creature. Ground·School·GinkgoTrees는 안 가져옴
+- `TileMapEditor`에서 복사: 구운 바닥 `World/FarmFishing_Floor`(프리팹 연결 유지, 위치 70,0,0), `SM_*` 25개 → 최상위 `Decor` 아래 (위치 그대로, `Decor`로 한 번에 켜고 끄기)
+- 위치: Pond·FarmField는 에디터의 `Compare/East` 배치와 같은 월드 위치·회전 (Pond 74.61,0,10.59 / 회전 321, FarmField 82.6,0,4.94). Player (80,0.1,5), RequestBoard (80,0,9), Creature (80,0,-2)는 임시 위치
+- 참조 정리: `GameBootstrap._bindRoots[0]`이 원본 씬 World를 가리켜 새 World로 고침. 그 밖의 빈 칸(_promptAnchor·_area)은 원본도 비어 있음
+- 원본 두 씬은 저장하지 않고 닫음 (git 변경 없음). Build Settings·`CLAUDE.md` 표는 아직 안 바꿈
+- 확인 (플레이 모드): 콘솔 에러 0, 플레이어 발밑 = 구운 바닥 충돌체, 카메라가 플레이어 따라감, 밭 36칸, HUD 표시. 심기·낚시·의뢰·대화 직접 조작은 아직 확인 안 함
+- 남은 점: FarmField(82.6, 4.94)는 1 m 칸 격자에 딱 맞지 않음 (에디터 배치 그대로 둠)
+
+## 2026-11-09 — 타일 맵 에디터: farm_grass 바탕 경계 세트 2개 추가 (사용자 제작 그림)
+- 사용자가 `Art/Map/Tile/farm/transitions/`에 `farm_grass_to_dark_garden_soil`, `farm_grass_to_dry_dirt_path` (각 12장, 32 px, 기존과 같은 방향 이름 규칙 — 그림으로 확인)를 넣음
+- Editor: `FarmTileSetBuilder`가 `meadow_grass_to_` 세트만이 아니라 **`<바탕 풀>_to_<바닥>` 세트를 모두** 처리. Rule Tile 이름: 기본 바탕(meadow_grass)은 `RT_<바닥>` 그대로, 다른 바탕은 `RT_<바탕>_to_<바닥>`. 팔레트에서 기본 바탕 세트가 먼저 오게 정렬(기존 배치 유지). `GroundSurfaceBuilder`가 새 Rule Tile 이름에서 바닥 종류를 읽음
+- 실행: 임포트 설정(411장, 새 24장 포함) → farm 타일 72개(바닥 12 + 경계 60), Rule Tile 5개(새 `RT_farm_grass_to_dark_garden_soil`, `RT_farm_grass_to_dry_dirt_path`), 팔레트 Farm 82칸(Rule Tile 줄 5개, 경계 블록 5개) → 바닥 종류 표 77줄(새 26줄, 모두 "흙"). 기존 타일·Rule Tile·팔레트는 같은 자리에서 갱신 (GUID 그대로)
+- 확인: 미리보기 장면(저장 안 됨)에서 farm_grass 바탕 위 새 Rule Tile 2개 → 바깥·안쪽 모서리·변 경계가 자동으로 붙음 / 콘솔 에러 0
+
+## 2026-11-09 — 농장 맵: 밭 칸을 새 FBX(Farm_Field_Dry/Wet)로 교체, 물 주면 Wet으로
+- 파일 (사용자): `Art/Map/Farm/Farm_Field_Dry.fbx`·`Farm_Field_Wet.fbx`(가로·세로 1.6 m, 높이 0.2 m, 바닥 한가운데 기준점, 메시 하나·카메라·조명 없음), 팔레트 `farm_field_dry_palette.png`·`farm_field_wet_palette.png`(64×8). UV가 팔레트 여러 칸을 씀 (Dry 6색, Wet 7색)
+- 임포트 설정: 이전과 같게 — FBX 카메라·조명 끔, 애니메이션 없음 / 텍스처 Point·Mip Map 끔·압축 없음·Clamp
+- 씬(`Prototype_FarmFishing`, 다시 만들지 않고 직접 수정·저장): `FarmField/Plots` 36칸을 `Farm_Field_Dry` 인스턴스로 교체 (이름·위치 그대로, 배율 1 ÷ 1.6 = 0.625, 윗면 0.125 m), 놓기 미리보기 높이 0.17 → 0.145. `Plots`에 `FarmSoilView` 추가
+- Gameplay: 새 `Farming/FarmSoilView` — `FarmGrid` 이벤트를 듣고, 물 준 작물이 차지한 칸의 메시·머티리얼을 Wet 모델 것으로, 뽑으면 Dry로 되돌림 (칸은 위치로 격자에 짝지음, 모델은 Inspector에서 바꿀 수 있음). Core 변경 없음
+- 씬 생성 도구: `FarmPlotModelPath` → `Farm_Field_Dry.fbx`, `FarmPlotWetModelPath` 추가, `Plots`에 `FarmSoilView` 연결
+- 확인 (플레이 모드, 함수 직접 호출): 호박(2×2)·무 심기, 격자 끝은 "칸이 부족해요", 심은 뒤 Wet 0칸 → 호박 물 주기 → 다 자람 + 그 4칸만 Wet(머티리얼도 Wet) → 뽑기 → 호박 획득, Wet 0칸 → 무 물 주기 → 그 칸 Wet / 화면: 젖은 칸이 진하게 보이고 작물이 밭 위에 놓임 / 콘솔 에러 0
+- 이전 `farm_grid.fbx`·`farm_grid.png`는 씬에서 쓰지 않지만 지우지 않음
+
+## 2026-11-09 — 농장 맵: 밭 칸을 사용자 FBX(farm_grid)로 교체
+- 파일 (사용자): `Art/Map/Farm/farm_grid.fbx`(가로·세로 2 m, 높이 0.3 m, 1복셀 0.1 m, 바닥 한가운데 기준점), `farm_grid.png`(256×1 팔레트)
+- 임포트 설정: FBX **카메라·조명 가져오기 끔**(Blender의 카메라·조명이 같이 들어 있어 칸마다 매우 밝은 조명이 생겨 화면이 하얗게 번졌음), 애니메이션 없음 / 텍스처 Point·Mip Map 끔·압축 없음·Clamp
+- 씬(`Prototype_FarmFishing`, 사용자가 고친 씬이라 다시 만들지 않고 직접 수정): `FarmField/Plots`에 6×6칸(`Plot_x_y`)을 칸 크기 1 m에 맞춰 배율 0.5로 배치(윗면 0.15 m), 예전 기본 도형 `Cells`는 꺼 둠(지우지 않음), 놓기 미리보기 높이 0.12 → 0.17(밭 윗면 위)
+- 기능 코드 변경 없음 (밭 칸은 보이는 모양일 뿐이고 심기·물 주기·뽑기는 `FarmField` 격자 계산 그대로)
+- 씬 생성 도구: 밭 모델이 있으면 같은 방식으로 배치(칸 크기 ÷ 모델 폭으로 배율, 미리보기 높이 = 윗면 + 0.02), 없으면 예전 기본 도형
+- 확인 (상호작용 함수 직접 호출): 대파·호박·무 심기, 격자 끝은 "칸이 부족해요", 물 주기 → 다 자람, 뽑기 → 대파 획득, 작물이 밭 위에 보임 / 콘솔 에러 0
+- 참고: 모델의 UV가 모두 팔레트 한 칸(68번, 갈색)을 가리킴 → 한 가지 색 + 음영으로 보임
+
+## 2026-11-08 — 타일 맵 에디터: 충돌체 함께 굽기
+- 사용자 요청 (설계 승인 절차 없이 바로 진행하라고 함, 브랜치 `feature/tool-tile-editor`): 구운 바닥이 충돌까지 맡아 게임 씬의 `Ground` 상자 없이 걸을 수 있게
+- Gameplay: `TileMapDocument`에 맵별 "충돌체 함께 굽기"(기본 켬). Core: `TileMapConfig`에 충돌체 두께 0.5 m
+- Editor: `TileFloorBaker`가 켜져 있으면 프리팹 루트에 **칠한 범위만 한 BoxCollider**(윗면 y = 0, 두께는 설정값)를 넣음, 끄면 안 넣음. 도구 창 굽기 영역에 체크박스, 결과 줄에 충돌체 크기
+- 확인: 시험 맵 10×8칸 굽기 → BoxCollider 10×0.5×8 m, 윗면 0 / 끄고 다시 굽기 → 프리팹에 충돌체 없음 / 플레이 모드에서 CharacterController(중력 적용)를 2 m 위에서 떨어뜨림 → 바닥 위에 섬(y 0.08 = 기본 skin width), 발밑 바닥 "흙", 3 m 걸어도 그대로 섬, 칠한 범위 밖으로 나가면 떨어짐(예상대로) / 테스트 92개 통과, 콘솔 에러 0. 시험 맵·결과는 지움
+- 이미 구운 맵(TestA, FarmSample)은 다시 굽기 전까지 충돌체 없음
+
 ## 2026-11-06 — 칩비 소켓을 위팔 본 기준으로 (Run에서 지팡이 틀어짐 수정)
 - 사용자 보고: Run에서 지팡이 위치·각도가 프레임마다 틀어짐 (Idle·Walk는 괜찮아 보임)
 - 원인 (측정): 칩비 팔 메시 `ArmR_Mesh`는 정점 전부가 `RightArm`(위팔) 본에만 붙어 있어 팔꿈치·손목이 안 보이는데, 소켓은 `RightHand` 본에 붙어 있어 애니메이션의 팔꿈치·손목 회전을 지팡이만 따라감. 보이는 팔 기준 소켓 어긋남(20프레임 최대): Idle 1.1°/0.1cm, Walk 28.6°/8.4cm, Run 124.5°/32.3cm

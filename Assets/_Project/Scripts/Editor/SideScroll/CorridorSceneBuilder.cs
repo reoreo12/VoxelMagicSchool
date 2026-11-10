@@ -20,8 +20,6 @@ namespace VoxelMagic.EditorTools
         internal const string SpriteMaterialPath =
             "Packages/com.unity.render-pipelines.universal/Runtime/Materials/Sprite-Unlit-Default.mat";
         private const string InputPath = "Assets/_Project/Input/GameControls.inputactions";
-        private const string PortalMaterialPath = "Assets/_Project/Art/Materials/CorridorPortal.mat";
-        private const string UnlitShader = "Universal Render Pipeline/Unlit";
         private const string LitSpriteMaterialPath = "Assets/_Project/Art/Materials/CorridorSpriteLit.mat";
         private const string LitSpriteShader = "VoxelMagic/Sprite Lit 3D";
         private const string GlowSpritePath = "Assets/_Project/Art/Lights/lamp_floor_glow.png";
@@ -101,7 +99,10 @@ namespace VoxelMagic.EditorTools
             camera.GetComponent<SideScrollCamera>().SetRef("_target", character.transform);
 
             var bounds = corridor.Bounds;
-            if (config.PortalEnabled) BuildPortal(config, bounds, moveConfig.GroundY, moveConfig.Z);
+            var transition = SceneTransitionRigBuilder.CreateRig(character.transform);
+            var portal = config.PortalEnabled
+                ? BuildPortal(config, bounds, moveConfig.GroundY, moveConfig.Z, transition, character.transform)
+                : null;
             var interactor = input.gameObject.AddComponent<SideScrollInteractor>();
             interactor.SetRef("_input", input).SetRef("_character", character.transform);
 
@@ -113,7 +114,10 @@ namespace VoxelMagic.EditorTools
             bootstrap.SetRef("_config", config)
                 .SetRef("_moveConfig", moveConfig)
                 .SetRef("_corridor", corridor)
-                .SetRefList("_bindRoots", new Object[] { camera.gameObject, character, hud, input.gameObject, lighting });
+                .SetRefList("_bindRoots", portal != null
+                    // 도착 지점이 먼저 캐릭터 x를 옮겨야 카메라가 그 자리에서 시작한다
+                    ? new Object[] { portal, camera.gameObject, character, hud, input.gameObject, lighting }
+                    : new Object[] { camera.gameObject, character, hud, input.gameObject, lighting });
 
             // 에디터에서도 플레이 때와 같은 화면이 보이도록 카메라를 복도 왼쪽 끝에 맞춘다.
             camera.orthographicSize = SideScrollMath.OrthographicSizeFor(bounds.Height);
@@ -222,52 +226,18 @@ namespace VoxelMagic.EditorTools
             return material;
         }
 
-        // 오른쪽 문 앞 반투명 원기둥: 루트에 포털 + 트리거(범위, 인스펙터에서 반지름 조절), 자식에 보이는 원기둥
-        private static void BuildPortal(CorridorConfig config, CorridorBounds bounds, float groundY, float z)
+        // 오른쪽 문 앞: 보이지 않는 이동 트리거 + 돌아올 때의 도착 지점 (포털 왼쪽). 반환값은 도착 지점 묶음(부트스트랩 연결용)
+        private static GameObject BuildPortal(CorridorConfig config, CorridorBounds bounds, float groundY, float z,
+            SceneTransitionDirector director, Transform character)
         {
             var root = new GameObject("Portal_" + config.PortalSceneName);
-            root.transform.position = new Vector3(bounds.MaxX - config.PortalInsetFromRight, groundY, z);
-            var trigger = root.AddComponent<CapsuleCollider>();
-            trigger.isTrigger = true;
-            trigger.radius = config.PortalTriggerRadius;
-            trigger.height = config.PortalHeight;
-            trigger.center = new Vector3(0f, config.PortalHeight * 0.5f, 0f);
-            root.AddComponent<ScenePortal>().SetString("_sceneName", config.PortalSceneName);
-
-            // 기본 원기둥은 키 2·지름 1이다.
-            var visual = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
-            visual.name = "Visual";
-            Object.DestroyImmediate(visual.GetComponent<Collider>());
-            visual.transform.SetParent(root.transform, false);
-            visual.transform.localPosition = new Vector3(0f, config.PortalHeight * 0.5f, 0f);
-            visual.transform.localScale = new Vector3(config.PortalDiameter, config.PortalHeight * 0.5f, config.PortalDiameter);
-            var renderer = visual.GetComponent<MeshRenderer>();
-            renderer.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
-            renderer.receiveShadows = false;
-            renderer.sharedMaterial = LoadOrCreatePortalMaterial(config.PortalColor);
-        }
-
-        // 조명 없는 반투명 머테리얼. 색은 설정에서 매번 다시 적용한다.
-        private static Material LoadOrCreatePortalMaterial(Color color)
-        {
-            var material = AssetDatabase.LoadAssetAtPath<Material>(PortalMaterialPath);
-            if (material == null)
-            {
-                EnsureFolder(System.IO.Path.GetDirectoryName(PortalMaterialPath).Replace('\\', '/'));
-                material = new Material(Shader.Find(UnlitShader));
-                AssetDatabase.CreateAsset(material, PortalMaterialPath);
-            }
-            material.SetFloat("_Surface", 1f);
-            material.SetFloat("_Blend", 0f);
-            material.SetFloat("_SrcBlend", (float)UnityEngine.Rendering.BlendMode.SrcAlpha);
-            material.SetFloat("_DstBlend", (float)UnityEngine.Rendering.BlendMode.OneMinusSrcAlpha);
-            material.SetFloat("_ZWrite", 0f);
-            material.EnableKeyword("_SURFACE_TYPE_TRANSPARENT");
-            material.SetOverrideTag("RenderType", "Transparent");
-            material.renderQueue = (int)UnityEngine.Rendering.RenderQueue.Transparent;
-            material.SetColor("_BaseColor", color);
-            EditorUtility.SetDirty(material);
-            return material;
+            float x = bounds.MaxX - config.PortalInsetFromRight;
+            SceneTransitionRigBuilder.CreateTrigger("Trigger", new Vector3(x, groundY + config.PortalHeight * 0.5f, z),
+                new Vector3(config.PortalWidth, config.PortalHeight, 2f), config.PortalSceneName,
+                config.PortalArrivalSpawnId, director, character, root.transform);
+            SceneTransitionRigBuilder.CreateSpawn(config.ReturnSpawnId,
+                new Vector3(x - config.ReturnSpawnOffset, groundY, z), Quaternion.identity, character, root.transform);
+            return root;
         }
 
         private static void EnsureFolder(string path)
