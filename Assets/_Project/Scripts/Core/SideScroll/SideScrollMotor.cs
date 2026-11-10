@@ -19,6 +19,13 @@ namespace VoxelMagic.Core
         public float MinX { get; }
         public float MaxX { get; }
 
+        /// <summary>속도 없이 x로 바로 옮긴다 (씬 도착 지점). 범위 밖이면 끝에 붙음.</summary>
+        public void Teleport(float x)
+        {
+            X = Mathf.Clamp(x, MinX, MaxX);
+            Velocity = 0f;
+        }
+
         /// <summary>그 방향으로 더 갈 수 없으면 true (복도 끝에 닿음).</summary>
         public bool IsBlocked(int direction) =>
             (direction < 0 && X <= MinX + EdgeEpsilon) || (direction > 0 && X >= MaxX - EdgeEpsilon);

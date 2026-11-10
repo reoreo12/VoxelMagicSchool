@@ -1,5 +1,17 @@
 # 변경 기록
 
+## 2026-11-09 — 씬 이동: 복도 ↔ FarmPond, 보이지 않는 트리거 + 픽셀 계단 원형 페이드
+- Core: `SceneFlow/SceneTravel`(이동 중 여부·도착 지점 ID·이벤트, 정적), `IScreenFade` / `Data/Config/SceneTransitionConfig`(페이드 아웃·멈춤·인 0.4·0.05·0.4초, 블록 12 px@1080p, 디더 3블록, 색, 원 중심 = 플레이어, 정렬 순서 500) → `Data/Config/SceneTransitionConfig.asset`
+- Gameplay: `SceneFlow/SceneTransitionDirector`(씬마다 하나: 입력 막기 → 페이드 아웃 → 비동기 로드 → 새 씬 진행자가 가린 채 시작 → 페이드 인 → 입력 풀기), `SceneTransitionTrigger`(보이지 않는 BoxCollider 범위에 플레이어 발 + 0.2 m 점이 들어오는 순간 이동. 물리 이벤트가 아니라 쿼터뷰·횡스크롤 공용), `SceneSpawnPoint`(도착 ID가 맞으면 부트스트랩보다 먼저 플레이어를 옮김, 횡스크롤은 이동 계산기 x도). `SideScrollMotor.Teleport` 추가
+- 입력 막기: `GameInputReader`·`SideScrollInputReader`가 이동 중에는 게임플레이 액션 맵을 끔. 페이드 판이 클릭도 막음. 환경설정 UI는 다른 액션 맵 + 더 높은 정렬 순서로 만들면 영향 없음
+- UI: `SceneFlow/PixelCircleFadeView` + 셰이더 `Art/Shaders/PixelCircleFade.shader`(화면을 블록으로 잘라 원 밖을 칠하고 테두리는 4×4 Bayer 디더) + `Art/Materials/UI_PixelCircleFade.mat`. 이미지 시퀀스 대신 셰이더로 (해상도 무관, 숫자로 조절)
+- Editor: `SceneFlow/SceneTransitionRigBuilder`(진행자+페이드 캔버스, 트리거, 도착 지점 만들기). `CorridorSceneBuilder`는 원기둥 포털 대신 트리거 + 돌아올 도착 지점(`FromFarm`, 포털 왼쪽 1.2 m)을 만들고 부트스트랩 연결 맨 앞에 넣음
+- `CorridorConfig` 포털: 이동 씬 `FarmPond`, 도착 ID `FromCorridor`, 트리거 폭 0.4 m 추가 / 지름·트리거 반지름·색 삭제. `ScenePortal.cs` 삭제 (`Art/Materials/CorridorPortal.mat`은 안 쓰지만 남겨 둠)
+- 씬: 복도 — 원기둥 포털 지우고 `Portal_FarmPond`(트리거 x 33.28, 도착 `FromFarm` x 32.08) + `SceneTransition`. FarmPond — `World/Portal_Corridor`(꼬리 길 끝 트리거 (80, 1, −7.5) 4×2×1 m, 도착 `FromCorridor` (80, 0.1, −4.5)) + `SceneTransition`
+- Build Settings: `FarmPond` 추가 (`SETUP.md`)
+- 확인 (플레이 모드, 프레임 한 칸씩 진행): FarmPond 꼬리 끝 → 원형 픽셀 페이드 → 복도 x 32.08 도착 → 입력 다시 켜짐 / 복도 포털 → FarmPond (80, −4.5) 도착, 게임플레이 키 켜짐 / 화면: 블록 계단 + 디더 테두리 원이 플레이어 중심으로 좁아짐 / 콘솔 에러 0
+- 처음엔 복도 캐릭터 발 높이가 트리거 바닥과 똑같아 잡히지 않아서, 발 + 0.2 m 점으로 검사하게 고침
+
 ## 2026-11-09 — 타일 맵 굽기: 충돌체를 칠한 칸 모양대로 BoxCollider 여러 개로
 - 원인: 칠한 범위 전체를 감싸는 상자 하나라, 포탈 길(꼬리)을 빼면 옆의 빈 허공까지 덮어 플레이어가 허공을 걸었음
 - Editor: `TileFloorBaker.AddFloorCollider` — 칠한 칸을 가로로 묶고 같은 폭의 다음 줄과 합쳐 직사각형마다 BoxCollider 하나 (빈 칸은 덮지 않음). 결과 표시는 "충돌체 N개 (칸 모양)"

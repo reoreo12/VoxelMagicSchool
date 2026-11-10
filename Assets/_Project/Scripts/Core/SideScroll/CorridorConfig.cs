@@ -49,17 +49,22 @@ namespace VoxelMagic.Core
         [SerializeField, Min(1)] private int _pixelSize = 4;
         [SerializeField] private Vector2Int _pixelSizeRange = new Vector2Int(2, 8);
 
-        [Header("오른쪽 문 포털 (바꾸면 복도 씬 다시 만들기)")]
+        [Header("오른쪽 문 포털: 보이지 않는 이동 트리거 (바꾸면 복도 씬 다시 만들기)")]
         [SerializeField] private bool _portalEnabled = true;
-        [Tooltip("E로 열 씬 이름 (Build Settings 씬 목록에 있어야 함)")]
-        [SerializeField] private string _portalSceneName = "Prototype_FarmFishing";
+        [Tooltip("닿으면 이동할 씬 이름 (Build Settings 씬 목록에 있어야 함)")]
+        [SerializeField] private string _portalSceneName = "FarmPond";
+        [Tooltip("도착할 씬의 도착 지점 ID")]
+        [SerializeField] private string _portalArrivalSpawnId = "FromCorridor";
         [Tooltip("복도 오른쪽 끝에서 안쪽으로 떨어진 거리 (끝 여유와 같으면 캐릭터가 멈추는 자리)")]
         [SerializeField, Min(0f)] private float _portalInsetFromRight = 2.56f;
+        [Tooltip("트리거 상자 높이 (m)")]
         [SerializeField, Min(0.1f)] private float _portalHeight = 1f;
-        [SerializeField, Min(0.05f)] private float _portalDiameter = 0.6f;
-        [Tooltip("이 반지름 안에 캐릭터 중심이 들어오면 E로 이동 (씬에서는 포털의 CapsuleCollider 반지름)")]
-        [SerializeField, Min(0.01f)] private float _portalTriggerRadius = 0.2f;
-        [SerializeField] private Color _portalColor = new Color(0.45f, 0.8f, 1f, 0.35f);
+        [Tooltip("트리거 상자 가로 폭 (m). 캐릭터 발 위치가 이 안에 들어오면 이동")]
+        [SerializeField, Min(0.01f)] private float _portalWidth = 0.4f;
+        [Tooltip("다른 씬에서 복도로 돌아올 때의 도착 지점 ID")]
+        [SerializeField] private string _returnSpawnId = "FromFarm";
+        [Tooltip("돌아온 도착 지점이 포털에서 왼쪽으로 떨어진 거리 (m, 바로 다시 밟지 않게)")]
+        [SerializeField, Min(0f)] private float _returnSpawnOffset = 1.2f;
         [Tooltip("캐릭터 발에서 이 높이의 점으로 포털 안인지 잰다")]
         [SerializeField, Min(0f)] private float _interactProbeHeight = 0.5f;
 
@@ -141,9 +146,10 @@ namespace VoxelMagic.Core
         public string PortalSceneName => _portalSceneName;
         public float PortalInsetFromRight => _portalInsetFromRight;
         public float PortalHeight => _portalHeight;
-        public float PortalDiameter => _portalDiameter;
-        public float PortalTriggerRadius => _portalTriggerRadius;
-        public Color PortalColor => _portalColor;
+        public string PortalArrivalSpawnId => _portalArrivalSpawnId;
+        public float PortalWidth => _portalWidth;
+        public string ReturnSpawnId => _returnSpawnId;
+        public float ReturnSpawnOffset => _returnSpawnOffset;
         public float InteractProbeHeight => _interactProbeHeight;
         public bool NightAtStart => _nightAtStart;
         public BackdropSet DayBackdrop => _dayBackdrop;

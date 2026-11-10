@@ -36,8 +36,24 @@ namespace VoxelMagic.Gameplay
             _map.FindAction("Interact", true).performed += _ => InteractPressed?.Invoke();
         }
 
-        private void OnEnable() => _map?.Enable();
-        private void OnDisable() => _map?.Disable();
+        private void OnEnable()
+        {
+            SceneTravel.TravelingChanged += OnTravelingChanged;
+            if (!SceneTravel.IsTraveling) _map?.Enable();
+        }
+
+        private void OnDisable()
+        {
+            SceneTravel.TravelingChanged -= OnTravelingChanged;
+            _map?.Disable();
+        }
+
+        // 씬 이동(페이드) 중에는 게임플레이 키 전부 막기. 환경설정 같은 UI는 다른 액션 맵을 쓰면 영향 없음.
+        private void OnTravelingChanged(bool traveling)
+        {
+            if (traveling) _map?.Disable();
+            else _map?.Enable();
+        }
 
         public MoveIntent Read()
         {

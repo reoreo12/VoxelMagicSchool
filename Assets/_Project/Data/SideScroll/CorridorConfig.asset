@@ -35,12 +35,13 @@ MonoBehaviour:
   _pixelSize: 4
   _pixelSizeRange: {x: 2, y: 8}
   _portalEnabled: 1
-  _portalSceneName: Prototype_FarmFishing
+  _portalSceneName: FarmPond
+  _portalArrivalSpawnId: FromCorridor
   _portalInsetFromRight: 2.56
   _portalHeight: 1
-  _portalDiameter: 0.6
-  _portalTriggerRadius: 0.2
-  _portalColor: {r: 0.45, g: 0.8, b: 1, a: 0.35}
+  _portalWidth: 0.4
+  _returnSpawnId: FromFarm
+  _returnSpawnOffset: 1.2
   _interactProbeHeight: 0.5
   _nightAtStart: 0
   _dayBackdrop: {fileID: 11400000, guid: e76c9dee7ec0d6b46ac9a564694e8199, type: 2}
