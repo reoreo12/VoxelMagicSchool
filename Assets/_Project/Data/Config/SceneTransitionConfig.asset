@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _fadeOutDuration: 0.8
   _holdDuration: 0.3
-  _fadeInDuration: 8
+  _fadeInDuration: 0.8
   _blockSize: 12
   _ditherBlocks: 3
   _color: {r: 0, g: 0, b: 0, a: 1}

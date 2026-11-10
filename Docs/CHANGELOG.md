@@ -1,5 +1,14 @@
 # 변경 기록
 
+## 2026-11-10 — 뒷산 바닥 복셀 FBX 9개 (브랜치 `Farm-pond-map`)
+- 설계: `Docs/DESIGN_MOUNTAIN_FLOOR.md`. 복셀 1칸 0.0667 m, 청크 16 × 16 m(입장 꼬리 T만 6 × 5 m), 윗면 y = 0 기준 절대 높이로 구움(길 높이 0 → 약 11 m)
+- 만든 것 (`Art/Map/Mountain/`): `Mountain_Floor_T/A1/A2/A3/B/C1/C2/C3/D.fbx`, `Mountain_palette.png`(256 × 1, Point·Mip 끔·무압축), `Mountain_Voxel.mat`(`M_Voxel` 복사 + 팔레트), `MountainFloor_All.prefab`(청크 9개를 (x, 0, z)에 조립한 확인용), `Source/`(청크별 메시 데이터 `.npz`, 생성 스크립트 `hf.py`·`gen_mesh.py` — 파이썬, 유니티는 무시). 확인 씬 `Scenes/Tools/MountainFloorPreview.unity`
+- 색: FarmPond 구운 아틀라스에서 읽은 길 `#8A5A36` + 외곽선 1복셀 `#4C321E`, 흙 `#6A4A33` 한 색, 연못 이끼색 `#507848` 덩어리. 연갈색 흙 없음. 바깥 둘레에 1.5 m(22복셀) 흙 단면 (윗 0.4 m 짙은 흙 + 그 아래 더 어두운 흙). 아랫면·안쪽 없음, 포획 구역이 붙을 B 북쪽 변은 단면 없이 열어 둠
+- 임포트: 배율 1·회전 0(축·단위 구움 처리), Read/Write 끔, 메시 압축 끔, 콜라이더 없음, 머티리얼은 `Mountain_Voxel` 하나를 모든 청크가 공유
+- 확인: 청크 경계 상자 (0~16, y, 0~16) 정확, 윗면 법선 전부 위, 윗면 면적 = 칸 수, 이웃 칸 단차 2복셀 이하, 삼각형 청크당 약 4만~5만 (총 약 38만). 이음새 틈 없음(화면 확인)
+- 도구: 높이장 → 청크 greedy 메시(`.npz`) → Blender에서 FBX. MagicaVoxel로 고치고 싶으면 `gen_mesh.py`가 청크별 `.vox`도 만든다 (청크당 약 5 MB라 프로젝트에는 넣지 않음)
+- FarmPond 씬·기존 에셋은 건드리지 않음 (`MountainFloorPreview`는 새 씬)
+
 ## 2026-11-09 — 씬 이동: 복도 ↔ FarmPond, 보이지 않는 트리거 + 픽셀 계단 원형 페이드
 - Core: `SceneFlow/SceneTravel`(이동 중 여부·도착 지점 ID·이벤트, 정적), `IScreenFade` / `Data/Config/SceneTransitionConfig`(페이드 아웃·멈춤·인 0.4·0.05·0.4초, 블록 12 px@1080p, 디더 3블록, 색, 원 중심 = 플레이어, 정렬 순서 500) → `Data/Config/SceneTransitionConfig.asset`
 - Gameplay: `SceneFlow/SceneTransitionDirector`(씬마다 하나: 입력 막기 → 페이드 아웃 → 비동기 로드 → 새 씬 진행자가 가린 채 시작 → 페이드 인 → 입력 풀기), `SceneTransitionTrigger`(보이지 않는 BoxCollider 범위에 플레이어 발 + 0.2 m 점이 들어오는 순간 이동. 물리 이벤트가 아니라 쿼터뷰·횡스크롤 공용), `SceneSpawnPoint`(도착 ID가 맞으면 부트스트랩보다 먼저 플레이어를 옮김, 횡스크롤은 이동 계산기 x도). `SideScrollMotor.Teleport` 추가
