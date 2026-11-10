@@ -1,5 +1,29 @@
 # 변경 기록
 
+## 2026-11-10 — 캐릭터 시스템 단계 2-②③: 텃밭·복도 이동 통일 + 텃밭 달리기 + 걷기 재생 속도
+- 설계: `DESIGN_CHARACTER.md` 9-3 (사용자: 텃밭 이동 속도 4는 그대로, 걷기 애니 재생이 너무 빠름 → 낮춤, 달리기는 이동·재생 모두 2.25배)
+- Core `Characters/Locomotion/`: `ICharacterMotor`(이동기 계약)·`ILocomotionSource`(이동 상태 알림), `PlanarMotor`(바닥 평면 가속·감속, 대각선 정규화), `LocomotionStateMachine`(Idle/Walk/Run 공용 상태 머신)
+- Core 변경: `MoveIntent`에 `Planar`(바닥 평면 방향)와 평면용 생성자, `CharacterBody.Motor`를 `ICharacterMotor`로, Idle/Walk/Run `Tick`이 `Motor.Drive` 호출, `SideScrollMotor`가 `ICharacterMotor` 구현, 복도 `CharacterStateMachine`은 방향 전환·끝 막힘만 하고 나머지는 `LocomotionStateMachine`에 맡김 (공개 API 그대로), `CharacterMoveConfig`에 상태별 애니메이션 재생 배율(`AnimationScaleFor`)
+- Gameplay: 텃밭 `PlayerMover`가 공용 상태 머신 + `PlanarMotor` + Shift 달리기, 이동 방향은 지금처럼 `PlayerConfig` 카메라 Yaw 기준. `CharacterAnimatorView`를 `ILocomotionSource` 공용으로(복도는 그대로 Bind, 텃밭은 `PlayerMover`가 연결). `AvatarAnimationSpeed`가 장면 이동 설정의 배율을 곱함. `GameInputReader.Run`
+- 입력: `GameControls` `Gameplay` 맵에 `Run`(왼쪽 Shift) — SETUP.md 입력 액션
+- 데이터: `Data/Config/FarmMoveConfig`(걷기 4·달리기 9, 가속 40·감속 50, 재생 배율 걷기 1.6·달리기 3.6 — 예전 걷기 재생은 이동 속도 ÷ 1 = 4배였음)
+- Editor: 메뉴 `VoxelMagic/캐릭터/텃밭 플레이어 이동·애니 통일`(`PlayerLocomotionSetup`), `PrototypeSceneBuilder`도 같은 처리 (실행 안 함)
+- 텃밭 씬(FarmPond): Model에 `CharacterAnimatorView`·`AvatarAnimationSpeed`, `PlayerMover`에 이동 설정·애니 뷰 연결, 옛 `PlayerAvatarAnimator`는 **끄기만**(삭제 안 함, Prototype 씬은 아직 사용)
+- 확인: 테스트 113개 통과(새 6개, 복도 상태 머신 기존 테스트 그대로 통과) / 텃밭 플레이: 상태 머신에 입력을 넣어 Idle → D 걷기(속력 4, 방향 = 카메라 오른쪽) → Shift 달리기(9) → W+D 달리기(대각선도 9) → 놓기 Idle, Animator Idle/Walk/Run 따라감, 재생 값 Walk 1.6·Run 3.6 / 복도 플레이: 걷기 1.6·달리기 3.6·좌우 방향·Animator 그대로 / 콘솔 에러 0
+- 확인 못 함: 실제 키보드 입력(에디터 포커스가 없어 가상 키가 액션에 안 들어감 — 사용자 플레이로 확인 필요)
+- 이동 방향 질문(D가 화면 대각선으로 간다는 보고): 코드는 카메라 기준이라 D = 화면 오른쪽으로 측정됨. 사용자가 카메라 Yaw를 바꿔 직접 시험하기로 함 (이동은 Yaw를 따라감)
+
+## 2026-11-10 — 캐릭터 시스템 단계 2-①: 플레이어 데이터 유지 + 파일 저장
+- 설계: `DESIGN_CHARACTER.md` 9번 (사용자 "제작 시작" 승인, 저장은 파일까지)
+- Core `Session/`: `PlayerProgress`(인벤토리·점수·도감·의뢰 + 밭 보관본, 나중에 스탯 자리), `GameSession`(정적 보관소, 저장 직전 `Capturing`), `SaveData`·`SlotRecord`·`FarmPlotRecord`(JSON용, 버전 1), `ISaveStore`, `DefinitionCatalog`(ID → 에셋), `SaveMapper`(진행 상태 ↔ 저장 데이터, 모르는 ID 건너뜀)
+- Core 변경: `GameContext.Create`가 `PlayerProgress`를 받아 씀(플레이어 데이터는 씬을 넘어 유지, 밭 격자·낚시·메시지·화면 상태는 씬마다 새로), `Inventory`·`ScoreBook`·`MaterialJournal`·`RequestTracker`에 불러오기용 `Restore`(internal), `MaterialJournal.DeliveredIds`, `RequestTracker.CompletedRequests`
+- Gameplay: `Save/JsonFileSaveStore`(임시 파일에 쓴 뒤 바꿔치기), `Save/GameSaveSystem`(처음 한 번 불러오기/새 게임, 저장, 종료 때 저장), `GameBootstrap`(세션에서 진행 상태 받기, 연결 뒤 밭 다시 심기, 씬을 떠날 때 밭 보관), `SceneTransitionDirector`(페이드 아웃 뒤 로드 전에 저장)
+- UI: 씬을 넘는 데이터 구독을 OnDestroy에서 풀도록 수정 — `QuestTrackerPanel`(해제 없던 것 + 씬에 들어올 때 진행 중 의뢰 바로 표시), `RequestBoardWindow`(람다 구독 → 메서드)
+- Editor: `Save/SaveTools` 메뉴 `VoxelMagic/저장/`, `PrototypeSceneBuilder`가 정의 목록 연결 (실행 안 함)
+- 데이터·씬: `Data/Save/DefinitionCatalog`(아이템 10·의뢰 3), `FarmPond` 씬 `_Bootstrap`에 연결·`_autoSave` 켬 (씬 diff: 이 두 줄 + 기존 컴포넌트 필드 `_probeHeight` 기본값 기록 한 줄)
+- 확인: 테스트 107개 통과(새 6개: JSON 왕복, 모르는 ID, 인벤토리 이벤트, 진행 중 의뢰 재지급 없음, 점수 범위, 세션 보관) / 플레이: 텃밭에서 아이템·점수·의뢰·밭(물 준 칸 포함) 바꿈 → 복도(진행 상태 그대로, 저장 파일 생성) → 텃밭(인벤토리 같은 객체, 밭 2칸·물 상태·뷰, 의뢰 추적 패널 표시) → 인벤토리 이벤트 구독자에 사라진 씬 UI 없음 → 플레이 끄기(저장) → 다시 켜기(파일에서 그대로 불러옴) / 콘솔 에러 0 / 시험 저장 파일은 지움
+- 덤: Unity가 `Animations/Mixamo/Y Bot@Watering.fbx.meta`를 만듦(사용자가 넣은 FBX의 임포트)
+
 ## 2026-11-10 — 뒷산 바닥 복셀 FBX 9개 (브랜치 `Farm-pond-map`)
 - 설계: `Docs/DESIGN_MOUNTAIN_FLOOR.md`. 복셀 1칸 0.0667 m, 청크 16 × 16 m(입장 꼬리 T만 6 × 5 m), 윗면 y = 0 기준 절대 높이로 구움(길 높이 0 → 약 11 m)
 - 만든 것 (`Art/Map/Mountain/`): `Mountain_Floor_T/A1/A2/A3/B/C1/C2/C3/D.fbx`, `Mountain_palette.png`(256 × 1, Point·Mip 끔·무압축), `Mountain_Voxel.mat`(`M_Voxel` 복사 + 팔레트), `MountainFloor_All.prefab`(청크 9개를 (x, 0, z)에 조립한 확인용), `Source/`(청크별 메시 데이터 `.npz`, 생성 스크립트 `hf.py`·`gen_mesh.py` — 파이썬, 유니티는 무시). 확인 씬 `Scenes/Tools/MountainFloorPreview.unity`

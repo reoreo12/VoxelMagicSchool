@@ -33,6 +33,22 @@ namespace VoxelMagic.Core
         public int AddWritten(int amount) => Add(ScoreKind.Written, ref _written, amount);
         public int AddPractical(int amount) => Add(ScoreKind.Practical, ref _practical, amount);
 
+        /// <summary>저장 파일에서 불러온 값으로 맞춘다 (최대값을 넘지 않게).</summary>
+        internal void Restore(int practical, int written)
+        {
+            Set(ScoreKind.Practical, ref _practical, practical);
+            Set(ScoreKind.Written, ref _written, written);
+        }
+
+        private void Set(ScoreKind kind, ref int value, int next)
+        {
+            next = Math.Max(0, Math.Min(MaxScore, next));
+            if (next == value) return;
+            int before = value;
+            value = next;
+            ScoreChanged?.Invoke(kind, before, value);
+        }
+
         private int Add(ScoreKind kind, ref int value, int amount)
         {
             if (amount <= 0) return 0;

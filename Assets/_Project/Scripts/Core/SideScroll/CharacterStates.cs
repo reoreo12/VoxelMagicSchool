@@ -13,16 +13,16 @@ namespace VoxelMagic.Core
         CharacterStateId Evaluate(MoveIntent intent);
     }
 
-    /// <summary>상태들이 함께 쓰는 것: 이동 계산기, 이동 설정, 이번 프레임 입력.</summary>
+    /// <summary>상태들이 함께 쓰는 것: 이동기(복도·텃밭 공용 계약), 이동 설정, 이번 프레임 입력.</summary>
     public sealed class CharacterBody
     {
-        public CharacterBody(SideScrollMotor motor, CharacterMoveConfig config)
+        public CharacterBody(ICharacterMotor motor, CharacterMoveConfig config)
         {
             Motor = motor;
             Config = config;
         }
 
-        public SideScrollMotor Motor { get; }
+        public ICharacterMotor Motor { get; }
         public CharacterMoveConfig Config { get; }
         public MoveIntent Intent { get; internal set; }
     }
@@ -47,7 +47,7 @@ namespace VoxelMagic.Core
         public override CharacterStateId Id => CharacterStateId.Idle;
 
         public override void Tick(float deltaTime) =>
-            Body.Motor.Step(0f, Body.Config.Acceleration, Body.Config.Deceleration, deltaTime);
+            Body.Motor.Drive(Body.Intent, 0f, Body.Config.Acceleration, Body.Config.Deceleration, deltaTime);
 
         // Shift를 누른 채 출발하면 Walk를 한 프레임 거치지 않고 바로 Run (애니메이션 깜빡임 방지).
         public override CharacterStateId Evaluate(MoveIntent intent)
@@ -57,7 +57,7 @@ namespace VoxelMagic.Core
         }
     }
 
-    /// <summary>Walk/Run 공통: 바라보는 방향으로 목표 속도까지 가속. 목표 속도만 자식이 정한다.</summary>
+    /// <summary>Walk/Run 공통: 입력 방향으로 목표 속도까지 가속. 목표 속도만 자식이 정한다.</summary>
     public abstract class MoveStateBase : CharacterStateBase
     {
         protected MoveStateBase(CharacterBody body) : base(body) { }
@@ -65,8 +65,7 @@ namespace VoxelMagic.Core
         protected abstract float TargetSpeed { get; }
 
         public override void Tick(float deltaTime) =>
-            Body.Motor.Step(Body.Intent.Direction * TargetSpeed, Body.Config.Acceleration, Body.Config.Deceleration,
-                deltaTime);
+            Body.Motor.Drive(Body.Intent, TargetSpeed, Body.Config.Acceleration, Body.Config.Deceleration, deltaTime);
     }
 
     public sealed class WalkState : MoveStateBase
