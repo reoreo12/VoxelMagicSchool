@@ -1,5 +1,11 @@
 # 변경 기록
 
+## 2026-11-11 — 뒷산 플레이어 그림자 구멍 수정 + 인수인계 문서 (브랜치 `Back-mountain-map`)
+- 원인: 뒷산 해(`Directional Light`)에 Depth Bias 0.1·Normal Bias 0 값은 있었지만 **Use Pipeline Settings가 켜져 있어** URP 기본값(Normal Bias 0.5)을 씀 → 복셀 아바타 그림자에 구멍 (2026-11-03 FarmPond와 같은 문제)
+- 수정: `VoxelShadowSettings.Apply`로 씬 조명만 파이프라인 설정 끔 + Depth 0.1·Normal 0 (FarmPond와 같은 값). 프로젝트 URP 설정은 그대로
+- 확인: 같은 카메라 위치 전/후 캡처 비교 — 바뀐 화소 306개(0.13%), 모두 어두워지는 쪽(그림자 구멍이 메워짐), 밝아진 곳 0
+- 문서: `Docs/HANDOFF_BACKMOUNTAIN.md` 새로 작성, `BACKMOUNTAIN_PROTOTYPE_GUIDE.md` 끝에 "추가 항목"(남은 기능·FBX 교체·최적화 표), `CLAUDE.md` 작업 표에 뒷산 줄 추가(사용자 승인)
+
 ## 2026-11-11 — 뒷산 배경 바위산(봉우리 청크) 제작 (브랜치 `Back-mountain-map`)
 - 새 FBX 11개 `Art/Map/Mountain/Backdrop/`: 봉우리 `Spire_A·B·C·D` × 길이축 x·z (8개, 각 1.4천~2.8천 삼각형) + 이끼 둔덕 `AP1~AP3` (3개, 합 약 2.4만). 메시는 보이는 면(윗면·−X·−Z)만, 콜라이더 없음
 - 팔레트 `Mountain_palette.png` 12~15번 칸에 바위 4색 추가(#B5AA9A·#9A8F82·#7C7268·#5E564E). 1~11번 색은 그대로라 기존 바닥 FBX 영향 없음. 머티리얼은 기존 `Mountain_Voxel` 재사용

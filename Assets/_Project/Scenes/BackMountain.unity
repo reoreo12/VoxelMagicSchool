@@ -399,6 +399,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Spire_Bx_15
       objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: 885ca753eb2c4a64cb2441ed45138d7a, type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 2147483647
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -947,6 +951,10 @@ PrefabInstance:
     - target: {fileID: 919132149155446097, guid: 4abdf725780d3f34b952395867b71e7d, type: 3}
       propertyPath: m_Name
       value: Spire_Bz_02
+      objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: 4abdf725780d3f34b952395867b71e7d, type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 2147483647
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -1646,13 +1654,14 @@ PrefabInstance:
       propertyPath: m_Name
       value: AP2
       objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: 040acde2e6eb0ce4d997201387433fcb, type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 2147483647
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents:
-    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 040acde2e6eb0ce4d997201387433fcb, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 2011409264}
+    m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 040acde2e6eb0ce4d997201387433fcb, type: 3}
 --- !u!1 &269182856
 GameObject:
@@ -2233,6 +2242,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Spire_Bz_17
       objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: 4abdf725780d3f34b952395867b71e7d, type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 2147483647
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -2297,6 +2310,10 @@ PrefabInstance:
     - target: {fileID: 919132149155446097, guid: 2b116c364b0affa4ca6de41c9aaf5f7b, type: 3}
       propertyPath: m_Name
       value: Spire_Az_13
+      objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: 2b116c364b0affa4ca6de41c9aaf5f7b, type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 2147483647
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -2773,6 +2790,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Spire_Ax_14
       objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: c3259b6e574c8084d86ca1d4471e54c1, type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 2147483647
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -3099,6 +3120,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Spire_Dx_07
       objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: 207c8c71a0dbe2c4795588f4b9768616, type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 2147483647
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -3164,6 +3189,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Spire_Bx_11
       objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: 885ca753eb2c4a64cb2441ed45138d7a, type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 2147483647
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -3228,6 +3257,10 @@ PrefabInstance:
     - target: {fileID: 919132149155446097, guid: 2b116c364b0affa4ca6de41c9aaf5f7b, type: 3}
       propertyPath: m_Name
       value: Spire_Az_18
+      objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: 2b116c364b0affa4ca6de41c9aaf5f7b, type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 2147483647
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -3345,7 +3378,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Version: 3
-  m_UsePipelineSettings: 1
+  m_UsePipelineSettings: 0
   m_AdditionalLightsShadowResolutionTier: 2
   m_LightLayerMask: 1
   m_RenderingLayers: 1
@@ -3512,6 +3545,10 @@ PrefabInstance:
     - target: {fileID: 919132149155446097, guid: 207c8c71a0dbe2c4795588f4b9768616, type: 3}
       propertyPath: m_Name
       value: Spire_Dx_01
+      objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: 207c8c71a0dbe2c4795588f4b9768616, type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 2147483647
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -4342,6 +4379,10 @@ PrefabInstance:
     - target: {fileID: 919132149155446097, guid: 207c8c71a0dbe2c4795588f4b9768616, type: 3}
       propertyPath: m_Name
       value: Spire_Dx_05
+      objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: 207c8c71a0dbe2c4795588f4b9768616, type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 2147483647
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -5183,6 +5224,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Spire_Ax_10
       objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: c3259b6e574c8084d86ca1d4471e54c1, type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 2147483647
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -5359,38 +5404,11 @@ Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: 207c8c71a0dbe2c4795588f4b9768616, type: 3}
   m_PrefabInstance: {fileID: 462958771}
   m_PrefabAsset: {fileID: 0}
---- !u!1 &765726859 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 919132149155446097, guid: 4751641482c85f34ebf281be297b8790, type: 3}
-  m_PrefabInstance: {fileID: 1711780800}
-  m_PrefabAsset: {fileID: 0}
 --- !u!4 &765726860 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: 4751641482c85f34ebf281be297b8790, type: 3}
   m_PrefabInstance: {fileID: 1711780800}
   m_PrefabAsset: {fileID: 0}
---- !u!64 &765726863
-MeshCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 765726859}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 0
-  m_ProvidesContacts: 0
-  m_Enabled: 1
-  serializedVersion: 5
-  m_Convex: 0
-  m_CookingOptions: 30
-  m_Mesh: {fileID: -4840399407846658002, guid: 4751641482c85f34ebf281be297b8790, type: 3}
 --- !u!4 &774765355 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: 2b116c364b0affa4ca6de41c9aaf5f7b, type: 3}
@@ -5667,38 +5685,11 @@ Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: 2062e7d7882a55b4ba78491b7885e117, type: 3}
   m_PrefabInstance: {fileID: 1370909176}
   m_PrefabAsset: {fileID: 0}
---- !u!1 &888661916 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 919132149155446097, guid: 28e793c36de2ecc40acdccfa44b3a56d, type: 3}
-  m_PrefabInstance: {fileID: 2092015802}
-  m_PrefabAsset: {fileID: 0}
 --- !u!4 &888661917 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: 28e793c36de2ecc40acdccfa44b3a56d, type: 3}
   m_PrefabInstance: {fileID: 2092015802}
   m_PrefabAsset: {fileID: 0}
---- !u!64 &888661920
-MeshCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 888661916}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 0
-  m_ProvidesContacts: 0
-  m_Enabled: 1
-  serializedVersion: 5
-  m_Convex: 0
-  m_CookingOptions: 30
-  m_Mesh: {fileID: -4840399407846658002, guid: 28e793c36de2ecc40acdccfa44b3a56d, type: 3}
 --- !u!1 &901956117
 GameObject:
   m_ObjectHideFlags: 0
@@ -6035,6 +6026,10 @@ PrefabInstance:
     - target: {fileID: 919132149155446097, guid: cf08e168398691a4fafb0c281e72049e, type: 3}
       propertyPath: m_Name
       value: Mountain_Floor_A1
+      objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: cf08e168398691a4fafb0c281e72049e, type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 2147483647
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -7486,6 +7481,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Spire_Ax_16
       objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: c3259b6e574c8084d86ca1d4471e54c1, type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 2147483647
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -7815,6 +7814,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Mountain_Floor_C2
       objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: 9621b199c97404a4ebcc55101e4f7813, type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 2147483647
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -7993,6 +7996,10 @@ PrefabInstance:
     - target: {fileID: 919132149155446097, guid: 2062e7d7882a55b4ba78491b7885e117, type: 3}
       propertyPath: m_Name
       value: Spire_Cx_00
+      objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: 2062e7d7882a55b4ba78491b7885e117, type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 2147483647
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -9055,6 +9062,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Mountain_Floor_A3
       objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: 41be39ace371cb54fb276a5de5fe03c6, type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 2147483647
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -9160,6 +9171,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Spire_Bx_06
       objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: 885ca753eb2c4a64cb2441ed45138d7a, type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 2147483647
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -9232,6 +9247,10 @@ PrefabInstance:
     - target: {fileID: 919132149155446097, guid: 34cb3eed833a43043bbf0a010366822f, type: 3}
       propertyPath: m_Name
       value: Spire_Dz_09
+      objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: 34cb3eed833a43043bbf0a010366822f, type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 2147483647
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -9899,6 +9918,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Spire_Az_12
       objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: 2b116c364b0affa4ca6de41c9aaf5f7b, type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 2147483647
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -10136,13 +10159,14 @@ PrefabInstance:
       propertyPath: m_Name
       value: AP1
       objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: 4751641482c85f34ebf281be297b8790, type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 2147483647
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents:
-    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 4751641482c85f34ebf281be297b8790, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 765726863}
+    m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 4751641482c85f34ebf281be297b8790, type: 3}
 --- !u!1 &1726069295
 GameObject:
@@ -10436,6 +10460,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Mountain_Floor_B
       objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: 501e74a58d098ed4a82680f6d712f898, type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 2147483647
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -10543,6 +10571,10 @@ PrefabInstance:
     - target: {fileID: 919132149155446097, guid: 2b116c364b0affa4ca6de41c9aaf5f7b, type: 3}
       propertyPath: m_Name
       value: Spire_Az_19
+      objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: 2b116c364b0affa4ca6de41c9aaf5f7b, type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 2147483647
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -10737,6 +10769,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Mountain_Floor_C1
       objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: a610478d62568e943b9f7410d1a4c3d3, type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 2147483647
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -10844,6 +10880,10 @@ PrefabInstance:
     - target: {fileID: 919132149155446097, guid: 2062e7d7882a55b4ba78491b7885e117, type: 3}
       propertyPath: m_Name
       value: Spire_Cx_04
+      objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: 2062e7d7882a55b4ba78491b7885e117, type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 2147483647
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -11705,38 +11745,11 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 2.2, y: 2.4, z: 0.4}
   m_Center: {x: 0, y: 1.2, z: 0}
---- !u!1 &2011409260 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 919132149155446097, guid: 040acde2e6eb0ce4d997201387433fcb, type: 3}
-  m_PrefabInstance: {fileID: 217099074}
-  m_PrefabAsset: {fileID: 0}
 --- !u!4 &2011409261 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: 040acde2e6eb0ce4d997201387433fcb, type: 3}
   m_PrefabInstance: {fileID: 217099074}
   m_PrefabAsset: {fileID: 0}
---- !u!64 &2011409264
-MeshCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2011409260}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 0
-  m_ProvidesContacts: 0
-  m_Enabled: 1
-  serializedVersion: 5
-  m_Convex: 0
-  m_CookingOptions: 30
-  m_Mesh: {fileID: -4840399407846658002, guid: 040acde2e6eb0ce4d997201387433fcb, type: 3}
 --- !u!1001 &2015600866
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -11804,6 +11817,10 @@ PrefabInstance:
     - target: {fileID: 919132149155446097, guid: 34cb3eed833a43043bbf0a010366822f, type: 3}
       propertyPath: m_Name
       value: Spire_Dz_03
+      objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: 34cb3eed833a43043bbf0a010366822f, type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 2147483647
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -12013,6 +12030,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Mountain_Floor_A2
       objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: 0dc7daae4fe2fc4429f29183dfbf2d78, type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 2147483647
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -12171,13 +12192,14 @@ PrefabInstance:
       propertyPath: m_Name
       value: AP3
       objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: 28e793c36de2ecc40acdccfa44b3a56d, type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 2147483647
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents:
-    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 28e793c36de2ecc40acdccfa44b3a56d, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 888661920}
+    m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 28e793c36de2ecc40acdccfa44b3a56d, type: 3}
 --- !u!1001 &2093808755
 PrefabInstance:
@@ -12487,6 +12509,10 @@ PrefabInstance:
     - target: {fileID: 919132149155446097, guid: 6072b20c5e24b604f9bb94828b27c333, type: 3}
       propertyPath: m_Name
       value: Spire_Cz_08
+      objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: 6072b20c5e24b604f9bb94828b27c333, type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 2147483647
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
