@@ -1,0 +1,30 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 78741f997fe779b4e95d67777e978904, type: 3}
+  m_Name: Gather_Mugwort
+  m_EditorClassIdentifier: 
+  _id: gather_Mugwort
+  _displayName: "\uC465"
+  _description: "\uD5A5\uC774 \uC9C4\uD55C \uC57D\uCD08 \uC78E."
+  _iconColor: {r: 0.5, g: 0.6, b: 0.45, a: 1}
+  _maxStack: 99
+  _creatureNote: "\uC465\uC740 \uB9C8\uB825\uC744 \uAC00\uB77C\uC549\uD600\u2026
+    \uADF8\uB798\uC11C \uC57D\uC5D0 \uAF2D \uB123\uC5B4."
+  _habitat: 3
+  _appearsAfterSchool: 1
+  _appearsAtNight: 0
+  _habitatHint: "\uD0C1 \uD2B8\uC778 \uD3C9\uC9C0\uC5D0 \uD540\uB2E4"
+  _sizeRangeCm:
+    _min: 3
+    _max: 8
+  _worldMesh: {fileID: 10203, guid: 0000000000000000e000000000000000, type: 0}
+  _worldScale: {x: 0.14, y: 0.1, z: 0.14}

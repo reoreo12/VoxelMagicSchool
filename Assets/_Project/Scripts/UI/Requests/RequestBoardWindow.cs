@@ -1,4 +1,5 @@
 // 의뢰 게시판 창. ScreenState가 게시판을 열면 보이고, 수락 버튼은 RequestTracker에 수락을 요청한다.
+// 씬마다 게시판에 걸 의뢰를 따로 정할 수 있다 (비우면 전체 목록).
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
@@ -11,6 +12,8 @@ namespace VoxelMagic.UI
         [SerializeField] private RectTransform _listRoot;
         [SerializeField] private RequestEntryView _entryPrefab;
         [SerializeField] private Button _closeButton;
+        [Tooltip("비우면 전체 의뢰 목록(RequestTracker.Catalog). 채우면 이 게시판에는 이 의뢰들만 (예: 뒷산 게시판)")]
+        [SerializeField] private List<RequestDefinition> _boardRequests = new List<RequestDefinition>();
 
         private readonly List<RequestEntryView> _entries = new List<RequestEntryView>();
         private RequestTracker _tracker;
@@ -22,8 +25,10 @@ namespace VoxelMagic.UI
             _tracker = context.Requests;
             _screen = context.Screen;
 
-            foreach (var request in _tracker.Catalog)
+            IReadOnlyList<RequestDefinition> requests = _boardRequests.Count > 0 ? _boardRequests : _tracker.Catalog;
+            foreach (var request in requests)
             {
+                if (request == null) continue;
                 var entry = Instantiate(_entryPrefab, _listRoot);
                 entry.Setup(request, OnAccept);
                 _entries.Add(entry);

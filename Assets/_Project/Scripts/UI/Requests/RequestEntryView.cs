@@ -27,6 +27,11 @@ namespace VoxelMagic.UI
             _creatureLine.text = $"\"{request.CreatureLine}\"";
             _needs.text = string.Format(GameTexts.NeedsFormat,
                 string.Join(", ", request.Requirements.Select(r => $"{r.Item.DisplayName} {r.Amount}")));
+            // 채집 재료면 서식지 힌트를 같은 줄 끝에 작게 (정확한 위치는 알려 주지 않는다)
+            var hints = request.Requirements.Select(r => r.Item).OfType<GatherMaterialDefinition>()
+                .Select(m => m.HabitatHint).Where(h => !string.IsNullOrEmpty(h)).Distinct().ToList();
+            if (hints.Count > 0)
+                _needs.text += $"  <size=80%><color=#B8C4A8>· {string.Join(" / ", hints)}</color></size>";
             _reward.text = string.Format(GameTexts.RewardFormat, request.BaseReward);
             _acceptButton.onClick.AddListener(() => onAccept(Request));
         }

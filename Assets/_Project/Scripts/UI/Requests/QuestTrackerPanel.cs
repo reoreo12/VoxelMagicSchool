@@ -50,7 +50,12 @@ namespace VoxelMagic.UI
 
         private void OnActiveChanged(RequestDefinition active)
         {
-            if (active == null) return;
+            if (active == null)
+            {
+                // 완료가 아니라 내려놓은 경우(디버그 의뢰 교체)는 바로 숨긴다.
+                if (_completedTitle == null) Hide();
+                return;
+            }
             _completedTitle = null;
             _hideTimer = 0f;
             Show();
@@ -100,6 +105,8 @@ namespace VoxelMagic.UI
                         .Append(GameTexts.TrackerDone).Append(' ').Append(progress).Append("</color>\n");
                 else
                     _builder.Append(GameTexts.TrackerTodo).Append(' ').Append(progress).Append('\n');
+                if (!progress.IsMet && progress.Item is GatherMaterialDefinition gather && !string.IsNullOrEmpty(gather.HabitatHint))
+                    _builder.Append("<size=80%><color=#B8C4A8>   ").Append(gather.HabitatHint).Append("</color></size>\n");
             }
             _body.text = _builder.ToString().TrimEnd('\n');
         }

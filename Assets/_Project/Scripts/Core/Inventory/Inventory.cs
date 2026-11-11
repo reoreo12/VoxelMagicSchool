@@ -85,6 +85,16 @@ namespace VoxelMagic.Core
             return true;
         }
 
+        /// <summary>한 칸을 통째로 비운다 (디버그 버리기). 비운 내용을 돌려준다.</summary>
+        public ItemStack DiscardSlot(int index)
+        {
+            if (index < 0 || index >= _slots.Length || _slots[index].IsEmpty) return ItemStack.Empty;
+            var removed = _slots[index];
+            _slots[index] = ItemStack.Empty;
+            SlotChanged?.Invoke(index);
+            return removed;
+        }
+
         /// <summary>저장 파일에서 불러온 칸 내용으로 통째로 바꾼다. 바뀐 칸·선택을 이벤트로 알린다.</summary>
         internal void Restore(ItemStack[] slots, int selectedIndex)
         {

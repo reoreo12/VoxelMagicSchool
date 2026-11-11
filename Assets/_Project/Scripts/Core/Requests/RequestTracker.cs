@@ -65,6 +65,16 @@ namespace VoxelMagic.Core
             return AcceptResult.Success;
         }
 
+        /// <summary>진행 중 의뢰를 완료 없이 내려놓는다 (디버그 의뢰 교체용). 수락 때 받은 아이템은 그대로 둔다.</summary>
+        public void Abandon()
+        {
+            if (!HasActive) return;
+            Active = null;
+            _progress.Clear();
+            ActiveChanged?.Invoke(null);
+            ProgressChanged?.Invoke();
+        }
+
         public DeliverResult CanDeliver()
         {
             if (!HasActive) return DeliverResult.NoActiveRequest;

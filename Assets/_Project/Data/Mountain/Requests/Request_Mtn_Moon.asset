@@ -1,0 +1,23 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6e2e2f20d9b88964fa16d99bbf67be48, type: 3}
+  m_Name: Request_Mtn_Moon
+  m_EditorClassIdentifier: 
+  _title: "\uBC24\uC758 \uBC84\uC12F"
+  _creatureLine: "\uBC24\uC5D0\uB9CC \uBE5B\uB098\uB294 \uBC84\uC12F\u2026 \uBCF4\uACE0
+    \uC2F6\uC5B4\u2026"
+  _requirements:
+  - _item: {fileID: 11400000, guid: f671480368ed82f4d9e3d1dc217eb429, type: 2}
+    _amount: 1
+  _givenItems: []
+  _baseReward: 10
+  _completionLine: "\uC640\uC544\u2026 \uC815\uB9D0 \uBE5B\uB098\uB124."

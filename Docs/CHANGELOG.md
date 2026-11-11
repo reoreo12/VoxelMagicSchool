@@ -1,5 +1,24 @@
 # 변경 기록
 
+## 2026-11-11 — 뒷산 프로토타입: 등반 확인 + 채집 (브랜치 `Back-mountain-map`)
+- 지침: `Docs/BACKMOUNTAIN_PROTOTYPE_GUIDE.md`. 씬 `BackMountain`
+- `feature/character-system`을 `Back-mountain-map`에 병합 (사용자 선택, 충돌 없음) → Shift 달리기·이동/동작 애니·저장이 들어옴
+- 씬: 청크 9개에 Mesh Collider (FBX는 그대로). FarmPond의 `_Bootstrap`·Player·Main Camera·UI·SceneTransition을 복사(참조 유지), 플레이어 T 시작점 (8, 0.1, −4.5). 원래 카메라는 `Main Camera (Map Preview, off)`로 꺼 둠
+- 등반: 길 중심선을 따라 4 m/s로 오르내림 → 막힘·낙하 없음 (오름 34초, 내림 33초). B 북쪽 변은 포획 구역 바닥 전까지 열려 있음
+- 채집 Core: `GatherMaterialDefinition`(서식지·방과후/밤·힌트·모양), `GatheringConfig`(채움 비율, 가정 0.5), `GatherSpawner`(자기 서식지·시간대만, 직전 빈 슬롯 우선, 의뢰 재료 보장), `GatheringService`, `MountainContext`(GameContext는 그대로)
+- Gameplay: `MountainBootstrap`(실행 순서 −900), `GatherHabitat`, `GatherPickup`(InteractableBase, "E: 줍기"), `MountainDebugInput`(F1 새 하루, F3 시간대 전환, Inspector에서 키 변경). UI: `DebugKeyHintView`(조작법 위)
+- 데이터·에셋: 재료 12종 `Data/Mountain/Gather/` (서식지마다 방과후 2 + 밤 1), 서식지 프리팹 4종 `Prefabs/Mountain/`, 머티리얼 `Materials/Mountain/`. 메뉴 `VoxelMagic/뒷산/채집 서식지 만들기·배치`로 `[Prototype]/Gathering`에 12개 배치(지면 맞춤). 정의 목록 다시 채움
+- 확인: 테스트 125개 통과(새 5개) / 플레이: 줍기·누적·가방 가득 참 안내, 새 하루 재배치, 밤엔 밤 재료만 / 콘솔 에러 0 / 시험 중 자동 저장 끔(저장 파일 안 바뀜)
+
+## 2026-11-11 — 뒷산 의뢰 연동 + 인벤토리 우클릭 버리기 (브랜치 `Back-mountain-map`)
+- 의뢰 4종 `Data/Mountain/Requests/` (그늘버섯 1 / 산딸기 3 / 쑥 1 + 돌이끼 1 / 달빛버섯 1(밤)), 재료 5종에 크리처 설명 추가. 메뉴 `VoxelMagic/뒷산/의뢰 데이터 만들기`
+- 씬: FarmPond의 `RequestBoard`·`Creature`를 `[Prototype]/Requests`로 복사 (게시판 (11, 2), 크리처 (4.6, 0.7)). 게시판 창 920×820·목록 높이 650 (의뢰 4개가 들어가게, 이 씬만)
+- `RequestBoardWindow._boardRequests`: 채우면 그 게시판에는 그 의뢰만 (비우면 예전처럼 전체 목록 → FarmPond 그대로)
+- `RequestEntryView`·`QuestTrackerPanel`: 채집 재료면 서식지 힌트를 같이 표시. 의뢰를 내려놓으면 추적 패널 숨김
+- Core: `RequestTracker.Abandon()`, `Inventory.DiscardSlot()`, `GatherSpawner.EnsureRequired()`, `GatheringService`가 의뢰를 받으면 필요한 재료를 1개 이상 보장 (다른 재료는 그대로)
+- 디버그: F2 의뢰 교체(`MountainDebugInput._swapRequests`, 완료한 의뢰는 건너뜀). `InventoryBar._debugRightClickDiscard`를 켜면 칸 우클릭 시 그 칸을 통째로 버림 (뒷산 씬만 켬)
+- 확인: 테스트 128개 통과 / 플레이: 게시판에 뒷산 의뢰 4개·힌트, F2 교체·다시 처음으로, 의뢰를 받자 그늘버섯 1개 보장, 우클릭으로 산딸기 2개 버림(왼쪽 클릭은 선택만), 줍기 → 크리처 전달 → 필기 +15·대사·추적 "완료!" / 콘솔 에러 0 / 자동 저장 끔
+
 ## 2026-11-11 — 동작 애니메이션 다듬기 + 옛 Controller 정리
 - 옛 Controller 삭제 (사용자 승인, GUID로 사용처 0 확인): `Animations/Avatars/Student_Male.controller`, `Student_Male_v05.controller`. `Student_Chibi_v2.controller`는 Prototype·TileMapEditor 씬이 써서 남김
 - 물 주기 휘적임 한 번 줄임: `ClipImportPlan`의 `Watering` 구간 0~168 → **84~168** (두 번째 왕복만, 끝 자세 = 기본 자세), 길이 5.60 → 2.80초, 물 들어가는 이벤트 0.3 → **0.4**(1.12초). Override는 같은 클립 이름이라 그대로 연결됨
