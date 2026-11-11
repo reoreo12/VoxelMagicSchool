@@ -160,7 +160,7 @@ Player                                  [CharacterController] [PlayerMover] [Pla
 
 ### 5-1. 애니메이션 (단계 4)
 - 이동(Idle/Walk/Run)은 Base 레이어 그대로. 위에 **Action 레이어**(Avatar Mask로 상체만, 필요하면 전신)를 두고 "한 번 재생" 동작
-- `CharacterActionId`: **ScriptableObject 이름표를 추천** (SocketId와 같은 방식, 코드 수정 없이 동작 추가). `AvatarSetup`에 동작 → 클립 목록
+- `CharacterActionId`: 2026-11-10 제작 때 **enum**으로 정함 (Animator 상태 이름과 1:1, 동작 추가 시 Controller도 다시 만들어야 해서 에셋 이름표의 이점이 적음). `AvatarSetup`에 동작 클립 칸
 - 게임 로직은 "동작 요청"만, 애니메이션 뷰가 재생. 던지는 순간 같은 타이밍은 애니메이션 이벤트 → 게임 로직
 - 임포트: 한 번 재생 클립은 반복 끄기 (데이터의 목록 기준 — 파일 이름 규칙보다 실수가 적다)
 - Unity 6의 `Animator.StringToHash`로 상태·파라미터 해시 캐시
@@ -318,7 +318,7 @@ Player                                  [CharacterController] [PlayerMover] [Pla
   - 물 주기: E → 물 주기 클립 재생, 물이 실제로 들어가는 순간은 이벤트 시점. 재생 중 이동 막을지 결정
 - 애니메이션 랩: 새 클립(자른 것·뒤집은 것)이 목록에 보여 미리 확인 가능 (랩 코드 변경 없음 예상)
 
-### 9-5. 제작 순서 (각 단계: 플레이 확인 → 보고 → 사용자 확인) — 1 완료·사용자 확인, 2 완료(2026-11-10, 사용자 확인 대기)
+### 9-5. 제작 순서 (각 단계: 플레이 확인 → 보고 → 사용자 확인) — 1~4 완료 (2026-11-11 동작 속도·물 주기 구간 다듬음). 현재 상태 요약: `HANDOFF_CHARACTER_STATUS.md`
 1. ① 데이터 유지·파일 저장: Core `PlayerProgress`·`GameSession`·`SaveData`·`SaveMapper`·`DefinitionCatalog` + 단위 테스트, `JsonFileSaveStore`, `GameBootstrap` 변경, 구독 해제 점검 → 텃밭 ↔ 복도 왕복 후 인벤토리·점수·의뢰·밭 유지, 플레이 껐다 켜도 유지 확인 → `HANDOFF_SAVE_LOAD.md` 작성
 2. ②③ 이동 통일: Core 상태 머신 분리 + `PlanarMotor` + 테스트(복도 기존 테스트 포함), 입력 Run 추가, 텃밭 이동·애니 교체 → 복도·텃밭 Idle/Walk/Run 확인
 3. ④-1 클립 준비: Humanoid 재임포트, Cast 자르기, 뒤집은 클립 도구, 랩에서 미리보기

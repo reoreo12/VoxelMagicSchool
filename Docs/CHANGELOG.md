@@ -1,12 +1,41 @@
 # 변경 기록
 
+## 2026-11-11 — 동작 애니메이션 다듬기 + 옛 Controller 정리
+- 옛 Controller 삭제 (사용자 승인, GUID로 사용처 0 확인): `Animations/Avatars/Student_Male.controller`, `Student_Male_v05.controller`. `Student_Chibi_v2.controller`는 Prototype·TileMapEditor 씬이 써서 남김
+- 물 주기 휘적임 한 번 줄임: `ClipImportPlan`의 `Watering` 구간 0~168 → **84~168** (두 번째 왕복만, 끝 자세 = 기본 자세), 길이 5.60 → 2.80초, 물 들어가는 이벤트 0.3 → **0.4**(1.12초). Override는 같은 클립 이름이라 그대로 연결됨
+- 재생 속도 (`Data/Config/CharacterActionConfig`): 던지기 1 → **2**(4초 → 2초, 찌 놓는 순간 1.04초), 낚아채기 1 → **2.5**(4초 → 1.6초) — 사용자: 던지기·성공 동작이 너무 길어 획득 정보 UI가 훨씬 먼저 뜸
+- `CharacterActionView`: 이미 그 이동 상태(예: 낚아채기가 끝나 Idle)면 다시 섞지 않음 (Idle→Idle 다시 섞기 없앰)
+- 확인 (텃밭 플레이, 0.05초씩 진행): 던지기 1.05초에 놓음·1.65초 기다리기, 낚아채기 1.6초 뒤 Idle, 물 주기 1.20초에 물·2.90초 끝 / 테스트 120개 통과 / 콘솔 에러 0 / 시험 저장 파일 지움
+
+## 2026-11-10 — 캐릭터 시스템 단계 2-④-2: 공용 Controller + 낚시·물 주기 애니메이션 연결
+- 설계: `DESIGN_CHARACTER.md` 9-4 (사용자 답: 입질 1초는 기다리기 자세, 미니게임부터 올리기 왕복, 잡으면 낚아채기, 놓치거나 거두면 Idle, 물 주기 중 이동 막고 물은 클립 중간에)
+- **공용 Controller**: `Animations/Avatars/Base/CharacterBase.controller` (상태 9개: Idle/Walk/Run + FishCast·FishWait·FishReel·FishReelBack·FishHook·Water, 파라미터 IdleSpeed·WalkSpeed·RunSpeed·ActionSpeed, 이어짐: FishCast→FishWait, FishReel↔FishReelBack, FishHook·Water→Idle) + 빈 열쇠 클립 `Base/Placeholders/*.anim`. 아바타 6개 모두 `Animations/Avatars/<아바타>.overrideController`로 바꾸고 `AvatarSetup._controller` 연결, 복도 프리팹 3개(Chibi_v2·Male·Male_v05) Animator도 Override로
+- 메뉴 `VoxelMagic/아바타/공용 Controller 다시 만들기 (모든 아바타)`(`CharacterControllerBuilder`), 메뉴 3(복도 캐릭터 만들기)도 이제 Override를 만듦
+- Core: `CharacterActionId`(동작 이름표 = Controller 상태 이름), `CharacterActionConfig`(동작별 재생 속도·섞기·물 주기 안전 시간, `Data/Config/CharacterActionConfig`), `AvatarSetup` 동작 클립 칸 6개(모든 아바타에 같은 Humanoid 클립 자동 연결)
+- Core 낚시: `FishingSession.WaitForCastRelease`·`ReleaseCast`·`CastReleased`·`IsCastReleased` — 던지기가 "놓는 순간"까지 기다렸다가 `CastSeconds` 동안 날아감, 신호가 없으면 `FishingConfig._castReleaseTimeoutSeconds`(6초) 뒤 스스로 놓음
+- Core 물 주기: `FarmService.UseWateringAction`·`IsWatering`·`WateringStarted`·`ApplyPendingWater`·`FinishWatering`·`WateringFinished` — 물 주기 동작 중에는 이동·상호작용 막고, 물은 이벤트 순간(이벤트 없으면 끝날 때) 한 번
+- Gameplay: `CharacterAnimationEvents`(모델, 클립 이벤트 `OnActionEvent(문자열)` → C# 이벤트), `CharacterActionView`(플레이어, 낚시 상태·물 주기 → Animator 상태, 끝나면 이동 상태로), `FishingDriver`(찌·줄은 놓는 순간부터), `PlayerMover`·`PlayerInteractor`(물 주는 중 멈춤·E 막음), 애니메이션 랩 인스턴스에도 이벤트 수신 부품
+- 클립 이벤트 (`ClipImportPlan` 새 칸 `Events`): `Fishing Cast_Throw` CastRelease 0.52(2.08초, 손이 앞으로 가장 빠른 순간), `Watering` WaterApply 0.3(1.68초, 지팡이를 처음 다 뻗은 순간) — 표에서 바꾸고 '동작 클립 준비' 다시 실행
+- 텃밭 씬: 메뉴 '텃밭 플레이어 이동·애니 통일'이 Override Controller·이벤트 수신·동작 뷰까지 연결, 씬 저장
+- 확인: 테스트 120개 통과(새 7개) / 텃밭 플레이(Animator·세션을 0.05초씩 직접 진행): 던지기 시작 → 찌 숨김 → 클립 이벤트로 2.10초에 놓음·찌 보임 → 0.6초 뒤 기다리기, Animator FishCast→FishWait 자동 → 입질 중 FishWait 유지 → E로 미니게임 FishReel↔FishReelBack 왕복(4.85초마다) → 잡음 FishHook → 끝나 Idle / 놓침 → Idle / 물 주기 Water 재생, 1.75초에 물, 5.65초 끝날 때까지 IsWatering, 끝나면 Idle / 기다리기 화면에서 지팡이 끝→연못 찌 줄 / 복도: Override로 Idle/Walk/Run 클립 그대로 / 콘솔 에러 0 / 시험 저장 파일 지움
+- 확인 못 함: 실제 키보드(E·WASD)로 처음부터 끝까지, 실제 프레임 속도에서의 모습 — 사용자 플레이로 확인 필요
+- 옛 Controller: `Student_Chibi_v2.controller`는 Prototype·TileMapEditor 씬이 아직 씀, `Student_Male.controller`·`Student_Male_v05.controller`는 이제 아무도 안 씀 (지우지 않음)
+
+## 2026-11-10 — 캐릭터 시스템 단계 2-④-1: 낚시·물 주기 클립 준비 + 이동 설정 이름 변경
+- 이동 설정 `Data/Config/FarmMoveConfig` → **`MoveConfig`** (복도를 뺀 3D 맵 플레이어 공용, 사용자 결정. GUID 그대로라 씬 연결 유지). 값은 사용자가 맞춘 걷기 3·달리기 4.5, 재생 배율 1.6·1.6. 코드 경로·툴팁 갱신
+- Editor: `ClipImportPlan`(에디터 전용 SO, `Data/Avatars/ClipImportPlan` — 파일·프레임 구간·반복·뒤집기 표), `ActionClipTools` + 메뉴 `VoxelMagic/아바타/동작 클립 준비 (ClipImportPlan)`: 표대로 Humanoid 재임포트(메뉴 2와 같은 루트 고정), 구간별 클립, 뒤집은 `.anim` 생성
+- 클립 (사용자 지정 구간): `Fishing Cast` → `Fishing Cast_Throw`(0~120, 4.00초)·`Fishing Cast_Reel`(120~끝, 4.77초), `Fishing Idle`(반복, 3.53초), `Watering`(5.60초). 뒤집은 클립 `Animations/Mixamo/Reversed/Fishing Cast_Throw_Reverse.anim`(낚아채기)·`Fishing Cast_Reel_Reverse.anim`(올리기 왕복의 돌아오는 쪽)
+- `AvatarPipeline` 자동 클립 연결: 키워드가 든 클립 중 이름이 가장 짧은 것 ("Fishing Idle"이 Idle로 잘못 연결되지 않게)
+- 확인 (랩, Student_Chibi_v2): 6개 클립 모두 Humanoid로 목록에 보임·재생 / 뒤집은 클립 = 원본 t ↔ 길이−t 손 위치 차이 0.00cm / 이음새 던지기 끝↔올리기 시작, 올리기 끝↔뒤집은 올리기 시작, 뒤집은 올리기 끝↔올리기 시작 모두 0cm / 던지기 1.2초 3/4 화면에서 손잡이를 쥔 지팡이 / 콘솔 에러 0
+- 알아 둘 점: `Fishing Idle` 첫 자세는 던지기 끝과 손 위치 27.6cm 차이 → 4단계 Animator에서 섞어서 넘김. 랩 목록에서 뒤집은 클립처럼 이름이 길면 글자가 두 줄로 겹쳐 보임(표시만)
+
 ## 2026-11-10 — 캐릭터 시스템 단계 2-②③: 텃밭·복도 이동 통일 + 텃밭 달리기 + 걷기 재생 속도
 - 설계: `DESIGN_CHARACTER.md` 9-3 (사용자: 텃밭 이동 속도 4는 그대로, 걷기 애니 재생이 너무 빠름 → 낮춤, 달리기는 이동·재생 모두 2.25배)
 - Core `Characters/Locomotion/`: `ICharacterMotor`(이동기 계약)·`ILocomotionSource`(이동 상태 알림), `PlanarMotor`(바닥 평면 가속·감속, 대각선 정규화), `LocomotionStateMachine`(Idle/Walk/Run 공용 상태 머신)
 - Core 변경: `MoveIntent`에 `Planar`(바닥 평면 방향)와 평면용 생성자, `CharacterBody.Motor`를 `ICharacterMotor`로, Idle/Walk/Run `Tick`이 `Motor.Drive` 호출, `SideScrollMotor`가 `ICharacterMotor` 구현, 복도 `CharacterStateMachine`은 방향 전환·끝 막힘만 하고 나머지는 `LocomotionStateMachine`에 맡김 (공개 API 그대로), `CharacterMoveConfig`에 상태별 애니메이션 재생 배율(`AnimationScaleFor`)
 - Gameplay: 텃밭 `PlayerMover`가 공용 상태 머신 + `PlanarMotor` + Shift 달리기, 이동 방향은 지금처럼 `PlayerConfig` 카메라 Yaw 기준. `CharacterAnimatorView`를 `ILocomotionSource` 공용으로(복도는 그대로 Bind, 텃밭은 `PlayerMover`가 연결). `AvatarAnimationSpeed`가 장면 이동 설정의 배율을 곱함. `GameInputReader.Run`
 - 입력: `GameControls` `Gameplay` 맵에 `Run`(왼쪽 Shift) — SETUP.md 입력 액션
-- 데이터: `Data/Config/FarmMoveConfig`(걷기 4·달리기 9, 가속 40·감속 50, 재생 배율 걷기 1.6·달리기 3.6 — 예전 걷기 재생은 이동 속도 ÷ 1 = 4배였음)
+- 데이터: `Data/Config/FarmMoveConfig`(→ 같은 날 `MoveConfig`로 이름 변경, 복도를 뺀 3D 맵 공용. 처음 값: 걷기 4·달리기 9, 가속 40·감속 50, 재생 배율 걷기 1.6·달리기 3.6 — 예전 걷기 재생은 이동 속도 ÷ 1 = 4배였음)
 - Editor: 메뉴 `VoxelMagic/캐릭터/텃밭 플레이어 이동·애니 통일`(`PlayerLocomotionSetup`), `PrototypeSceneBuilder`도 같은 처리 (실행 안 함)
 - 텃밭 씬(FarmPond): Model에 `CharacterAnimatorView`·`AvatarAnimationSpeed`, `PlayerMover`에 이동 설정·애니 뷰 연결, 옛 `PlayerAvatarAnimator`는 **끄기만**(삭제 안 함, Prototype 씬은 아직 사용)
 - 확인: 테스트 113개 통과(새 6개, 복도 상태 머신 기존 테스트 그대로 통과) / 텃밭 플레이: 상태 머신에 입력을 넣어 Idle → D 걷기(속력 4, 방향 = 카메라 오른쪽) → Shift 달리기(9) → W+D 달리기(대각선도 9) → 놓기 Idle, Animator Idle/Walk/Run 따라감, 재생 값 Walk 1.6·Run 3.6 / 복도 플레이: 걷기 1.6·달리기 3.6·좌우 방향·Animator 그대로 / 콘솔 에러 0

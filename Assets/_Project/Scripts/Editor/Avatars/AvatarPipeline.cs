@@ -146,7 +146,7 @@ namespace VoxelMagic.EditorTools
 
         // ── 3. 복도 캐릭터 ───────────────────────────────────
 
-        /// <summary>상태 Idle/Walk/Run(+재생 속도 파라미터) Controller와, 큐브와 같은 로직 루트에 Model만 다른 프리팹을 만든다.</summary>
+        /// <summary>공용 Controller의 Override(이 아바타 클립)와, 큐브와 같은 로직 루트에 Model만 다른 프리팹을 만든다.</summary>
         public static GameObject BuildCharacter(AvatarSetup setup)
         {
             if (setup.Model == null || LoadAvatar(AssetDatabase.GetAssetPath(setup.Model)) == null)
@@ -159,7 +159,7 @@ namespace VoxelMagic.EditorTools
                 Debug.LogWarning($"[AvatarPipeline] {setup.name}: 클립이 비어 있는 상태 {string.Join(", ", missing)} (AvatarSetup에서 연결하세요)");
 
             EnsureFolder(ControllerFolder);
-            var controller = BuildController(setup);
+            var controller = CharacterControllerBuilder.BuildOverride(setup, CharacterControllerBuilder.LoadOrBuildBase());
 
             string modelPath = AssetDatabase.GetAssetPath(setup.Model);
             var root = new GameObject($"SideScrollCharacter_{setup.name}");
@@ -223,30 +223,6 @@ namespace VoxelMagic.EditorTools
             AssetDatabase.SaveAssets();
         }
 
-        private static AnimatorController BuildController(AvatarSetup setup)
-        {
-            string path = $"{ControllerFolder}/{setup.name}.controller";
-            var controller = AssetDatabase.LoadAssetAtPath<AnimatorController>(path)
-                             ?? AnimatorController.CreateAnimatorControllerAtPath(path);
-            var machine = controller.layers[0].stateMachine;
-            foreach (var state in States)
-            {
-                string parameter = AvatarSetup.SpeedParameter(state);
-                if (controller.parameters.All(p => p.name != parameter))
-                    controller.AddParameter(new AnimatorControllerParameter
-                        { name = parameter, type = AnimatorControllerParameterType.Float, defaultFloat = 1f });
-
-                var animatorState = machine.states.FirstOrDefault(s => s.state.name == state.ToString()).state
-                                    ?? machine.AddState(state.ToString());
-                animatorState.motion = setup.ClipFor(state);
-                animatorState.speedParameterActive = true;
-                animatorState.speedParameter = parameter;
-                if (state == CharacterStateId.Idle) machine.defaultState = animatorState;
-            }
-            EditorUtility.SetDirty(controller);
-            return controller;
-        }
-
         // ── 검색 (애니메이션 랩도 사용) ──────────────────────
 
         public static List<(string path, AnimationClip clip, bool isHuman)> ScanClips()
@@ -277,8 +253,10 @@ namespace VoxelMagic.EditorTools
         private static void AutoMapClips(AvatarSetup setup)
         {
             var human = ScanClips().Where(c => c.isHuman).Select(c => c.clip).ToList();
+            // 이름에 키워드가 든 클립 중 이름이 가장 짧은 것 ("Idle"이 "Fishing Idle"보다 먼저).
             AnimationClip Find(params string[] keys) =>
-                keys.Select(k => human.FirstOrDefault(c => c.name.ToLowerInvariant().Contains(k))).FirstOrDefault(c => c != null);
+                keys.Select(k => human.Where(c => c.name.ToLowerInvariant().Contains(k)).OrderBy(c => c.name.Length).FirstOrDefault())
+                    .FirstOrDefault(c => c != null);
 
             if (setup.ClipFor(CharacterStateId.Idle) == null) setup.SetRef("_idle", Find("idle"));
             if (setup.ClipFor(CharacterStateId.Walk) == null) setup.SetRef("_walk", Find("walk"));

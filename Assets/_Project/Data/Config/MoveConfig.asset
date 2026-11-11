@@ -10,7 +10,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: cde70bef83822304f9f303ec8ac4a5f1, type: 3}
-  m_Name: FarmMoveConfig
+  m_Name: MoveConfig
   m_EditorClassIdentifier: 
   _walkSpeed: 3
   _runSpeed: 4.5

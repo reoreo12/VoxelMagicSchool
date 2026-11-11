@@ -1,4 +1,4 @@
-// 텃밭 플레이어 이동·애니메이션을 복도와 같은 방식으로 바꾸는 에디터 도구: 텃밭용 이동 설정 에셋(없을 때만)을 만들고,
+// 텃밭 등 3D 맵 플레이어 이동·애니메이션(복도와 같은 방식)과 동작(낚시·물 주기) 연결 에디터 도구: 공용 이동 설정(MoveConfig, 없을 때만)을 만들고,
 // 지금 열린 씬의 플레이어에 연결한다 (Model에 CharacterAnimatorView·AvatarAnimationSpeed, 옛 PlayerAvatarAnimator는 끄기만). 씬 저장은 사용자가.
 using UnityEditor;
 using UnityEditor.SceneManagement;
@@ -10,7 +10,8 @@ namespace VoxelMagic.EditorTools
 {
     public static class PlayerLocomotionSetup
     {
-        public const string FarmMoveConfigPath = "Assets/_Project/Data/Config/FarmMoveConfig.asset";
+        /// <summary>복도를 뺀 3D 맵(텃밭·연못·뒷산 등) 플레이어가 함께 쓰는 이동 설정.</summary>
+        public const string MoveConfigPath = "Assets/_Project/Data/Config/MoveConfig.asset";
         private const string AnimationConfigPath = "Assets/_Project/Data/SideScroll/CharacterAnimationConfig.asset";
 
         [MenuItem("VoxelMagic/캐릭터/텃밭 플레이어 이동·애니 통일")]
@@ -37,7 +38,7 @@ namespace VoxelMagic.EditorTools
         {
             var animator = player.GetComponentInChildren<Animator>(true);
             if (animator == null) return false;
-            var moveConfig = GetOrCreateFarmMoveConfig();
+            var moveConfig = GetOrCreateMoveConfig();
 
             var view = GetOrAdd<CharacterAnimatorView>(animator.gameObject);
             view.SetRef("_animator", animator)
@@ -50,6 +51,19 @@ namespace VoxelMagic.EditorTools
             Undo.RecordObject(mover, "텃밭 이동 설정 연결");
             mover.SetRef("_moveConfig", moveConfig).SetRef("_animationView", view);
 
+            // 동작(낚시·물 주기): 공용 Controller의 Override, 클립 이벤트 수신(모델), 동작 뷰(플레이어)
+            if (avatar != null && avatar.Controller != null && animator.runtimeAnimatorController != avatar.Controller)
+            {
+                Undo.RecordObject(animator, "공용 Controller 연결");
+                animator.runtimeAnimatorController = avatar.Controller;
+            }
+            var events = GetOrAdd<CharacterAnimationEvents>(animator.gameObject);
+            GetOrAdd<CharacterActionView>(player)
+                .SetRef("_animator", animator)
+                .SetRef("_events", events)
+                .SetRef("_mover", mover)
+                .SetRef("_config", CharacterControllerBuilder.GetOrCreateActionConfig());
+
             var legacy = player.GetComponent<PlayerAvatarAnimator>();
             if (legacy != null && legacy.enabled)
             {
@@ -60,13 +74,13 @@ namespace VoxelMagic.EditorTools
             return true;
         }
 
-        /// <summary>텃밭용 이동 설정. 없을 때만 만든다: 걷기 4·달리기 9(2.25배), 거의 바로 붙는 가속·감속, 재생 배율 걷기 1.6·달리기 3.6(2.25배).</summary>
-        public static CharacterMoveConfig GetOrCreateFarmMoveConfig()
+        /// <summary>3D 맵 공용 이동 설정. 없을 때만 만든다: 걷기 4·달리기 9(2.25배), 거의 바로 붙는 가속·감속, 재생 배율 걷기 1.6·달리기 3.6(2.25배).</summary>
+        public static CharacterMoveConfig GetOrCreateMoveConfig()
         {
-            var config = AssetDatabase.LoadAssetAtPath<CharacterMoveConfig>(FarmMoveConfigPath);
+            var config = AssetDatabase.LoadAssetAtPath<CharacterMoveConfig>(MoveConfigPath);
             if (config != null) return config;
             config = ScriptableObject.CreateInstance<CharacterMoveConfig>();
-            AssetDatabase.CreateAsset(config, FarmMoveConfigPath);
+            AssetDatabase.CreateAsset(config, MoveConfigPath);
             var so = new SerializedObject(config);
             so.FindProperty("_walkSpeed").floatValue = 4f;
             so.FindProperty("_runSpeed").floatValue = 9f;

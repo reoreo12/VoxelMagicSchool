@@ -1,5 +1,5 @@
 // 텃밭·연못 플레이어 이동: 카메라 방향 기준 WASD + Shift 달리기를 복도와 같은 이동 상태 머신(Idle/Walk/Run)으로 처리하고,
-// 바닥 평면 이동기(PlanarMotor)의 속도를 CharacterController로 옮긴다. 창이 열려 있으면 멈추고, 움직이면 낚시 취소·획득 정보 닫기.
+// 바닥 평면 이동기(PlanarMotor)의 속도를 CharacterController로 옮긴다. 창이 열려 있거나 물 주는 중이면 멈추고, 움직이면 낚시 취소·획득 정보 닫기.
 using UnityEngine;
 using VoxelMagic.Core;
 
@@ -9,7 +9,7 @@ namespace VoxelMagic.Gameplay
     public sealed class PlayerMover : MonoBehaviour, IGameContextBinder
     {
         [SerializeField] private GameInputReader _input;
-        [Tooltip("텃밭용 이동 설정 (걷기·달리기 속도, 가속·감속, 애니메이션 재생 배율)")]
+        [Tooltip("3D 맵 공용 이동 설정 MoveConfig (걷기·달리기 속도, 가속·감속, 애니메이션 재생 배율)")]
         [SerializeField] private CharacterMoveConfig _moveConfig;
         [Tooltip("이동 상태를 애니메이션으로 보여 줄 뷰 (아바타 모델의 CharacterAnimatorView)")]
         [SerializeField] private CharacterAnimatorView _animationView;
@@ -42,7 +42,8 @@ namespace VoxelMagic.Gameplay
             if (_context == null || _locomotion == null) return;
             var config = _context.PlayerConfig;
 
-            Vector2 input = _context.Screen.IsModalOpen ? Vector2.zero : _input.Move;
+            // 창이 열려 있거나 물 주기 동작 중에는 멈춘다.
+            Vector2 input = _context.Screen.IsModalOpen || _context.Farm.IsWatering ? Vector2.zero : _input.Move;
             bool moving = input.sqrMagnitude > 0.01f;
             if (moving)
             {

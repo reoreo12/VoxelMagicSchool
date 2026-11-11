@@ -1,5 +1,6 @@
 // 텃밭 칸과 선택한 아이템으로 할 수 있는 행동(심기/물 주기/뽑기)을 판단하고 실행한다.
 // 안내 문구 판단과 실행 규칙을 여기 모아, Gameplay는 플레이어 앞 칸 계산만 하면 되게 한다.
+using System;
 using UnityEngine;
 
 namespace VoxelMagic.Core
@@ -45,6 +46,16 @@ namespace VoxelMagic.Core
         private readonly Inventory _inventory;
         private readonly IRandom _random;
         private readonly GameMessages _messages;
+        private FarmPlot _pendingWater;
+
+        /// <summary>물 주기 동작 시작 (애니메이션 재생). 물은 ApplyPendingWater 때 들어간다.</summary>
+        public event Action<FarmPlot> WateringStarted;
+        public event Action WateringFinished;
+
+        /// <summary>켜면 물 주기가 바로 끝나지 않고 동작(애니메이션)을 거친다. 끄면 예전처럼 즉시 (애니메이션 없는 씬).</summary>
+        public bool UseWateringAction { get; set; }
+        /// <summary>물 주기 동작 중 (이동·다른 상호작용 막기).</summary>
+        public bool IsWatering { get; private set; }
 
         public FarmService(FarmGrid grid, Inventory inventory, IRandom random, GameMessages messages)
         {
@@ -55,6 +66,23 @@ namespace VoxelMagic.Core
         }
 
         public FarmGrid Grid { get; }
+
+        /// <summary>물 주기 동작 중 물이 들어가는 순간 (애니메이션 이벤트). 한 번만 들어간다.</summary>
+        public void ApplyPendingWater()
+        {
+            if (_pendingWater == null) return;
+            Grid.Water(_pendingWater);
+            _pendingWater = null;
+        }
+
+        /// <summary>물 주기 동작이 끝남. 이벤트를 못 받았어도 물은 이때 들어간다.</summary>
+        public void FinishWatering()
+        {
+            if (!IsWatering) return;
+            ApplyPendingWater();
+            IsWatering = false;
+            WateringFinished?.Invoke();
+        }
 
         public FarmAction Resolve(Vector2Int cell, ItemDefinition selected)
         {
@@ -102,7 +130,12 @@ namespace VoxelMagic.Core
                     return Grid.TryPlant(action.Seed, action.Origin, out _);
 
                 case FarmActionType.Water:
-                    return Grid.Water(action.Plot);
+                    if (!UseWateringAction) return Grid.Water(action.Plot);
+                    if (IsWatering) return false;
+                    _pendingWater = action.Plot;
+                    IsWatering = true;
+                    WateringStarted?.Invoke(action.Plot);
+                    return true;
 
                 case FarmActionType.Harvest:
                     var produce = action.Plot.Seed.Produce;
