@@ -13,6 +13,9 @@ MonoBehaviour:
   m_Name: DefinitionCatalog
   m_EditorClassIdentifier: 
   _items:
+  - {fileID: 11400000, guid: c76ac57c57e635a419e38f2d417f1fb2, type: 2}
+  - {fileID: 11400000, guid: 472d6650faf9c9e4b8a4175a896235d0, type: 2}
+  - {fileID: 11400000, guid: a3e76bb13dbc99e41864305897f67471, type: 2}
   - {fileID: 11400000, guid: 2c3a7d50508108c4e954dc1963770b38, type: 2}
   - {fileID: 11400000, guid: 22a9aaf902f918b46996f13b7ed2ff1b, type: 2}
   - {fileID: 11400000, guid: ba50b8e8f541aa74897cbe737d121c41, type: 2}

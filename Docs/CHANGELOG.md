@@ -1,5 +1,27 @@
 # 변경 기록
 
+## 2026-11-11 — 뒷산 맵 줄이기 + 맵별 이동 속도 (브랜치 `Back-mountain-map`)
+- 맵별 이동 속도: `Data/Config/MoveConfig_BackMountain.asset`(걷기 4·달리기 5.5, 사용자가 올린 값)을 만들어 뒷산 `PlayerMover`·`AvatarAnimationSpeed`에 연결. FarmPond가 쓰는 `MoveConfig`는 걷기 3·달리기 4.5로 되돌림. 코드 변경 없음 (이동 설정은 씬의 플레이어마다 연결하는 에셋)
+- 뒷산 씬에서 `Mountain_Floor_C3`·`Mountain_Floor_D` 청크 삭제 (사용자 요청, FBX 파일은 남김). 길 끝(C2 동쪽 변 x = 48)에 투명 벽 `[Prototype]/PathEndWall (invisible)` (높이 3 m)
+- 확인: 플레이에서 뒷산 플레이어가 `MoveConfig_BackMountain` 사용, 길 끝에서 동쪽으로 달려도 x 47.57에서 멈춤(낙하 없음), 남은 청크 T·A1~A3·B·C1·C2 / 콘솔 에러 0
+
+## 2026-11-11 — 뒷산 포획 다듬기: 근처 길 신호 흔들림 + 놓침 비율 (브랜치 `Back-mountain-map`)
+- 사용자 의도: 근처 산길을 지나갈 때 맨 앞 풀 하나만 짧게 흔들려 "여기에 뭔가 온다"를 알리기. 다가가는 풀마다 흔들리던 것과, 멀어지면 흔들림이 뚝 끊기던 것을 고침
+- `CaptureZone`: 구역 안 '앞쪽 풀숲' 흔들기를 없애고, 근처 길 영역(`NearPath`, x 8.5~20 · z 53.5~60)에 걸어 들어오면 `_frontTuft` 하나만 한 번 흔듦. 길을 벗어났다 다시 와야 하고 쿨다운 8초(가정). 영역은 기본 카메라(Pitch 55·거리 12)에서 맨 앞 풀숲이 화면 안에 보이는 구간으로 잡음
+- `CaptureService.PassBy`: 구역 밖에서도 됨 (입질 중인 풀숲은 그대로). 흔들림은 상태가 끝나도 `GrassTuft`가 잦아들게 멈춤 (`CaptureConfig` 지나갈 때 0.6초·세기 0.7·잦아듦 0.35초, 가정)
+- 맨 앞 풀숲 `GrassTuft_02`를 (12.5, 66) → (12.5, 65.3)으로 길 쪽에 붙임
+- `MagicCircleStub`: 무작위 정확도 대신 성공 확률(가정 0.85)로 요구 정확도 이상/미만을 돌려줌 → 놓침 약 15%
+- 확인: 테스트 134개 통과 / 플레이: 산길(z 44 → 코너 → x 24)을 걸을 때 맨 앞 풀숲만 1번 (8.5, 53.9)에서 흔들림, 곧바로 되돌아 걸어도 0번(쿨다운), 구역 안에서 풀숲 사이를 걸어도 0번 / 흔들림 세기 0.6초 유지 후 0.84초에 0으로 잦아듦 / 스텁 2000번: 요구 0.5·0.6·0.8 모두 성공 84~87% / 콘솔 에러 0 / 자동 저장 끔
+
+## 2026-11-11 — 뒷산 낚시 UI 정리 + 포획 (브랜치 `Back-mountain-map`)
+- 뒷산 씬에서 뺌 (사용자: 그 맵에서 하는 동작의 UI만): `HUDCanvas/FishingMinigame`, 플레이어 `BiteIndicator`, `CharacterActionView`(낚시·물 주기 동작). Core의 낚시·농사 서비스는 공용 `GameContext`가 만들어 그대로 있으나 뒷산에서 쓰는 곳 없음
+- `ControlsHintView._sceneText`: 씬별 조작법 문구 (비우면 기본). 뒷산: 이동·Shift 달리기·E·1~5·스크롤 카메라 줌·Q·Esc
+- 포획 Core: `AnimalDefinition`(요구 정확도), `CaptureConfig`(입질 간격 5초·흔들림 3초·동시 1~2개·지나갈 때 0.4초/3 m/±60°, 모두 가정), `CaptureService`(구역 안에서만 입질, 구역 밖에서는 흔들리던 것만 끝까지, 포획 중 풀숲은 멈춰 기다림, 성공/실패, 다음 결과 강제), `IMagicCircleDrawer`(실제 마법진으로 바꿔 끼울 자리), `MountainMessages`(중앙 문구)
+- Gameplay: `GrassTuft`(흔들림·"E: 포획"), `CaptureZone`(영역 안/밖, 앞쪽 가장 가까운 풀숲 지나갈 때 흔들기), `MagicCircleStub`(1초 뒤 0.3~1 무작위 정확도, 가정). `MountainBootstrap`이 포획도 조립. 디버그 키 F4 입질 즉시·F5/F6 다음 마법진 성공/실패
+- UI: `CenterBannerView`("OOO 포획!"·"놓쳤다", 1.5초), 디버그 안내에 마법진 강제 상태
+- 데이터·씬: 동물 3종 `Data/Mountain/Animals/`(산토끼 0.5·다람쥐 0.6·여우 0.8), `Data/Config/CaptureConfig`, 프리팹 `Prefabs/Mountain/GrassTuft`. 메뉴 `VoxelMagic/뒷산/포획 구역 만들기·배치` → `[Prototype]/Capture`: 바닥 16×16 m(윗면 4.2), 트리거(0.5 m 안쪽·높이 3 m), 풀숲 12개, "산 동물 조심" 팻말, 투명 벽(서·북·동 1.2 m). 정의 목록 다시 채움
+- 확인: 테스트 133개 통과(새 5개) / 플레이: 길(10, 57)은 구역 밖·입질 없음, 걸어서 z 64.56에서 구역 진입(단차 없음), 앞 풀숲 2개 지나갈 때 흔들림, F4 입질 → "E: 포획" → 강제 성공 "여우 포획!"·가방·획득 정보 / 강제 실패 "놓쳤다"·흔들림 멈춤 / 콘솔 에러 0 / 자동 저장 끔. 실시간 5초 간격·3초 흔들림은 에디터가 백그라운드라 프레임이 안 돌아 단위 테스트로만 확인
+
 ## 2026-11-11 — 뒷산 프로토타입: 등반 확인 + 채집 (브랜치 `Back-mountain-map`)
 - 지침: `Docs/BACKMOUNTAIN_PROTOTYPE_GUIDE.md`. 씬 `BackMountain`
 - `feature/character-system`을 `Back-mountain-map`에 병합 (사용자 선택, 충돌 없음) → Shift 달리기·이동/동작 애니·저장이 들어옴
