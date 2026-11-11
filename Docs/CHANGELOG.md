@@ -1,5 +1,11 @@
 # 변경 기록
 
+## 2026-11-11 — 뒷산 배경 바위산(봉우리 청크) 제작 (브랜치 `Back-mountain-map`)
+- 새 FBX 11개 `Art/Map/Mountain/Backdrop/`: 봉우리 `Spire_A·B·C·D` × 길이축 x·z (8개, 각 1.4천~2.8천 삼각형) + 이끼 둔덕 `AP1~AP3` (3개, 합 약 2.4만). 메시는 보이는 면(윗면·−X·−Z)만, 콜라이더 없음
+- 팔레트 `Mountain_palette.png` 12~15번 칸에 바위 4색 추가(#B5AA9A·#9A8F82·#7C7268·#5E564E). 1~11번 색은 그대로라 기존 바닥 FBX 영향 없음. 머티리얼은 기존 `Mountain_Voxel` 재사용
+- 씬 `BackMountain`에 `MountainBackdrop`(앞줄·뒷줄·둔덕, 총 23개, 약 6만 삼각형) 배치. 그림자 끔. 씬 저장은 사용자 확인 후
+- 제작 스크립트·배치표: `Source/Backdrop/` (`gen_spires.py`, `gen_apron.py`, `layout.py`, `export_fbx.py`, `placement.json`)
+
 ## 2026-11-11 — 뒷산 맵 줄이기 + 맵별 이동 속도 (브랜치 `Back-mountain-map`)
 - 맵별 이동 속도: `Data/Config/MoveConfig_BackMountain.asset`(걷기 4·달리기 5.5, 사용자가 올린 값)을 만들어 뒷산 `PlayerMover`·`AvatarAnimationSpeed`에 연결. FarmPond가 쓰는 `MoveConfig`는 걷기 3·달리기 4.5로 되돌림. 코드 변경 없음 (이동 설정은 씬의 플레이어마다 연결하는 에셋)
 - 뒷산 씬에서 `Mountain_Floor_C3`·`Mountain_Floor_D` 청크 삭제 (사용자 요청, FBX 파일은 남김). 길 끝(C2 동쪽 변 x = 48)에 투명 벽 `[Prototype]/PathEndWall (invisible)` (높이 3 m)

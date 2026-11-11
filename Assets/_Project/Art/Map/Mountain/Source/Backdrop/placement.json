@@ -1,0 +1,347 @@
+[
+ {
+  "name": "Spire_Cx_00",
+  "mesh": "Spire_Cx",
+  "pos": [
+   -0.06,
+   4.06,
+   80.92
+  ],
+  "scale": [
+   0.8,
+   1.0,
+   0.8
+  ],
+  "row": "front"
+ },
+ {
+  "name": "Spire_Dx_01",
+  "mesh": "Spire_Dx",
+  "pos": [
+   9.0,
+   4.06,
+   80.0
+  ],
+  "scale": [
+   1.0,
+   1.0,
+   1.0
+  ],
+  "row": "front"
+ },
+ {
+  "name": "Spire_Bz_02",
+  "mesh": "Spire_Bz",
+  "pos": [
+   16.815,
+   4.261,
+   66.77
+  ],
+  "scale": [
+   0.85,
+   1.0,
+   0.85
+  ],
+  "row": "front"
+ },
+ {
+  "name": "Spire_Dz_03",
+  "mesh": "Spire_Dz",
+  "pos": [
+   16.28,
+   4.114,
+   74.15
+  ],
+  "scale": [
+   0.9,
+   1.1,
+   0.9
+  ],
+  "row": "front"
+ },
+ {
+  "name": "Spire_Cx_04",
+  "mesh": "Spire_Cx",
+  "pos": [
+   18.37,
+   6.888,
+   64.71
+  ],
+  "scale": [
+   0.9,
+   1.05,
+   0.9
+  ],
+  "row": "front"
+ },
+ {
+  "name": "Spire_Dx_05",
+  "mesh": "Spire_Dx",
+  "pos": [
+   28.525,
+   8.019,
+   64.42
+  ],
+  "scale": [
+   0.85,
+   0.9,
+   0.85
+  ],
+  "row": "front"
+ },
+ {
+  "name": "Spire_Bx_06",
+  "mesh": "Spire_Bx",
+  "pos": [
+   34.7,
+   8.419,
+   64.5
+  ],
+  "scale": [
+   1.0,
+   1.05,
+   1.0
+  ],
+  "row": "front"
+ },
+ {
+  "name": "Spire_Dx_07",
+  "mesh": "Spire_Dx",
+  "pos": [
+   42.375,
+   8.847,
+   64.7
+  ],
+  "scale": [
+   0.75,
+   1.0,
+   0.75
+  ],
+  "row": "front"
+ },
+ {
+  "name": "Spire_Cz_08",
+  "mesh": "Spire_Cz",
+  "pos": [
+   48.92,
+   8.212,
+   50.44
+  ],
+  "scale": [
+   0.8,
+   1.0,
+   0.8
+  ],
+  "row": "front"
+ },
+ {
+  "name": "Spire_Dz_09",
+  "mesh": "Spire_Dz",
+  "pos": [
+   48.46,
+   8.719,
+   59.2
+  ],
+  "scale": [
+   0.8,
+   1.1,
+   0.8
+  ],
+  "row": "front"
+ },
+ {
+  "name": "Spire_Ax_10",
+  "mesh": "Spire_Ax",
+  "pos": [
+   0.9,
+   4.06,
+   86.8
+  ],
+  "scale": [
+   1.0,
+   1.15,
+   1.0
+  ],
+  "row": "back"
+ },
+ {
+  "name": "Spire_Bx_11",
+  "mesh": "Spire_Bx",
+  "pos": [
+   7.7,
+   4.06,
+   86.4
+  ],
+  "scale": [
+   1.0,
+   1.2,
+   1.0
+  ],
+  "row": "back"
+ },
+ {
+  "name": "Spire_Az_12",
+  "mesh": "Spire_Az",
+  "pos": [
+   22.52,
+   7.067,
+   68.16
+  ],
+  "scale": [
+   0.9,
+   1.05,
+   0.9
+  ],
+  "row": "back"
+ },
+ {
+  "name": "Spire_Az_13",
+  "mesh": "Spire_Az",
+  "pos": [
+   22.8,
+   4.08,
+   76.4
+  ],
+  "scale": [
+   1.0,
+   1.15,
+   1.0
+  ],
+  "row": "back"
+ },
+ {
+  "name": "Spire_Ax_14",
+  "mesh": "Spire_Ax",
+  "pos": [
+   28.16,
+   7.765,
+   71.02
+  ],
+  "scale": [
+   0.9,
+   1.0,
+   0.9
+  ],
+  "row": "back"
+ },
+ {
+  "name": "Spire_Bx_15",
+  "mesh": "Spire_Bx",
+  "pos": [
+   34.2,
+   8.386,
+   71.4
+  ],
+  "scale": [
+   1.0,
+   1.1,
+   1.0
+  ],
+  "row": "back"
+ },
+ {
+  "name": "Spire_Ax_16",
+  "mesh": "Spire_Ax",
+  "pos": [
+   43.14,
+   8.924,
+   70.58
+  ],
+  "scale": [
+   1.1,
+   1.2,
+   1.1
+  ],
+  "row": "back"
+ },
+ {
+  "name": "Spire_Bz_17",
+  "mesh": "Spire_Bz",
+  "pos": [
+   54.61,
+   8.196,
+   49.08
+  ],
+  "scale": [
+   0.9,
+   1.05,
+   0.9
+  ],
+  "row": "back"
+ },
+ {
+  "name": "Spire_Az_18",
+  "mesh": "Spire_Az",
+  "pos": [
+   54.6,
+   8.311,
+   57.4
+  ],
+  "scale": [
+   1.0,
+   1.1,
+   1.0
+  ],
+  "row": "back"
+ },
+ {
+  "name": "Spire_Az_19",
+  "mesh": "Spire_Az",
+  "pos": [
+   54.52,
+   9.091,
+   65.16
+  ],
+  "scale": [
+   0.9,
+   1.15,
+   0.9
+  ],
+  "row": "back"
+ },
+ {
+  "name": "AP1",
+  "mesh": "AP1",
+  "pos": [
+   0,
+   0,
+   80
+  ],
+  "scale": [
+   1,
+   1,
+   1
+  ],
+  "row": "apron"
+ },
+ {
+  "name": "AP2",
+  "mesh": "AP2",
+  "pos": [
+   16,
+   0,
+   64
+  ],
+  "scale": [
+   1,
+   1,
+   1
+  ],
+  "row": "apron"
+ },
+ {
+  "name": "AP3",
+  "mesh": "AP3",
+  "pos": [
+   48,
+   0,
+   48
+  ],
+  "scale": [
+   1,
+   1,
+   1
+  ],
+  "row": "apron"
+ }
+]
