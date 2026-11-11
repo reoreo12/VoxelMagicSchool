@@ -21,7 +21,13 @@ MonoBehaviour:
   _idleSpeed: 1
   _walkSpeed: 1
   _runSpeed: 1
+  _fishCast: {fileID: -203655887218126122, guid: 76fd4e83b8e62804daf399e40bfe86ea, type: 3}
+  _fishWait: {fileID: -203655887218126122, guid: dbfa0c41b5ba533479b23b47e1f58df3, type: 3}
+  _fishReel: {fileID: 4061839508520268033, guid: 76fd4e83b8e62804daf399e40bfe86ea, type: 3}
+  _fishReelBack: {fileID: 7400000, guid: beb67c7df826fe14b8eda522866bf11b, type: 2}
+  _fishHook: {fileID: 7400000, guid: 52199165374c47a4c80cda44c0d8c864, type: 2}
+  _water: {fileID: -203655887218126122, guid: d78021bcd5e1d3d47b54ba1c29c2365d, type: 3}
   _sprites: {fileID: 11400000, guid: 575feaddd7b6fa549a018a4a4ff86df8, type: 2}
   _socketProfile: {fileID: 11400000, guid: dd322e73a93c45245a9dcd0b59e9ae4c, type: 2}
-  _controller: {fileID: 9100000, guid: 05ea9984268689043be14d0f0e037df2, type: 2}
+  _controller: {fileID: 22100000, guid: b0809ebfe86145b45830808e7f3e6d58, type: 2}
   _characterPrefab: {fileID: 1271594051816042358, guid: dc822f3a60ada7b4cabe46fa0aa56ed0, type: 3}

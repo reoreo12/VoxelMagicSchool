@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace VoxelMagic.Core
 {
-    public sealed class SideScrollMotor
+    public sealed class SideScrollMotor : ICharacterMotor
     {
         private const float EdgeEpsilon = 0.0001f;
 
@@ -18,6 +18,11 @@ namespace VoxelMagic.Core
         public float Velocity { get; private set; }
         public float MinX { get; }
         public float MaxX { get; }
+        public float Speed => Mathf.Abs(Velocity);
+
+        /// <summary>상태 머신용: 좌우 입력 방향 × 목표 속도로 Step.</summary>
+        public void Drive(MoveIntent intent, float targetSpeed, float acceleration, float deceleration, float deltaTime) =>
+            Step(intent.Direction * targetSpeed, acceleration, deceleration, deltaTime);
 
         /// <summary>속도 없이 x로 바로 옮긴다 (씬 도착 지점). 범위 밖이면 끝에 붙음.</summary>
         public void Teleport(float x)

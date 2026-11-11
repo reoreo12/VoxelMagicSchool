@@ -144,7 +144,7 @@ PrefabInstance:
     - target: {fileID: 5866666021909216657, guid: bc4958b420356cc479391fcf8a8c2bb5, type: 3}
       propertyPath: m_Controller
       value: 
-      objectReference: {fileID: 9100000, guid: 3ed707516f309d1458044948964267c6, type: 2}
+      objectReference: {fileID: 22100000, guid: 0ef048993f950a24a9e3be0ceeb44ec2, type: 2}
     - target: {fileID: 5866666021909216657, guid: bc4958b420356cc479391fcf8a8c2bb5, type: 3}
       propertyPath: m_CullingMode
       value: 0
@@ -190,3 +190,4 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _setup: {fileID: 11400000, guid: 4e4635621efa64f498d6f5f7b1af1f4e, type: 2}
   _animator: {fileID: 3694227100782035076}
+  _moveConfig: {fileID: 0}

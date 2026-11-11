@@ -1,5 +1,5 @@
 // 매 프레임 FishingSession을 진행시키고, 상태에 맞게 찌와 낚싯줄을 연출한다 (던지기 포물선, 기다림 출렁임, 입질 가라앉음).
-// 낚싯줄 시작점은 손에 든 지팡이 끝(ICastOrigin), 없으면 기본 WandTip.
+// 낚싯줄 시작점은 손에 든 지팡이 끝(ICastOrigin), 없으면 기본 WandTip. 찌는 던지기의 "놓는 순간"부터 날아간다.
 using UnityEngine;
 using VoxelMagic.Core;
 
@@ -37,23 +37,37 @@ namespace VoxelMagic.Gameplay
             _session = context.Fishing;
             _castDuration = Mathf.Max(0.01f, context.FishingConfig.CastSeconds);
             _session.StateChanged += OnStateChanged;
+            _session.CastReleased += OnCastReleased;
             OnStateChanged(_session.State);
         }
 
         private void OnDestroy()
         {
-            if (_session != null) _session.StateChanged -= OnStateChanged;
+            if (_session == null) return;
+            _session.StateChanged -= OnStateChanged;
+            _session.CastReleased -= OnCastReleased;
         }
 
+        // 던지기 상태에서는 "놓는 순간"(애니메이션 이벤트)까지 찌·줄을 숨긴다.
         private void OnStateChanged(FishingState state)
         {
             _stateTime = 0f;
-            if (state == FishingState.Casting)
-            {
-                _castStart = LineStart();
-                _pond.UpdateCastPoint(_castStart);
-            }
-            bool visible = state != FishingState.Idle && state != FishingState.Result;
+            bool visible = state == FishingState.Casting ? _session.IsCastReleased
+                : state != FishingState.Idle && state != FishingState.Result;
+            SetVisible(visible);
+        }
+
+        // 놓는 순간부터 지팡이 끝에서 찌가 포물선으로 날아간다 (CastSeconds 동안).
+        private void OnCastReleased()
+        {
+            _stateTime = 0f;
+            _castStart = LineStart();
+            _pond.UpdateCastPoint(_castStart);
+            SetVisible(true);
+        }
+
+        private void SetVisible(bool visible)
+        {
             _bobber.gameObject.SetActive(visible);
             _line.enabled = visible;
         }

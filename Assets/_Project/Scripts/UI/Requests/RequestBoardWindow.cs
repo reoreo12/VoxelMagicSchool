@@ -15,6 +15,7 @@ namespace VoxelMagic.UI
         private readonly List<RequestEntryView> _entries = new List<RequestEntryView>();
         private RequestTracker _tracker;
         private ScreenState _screen;
+        private Inventory _inventory;
 
         public void Bind(GameContext context)
         {
@@ -30,14 +31,25 @@ namespace VoxelMagic.UI
             _closeButton.onClick.AddListener(() => _screen.Close(GameWindow.RequestBoard));
 
             _screen.WindowChanged += OnWindowChanged;
-            _tracker.ActiveChanged += _ => RefreshEntries();
-            context.Inventory.SlotChanged += _ => { if (IsVisible) RefreshEntries(); };
+            _inventory = context.Inventory;
+            // 의뢰·인벤토리는 씬을 넘어 유지되므로 OnDestroy에서 꼭 구독을 푼다.
+            _tracker.ActiveChanged += OnActiveChanged;
+            _inventory.SlotChanged += OnSlotChanged;
             SetVisible(false);
         }
 
         private void OnDestroy()
         {
             if (_screen != null) _screen.WindowChanged -= OnWindowChanged;
+            if (_tracker != null) _tracker.ActiveChanged -= OnActiveChanged;
+            if (_inventory != null) _inventory.SlotChanged -= OnSlotChanged;
+        }
+
+        private void OnActiveChanged(RequestDefinition _) => RefreshEntries();
+
+        private void OnSlotChanged(int _)
+        {
+            if (IsVisible) RefreshEntries();
         }
 
         private void OnWindowChanged(GameWindow window)

@@ -1,4 +1,4 @@
-// 씬 이동 진행자 (씬마다 하나). 나갈 때: 입력 막기 → 원형 페이드 아웃 → 비동기 로드. 들어올 때: 가린 채 시작 → 페이드 인 → 입력 풀기.
+// 씬 이동 진행자 (씬마다 하나). 나갈 때: 입력 막기 → 원형 페이드 아웃 → 저장 → 비동기 로드. 들어올 때: 가린 채 시작 → 페이드 인 → 입력 풀기.
 using System.Collections;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -53,6 +53,8 @@ namespace VoxelMagic.Gameplay
             yield return Animate(0f, 1f, _config.FadeOutDuration);
             if (_config.HoldDuration > 0f) yield return new WaitForSecondsRealtime(_config.HoldDuration);
 
+            // 화면이 가려진 뒤, 씬이 내려가기 전에 저장 (밭 등 씬 소속 데이터도 이때 보관본으로 옮겨진다).
+            GameSaveSystem.AutoSave();
             var load = SceneManager.LoadSceneAsync(sceneName);
             while (!load.isDone) yield return null;
 

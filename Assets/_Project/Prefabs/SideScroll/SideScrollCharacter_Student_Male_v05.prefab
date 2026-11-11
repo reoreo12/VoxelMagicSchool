@@ -262,7 +262,7 @@ PrefabInstance:
     - target: {fileID: 5866666021909216657, guid: 3165f02d9a4476f469a458745275f21f, type: 3}
       propertyPath: m_Controller
       value: 
-      objectReference: {fileID: 9100000, guid: 61d0c94c31d9b3243aac5ae193f22741, type: 2}
+      objectReference: {fileID: 22100000, guid: 893cef2fac33a3649b138784feb98bf9, type: 2}
     - target: {fileID: 5866666021909216657, guid: 3165f02d9a4476f469a458745275f21f, type: 3}
       propertyPath: m_CullingMode
       value: 0
@@ -303,6 +303,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _setup: {fileID: 11400000, guid: 82426b912c3295d4aa581200eb8307f9, type: 2}
   _animator: {fileID: 1787246676864804727}
+  _moveConfig: {fileID: 0}
 --- !u!4 &5633369500032957709 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: 3165f02d9a4476f469a458745275f21f, type: 3}

@@ -13,6 +13,7 @@ namespace VoxelMagic.Gameplay
 
         private InputActionMap _map;
         private InputAction _move;
+        private InputAction _run;
         private InputAction[] _slots;
         private GameContext _context;
 
@@ -21,6 +22,8 @@ namespace VoxelMagic.Gameplay
         public event Action<float> ZoomRequested;
 
         public Vector2 Move => _move != null ? _move.ReadValue<Vector2>() : Vector2.zero;
+        /// <summary>달리기 키(Shift)를 누르고 있는지.</summary>
+        public bool Run => _run != null && _run.IsPressed();
 
         public void Bind(GameContext context) => _context = context;
 
@@ -28,6 +31,7 @@ namespace VoxelMagic.Gameplay
         {
             _map = _actions.FindActionMap(_mapName, throwIfNotFound: true);
             _move = _map.FindAction("Move", true);
+            _run = _map.FindAction("Run", true);
             _slots = new InputAction[5];
             for (int i = 0; i < _slots.Length; i++)
             {

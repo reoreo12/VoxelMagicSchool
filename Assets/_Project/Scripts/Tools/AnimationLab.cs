@@ -149,6 +149,8 @@ namespace VoxelMagic.Tools
 
             _player = new LabClipPlayer(_animator) { Loop = _ui.LoopToggle.isOn, Speed = _ui.SpeedSlider.value };
             AttachEquipment();
+            // 동작 클립(낚시·물 주기)의 Animation Event를 받을 곳 (없으면 Unity가 '받는 함수 없음' 오류를 낸다). 랩은 게임 로직 없이 받기만 한다.
+            _instance.AddComponent<CharacterAnimationEvents>();
             float height = MeasureHeight(_instance);
             if (firstSpawn) _camera.Focus(_spawnPoint.position + Vector3.up * height * _config.FocusHeightRatio, height);
             _ui.AvatarInfo.text = string.Format(LabTexts.AvatarInfo, _setup.name, height, LabTexts.Yes, CountMappedBones(),

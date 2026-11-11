@@ -1,4 +1,5 @@
 // 낚시 상태 머신: 대기 → 던지기 → 기다림 → 입질 → 미니게임 → 결과.
+// 던지기 애니메이션이 있으면(WaitForCastRelease) "놓는 순간"(ReleaseCast)까지 기다렸다가 찌가 날아가고, 신호가 안 오면 정한 시간 뒤 스스로 놓는다.
 // MonoBehaviour가 매 프레임 Tick을 불러 주고, 상태 변화는 이벤트로 알린다.
 using System;
 
@@ -30,10 +31,18 @@ namespace VoxelMagic.Core
         private readonly GameMessages _messages;
         private readonly float _resultHoldSeconds;
         private float _timer;
+        private bool _castReleased;
 
         public event Action<FishingState> StateChanged;
         /// <summary>(물고기, 크기 cm)</summary>
         public event Action<FishDefinition, float> Caught;
+        /// <summary>던지기에서 찌를 놓은 순간 (찌가 날기 시작).</summary>
+        public event Action CastReleased;
+
+        /// <summary>켜면 던지기 상태가 ReleaseCast(애니메이션 이벤트)를 기다린다. 끄면 바로 놓는다 (애니메이션 없는 씬).</summary>
+        public bool WaitForCastRelease { get; set; }
+        /// <summary>이번 던지기에서 찌를 놓았는지 (던지기 상태에서만 의미가 있다).</summary>
+        public bool IsCastReleased => _castReleased;
 
         public FishingSession(FishingConfig config, Inventory inventory, IRandom random, GameMessages messages,
             float resultHoldSeconds)
@@ -61,8 +70,19 @@ namespace VoxelMagic.Core
             CurrentFish = null;
             Minigame = null;
             LastOutcome = FishingOutcome.None;
-            Enter(FishingState.Casting, _config.CastSeconds);
+            _castReleased = false;
+            Enter(FishingState.Casting, WaitForCastRelease ? _config.CastReleaseTimeoutSeconds : 0f);
+            if (!WaitForCastRelease) ReleaseCast();
             return true;
+        }
+
+        /// <summary>던지기 중 찌를 놓는다 (애니메이션 이벤트). 이후 CastSeconds 동안 날아가 기다림으로 넘어간다.</summary>
+        public void ReleaseCast()
+        {
+            if (State != FishingState.Casting || _castReleased) return;
+            _castReleased = true;
+            _timer = _config.CastSeconds;
+            CastReleased?.Invoke();
         }
 
         /// <summary>낚시 중 E 입력: 입질이면 미니게임 시작, 입질 오기 전이면 거두기, 결과 표시 중이면 다시 던지기.</summary>
@@ -102,7 +122,9 @@ namespace VoxelMagic.Core
             switch (State)
             {
                 case FishingState.Casting:
-                    if (CountDown(deltaTime)) EnterWaiting();
+                    if (!CountDown(deltaTime)) break;
+                    if (!_castReleased) ReleaseCast();   // 신호가 안 와도 멈추지 않게
+                    else EnterWaiting();
                     break;
 
                 case FishingState.Waiting:

@@ -39,6 +39,7 @@
 | 2026-11-02 | `Input/GameControls.inputactions`에 `SideScroll` 맵 추가 (Move: 1D Axis A/D·←/→, Run: Left Shift). 기존 `Gameplay` 맵은 그대로 | 복도 횡스크롤 조작. W/S는 바인딩 자체가 없음 | 사용자 승인 |
 | 2026-11-04 | `SideScroll` 맵에 `ToggleCameraFollow`(C), `Interact`(E) 추가 | 복도 카메라 고정/부드럽게 전환, 오른쪽 문 포털 | 사용자 승인 |
 | 2026-11-04 | `SideScroll` 맵에 `ToggleNight`(N) 추가 | 복도 낮/밤 전환 | 사용자 승인 |
+| 2026-11-10 | `Gameplay` 맵에 `Run`(Left Shift, Button) 추가 | 텃밭·연못 달리기 (복도 Run과 같은 키) | 사용자 승인 (설계 9-3) |
 
 ## 빌드 씬 목록 (Build Settings)
 
@@ -83,6 +84,14 @@
 | VoxelMagic.Tests | `Assets/_Project/Tests` (EditMode 테스트) | Core, Test Runner, NUnit |
 | VoxelMagic.Tools (2026-11-03, 11-06 `VoxelMagic.Sandbox`에서 이름 변경) | `Assets/_Project/Scripts/Tools` (애니메이션 랩, 자동 참조 끔) | Core, **Gameplay**(2026-11-06 추가: 농장과 같은 소켓·장착 부품을 랩에서 그대로 사용), Unity.InputSystem, Unity.TextMeshPro, UnityEngine.UI |
 | VoxelMagic.Tools.Editor (2026-11-03, 11-06 `VoxelMagic.Sandbox.Editor`에서 이름 변경) | `Assets/_Project/Scripts/Tools/Editor` (에디터 전용) | Tools, Core, Gameplay, Editor, TMP, UI, InputSystem |
+
+## 저장 파일 (2026-11-10)
+- 위치: `Application.persistentDataPath/Saves/save_<슬롯>.json` → Windows: `C:/Users/<사용자>/AppData/LocalLow/DefaultCompany/VoxelMagicSchool/Saves/` (회사·제품 이름은 Player Settings 값, 바꾸면 위치도 바뀜)
+- 프로젝트 폴더 밖에 게임이 실행 중 쓰는 파일이다 (git에 안 들어감). 지금은 슬롯 0만 사용
+- 저장 시점: 씬 이동(페이드 아웃 뒤, 로드 전), 게임 종료(에디터는 플레이 끄기). `_Bootstrap`의 `_autoSave`를 끄면 저장 안 함
+- 불러오기: 게임 시작 후 텃밭 씬 부트스트랩이 처음 진행 상태를 만들 때 파일이 있으면 불러옴, 없으면 시작 아이템 지급
+- ID 표: `Data/Save/DefinitionCatalog` — 새 아이템·의뢰를 만들면 메뉴 `VoxelMagic/저장/정의 목록 채우기`를 다시 실행 (안 하면 그 아이템은 저장은 되지만 불러올 때 건너뜀)
+- 메뉴: `VoxelMagic/저장/` 정의 목록 채우기(+ 지금 씬 부트스트랩 연결) · 저장 폴더 열기 · 저장 지우기(슬롯 0)
 
 ## 연결 메모
 - 한글 폰트: `Fonts/Pretendard SDF.asset`은 고정(Static) 아틀라스라 플레이해도 파일이 바뀌지 않는다. 문자 목록에 없는 글자를 쓰려면 `VoxelMagic/한글 폰트 다시 굽기`를 실행한다.

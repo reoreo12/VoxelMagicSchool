@@ -86,6 +86,7 @@ namespace VoxelMagic.EditorTools
                 .SetRef("_farm", farm)
                 .SetRef("_fishing", fishing)
                 .SetRef("_player", player)
+                .SetRef("_catalog", SaveTools.FillCatalog())
                 .SetRef("_playerInteractor", interactor)
                 .SetRefList("_bindRoots", new Object[] { world, playerRoot, camera.gameObject, ui })
                 .SetRefList("_requests", data.Requests.ToArray())
@@ -315,8 +316,8 @@ namespace VoxelMagic.EditorTools
                 .SetRef("_actions", AssetDatabase.LoadAssetAtPath<InputActionAsset>(InputPath));
             root.AddComponent<PlayerMover>().SetRef("_input", input);
             interactor = root.AddComponent<PlayerInteractor>().SetRef("_input", input);
-            if (avatarAnimator != null)
-                root.AddComponent<PlayerAvatarAnimator>().SetRef("_animator", avatarAnimator);
+            // 이동·애니메이션은 복도와 같은 방식 (이동 상태 머신 + CharacterAnimatorView). DESIGN_CHARACTER.md 9-3
+            if (avatarAnimator != null) PlayerLocomotionSetup.ApplyTo(root, avatar);
             return root;
         }
 
