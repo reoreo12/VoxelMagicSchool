@@ -45,7 +45,8 @@ namespace VoxelMagic.Gameplay
 
         private GatheringService BuildGathering(GameContext game, out TimeOfDayState time)
         {
-            var habitats = Find<GatherHabitat>();
+            // 꺼 둔 서식지(교체 전 기본 도형 등)에는 재료를 놓지 않는다.
+            var habitats = Find<GatherHabitat>(includeInactive: false);
             var kinds = new List<GatherHabitatKind>();
             var slotCounts = new List<int>();
             for (int i = 0; i < habitats.Count; i++)
@@ -61,7 +62,7 @@ namespace VoxelMagic.Gameplay
 
         private CaptureService BuildCapture(GameContext game, MountainMessages messages)
         {
-            var tufts = Find<GrassTuft>();
+            var tufts = Find<GrassTuft>(includeInactive: false);
             for (int i = 0; i < tufts.Count; i++) tufts[i].Setup(i, _capture);
             var capture = new CaptureService(tufts.Count, _animals, _capture, game.Inventory, game.Messages, messages, game.Random);
 
@@ -72,11 +73,11 @@ namespace VoxelMagic.Gameplay
             return capture;
         }
 
-        private List<T> Find<T>()
+        private List<T> Find<T>(bool includeInactive = true)
         {
             var list = new List<T>();
             foreach (var root in _bindRoots)
-                if (root != null) list.AddRange(root.GetComponentsInChildren<T>(true));
+                if (root != null) list.AddRange(root.GetComponentsInChildren<T>(includeInactive));
             return list;
         }
     }

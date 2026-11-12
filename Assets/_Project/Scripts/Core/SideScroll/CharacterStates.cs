@@ -64,8 +64,9 @@ namespace VoxelMagic.Core
 
         protected abstract float TargetSpeed { get; }
 
+        // 개발용 속도 치트 배율(평소 1)을 곱한다.
         public override void Tick(float deltaTime) =>
-            Body.Motor.Drive(Body.Intent, TargetSpeed, Body.Config.Acceleration, Body.Config.Deceleration, deltaTime);
+            Body.Motor.Drive(Body.Intent, TargetSpeed * MoveSpeedCheat.Multiplier, Body.Config.Acceleration, Body.Config.Deceleration, deltaTime);
     }
 
     public sealed class WalkState : MoveStateBase

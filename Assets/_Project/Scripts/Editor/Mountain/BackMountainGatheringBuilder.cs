@@ -82,6 +82,7 @@ namespace VoxelMagic.EditorTools
             var itemMaterial = MakeMaterial("M_GatherItem", Color.white);
             var materials = CreateMaterialAssets();
             var config = LoadOrCreate<GatheringConfig>(ConfigPath);
+            GatheringBalanceTool.EnsureDefaults(config); // 서식지 종류별 밸런스가 비어 있으면 기본값
             var prefabs = new Dictionary<GatherHabitatKind, GameObject>
             {
                 { GatherHabitatKind.TreeShade, BuildPrefab(GatherHabitatKind.TreeShade, itemMaterial) },
@@ -254,7 +255,7 @@ namespace VoxelMagic.EditorTools
             return prefab;
         }
 
-        private static GatherPickup MakeSlot(Transform parent, int index, Vector3 position, Material itemMaterial)
+        internal static GatherPickup MakeSlot(Transform parent, int index, Vector3 position, Material itemMaterial)
         {
             var slot = new GameObject($"Slot_{index}");
             slot.transform.SetParent(parent, false);
@@ -363,7 +364,7 @@ namespace VoxelMagic.EditorTools
         }
 
         /// <summary>뒷산 높이장 생성기(hf.py)의 길 중심선 x (z 0~52 직선 구간).</summary>
-        private static float PathCenterX(float z)
+        internal static float PathCenterX(float z)
         {
             float env = Smooth(z, 0f, 6f) * (1f - Smooth(z, 42f, 52f));
             float wob = 2.0f * Mathf.Sin(2f * Mathf.PI * z / 26f + 0.8f) + 0.7f * Mathf.Sin(2f * Mathf.PI * z / 11f + 2.0f);

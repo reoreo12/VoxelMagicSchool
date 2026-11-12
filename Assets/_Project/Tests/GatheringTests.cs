@@ -1,4 +1,4 @@
-// 뒷산 채집 배치 규칙 테스트: 자기 서식지·시간대만, 다시 배치하면 슬롯 이동, 의뢰 재료 보장, 줍기와 누적.
+// 뒷산 채집 배치 규칙 테스트: 자기 서식지·시간대만, 서식지 종류별 개수(0개 가능), 다시 배치하면 슬롯 이동, 의뢰 재료 보장, 줍기와 누적.
 using System.Collections.Generic;
 using NUnit.Framework;
 using VoxelMagic.Core;
@@ -12,6 +12,17 @@ namespace VoxelMagic.Tests
         private static GatherMaterialDefinition Mat(string id, GatherHabitatKind kind, bool afterSchool, bool night)
             => TestAssets.Create<GatherMaterialDefinition>(("_id", id), ("_displayName", id), ("_habitat", kind),
                 ("_appearsAfterSchool", afterSchool), ("_appearsAtNight", night), ("_sizeRangeCm", new FloatRange(3f, 5f)));
+
+        /// <summary>모든 서식지 종류에 같은 밸런스 (최소~최대, 추가분 확률).</summary>
+        private static GatheringConfig Balance(int min, int max, float chance = 1f)
+        {
+            var config = TestAssets.Create<GatheringConfig>();
+            var list = new List<HabitatBalance>();
+            foreach (GatherHabitatKind kind in System.Enum.GetValues(typeof(GatherHabitatKind)))
+                list.Add(new HabitatBalance(kind, 2, min, max, chance, null));
+            config.SetHabitats(list);
+            return config;
+        }
 
         private static GatherSpawner Spawner(params (GatherHabitatKind kind, int slots)[] habitats)
         {
@@ -29,7 +40,7 @@ namespace VoxelMagic.Tests
             var berry = Mat("berry", GatherHabitatKind.Bush, true, false);
             var spawner = Spawner((GatherHabitatKind.TreeShade, 4), (GatherHabitatKind.Bush, 3));
 
-            spawner.Respawn(new[] { shade, moon, berry }, TimeOfDay.Day, null, 1f, new FixedRandom(0f));
+            spawner.Respawn(new[] { shade, moon, berry }, TimeOfDay.Day, null, Balance(4, 4), new FixedRandom(0f));
 
             for (int s = 0; s < 4; s++) Assert.AreEqual(shade, spawner.Get(0, s));
             for (int s = 0; s < 3; s++) Assert.AreEqual(berry, spawner.Get(1, s));
@@ -43,7 +54,7 @@ namespace VoxelMagic.Tests
             var moon = Mat("moon", GatherHabitatKind.TreeShade, false, true);
             var spawner = Spawner((GatherHabitatKind.TreeShade, 4));
 
-            spawner.Respawn(new[] { shade, moon }, TimeOfDay.Night, null, 1f, new FixedRandom(0f));
+            spawner.Respawn(new[] { shade, moon }, TimeOfDay.Night, null, Balance(4, 4), new FixedRandom(0f));
 
             Assert.AreEqual(0, spawner.CountOf(shade));
             Assert.AreEqual(4, spawner.CountOf(moon));
@@ -56,10 +67,10 @@ namespace VoxelMagic.Tests
             var spawner = Spawner((GatherHabitatKind.TreeShade, 4));
             var random = new FixedRandom(0f);
 
-            spawner.Respawn(new[] { shade }, TimeOfDay.Day, null, 0.5f, random);
+            spawner.Respawn(new[] { shade }, TimeOfDay.Day, null, Balance(2, 2), random);
             var first = new List<int>();
             for (int s = 0; s < 4; s++) if (spawner.Get(0, s) != null) first.Add(s);
-            spawner.Respawn(new[] { shade }, TimeOfDay.Day, null, 0.5f, random);
+            spawner.Respawn(new[] { shade }, TimeOfDay.Day, null, Balance(2, 2), random);
 
             Assert.AreEqual(2, first.Count);
             foreach (int s in first) Assert.IsNull(spawner.Get(0, s), $"슬롯 {s}에 그대로 남음");
@@ -73,7 +84,7 @@ namespace VoxelMagic.Tests
             var spawner = Spawner((GatherHabitatKind.Bush, 3));
 
             // FixedRandom(0)은 항상 첫 후보(common)를 고른다 → 보장 규칙이 없으면 needed는 0개.
-            spawner.Respawn(new[] { common, needed }, TimeOfDay.Day, new ItemDefinition[] { needed }, 0.34f, new FixedRandom(0f));
+            spawner.Respawn(new[] { common, needed }, TimeOfDay.Day, new ItemDefinition[] { needed }, Balance(1, 1), new FixedRandom(0f));
 
             Assert.GreaterOrEqual(spawner.CountOf(needed), 1);
         }
@@ -83,7 +94,7 @@ namespace VoxelMagic.Tests
         {
             var common = Mat("common", GatherHabitatKind.Bush, true, false);
             var needed = Mat("needed", GatherHabitatKind.Bush, true, false);
-            var config = TestAssets.Create<GatheringConfig>(("_fillRatio", 0.34f));
+            var config = Balance(1, 1);
             var inventory = new Inventory(5);
             var tracker = new RequestTracker(new RequestDefinition[0], inventory, new ScoreBook(100), new MaterialJournal(), 0);
             var service = new GatheringService(Spawner((GatherHabitatKind.Bush, 3)), new[] { common, needed }, config,
@@ -95,6 +106,22 @@ namespace VoxelMagic.Tests
 
             Assert.AreEqual(1, service.CountOf(needed));
             Assert.AreEqual(1, service.CountOf(common), "다른 재료는 그대로");
+        }
+
+        [Test]
+        public void Balance_ZeroToOne_CanBeEmpty_AndNeverExceedsMax()
+        {
+            var shade = Mat("shade", GatherHabitatKind.TreeShade, true, false);
+            var spawner = Spawner((GatherHabitatKind.TreeShade, 2));
+
+            spawner.Respawn(new[] { shade }, TimeOfDay.Day, null, Balance(0, 1, 0f), new FixedRandom(0f));
+            Assert.AreEqual(0, spawner.CountOf(shade), "확률 0 → 0개 (예전처럼 최소 1개를 강제하지 않음)");
+
+            spawner.Respawn(new[] { shade }, TimeOfDay.Day, null, Balance(0, 1, 1f), new FixedRandom(0f));
+            Assert.AreEqual(1, spawner.CountOf(shade), "최대 1 → 슬롯이 2칸이어도 1개");
+
+            spawner.Respawn(new[] { shade }, TimeOfDay.Day, null, Balance(0, 5, 1f), new FixedRandom(0f));
+            Assert.AreEqual(2, spawner.CountOf(shade), "최대가 슬롯 수보다 크면 슬롯 수까지");
         }
 
         [Test]
@@ -132,7 +159,7 @@ namespace VoxelMagic.Tests
         public void Pick_AddsToInventoryAndStacks()
         {
             var berry = Mat("berry", GatherHabitatKind.Bush, true, false);
-            var config = TestAssets.Create<GatheringConfig>(("_fillRatio", 1f));
+            var config = Balance(3, 3);
             var inventory = new Inventory(5);
             var messages = new GameMessages();
             int acquired = 0;

@@ -51,7 +51,10 @@ _Bootstrap (GameBootstrap) · Player · Main Camera(QuarterViewCamera) · UI · 
 
 ## 3. 데이터·메뉴
 - 재료 12종 `Data/Mountain/Gather/` (서식지마다 방과후 2 + 밤 1), 의뢰 4종 `Data/Mountain/Requests/`, 동물 3종 `Data/Mountain/Animals/`(산토끼 0.5·다람쥐 0.6·여우 0.8)
-- 설정: `Data/Config/GatheringConfig`(채움 0.5), `CaptureConfig`(간격 5·흔들림 3·동시 1~2·근처 길 0.6초/쿨다운 8/세기 0.7·잦아듦 0.35), `MoveConfig_BackMountain`. **모든 숫자는 "가정" 기본값**
+- **채집 밸런스**: `Data/Config/GatheringConfig`의 서식지 종류별 슬롯 수·최소/최대 개수·추가분 확률·슬롯 배치 모양 (지금 모두 슬롯 2·0~1개·0.5). 창 `VoxelMagic/뒷산/채집 밸런스`에서 조절, 슬롯 수는 "슬롯 수 적용"으로 프리팹·씬에 반영
+- 설정: `CaptureConfig`(간격 5·흔들림 3·동시 1~2·근처 길 0.6초/쿨다운 8/세기 0.7·잦아듦 0.35), `MoveConfig_BackMountain`. **모든 숫자는 "가정" 기본값**
+- **FBX에 기능 붙이기**: 직접 배치한 FBX를 선택하고 `VoxelMagic/뒷산/선택한 오브젝트에 기능 붙이기/…`(서식지 4종·포획 풀숲·의뢰 게시판·크리처). 서식지 슬롯 자리를 정하려면 FBX 아래에 "Slot"으로 시작하는 빈 오브젝트를 놓아 둔다. 교체 전 기본 도형은 끄면 채집·포획에서 빠진다 (초입 그늘 나무 3그루가 이렇게 교체됨)
+- 개발용 치트: 모든 맵에서 F9 = 걷기·달리기 ×3 (에디터·개발 빌드만)
 - 메뉴 `VoxelMagic/뒷산/채집 서식지 만들기·배치`, `…/의뢰 데이터 만들기`, `…/포획 구역 만들기·배치` — 배치 메뉴는 `[Prototype]/Gathering`·`Capture`를 **지우고 다시 만든다**(사용자 조정 사라짐). 새 아이템·의뢰를 만들면 `VoxelMagic/저장/정의 목록 채우기`
 
 ## 4. 알려진 문제·결정 대기 (기능)

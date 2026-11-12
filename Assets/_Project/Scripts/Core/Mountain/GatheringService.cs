@@ -59,7 +59,7 @@ namespace VoxelMagic.Core
         /// <summary>새 하루 시작·시간대 전환 때 부른다. 지금은 디버그 키로도 부른다.</summary>
         public void Respawn()
         {
-            _spawner.Respawn(_pool, _time.Time, RequiredItems(), _config.FillRatio, _random);
+            _spawner.Respawn(_pool, _time.Time, RequiredItems(), _config, _random);
             Changed?.Invoke();
         }
 

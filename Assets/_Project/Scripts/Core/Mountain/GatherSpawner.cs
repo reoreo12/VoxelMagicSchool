@@ -1,5 +1,5 @@
-// 서식지 슬롯마다 어떤 재료가 놓였는지 관리한다. 다시 배치할 때 자기 서식지·현재 시간대 재료만 고르고,
-// 직전에 비어 있던 슬롯을 먼저 써서 위치가 바뀌게 하며, 의뢰에 필요한 재료는 최소 1개를 보장한다.
+// 서식지 슬롯마다 어떤 재료가 놓였는지 관리한다. 다시 배치할 때 자기 서식지·현재 시간대 재료만 서식지 종류별 개수(GatheringConfig)만큼 고르고,
+// 직전에 비어 있던 슬롯을 먼저 써서 위치가 바뀌게 하며, 의뢰에 필요한 재료는 맵 전체에 최소 1개를 보장한다.
 using System.Collections.Generic;
 
 namespace VoxelMagic.Core
@@ -45,10 +45,10 @@ namespace VoxelMagic.Core
         }
 
         public void Respawn(IReadOnlyList<GatherMaterialDefinition> pool, TimeOfDay time,
-            IEnumerable<ItemDefinition> required, float fillRatio, IRandom random)
+            IEnumerable<ItemDefinition> required, GatheringConfig balance, IRandom random)
         {
             for (int h = 0; h < _slots.Length; h++)
-                RespawnHabitat(h, pool, time, fillRatio, random);
+                RespawnHabitat(h, pool, time, balance.For(_kinds[h]), random);
             EnsureRequired(required, time, random);
         }
 
@@ -62,7 +62,7 @@ namespace VoxelMagic.Core
         }
 
         private void RespawnHabitat(int h, IReadOnlyList<GatherMaterialDefinition> pool, TimeOfDay time,
-            float fillRatio, IRandom random)
+            HabitatBalance balance, IRandom random)
         {
             var slots = _slots[h];
             _candidates.Clear();
@@ -77,8 +77,8 @@ namespace VoxelMagic.Core
             for (int s = 0; s < slots.Length; s++) slots[s] = null;
             if (_candidates.Count == 0 || slots.Length == 0) return;
 
-            int target = (int)System.Math.Round(fillRatio * slots.Length);
-            target = System.Math.Max(1, System.Math.Min(slots.Length, target));
+            // 서식지 종류별 밸런스: 최소 + 확률로 더한 개수 (0개도 가능)
+            int target = balance.RollCount(slots.Length, random);
             for (int i = 0; i < target; i++)
                 slots[_order[i]] = _candidates[random.Range(0, _candidates.Count)];
         }

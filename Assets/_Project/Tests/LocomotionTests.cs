@@ -17,6 +17,7 @@ namespace VoxelMagic.Tests
         [SetUp]
         public void SetUp()
         {
+            MoveSpeedCheat.Reset(); // 플레이 중 켠 개발용 속도 치트가 남아 있어도 테스트는 배율 1로
             _config = TestAssets.Create<CharacterMoveConfig>(
                 ("_walkSpeed", 4f), ("_runSpeed", 9f), ("_acceleration", 40f), ("_deceleration", 50f));
             _motor = new PlanarMotor();
@@ -25,7 +26,23 @@ namespace VoxelMagic.Tests
             _machine.StateChanged += (from, to) => _changes.Add((from, to));
         }
 
-        [TearDown] public void TearDown() => TestAssets.DestroyAll();
+        [Test]
+        public void SpeedCheat_MultipliesTargetSpeed_AndResets()
+        {
+            MoveSpeedCheat.Set(3f);
+            for (int i = 0; i < 60; i++) _machine.Update(new MoveIntent(Vector2.right, false), 1f / 60f);
+            Assert.AreEqual(12f, _motor.Velocity.magnitude, 0.001f);
+            MoveSpeedCheat.Reset();
+            for (int i = 0; i < 60; i++) _machine.Update(new MoveIntent(Vector2.right, false), 1f / 60f);
+            Assert.AreEqual(4f, _motor.Velocity.magnitude, 0.001f);
+        }
+
+        [TearDown]
+        public void TearDown()
+        {
+            MoveSpeedCheat.Reset();
+            TestAssets.DestroyAll();
+        }
 
         private void Run(MoveIntent intent, int frames)
         {

@@ -23,6 +23,8 @@ namespace VoxelMagic.Gameplay
 
         public void Bind(MountainContext context)
         {
+            // 부트스트랩이 번호를 주지 않은 서식지(꺼 둔 교체 전 서식지 등)는 채집에 참여하지 않는다.
+            if (Index < 0) return;
             _gathering = context.Gathering;
             _gathering.Changed += Refresh;
             Refresh();

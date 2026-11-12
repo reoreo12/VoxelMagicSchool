@@ -30,7 +30,11 @@ namespace VoxelMagic.Gameplay
             _phase = index * 1.7f;
         }
 
-        public void Bind(MountainContext context) => _capture = context.Capture;
+        // 부트스트랩이 번호를 주지 않은 풀숲(꺼 둔 것)은 포획에 참여하지 않는다.
+        public void Bind(MountainContext context)
+        {
+            if (Index >= 0) _capture = context.Capture;
+        }
 
         private void Update()
         {

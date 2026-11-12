@@ -28,7 +28,12 @@ namespace VoxelMagic.Gameplay
         {
             if (_setup == null) return;
             for (int i = 0; i < States.Length; i++)
-                _animator.SetFloat(_parameters[i], _setup.SpeedFor(States[i]) * (_moveConfig != null ? _moveConfig.AnimationScaleFor(States[i]) : 1f));
+            {
+                float speed = _setup.SpeedFor(States[i]) * (_moveConfig != null ? _moveConfig.AnimationScaleFor(States[i]) : 1f);
+                // 속도 치트가 켜지면 걷기·달리기 재생도 같은 배율로 (발 미끄러짐 줄이기)
+                if (States[i] != CharacterStateId.Idle) speed *= MoveSpeedCheat.Multiplier;
+                _animator.SetFloat(_parameters[i], speed);
+            }
         }
     }
 }
