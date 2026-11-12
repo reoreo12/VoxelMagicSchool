@@ -5366,6 +5366,7 @@ MonoBehaviour:
   _listRoot: {fileID: 112853661}
   _entryPrefab: {fileID: 7058891801501796666, guid: 75f4106a4e7e10946abea74df4af43a6, type: 3}
   _closeButton: {fileID: 495286024}
+  _boardRequests: []
 --- !u!225 &504015241
 CanvasGroup:
   m_ObjectHideFlags: 0
@@ -7133,6 +7134,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _text: {fileID: 829389802}
+  _sceneText: 
 --- !u!114 &829389801
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -12683,6 +12685,7 @@ MonoBehaviour:
   _slotRoot: {fileID: 1287059342}
   _slotPrefab: {fileID: 3478817151892881494, guid: 9c2a8c0d2b616354393600a7629ba94a, type: 3}
   _selectedName: {fileID: 1460599913}
+  _debugRightClickDiscard: 0
 --- !u!1 &1521317528
 GameObject:
   m_ObjectHideFlags: 0

@@ -10,6 +10,7 @@
 - 새 FBX 11개 `Art/Map/Mountain/Backdrop/`: 봉우리 `Spire_A·B·C·D` × 길이축 x·z (8개, 각 1.4천~2.8천 삼각형) + 이끼 둔덕 `AP1~AP3` (3개, 합 약 2.4만). 메시는 보이는 면(윗면·−X·−Z)만, 콜라이더 없음
 - 팔레트 `Mountain_palette.png` 12~15번 칸에 바위 4색 추가(#B5AA9A·#9A8F82·#7C7268·#5E564E). 1~11번 색은 그대로라 기존 바닥 FBX 영향 없음. 머티리얼은 기존 `Mountain_Voxel` 재사용
 - 씬 `BackMountain`에 `MountainBackdrop`(앞줄·뒷줄·둔덕, 총 23개, 약 6만 삼각형) 배치. 그림자 끔. 씬 저장은 사용자 확인 후
+- 봉우리 FBX를 8개 → 4개(`Spire_A~D`)로 줄임: 보이지 않던 +X/+Z 면까지 채워(삼각형 약 +60%, 씬 합계 약 8.3만) X·Z 방향 변형을 FBX가 아닌 인스턴스의 Y축 90° 회전으로 처리. 씬의 고유 메시는 23개 → 7개. 옛 `Spire_?x/?z.fbx` 8개는 `Backdrop/_Unused/`로 옮겨 둠(삭제는 사용자)
 - 제작 스크립트·배치표: `Source/Backdrop/` (`gen_spires.py`, `gen_apron.py`, `layout.py`, `export_fbx.py`, `placement.json`)
 
 ## 2026-11-11 — 뒷산 맵 줄이기 + 맵별 이동 속도 (브랜치 `Back-mountain-map`)

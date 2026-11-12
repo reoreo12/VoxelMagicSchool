@@ -1,12 +1,13 @@
 [
  {
   "name": "Spire_Cx_00",
-  "mesh": "Spire_Cx",
+  "mesh": "Spire_C",
   "pos": [
    -0.06,
    4.06,
    80.92
   ],
+  "rotY": 0,
   "scale": [
    0.8,
    1.0,
@@ -16,12 +17,13 @@
  },
  {
   "name": "Spire_Dx_01",
-  "mesh": "Spire_Dx",
+  "mesh": "Spire_D",
   "pos": [
    9.0,
    4.06,
    80.0
   ],
+  "rotY": 0,
   "scale": [
    1.0,
    1.0,
@@ -31,12 +33,13 @@
  },
  {
   "name": "Spire_Bz_02",
-  "mesh": "Spire_Bz",
+  "mesh": "Spire_B",
   "pos": [
    16.815,
    4.261,
-   66.77
+   73.23
   ],
+  "rotY": 90,
   "scale": [
    0.85,
    1.0,
@@ -46,12 +49,13 @@
  },
  {
   "name": "Spire_Dz_03",
-  "mesh": "Spire_Dz",
+  "mesh": "Spire_D",
   "pos": [
    16.28,
    4.114,
-   74.15
+   80.45
   ],
+  "rotY": 90,
   "scale": [
    0.9,
    1.1,
@@ -61,12 +65,13 @@
  },
  {
   "name": "Spire_Cx_04",
-  "mesh": "Spire_Cx",
+  "mesh": "Spire_C",
   "pos": [
    18.37,
    6.888,
    64.71
   ],
+  "rotY": 0,
   "scale": [
    0.9,
    1.05,
@@ -76,12 +81,13 @@
  },
  {
   "name": "Spire_Dx_05",
-  "mesh": "Spire_Dx",
+  "mesh": "Spire_D",
   "pos": [
    28.525,
    8.019,
    64.42
   ],
+  "rotY": 0,
   "scale": [
    0.85,
    0.9,
@@ -91,12 +97,13 @@
  },
  {
   "name": "Spire_Bx_06",
-  "mesh": "Spire_Bx",
+  "mesh": "Spire_B",
   "pos": [
    34.7,
    8.419,
    64.5
   ],
+  "rotY": 0,
   "scale": [
    1.0,
    1.05,
@@ -106,12 +113,13 @@
  },
  {
   "name": "Spire_Dx_07",
-  "mesh": "Spire_Dx",
+  "mesh": "Spire_D",
   "pos": [
    42.375,
    8.847,
    64.7
   ],
+  "rotY": 0,
   "scale": [
    0.75,
    1.0,
@@ -121,12 +129,13 @@
  },
  {
   "name": "Spire_Cz_08",
-  "mesh": "Spire_Cz",
+  "mesh": "Spire_C",
   "pos": [
    48.92,
    8.212,
-   50.44
+   59.56
   ],
+  "rotY": 90,
   "scale": [
    0.8,
    1.0,
@@ -136,12 +145,13 @@
  },
  {
   "name": "Spire_Dz_09",
-  "mesh": "Spire_Dz",
+  "mesh": "Spire_D",
   "pos": [
    48.46,
    8.719,
-   59.2
+   64.8
   ],
+  "rotY": 90,
   "scale": [
    0.8,
    1.1,
@@ -151,12 +161,13 @@
  },
  {
   "name": "Spire_Ax_10",
-  "mesh": "Spire_Ax",
+  "mesh": "Spire_A",
   "pos": [
    0.9,
    4.06,
    86.8
   ],
+  "rotY": 0,
   "scale": [
    1.0,
    1.15,
@@ -166,12 +177,13 @@
  },
  {
   "name": "Spire_Bx_11",
-  "mesh": "Spire_Bx",
+  "mesh": "Spire_B",
   "pos": [
    7.7,
    4.06,
    86.4
   ],
+  "rotY": 0,
   "scale": [
    1.0,
    1.2,
@@ -181,12 +193,13 @@
  },
  {
   "name": "Spire_Az_12",
-  "mesh": "Spire_Az",
+  "mesh": "Spire_A",
   "pos": [
    22.52,
    7.067,
-   68.16
+   72.84
   ],
+  "rotY": 90,
   "scale": [
    0.9,
    1.05,
@@ -196,12 +209,13 @@
  },
  {
   "name": "Spire_Az_13",
-  "mesh": "Spire_Az",
+  "mesh": "Spire_A",
   "pos": [
    22.8,
    4.08,
-   76.4
+   81.6
   ],
+  "rotY": 90,
   "scale": [
    1.0,
    1.15,
@@ -211,12 +225,13 @@
  },
  {
   "name": "Spire_Ax_14",
-  "mesh": "Spire_Ax",
+  "mesh": "Spire_A",
   "pos": [
    28.16,
    7.765,
    71.02
   ],
+  "rotY": 0,
   "scale": [
    0.9,
    1.0,
@@ -226,12 +241,13 @@
  },
  {
   "name": "Spire_Bx_15",
-  "mesh": "Spire_Bx",
+  "mesh": "Spire_B",
   "pos": [
    34.2,
    8.386,
    71.4
   ],
+  "rotY": 0,
   "scale": [
    1.0,
    1.1,
@@ -241,12 +257,13 @@
  },
  {
   "name": "Spire_Ax_16",
-  "mesh": "Spire_Ax",
+  "mesh": "Spire_A",
   "pos": [
    43.14,
    8.924,
    70.58
   ],
+  "rotY": 0,
   "scale": [
    1.1,
    1.2,
@@ -256,12 +273,13 @@
  },
  {
   "name": "Spire_Bz_17",
-  "mesh": "Spire_Bz",
+  "mesh": "Spire_B",
   "pos": [
    54.61,
    8.196,
-   49.08
+   55.92
   ],
+  "rotY": 90,
   "scale": [
    0.9,
    1.05,
@@ -271,12 +289,13 @@
  },
  {
   "name": "Spire_Az_18",
-  "mesh": "Spire_Az",
+  "mesh": "Spire_A",
   "pos": [
    54.6,
    8.311,
-   57.4
+   62.6
   ],
+  "rotY": 90,
   "scale": [
    1.0,
    1.1,
@@ -286,12 +305,13 @@
  },
  {
   "name": "Spire_Az_19",
-  "mesh": "Spire_Az",
+  "mesh": "Spire_A",
   "pos": [
    54.52,
    9.091,
-   65.16
+   69.84
   ],
+  "rotY": 90,
   "scale": [
    0.9,
    1.15,
@@ -307,6 +327,7 @@
    0,
    80
   ],
+  "rotY": 0,
   "scale": [
    1,
    1,
@@ -322,6 +343,7 @@
    0,
    64
   ],
+  "rotY": 0,
   "scale": [
    1,
    1,
@@ -337,6 +359,7 @@
    0,
    48
   ],
+  "rotY": 0,
   "scale": [
    1,
    1,

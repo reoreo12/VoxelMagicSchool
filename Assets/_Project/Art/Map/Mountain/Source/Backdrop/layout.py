@@ -10,17 +10,21 @@ INST=[  # kind, 방향, 중심x, 중심z, 확대xz, 확대y
  ('B','z',56.5,52.5,.9,1.05),('A','z',56.8,60.0,1.0,1.1),('A','z',56.5,67.5,.9,1.15)]
 
 def transforms():
-    res = []
-    cache = {}
+    # 봉우리 종류당 FBX 1개(길이축 X). 'z' 방향은 FBX가 아니라 Y 회전 90°로 만든다 (4면을 모두 만들어 둠)
+    res = []; cache = {}
     for n, (k, o, cx, cz, sxz, sy) in enumerate(INST):
-        key = k + o
-        if key not in cache:
-            V, N, C, nq, info = G.build_piece(k, 1 if o == 'z' else 0, seed=ord(k)); cache[key] = info['size']
-        NU, NV = cache[key]
+        if k not in cache:
+            V, N, C, nq, info = G.build_piece(k, 0, seed=ord(k)); cache[k] = info['size']
+        NU, NV = cache[k]
         y0 = float(A.base_height(cx, cz)[0]) - 0.1
-        res.append(dict(name=f"Spire_{k}{o}_{n:02d}", mesh=f"Spire_{k}{o}", pos=[round(cx - NU / 2 * sxz, 3), round(y0, 3), round(cz - NV / 2 * sxz, 3)], scale=[sxz, sy, sxz], row='front' if n < 10 else 'back'))
+        if o == 'x':
+            rot = 0; pos = [cx - NU / 2 * sxz, y0, cz - NV / 2 * sxz]
+        else:
+            rot = 90   # 유니티 Y축 90°: 로컬 (x,z) → 월드 (z,-x)
+            pos = [cx - NV / 2 * sxz, y0, cz + NU / 2 * sxz]
+        res.append(dict(name=f"Spire_{k}{o}_{n:02d}", mesh=f"Spire_{k}", pos=[round(v, 3) for v in pos], rotY=rot, scale=[sxz, sy, sxz], row='front' if n < 10 else 'back'))
     for name, (a, b, c, d) in A.CHUNKS.items():
-        res.append(dict(name=name, mesh=name, pos=[a, 0, b], scale=[1, 1, 1], row='apron'))
+        res.append(dict(name=name, mesh=name, pos=[a, 0, b], rotY=0, scale=[1, 1, 1], row='apron'))
     return res
 if __name__ == '__main__':
     json.dump(transforms(), open((sys.argv[1] if len(sys.argv) > 1 else '.') + '/placement.json', 'w'), indent=1, ensure_ascii=False)

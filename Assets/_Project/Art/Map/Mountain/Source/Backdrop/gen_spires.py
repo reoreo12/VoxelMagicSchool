@@ -4,6 +4,7 @@
 import numpy as np, sys, os, json
 from scipy.ndimage import gaussian_filter, binary_opening
 from scipy.spatial import cKDTree
+FULL = os.environ.get('FULL', '1') == '1'     # 1: 보이지 않는 +X/+Z 면까지 채움 → 회전해 재사용 가능
 S = 1.0 / 15.0; VPM = 15
 OUT = sys.argv[1] if len(sys.argv) > 1 else 'out2'
 HERE = os.path.dirname(os.path.abspath(__file__))
@@ -30,7 +31,7 @@ def greedy(g):
         used[u:u2, v:v2] = True; rects.append((u, v, u2, v2, int(c)))
     return rects
 
-def mesh(Hg, Mg, Tg, facec, lowg, box):
+def mesh(Hg, Mg, Tg, facec, lowg, box, sides=((-1, 0), (0, -1))):
     """Hg 높이(복셀 정수) Mg 마스크 Tg 윗면색 lowg 마스크 밖 이웃일 때 단면 아래 끝(복셀). box=(i0,i1,j0,j1) 그리드 인덱스. 좌표는 box 모서리 기준 미터."""
     i0, i1, j0, j1 = box; NXg, NZg = Hg.shape
     hs = Hg[i0:i1, j0:j1]; ms = Mg[i0:i1, j0:j1]; quads = []
@@ -39,7 +40,7 @@ def mesh(Hg, Mg, Tg, facec, lowg, box):
         g = np.where(ms & (hs == lvl), Tg[i0:i1, j0:j1], 0).astype(np.uint8)
         for u, v, u2, v2, c in greedy(g):
             y = lvl * S; quads.append(((u*S, y, v*S), (u*S, y, v2*S), (u2*S, y, v2*S), (u2*S, y, v*S), 0, 1, 0, c))
-    for di, dj in ((-1, 0), (0, -1)):
+    for di, dj in sides:
         planes = {}
         ii = np.arange(i0, i1)[:, None]; jj = np.arange(j0, j1)[None, :]
         ni = ii + di; nj = jj + dj; ins = (ni >= 0) & (nj >= 0)
@@ -49,7 +50,7 @@ def mesh(Hg, Mg, Tg, facec, lowg, box):
         for a, b in zip(pa, pb):
             gi = i0 + a; gj = j0 + b; ks = np.arange(nh[a, b] + 1, hs[a, b] + 1)
             cols = facec('x' if di else 'z', gi, gj, ks)
-            key = gi if di else gj; along = (gj - j0) if di else (gi - i0)
+            key = (gi + (1 if di > 0 else 0)) if di else (gj + (1 if dj > 0 else 0)); along = (gj - j0) if di else (gi - i0)
             planes.setdefault(key, []).append((along, ks, cols))
         for key, items in planes.items():
             n_al = (j1 - j0) if di else (i1 - i0)
@@ -58,9 +59,11 @@ def mesh(Hg, Mg, Tg, facec, lowg, box):
             for u, v, u2, v2, c in greedy(g):
                 ya, yb = (v + kmin - 1) * S, (v2 + kmin - 1) * S
                 if di:
-                    x = (key - i0) * S; quads.append(((x, ya, u*S), (x, yb, u*S), (x, yb, u2*S), (x, ya, u2*S), -1, 0, 0, c))
+                    x = (key + (1 if di > 0 else 0) - i0) * S if False else (key - i0) * S
+                    quads.append(((x, ya, u*S), (x, yb, u*S), (x, yb, u2*S), (x, ya, u2*S), int(di), 0, 0, c))
                 else:
-                    z = (key - j0) * S; quads.append(((u*S, ya, z), (u2*S, ya, z), (u2*S, yb, z), (u*S, yb, z), 0, 0, -1, c))
+                    z = (key - j0) * S
+                    quads.append(((u*S, ya, z), (u2*S, ya, z), (u2*S, yb, z), (u*S, yb, z), 0, 0, int(dj), c))
     Vq = np.array([q[:4] for q in quads], np.float32); Nq = np.array([q[4:7] for q in quads], np.float32)
     cr = np.cross(Vq[:, 1] - Vq[:, 0], Vq[:, 2] - Vq[:, 0]); bad = (cr * Nq).sum(1) < 0; Vq[bad] = Vq[bad][:, [0, 3, 2, 1]]
     return Vq.reshape(-1, 3), np.repeat(Nq, 4, 0), np.repeat(np.array([q[7] for q in quads], np.int32), 4), len(quads)
@@ -134,15 +137,15 @@ def build_piece(kind, swap, Q=int(os.environ.get('SQ', 8)), seed=0, HB=int(os.en
         mcol = PIDX['moss_dark'] if st < -0.3 else PIDX['moss']
         return np.where(ks * S < lim[gi, gj] + 0.35 * np.sin(ks * 0.11 + gj * 0.2), mcol, base).astype(np.uint8)
     low0 = np.zeros(Hv.shape, np.int32)
-    V, N, C, nq = mesh(Hv, M, T, facec, low0, (0, NU, 0, NV))
+    V, N, C, nq = mesh(Hv, M, T, facec, low0, (0, NU, 0, NV), sides=((-1, 0), (1, 0), (0, -1), (0, 1)) if FULL else ((-1, 0), (0, -1)))
     return V, N, C, nq, dict(size=(NU * S, NV * S), margin=0.5, Hmax=float(Hmax * S))
 
 if __name__ == '__main__':
     os.makedirs(OUT, exist_ok=True); st = []
     for k in KINDS:
-        for sw in (0, 1):
+        for sw in ((0,) if FULL else (0, 1)):
             V, N, C, nq, info = build_piece(k, sw, seed=ord(k))
-            name = f'Spire_{k}{"z" if sw else "x"}'
+            name = f'Spire_{k}' if FULL else f'Spire_{k}{"z" if sw else "x"}'
             np.savez_compressed(f'{OUT}/{name}.npz', V=V, N=N, C=C, palette_n=len(PAL_ORDER))
             st.append(dict(name=name, tris=nq * 2, **info)); print(st[-1], flush=True)
     json.dump(st, open(f'{OUT}/stats_spires.json', 'w'), indent=1)
