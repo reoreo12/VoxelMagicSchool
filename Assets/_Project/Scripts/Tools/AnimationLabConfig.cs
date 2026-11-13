@@ -37,7 +37,8 @@ namespace VoxelMagic.Tools
 
         [Header("카메라")]
         [SerializeField, Min(0.01f)] private float _orbitSpeed = 0.25f;
-        [SerializeField, Min(0.01f)] private float _zoomSpeed = 0.002f;
+        [Tooltip("휠 한 칸마다 거리가 줄거나 느는 비율 (0.25 = 25%)")]
+        [SerializeField, Range(0.01f, 0.6f)] private float _zoomSpeed = 0.25f;
         [SerializeField, Min(0.0001f)] private float _panSpeed = 0.003f;
         [SerializeField, Min(0.1f)] private float _minDistance = 0.8f;
         [SerializeField, Min(0.2f)] private float _maxDistance = 10f;

@@ -118,6 +118,11 @@ namespace VoxelMagic.Tools
         // ── 아바타 ───────────────────────────────────────────
 
         // 버전 비교가 쉽도록, 바꾸기 전의 클립·재생 시간·일시정지·카메라를 새 아바타에 그대로 이어 간다.
+        // 크리처 프리팹에 든 리그 묶음(있으면 클립에 맞는 리그 메시만 켠다)과, 클립 목록을 다시 그릴 때 쓰는 마지막 검색 결과.
+        private CreatureRigSet _rigSet;
+        private IReadOnlyList<LabClip> _lastClips;
+        private IReadOnlyList<LabClip> _lastCreatureClips;
+
         private void SelectAvatar(int index)
         {
             bool firstSpawn = _instance == null;
@@ -137,7 +142,11 @@ namespace VoxelMagic.Tools
             _setup = _avatars[Mathf.Clamp(index, 0, _avatars.Count - 1)];
             _instance = Instantiate(_setup.Model, _spawnPoint.position, _spawnPoint.rotation);
             _animator = _instance.GetComponent<Animator>();
-            if (_animator == null || _animator.avatar == null || !_animator.avatar.isHuman)
+            _rigSet = _instance.GetComponent<CreatureRigSet>();
+            // Humanoid가 아니어도 Idle 클립이 Generic 클립이면(예: 동물형 크리처) 그대로 재생한다.
+            var idleClip = _setup.ClipFor(CharacterStateId.Idle);
+            bool generic = _animator != null && (_animator.avatar == null || !_animator.avatar.isHuman) && idleClip != null && !idleClip.isHumanMotion;
+            if (_animator == null || (!generic && (_animator.avatar == null || !_animator.avatar.isHuman)))
             {
                 Status(string.Format(LabTexts.NotHuman, _setup.name));
                 _ui.AvatarInfo.text = _setup.name;
@@ -156,7 +165,8 @@ namespace VoxelMagic.Tools
             _ui.AvatarInfo.text = string.Format(LabTexts.AvatarInfo, _setup.name, height, LabTexts.Yes, CountMappedBones(),
                 ClipName(CharacterStateId.Idle), ClipName(CharacterStateId.Walk), ClipName(CharacterStateId.Run));
 
-            if (keepClip != null)
+            // 이전 아바타에서 재생하던 클립은 새 아바타의 뼈 구조에 맞을 때만 이어서 재생한다 (Humanoid ↔ 크리처 전환 시 맞지 않는 클립 방지).
+            if (keepClip != null && keepClip.isHumanMotion == _animator.isHuman && (_rigSet == null || _rigSet.Contains(keepClip)))
             {
                 _player.Play(keepClip, 0f);
                 _player.Scrub(keepTime);
@@ -169,6 +179,7 @@ namespace VoxelMagic.Tools
                 var first = _setup.ClipFor(CharacterStateId.Idle);
                 if (first != null) Play(first);
             }
+            BuildClipList();
             Status("");
         }
 
@@ -176,6 +187,7 @@ namespace VoxelMagic.Tools
 
         private int CountMappedBones()
         {
+            if (!_animator.isHuman) return 0;
             int count = 0;
             for (int i = 0; i < (int)HumanBodyBones.LastBone; i++)
                 if (_animator.GetBoneTransform((HumanBodyBones)i) != null) count++;
@@ -227,32 +239,71 @@ namespace VoxelMagic.Tools
                 return;
             }
 
-            var clips = AnimationLabBridge.ScanClips();
-            _ui.ClipCount.text = string.Format(LabTexts.ClipCount, clips.Count, clips.Count(c => c.IsHuman));
-            foreach (var entry in clips)
+            _lastClips = AnimationLabBridge.ScanClips();
+            _lastCreatureClips = AnimationLabBridge.ScanCreatureClips != null ? AnimationLabBridge.ScanCreatureClips() : new List<LabClip>();
+            BuildClipList();
+        }
+
+        // 오른쪽 목록: Humanoid / 크리처(Generic) / 기타를 따로 묶는다. 지금 아바타에 맞지 않는 항목은 눌리지 않게 흐리게 둔다.
+        private void BuildClipList()
+        {
+            foreach (var button in _clipButtons) Destroy(button);
+            _clipButtons.Clear();
+            if (_lastClips == null) return;
+            var human = _lastClips.Where(c => c.IsHuman).ToList();
+            var others = _lastClips.Where(c => !c.IsHuman).ToList();
+            var creature = _lastCreatureClips != null ? _lastCreatureClips.ToList() : new List<LabClip>();
+            bool humanAvatar = _animator == null || _animator.isHuman;
+            _ui.ClipCount.text = string.Format(LabTexts.ClipCount, _lastClips.Count, human.Count, creature.Count);
+
+            AddClipHeader(string.Format(LabTexts.HeaderHuman, human.Count));
+            foreach (var entry in human)
             {
-                var button = Instantiate(_ui.ClipButtonTemplate, _ui.ClipListContent);
-                button.gameObject.SetActive(true);
-                var label = button.GetComponentInChildren<TMP_Text>();
+                var button = AddClipButton(string.Format(LabTexts.ClipEntry, entry.Clip.name, entry.Clip.length, System.IO.Path.GetFileName(entry.Path)));
                 var captured = entry;
-                if (entry.IsHuman)
+                button.interactable = humanAvatar;
+                button.onClick.AddListener(() => Play(captured.Clip));
+            }
+
+            AddClipHeader(string.Format(LabTexts.HeaderCreature, creature.Count));
+            foreach (var entry in creature)
+            {
+                string group = System.IO.Path.GetFileName(System.IO.Path.GetDirectoryName(entry.Path));
+                bool usable = _rigSet != null && _rigSet.Contains(entry.Clip);
+                var button = AddClipButton(string.Format(usable ? LabTexts.CreatureEntry : LabTexts.CreatureEntryOther, entry.Clip.name, entry.Clip.length, group));
+                var captured = entry;
+                button.interactable = usable;
+                button.onClick.AddListener(() => Play(captured.Clip));
+            }
+
+            if (others.Count == 0) return;
+            AddClipHeader(LabTexts.HeaderOther);
+            foreach (var entry in others)
+            {
+                var captured = entry;
+                if (entry.CanImport)
                 {
-                    label.text = string.Format(LabTexts.ClipEntry, entry.Clip.name, entry.Clip.length, System.IO.Path.GetFileName(entry.Path));
-                    button.onClick.AddListener(() => Play(captured.Clip));
-                }
-                else if (entry.CanImport)
-                {
-                    label.text = string.Format(LabTexts.GenericEntry, System.IO.Path.GetFileName(entry.Path));
+                    var button = AddClipButton(string.Format(LabTexts.GenericEntry, System.IO.Path.GetFileName(entry.Path)));
                     button.onClick.AddListener(() => ImportAsHumanoid(captured.Path));
                 }
                 else
                 {
-                    label.text = string.Format(LabTexts.UnusableEntry, entry.Clip.name, System.IO.Path.GetFileName(entry.Path));
+                    var button = AddClipButton(string.Format(LabTexts.UnusableEntry, entry.Clip.name, System.IO.Path.GetFileName(entry.Path)));
                     button.interactable = false;
                 }
-                _clipButtons.Add(button.gameObject);
             }
         }
+
+        private Button AddClipButton(string text)
+        {
+            var button = Instantiate(_ui.ClipButtonTemplate, _ui.ClipListContent);
+            button.gameObject.SetActive(true);
+            button.GetComponentInChildren<TMP_Text>().text = text;
+            _clipButtons.Add(button.gameObject);
+            return button;
+        }
+
+        private void AddClipHeader(string text) => AddClipButton(text).interactable = false;
 
         private void ImportAsHumanoid(string path)
         {
@@ -264,6 +315,12 @@ namespace VoxelMagic.Tools
         private void Play(AnimationClip clip)
         {
             if (_player == null || clip == null) return;
+            // Generic 아바타(크리처)는 Humanoid 클립을 못 쓰고, 크리처 클립은 자기 리그의 메시를 켜야 보인다.
+            if (_animator != null && !_animator.isHuman && (clip.isHumanMotion || (_rigSet != null && !_rigSet.Activate(clip))))
+            {
+                Status(string.Format(LabTexts.ClipNotForAvatar, clip.name, _setup != null ? _setup.name : ""));
+                return;
+            }
             if (clip != _abSecond)
             {
                 _abFirst = _abSecond;

@@ -17,7 +17,13 @@ namespace VoxelMagic.Tools
         public const string ClipEntry = "{0}   <color=#9aa>{1:0.00}초 · {2}</color>";
         public const string UnusableEntry = "<color=#888>[Generic] {0} · {1}   이 아바타에 쓸 수 없음</color>";
         public const string GenericEntry = "<color=#e9a>[Generic]</color> {0}   <color=#9aa>눌러서 Humanoid로 임포트</color>";
-        public const string ClipCount = "애니메이션 {0}개 (Humanoid {1}개)   ·   Assets/_Project/Animations";
+        public const string ClipCount = "애니메이션 {0}개 (Humanoid {1}개) · 크리처 {2}개";
+        public const string HeaderHuman = "<b>Humanoid</b>  ({0})  ·  Assets/_Project/Animations";
+        public const string HeaderCreature = "<b>크리처 (Generic)</b>  ({0})  ·  Assets/_Project/Art/Creatures";
+        public const string HeaderOther = "<b>기타 Generic</b>";
+        public const string CreatureEntry = "<color=#9d9>[{2}]</color> {0}   <color=#9aa>{1:0.00}초</color>";
+        public const string CreatureEntryOther = "<color=#888>[{2}] {0}   이 아바타에는 쓸 수 없음 (뼈 구조 다름)</color>";
+        public const string ClipNotForAvatar = "{0}: {1}에 맞는 클립이 아닙니다 (뼈 구조가 다름)";
         public const string AvatarInfo = "{0}\n키 {1:0.00}  ·  Humanoid {2}  ·  매핑된 뼈 {3}개\n상태 클립: Idle {4} / Walk {5} / Run {6}";
         public const string Yes = "예";
         public const string No = "아니요";

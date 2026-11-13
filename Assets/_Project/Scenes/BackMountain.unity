@@ -347,11 +347,7 @@ MonoBehaviour:
   _listRoot: {fileID: 1856435752}
   _entryPrefab: {fileID: 7058891801501796666, guid: 75f4106a4e7e10946abea74df4af43a6, type: 3}
   _closeButton: {fileID: 269182858}
-  _boardRequests:
-  - {fileID: 11400000, guid: 38e38f7098ec05a48a682b350b6d2426, type: 2}
-  - {fileID: 11400000, guid: 5987e83309031cb4eb8884a44f08f619, type: 2}
-  - {fileID: 11400000, guid: e6974c39d6d0cad4ea70c9faaf4c6f21, type: 2}
-  - {fileID: 11400000, guid: d9a6489ae38115a4bac9190d1aee413f, type: 2}
+  _boardRequests: []
 --- !u!225 &43652801
 CanvasGroup:
   m_ObjectHideFlags: 0
@@ -4859,7 +4855,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _setup: {fileID: 11400000, guid: 0ee861e8c3cac8244bbefedbad045110, type: 2}
   _animator: {fileID: 371558444}
-  _moveConfig: {fileID: 11400000, guid: d85729e6fdc9851499be305ff8beaba1, type: 2}
+  _moveConfig: {fileID: 0}
 --- !u!114 &371558447
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -13956,7 +13952,7 @@ MonoBehaviour:
   _startingItems:
   - _item: {fileID: 11400000, guid: be3750a702fdc8f4c86ddf79204318e4, type: 2}
     _amount: 1
-  _catalog: {fileID: 11400000, guid: 54bc0affaae4dc249aeb8807ae2f045f, type: 2}
+  _catalog: {fileID: 0}
   _autoSave: 1
   _bindRoots:
   - {fileID: 1329131052}
@@ -18355,10 +18351,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _text: {fileID: 1459942188}
-  _sceneText: "WASD / \uBC29\uD5A5\uD0A4  \uC774\uB3D9\nShift  \uB2EC\uB9AC\uAE30\nE 
-    \uC0C1\uD638\uC791\uC6A9\n1~5 / \uD074\uB9AD  \uC778\uBCA4\uD1A0\uB9AC \uC120\uD0DD\n\uC2A4\uD06C\uB864 
-    \uCE74\uBA54\uB77C \uC90C\nQ  \uC758\uB8B0 \uC9C4\uD589 \uC811\uAE30/\uD3BC\uCE58\uAE30\nEsc 
-    \uCC3D \uB2EB\uAE30"
+  _sceneText: 
 --- !u!114 &1459942187
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -19798,8 +19791,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _input: {fileID: 1540661503}
-  _moveConfig: {fileID: 11400000, guid: d85729e6fdc9851499be305ff8beaba1, type: 2}
-  _animationView: {fileID: 371558447}
+  _moveConfig: {fileID: 0}
+  _animationView: {fileID: 0}
 --- !u!143 &1540661512
 CharacterController:
   m_ObjectHideFlags: 0
@@ -24952,7 +24945,7 @@ MonoBehaviour:
   _slotRoot: {fileID: 358810260}
   _slotPrefab: {fileID: 3478817151892881494, guid: 9c2a8c0d2b616354393600a7629ba94a, type: 3}
   _selectedName: {fileID: 1478861232}
-  _debugRightClickDiscard: 1
+  _debugRightClickDiscard: 0
 --- !u!1001 &2076559545
 PrefabInstance:
   m_ObjectHideFlags: 0
