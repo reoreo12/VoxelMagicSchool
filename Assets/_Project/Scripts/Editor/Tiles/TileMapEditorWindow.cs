@@ -1,5 +1,7 @@
 // 타일 맵 에디터 도구 창: 맵 목록(선택·보이기), 새 맵, 구운 맵 불러오기, 작업 대상 맵(고른 맵, 없으면 첫 맵)의 이름·칸 크기·굽기·보기 전환·칠하기 시작, 해 높이.
-// 맵 = Map_<이름> 루트(TileMapDocument). 비교 오브젝트는 작업 대상 맵을 따라간다.
+// 맵 = Map_<이름> 루트(TileMapDocument). 카메라·치비는 작업 대상 맵을 따라가고, 연못·밭은 제자리에 둔다.
+using System.Collections.Generic;
+using System.IO;
 using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEditor.Tilemaps;
@@ -55,11 +57,12 @@ namespace VoxelMagic.EditorTools
         {
             if (document == null || document == _lastTarget) return;
             _lastTarget = document;
+            // 비교 오브젝트: 카메라·치비(가운데)만 작업 대상 맵을 따라가고, 연못·밭(동쪽)은 제자리
             var rig = FindFirstObjectByType<TileMapCompareRig>();
             if (rig != null && rig.Target != document)
             {
-                Undo.RecordObject(rig, "비교 오브젝트 옮기기");
-                rig.SetTarget(document);
+                Undo.RecordObject(rig, "카메라·치비 옮기기");
+                rig.FollowCenter(document);
             }
             if (GridPaintingState.palette != null && document.Paint != null)
                 GridPaintingState.scenePaintTarget = document.Paint.gameObject;
@@ -143,6 +146,33 @@ namespace VoxelMagic.EditorTools
             if (SceneView.lastActiveSceneView != null) SceneView.lastActiveSceneView.FrameSelected();
         }
 
+        // 바탕 타일 고르기 목록: TileAssets/<팩>/floors의 바닥 타일 (farm, cave …)
+        private void DrawFloorPicker()
+        {
+            var paths = new List<string>();
+            foreach (var guid in AssetDatabase.FindAssets("t:Tile", new[] { FarmTileSetBuilder.TileAssetRoot }))
+            {
+                string path = AssetDatabase.GUIDToAssetPath(guid);
+                if (Path.GetFileName(Path.GetDirectoryName(path)) == "floors") paths.Add(path);
+            }
+            paths.Sort(System.StringComparer.Ordinal);
+            var names = new string[paths.Count + 1];
+            names[0] = "바닥 목록에서 고르기…";
+            int current = 0;
+            for (int i = 0; i < paths.Count; i++)
+            {
+                string pack = Path.GetFileName(Path.GetDirectoryName(Path.GetDirectoryName(paths[i])));
+                names[i + 1] = $"{pack}/{Path.GetFileNameWithoutExtension(paths[i])}";
+                if (_newFill != null && AssetDatabase.GetAssetPath(_newFill) == paths[i]) current = i + 1;
+            }
+            int pick = EditorGUILayout.Popup("바탕 바닥 고르기", current, names);
+            if (pick > 0 && pick != current)
+            {
+                _newFill = AssetDatabase.LoadAssetAtPath<TileBase>(paths[pick - 1]);
+                _newFillCleared = false;
+            }
+        }
+
         private void DrawNewMap()
         {
             _showNewMap = EditorGUILayout.Foldout(_showNewMap, "새 맵", true, EditorStyles.foldoutHeader);
@@ -158,6 +188,7 @@ namespace VoxelMagic.EditorTools
                 EditorGUI.BeginChangeCheck();
                 _newFill = (TileBase)EditorGUILayout.ObjectField("바탕 타일 (비우면 빈 맵)", _newFill, typeof(TileBase), false);
                 if (EditorGUI.EndChangeCheck()) _newFillCleared = _newFill == null;
+                DrawFloorPicker();
                 _newHideOthers = EditorGUILayout.Toggle("다른 맵 숨기기", _newHideOthers);
 
                 string problem = TileMapLibrary.ValidateNewName(_newName.Trim());
@@ -170,6 +201,7 @@ namespace VoxelMagic.EditorTools
                         if (created != null)
                         {
                             SelectMap(created);
+                            FollowTarget(created); // 선택 변경 알림을 기다리지 않고 바로 카메라·치비를 옮긴다
                             StartPainting(created);
                             _newName = null;
                         }
@@ -222,6 +254,7 @@ namespace VoxelMagic.EditorTools
             if (loaded != null)
             {
                 SelectMap(loaded);
+                FollowTarget(loaded);
                 StartPainting(loaded);
             }
             GUIUtility.ExitGUI();

@@ -15,7 +15,10 @@ namespace VoxelMagic.EditorTools
         public const string ConfigPath = "Assets/_Project/Data/Tiles/TileMapConfig.asset";
         public const string TilePackFolder = "Assets/_Project/Art/Map/Tile";
         private const string FarmFolder = TilePackFolder + "/farm";
-        private const string TileAssetFolder = "Assets/_Project/Art/Map/TileAssets/farm";
+        public const string TileAssetRoot = "Assets/_Project/Art/Map/TileAssets";
+        private const string TileAssetFolder = TileAssetRoot + "/farm";
+        // 팔레트 바닥 줄 끝에 낱장으로 붙이는 다른 팩 (Tile/<팩>/*.png)
+        public static readonly string[] ExtraFloorPacks = { "cave_floor_tiles_v3" };
         private const string PaletteFolder = "Assets/_Project/Art/Map/TilePalettes";
         private const string PaletteName = "Farm";
         public const string PalettePath = PaletteFolder + "/" + PaletteName + ".prefab";
@@ -23,6 +26,8 @@ namespace VoxelMagic.EditorTools
         private const string TransitionMarker = "_to_";
         private const int SetColumnStride = 6;   // 팔레트에서 경계 세트 사이 간격 (5칸 + 빈칸 1)
         private const int TransitionTopRow = -3;
+        private const int ExtraTopRow = -7;      // 다른 팩 바닥 3×3 블록 윗줄 (경계 세트 3줄 아래 + 빈 줄 1)
+        private const int ExtraBlockStride = 4;  // 3×3 블록 사이 간격 (3칸 + 빈칸 1)
 
         private static readonly Vector3Int N = new Vector3Int(0, 1, 0), S = new Vector3Int(0, -1, 0),
             E = new Vector3Int(1, 0, 0), W = new Vector3Int(-1, 0, 0),
@@ -125,6 +130,16 @@ namespace VoxelMagic.EditorTools
             foreach (var path in PngsIn($"{FarmFolder}/floors"))
                 floors[Path.GetFileNameWithoutExtension(path)] = SaveTile(path, $"{TileAssetFolder}/floors");
 
+            // 다른 팩의 낱장 바닥 (floors 폴더 없이 팩 폴더에 바로 있는 PNG). farm 바닥 뒤에 붙여 기존 팔레트 배치를 안 바꾼다
+            var extraFloors = new List<string>();
+            foreach (var pack in ExtraFloorPacks)
+                foreach (var path in PngsIn($"{TilePackFolder}/{pack}"))
+                {
+                    string name = Path.GetFileNameWithoutExtension(path);
+                    floors[name] = SaveTile(path, $"{TileAssetRoot}/{pack}/floors");
+                    extraFloors.Add(name);
+                }
+
             // 경계 세트 = <바탕 풀>_to_<바닥>. 기본 바탕(meadow_grass) 세트를 먼저, 나머지는 이름순 (팔레트 배치가 바뀌지 않게)
             var setFolders = new List<string>(AssetDatabase.GetSubFolders($"{FarmFolder}/transitions"));
             setFolders.Sort((a, b) =>
@@ -150,7 +165,7 @@ namespace VoxelMagic.EditorTools
                 sets.Add((floor, tiles, SaveRuleTile(RuleTileName(baseFloor, floor), floors[floor].sprite, tiles)));
             }
 
-            BuildPalette(palettePath, config, floors, sets);
+            BuildPalette(palettePath, config, floors, sets, extraFloors);
             AssetDatabase.SaveAssets();
             Debug.Log($"[타일 맵] farm: 바닥 {floors.Count}, 경계 세트 {sets.Count}, Rule Tile {sets.Count}, 팔레트 {palettePath}");
             return true;
@@ -214,9 +229,68 @@ namespace VoxelMagic.EditorTools
             return rule;
         }
 
-        // 1줄: 바닥 (meadow_grass 먼저) · 2줄 아래: Rule Tile · 그 아래: 경계 세트를 그림 모양대로 (5×3 블록)
+        // 다른 팩 바닥: 경계 세트 아래에 <바닥>_moss_<방향>_NN을 변형 번호(NN)마다 3×3 블록으로 (가운데 = <바닥>_NN),
+        // 블록 가운데에 못 들어간 낱장(<바닥>_NN 나머지 등)은 블록 아래 한 줄로
+        private static void PlaceExtraFloors(Tilemap tilemap, Dictionary<string, Tile> floors, List<string> extraFloors)
+        {
+            var edgeRegex = new System.Text.RegularExpressions.Regex(@"^(.+)_moss_(top_left|top_right|bottom_left|bottom_right|top|bottom|left|right)_(\d+)$");
+            var placed = new HashSet<string>();
+            var blockBases = new Dictionary<string, int>(); // <바닥> → 블록 가로 시작 (변형 1번 기준)
+            int nextBaseX = 0, blockCount = 0;
+            foreach (var name in extraFloors)
+            {
+                var match = edgeRegex.Match(name);
+                if (!match.Success) continue;
+                string floor = match.Groups[1].Value;
+                int variant = int.Parse(match.Groups[3].Value);
+                if (!blockBases.TryGetValue(floor, out int baseX))
+                {
+                    baseX = nextBaseX;
+                    blockBases[floor] = baseX;
+                }
+                var (dx, dy) = EdgeCell(match.Groups[2].Value);
+                int x = baseX + (variant - 1) * ExtraBlockStride + dx;
+                tilemap.SetTile(new Vector3Int(x, ExtraTopRow + dy, 0), floors[name]);
+                placed.Add(name);
+                blockCount = Mathf.Max(blockCount, variant);
+                nextBaseX = Mathf.Max(nextBaseX, baseX + variant * ExtraBlockStride);
+            }
+
+            // 블록 가운데: <바닥>_NN
+            foreach (var pair in blockBases)
+                for (int v = 1; v <= blockCount; v++)
+                {
+                    string center = $"{pair.Key}_{v:00}";
+                    if (!floors.ContainsKey(center) || !extraFloors.Contains(center)) continue;
+                    tilemap.SetTile(new Vector3Int(pair.Value + (v - 1) * ExtraBlockStride + 1, ExtraTopRow - 1, 0), floors[center]);
+                    placed.Add(center);
+                }
+
+            // 나머지 낱장: 블록 아래 한 줄
+            int rest = 0;
+            foreach (var name in extraFloors)
+                if (!placed.Contains(name))
+                    tilemap.SetTile(new Vector3Int(rest++, ExtraTopRow - 4, 0), floors[name]);
+        }
+
+        private static (int dx, int dy) EdgeCell(string direction)
+        {
+            switch (direction)
+            {
+                case "top_left": return (0, 0);
+                case "top": return (1, 0);
+                case "top_right": return (2, 0);
+                case "left": return (0, -1);
+                case "right": return (2, -1);
+                case "bottom_left": return (0, -2);
+                case "bottom": return (1, -2);
+                default: return (2, -2); // bottom_right
+            }
+        }
+
+        // 1줄: 바닥 (meadow_grass 먼저) · 2줄 아래: Rule Tile · 그 아래: 경계 세트를 그림 모양대로 (5×3 블록) · 그 아래: 다른 팩 바닥 3×3 블록
         private static void BuildPalette(string palettePath, TileMapConfig config, Dictionary<string, Tile> floors,
-            List<(string floor, Dictionary<string, Tile> tiles, RuleTile rule)> sets)
+            List<(string floor, Dictionary<string, Tile> tiles, RuleTile rule)> sets, List<string> extraFloors)
         {
             if (AssetDatabase.LoadAssetAtPath<GameObject>(palettePath) == null)
             {
@@ -232,9 +306,11 @@ namespace VoxelMagic.EditorTools
                 tilemap.ClearAllTiles();
 
                 var floorNames = new List<string>(floors.Keys);
+                floorNames.RemoveAll(extraFloors.Contains);
                 floorNames.Sort((a, b) => a == BaseFloor ? -1 : b == BaseFloor ? 1 : string.CompareOrdinal(a, b));
                 for (int i = 0; i < floorNames.Count; i++)
                     tilemap.SetTile(new Vector3Int(i, 0, 0), floors[floorNames[i]]);
+                PlaceExtraFloors(tilemap, floors, extraFloors);
 
                 for (int s = 0; s < sets.Count; s++)
                 {

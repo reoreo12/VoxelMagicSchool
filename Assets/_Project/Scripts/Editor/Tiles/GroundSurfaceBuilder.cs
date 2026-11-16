@@ -27,6 +27,12 @@ namespace VoxelMagic.EditorTools
             ("Wood", "나무판", new[] { "barn_floor_planks" }),
         };
 
+        // 이름 앞부분으로 정하는 바닥 종류 (변형 번호가 붙는 동굴 바닥 등): 앞부분, 기본 바닥 종류 에셋 이름
+        private static readonly (string prefix, string asset)[] PrefixDefaults =
+        {
+            ("cave_stone", "Stone"),
+        };
+
         [MenuItem("VoxelMagic/타일 맵/바닥 종류 표 만들기·채우기 (farm)")]
         private static void BuildFromMenu()
         {
@@ -39,9 +45,11 @@ namespace VoxelMagic.EditorTools
         {
             EnsureFolder(SurfaceFolder);
             var byFloor = new Dictionary<string, GroundSurface>();
+            var byAsset = new Dictionary<string, GroundSurface>();
             foreach (var (asset, display, floors) in Defaults)
             {
                 var surface = LoadOrCreateSurface(asset, display);
+                byAsset[asset] = surface;
                 foreach (var floor in floors) byFloor[floor] = surface;
             }
 
@@ -53,12 +61,18 @@ namespace VoxelMagic.EditorTools
             }
 
             int added = 0, unknown = 0;
-            foreach (var guid in AssetDatabase.FindAssets("t:TileBase", new[] { TileFolder }))
+            var tileFolders = new List<string> { TileFolder };
+            foreach (var pack in FarmTileSetBuilder.ExtraFloorPacks) tileFolders.Add($"{FarmTileSetBuilder.TileAssetRoot}/{pack}");
+            foreach (var guid in AssetDatabase.FindAssets("t:TileBase", tileFolders.ToArray()))
             {
                 string path = AssetDatabase.GUIDToAssetPath(guid);
                 var tile = AssetDatabase.LoadAssetAtPath<TileBase>(path);
                 string floor = FloorNameOf(path);
-                if (floor == null || !byFloor.TryGetValue(floor, out var surface)) { unknown++; continue; }
+                GroundSurface surface = null;
+                if (floor != null && !byFloor.TryGetValue(floor, out surface))
+                    foreach (var (prefix, asset) in PrefixDefaults)
+                        if (floor.StartsWith(prefix, System.StringComparison.Ordinal)) { surface = byAsset[asset]; break; }
+                if (surface == null) { unknown++; continue; }
                 if (table.AddIfMissing(tile, surface)) added++;
             }
             EditorUtility.SetDirty(table);

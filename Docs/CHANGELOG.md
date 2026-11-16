@@ -1,5 +1,14 @@
 # 변경 기록
 
+## 2026-11-16 — 동굴 바닥 타일을 타일 맵 에디터 팔레트에 추가 (브랜치 `feature/tool-tile-editor`)
+- 처음 넣은 `Tile/cave/cave_cobblestone.png`(와 타일 에셋)는 사용자 요청으로 삭제. 대신 `Tile/cave_floor_tiles_v3/` 26장(`cave_stone_01~06`, `cave_stone_moss_<방향>_NN`)을 씀
+- 임포트 설정 적용(Sprite·Point·압축 없음·32 PPU) → 타일 `Art/Map/TileAssets/cave_floor_tiles_v3/floors/*.asset` 26개
+- `FarmTileSetBuilder`: `ExtraFloorPacks`(`cave_floor_tiles_v3`)의 타일을 Farm 팔레트 경계 세트 아래(7줄째부터)에 이끼 방향대로 3×3 블록으로 배치. 변형 번호 01·02·03마다 블록 하나(가운데 = `cave_stone_01~03`, 03 블록은 모서리 그림이 없어 빈칸), 남은 `cave_stone_04~06`은 블록 아래 한 줄. 바닥 줄(맨 윗줄)의 farm 타일 위치는 그대로
+- `GroundSurfaceBuilder`: 이름이 `cave_stone`으로 시작하는 타일 = 돌 종류 (앞부분 규칙 `PrefixDefaults`)
+- 참고: 그 전에 구운 `Baked/Cave`의 칸 데이터는 지운 `cave_cobblestone`을 가리키므로, 다시 불러오면 그 칸이 비어 있음 (구운 프리팹 모양은 그대로)
+- 타일 맵 에디터 창: 새 맵 "바탕 바닥 고르기" 드롭다운 (`TileAssets/<팩>/floors` 바닥 타일 목록, cave 포함)
+- 타일 맵 에디터 창: 맵을 고르거나 새로 만들면 카메라·치비·1 m 상자(Compare/Center)만 따라가고, 연못·밭(Compare/East)은 붙어 있던 맵에 그대로 (`TileMapCompareRig`에 `_eastTarget`·`FollowCenter` 추가)
+
 ## 2026-11-12 — 채집 슬롯·드랍 밸런스 (서식지 종류별, 슬롯 2칸·0~1개) (브랜치 `Back-mountain-map`)
 - 사용자 요청: 슬롯 2칸, 서식지마다 0~1개 무작위 (너무 얻기 쉽지 않게, 밸런스는 추후 조절)
 - `GatheringConfig`: `_fillRatio`(슬롯 절반·최소 1개) 대신 서식지 종류별 `HabitatBalance` 목록 — 슬롯 수, 최소·최대 개수, 추가분 확률, 슬롯 배치 모양. 기본값 슬롯 2·0~1개·확률 0.5(가정) → 서식지가 비어 있을 확률 50%
