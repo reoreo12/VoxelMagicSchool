@@ -13,6 +13,7 @@ namespace VoxelMagic.Gameplay
 
         private InputActionMap _map;
         private InputAction _move;
+        private InputAction _run;
         private InputAction[] _slots;
         private GameContext _context;
 
@@ -21,6 +22,8 @@ namespace VoxelMagic.Gameplay
         public event Action<float> ZoomRequested;
 
         public Vector2 Move => _move != null ? _move.ReadValue<Vector2>() : Vector2.zero;
+        /// <summary>달리기 키(Shift)를 누르고 있는지.</summary>
+        public bool Run => _run != null && _run.IsPressed();
 
         public void Bind(GameContext context) => _context = context;
 
@@ -28,6 +31,7 @@ namespace VoxelMagic.Gameplay
         {
             _map = _actions.FindActionMap(_mapName, throwIfNotFound: true);
             _move = _map.FindAction("Move", true);
+            _run = _map.FindAction("Run", true);
             _slots = new InputAction[5];
             for (int i = 0; i < _slots.Length; i++)
             {
@@ -41,8 +45,24 @@ namespace VoxelMagic.Gameplay
             _map.FindAction("Cancel", true).performed += _ => OnCancel();
         }
 
-        private void OnEnable() => _map?.Enable();
-        private void OnDisable() => _map?.Disable();
+        private void OnEnable()
+        {
+            SceneTravel.TravelingChanged += OnTravelingChanged;
+            if (!SceneTravel.IsTraveling) _map?.Enable();
+        }
+
+        private void OnDisable()
+        {
+            SceneTravel.TravelingChanged -= OnTravelingChanged;
+            _map?.Disable();
+        }
+
+        // 씬 이동(페이드) 중에는 게임플레이 키 전부 막기. 환경설정 같은 UI는 다른 액션 맵을 쓰면 영향 없음.
+        private void OnTravelingChanged(bool traveling)
+        {
+            if (traveling) _map?.Disable();
+            else _map?.Enable();
+        }
 
         // 스크롤은 낚시 미니게임 중이면 잡기 바를 움직이고, 창이 열려 있지 않은 평소에는 카메라 줌으로 쓴다.
         private void OnScroll(InputAction.CallbackContext ctx)

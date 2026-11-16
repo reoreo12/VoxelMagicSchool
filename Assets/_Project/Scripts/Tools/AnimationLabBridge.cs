@@ -26,6 +26,8 @@ namespace VoxelMagic.Tools
     public static class AnimationLabBridge
     {
         public static Func<IReadOnlyList<LabClip>> ScanClips;
+        /// <summary>크리처(Generic 리그) 전용 클립 (Art/Creatures 아래). Humanoid 목록과 따로 보여 준다.</summary>
+        public static Func<IReadOnlyList<LabClip>> ScanCreatureClips;
         public static Func<IReadOnlyList<AvatarSetup>> ScanAvatars;
         public static Func<string, bool> ImportAsHumanoid;
         /// <summary>아직 아바타 데이터가 없는 캐릭터 모델을 준비하고, 새로 준비한 아바타 이름을 돌려준다.</summary>

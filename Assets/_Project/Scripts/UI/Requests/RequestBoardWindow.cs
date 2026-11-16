@@ -1,4 +1,5 @@
 // 의뢰 게시판 창. ScreenState가 게시판을 열면 보이고, 수락 버튼은 RequestTracker에 수락을 요청한다.
+// 씬마다 게시판에 걸 의뢰를 따로 정할 수 있다 (비우면 전체 목록).
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
@@ -11,18 +12,23 @@ namespace VoxelMagic.UI
         [SerializeField] private RectTransform _listRoot;
         [SerializeField] private RequestEntryView _entryPrefab;
         [SerializeField] private Button _closeButton;
+        [Tooltip("비우면 전체 의뢰 목록(RequestTracker.Catalog). 채우면 이 게시판에는 이 의뢰들만 (예: 뒷산 게시판)")]
+        [SerializeField] private List<RequestDefinition> _boardRequests = new List<RequestDefinition>();
 
         private readonly List<RequestEntryView> _entries = new List<RequestEntryView>();
         private RequestTracker _tracker;
         private ScreenState _screen;
+        private Inventory _inventory;
 
         public void Bind(GameContext context)
         {
             _tracker = context.Requests;
             _screen = context.Screen;
 
-            foreach (var request in _tracker.Catalog)
+            IReadOnlyList<RequestDefinition> requests = _boardRequests.Count > 0 ? _boardRequests : _tracker.Catalog;
+            foreach (var request in requests)
             {
+                if (request == null) continue;
                 var entry = Instantiate(_entryPrefab, _listRoot);
                 entry.Setup(request, OnAccept);
                 _entries.Add(entry);
@@ -30,14 +36,25 @@ namespace VoxelMagic.UI
             _closeButton.onClick.AddListener(() => _screen.Close(GameWindow.RequestBoard));
 
             _screen.WindowChanged += OnWindowChanged;
-            _tracker.ActiveChanged += _ => RefreshEntries();
-            context.Inventory.SlotChanged += _ => { if (IsVisible) RefreshEntries(); };
+            _inventory = context.Inventory;
+            // 의뢰·인벤토리는 씬을 넘어 유지되므로 OnDestroy에서 꼭 구독을 푼다.
+            _tracker.ActiveChanged += OnActiveChanged;
+            _inventory.SlotChanged += OnSlotChanged;
             SetVisible(false);
         }
 
         private void OnDestroy()
         {
             if (_screen != null) _screen.WindowChanged -= OnWindowChanged;
+            if (_tracker != null) _tracker.ActiveChanged -= OnActiveChanged;
+            if (_inventory != null) _inventory.SlotChanged -= OnSlotChanged;
+        }
+
+        private void OnActiveChanged(RequestDefinition _) => RefreshEntries();
+
+        private void OnSlotChanged(int _)
+        {
+            if (IsVisible) RefreshEntries();
         }
 
         private void OnWindowChanged(GameWindow window)

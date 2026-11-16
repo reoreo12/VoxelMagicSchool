@@ -14,6 +14,9 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/_Project/Scenes/Prototype_FarmFishing.unity
     guid: 1178d783e41a8d94ea6d47f6c65352bb
+  - enabled: 1
+    path: Assets/_Project/Scenes/FarmPond.unity
+    guid: 816590fe66e713943becc3e05f0727a4
   m_configObjects:
     com.unity.input.settings.actions: {fileID: -944628639613478452, guid: 052faaac586de48259a63d0c4782560b, type: 3}
   m_UseUCBPForAssetBundles: 0

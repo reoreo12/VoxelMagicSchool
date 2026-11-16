@@ -6,7 +6,8 @@
   |---|---|---|
   | 프로토타입 1: 의뢰 · 농사 · 낚시 루프 | `GAMEPLAY_PROTOTYPE_SPEC.md` | `Docs/DESIGN.md` |
   | 프로토타입 2: 2D 횡스크롤 복도 + 캐릭터 | `CORRIDOR_SIDESCROLL_SPEC.md` | `Docs/DESIGN_CORRIDOR.md` |
-  | 캐릭터 공용 시스템: 소켓·장착물 · 애니메이션 · 스탯 (현재) | `Docs/HANDOFF_CHARACTER_SYSTEMS.md` | `Docs/DESIGN_CHARACTER.md` |
+  | 캐릭터 공용 시스템: 소켓·장착물 · 애니메이션 · 스탯 | `Docs/HANDOFF_CHARACTER_SYSTEMS.md` | `Docs/DESIGN_CHARACTER.md` |
+  | 뒷산 맵: 채집 · 포획 프로토타입 (현재, 브랜치 `Back-mountain-map`) | `Docs/BACKMOUNTAIN_PROTOTYPE_GUIDE.md` (맨 아래 "추가 항목") | `Docs/HANDOFF_BACKMOUNTAIN.md` · `Docs/DESIGN_MOUNTAIN_FLOOR.md` |
 
 - **설계 먼저**: 코드를 만들기 전에 해당 설계 문서로 설계를 정리해 설명하고, 사용자가 "제작 시작"이라고 승인한 뒤에만 스크립트·씬·에셋을 만든다.
 - 모든 스크립트 맨 위에 주석으로 스크립트의 용도와 의도를 적는다. 최대 3줄, 짧게 쓸 수 있으면 1줄로 충분하다.

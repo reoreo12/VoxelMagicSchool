@@ -1,0 +1,23 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6e2e2f20d9b88964fa16d99bbf67be48, type: 3}
+  m_Name: Request_Mtn_Mushroom
+  m_EditorClassIdentifier: 
+  _title: "'\uADF8\uAC83'\uC758 \uBC84\uC12F \uC2EC\uBD80\uB984"
+  _creatureLine: "\uBC84\uC12F\u2026 \uADF8\uB298\uC5D0\uC11C \uB098\uB294 \uAC70\u2026
+    \uD558\uB098\uB9CC\u2026"
+  _requirements:
+  - _item: {fileID: 11400000, guid: f399077c6983dd14fa438a8a21576ca7, type: 2}
+    _amount: 1
+  _givenItems: []
+  _baseReward: 10
+  _completionLine: "\uC74C\uC74C, \uC774 \uD5A5\uC774\uC57C. \uACE0\uB9C8\uC6CC."

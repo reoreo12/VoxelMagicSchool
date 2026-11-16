@@ -57,7 +57,11 @@ namespace VoxelMagic.Tools
 
                 float scroll = mouse.scroll.ReadValue().y;
                 if (!Mathf.Approximately(scroll, 0f))
-                    _distance = Mathf.Clamp(_distance * (1f - scroll * _config.ZoomSpeed), _config.MinDistance, _config.MaxDistance);
+                {
+                    // 휠 값이 환경에 따라 ±1 또는 ±120으로 들어오므로 '한 칸' 단위로 맞춘 뒤, 한 칸마다 거리를 일정 비율로 줄이거나 늘린다.
+                    float notches = Mathf.Clamp(Mathf.Abs(scroll) > 10f ? scroll / 120f : scroll, -3f, 3f);
+                    _distance = Mathf.Clamp(_distance * Mathf.Pow(1f - _config.ZoomSpeed, notches), _config.MinDistance, _config.MaxDistance);
+                }
             }
             Place();
         }

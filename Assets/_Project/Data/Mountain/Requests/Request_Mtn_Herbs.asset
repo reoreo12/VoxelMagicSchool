@@ -1,0 +1,25 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6e2e2f20d9b88964fa16d99bbf67be48, type: 3}
+  m_Name: Request_Mtn_Herbs
+  m_EditorClassIdentifier: 
+  _title: "\uC57D\uCD08 \uB450 \uAC00\uC9C0"
+  _creatureLine: "\uC465\uC774\uB791 \uB3CC\uC774\uB07C\u2026 \uD558\uB098\uC529
+    \uC11E\uC73C\uBA74 \uC57D\uC774 \uB3FC\u2026"
+  _requirements:
+  - _item: {fileID: 11400000, guid: 3b887b5f92518984294697151943f6f0, type: 2}
+    _amount: 1
+  - _item: {fileID: 11400000, guid: 04a05f7c9cf0e1f42874b7fe6c679e14, type: 2}
+    _amount: 1
+  _givenItems: []
+  _baseReward: 10
+  _completionLine: "\uC88B\uC544, \uC774\uC81C \uC57D\uC744 \uB2EC\uC77C \uC218 \uC788\uC5B4."

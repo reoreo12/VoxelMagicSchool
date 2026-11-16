@@ -1,0 +1,23 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6e2e2f20d9b88964fa16d99bbf67be48, type: 3}
+  m_Name: Request_Mtn_Berries
+  m_EditorClassIdentifier: 
+  _title: "\uC0C8\uCF64\uD55C \uAC04\uC2DD"
+  _creatureLine: "\uBE68\uAC1B\uACE0 \uC0C8\uCF64\uD55C \uAC70\u2026 \uC138 \uC54C
+    \uBA39\uACE0 \uC2F6\uC5B4\u2026"
+  _requirements:
+  - _item: {fileID: 11400000, guid: 2cae458e7322ee046ad1d1c0da0f4188, type: 2}
+    _amount: 3
+  _givenItems: []
+  _baseReward: 10
+  _completionLine: "\uB0E0\u2026 \uC138 \uC54C \uB2E4 \uB9DB\uC788\uC5B4!"

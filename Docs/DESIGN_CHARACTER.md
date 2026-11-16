@@ -160,7 +160,7 @@ Player                                  [CharacterController] [PlayerMover] [Pla
 
 ### 5-1. 애니메이션 (단계 4)
 - 이동(Idle/Walk/Run)은 Base 레이어 그대로. 위에 **Action 레이어**(Avatar Mask로 상체만, 필요하면 전신)를 두고 "한 번 재생" 동작
-- `CharacterActionId`: **ScriptableObject 이름표를 추천** (SocketId와 같은 방식, 코드 수정 없이 동작 추가). `AvatarSetup`에 동작 → 클립 목록
+- `CharacterActionId`: 2026-11-10 제작 때 **enum**으로 정함 (Animator 상태 이름과 1:1, 동작 추가 시 Controller도 다시 만들어야 해서 에셋 이름표의 이점이 적음). `AvatarSetup`에 동작 클립 칸
 - 게임 로직은 "동작 요청"만, 애니메이션 뷰가 재생. 던지는 순간 같은 타이밍은 애니메이션 이벤트 → 게임 로직
 - 임포트: 한 번 재생 클립은 반복 끄기 (데이터의 목록 기준 — 파일 이름 규칙보다 실수가 적다)
 - Unity 6의 `Animator.StringToHash`로 상태·파라미터 해시 캐시
@@ -241,3 +241,99 @@ Player                                  [CharacterController] [PlayerMover] [Pla
 - 칩비형은 팔 메시가 위팔 본에만 붙어 있어 팔꿈치·손목 본의 회전이 화면에 보이지 않는다. 손 본에 소켓을 달면 그 보이지 않는 회전을 장착물만 따라가 Run 같은 활발한 동작에서 크게 어긋난다 (측정: Run 124.5°/32.3cm).
 - 그래서 **소켓은 "보이는 손이 실제로 따라가는 본"에 단다** — 칩비형 손 소켓은 `RightUpperArm`/`LeftUpperArm`. 보정 값은 Idle에서 주먹 위치에 오도록 잡는다.
 - 새 아바타 소켓 프로필 자동화("어떤 FBX든") 때: 손 근처 정점이 붙은 본을 찾아 기준 본으로 고르면 칩비형·일반 리깅 모두 처리된다.
+
+---
+
+## 9. 단계 2 설계 — 플레이어 데이터 유지 · 이동 통일 · 동작 애니메이션 (2026-11-10, 설계 단계)
+
+> 사용자 요청: ① 씬을 옮겨도 플레이어 데이터(인벤토리·스탯 등) 유지 ② 복도와 텃밭/연못의 이동 애니메이션 방식이 다르면 통일 ③ 텃밭/연못에서도 같은 규칙으로 달리기 ④ 낚시·물 주기 동작 애니메이션 추가.
+> 앞 결정(2026-11-10): 별도 "공용 애니메이션 시스템"은 만들지 않는다 — Unity Animator가 그 역할. 여기서는 Animator 설정과 얇은 연결 부품만 만든다.
+
+### 9-1. 확인한 지금 상태
+| 항목 | 지금 | 문제 |
+|---|---|---|
+| 씬 이동 | `SceneTransitionDirector` → `SceneManager.LoadSceneAsync` (단일 씬 교체). 이동 상태만 정적 `SceneTravel`에 남음 | 텃밭/연못의 `GameBootstrap.Awake`가 씬마다 `GameContext.Create`로 **인벤토리·점수·의뢰·도감·밭을 새로 만든다** → 복도 갔다 오면 전부 처음으로 |
+| 복도 데이터 | `SideScrollContext` (인벤토리 없음) | 복도는 플레이어 데이터를 쓰지 않음 |
+| 스탯 | 없음 | 단계 3(보류). 이번엔 "나중에 스탯이 들어갈 자리"만 만든다 |
+| 텃밭/연못 이동·애니 | `PlayerMover`: 입력이 있으면 고정 속도 4로 즉시 이동(가속 없음). `PlayerAvatarAnimator`: 실제 속도 > 0.1이면 Walk, 아니면 Idle, Walk 재생 속도 = 속도 ÷ 기준 속도. **달리기 없음** | 복도와 방식이 다름 |
+| 복도 이동·애니 | Core `CharacterStateMachine`(상태 패턴): 입력(방향+Shift) → Idle/Walk/Run 결정, 가속·감속(`CharacterMoveConfig`). `CharacterAnimatorView`가 상태 바뀔 때만 크로스페이드, 재생 속도는 `AvatarSetup` 상태별 값 | 상태 머신이 1차원 `SideScrollMotor`·좌우 방향(`int`)에 묶여 3D 텃밭에서 못 씀 |
+| 입력 | `Gameplay` 맵에 Run 없음, `SideScroll` 맵에만 Run(Shift) | 텃밭에서 Shift를 못 읽음 |
+| 새 클립 3종 | `Y Bot@Fishing Cast`(0~263, 30fps, 8.77초), `Fishing Idle`(0~106, 3.53초), `Watering`(0~168, 5.60초) — **모두 Generic으로 임포트됨** | Humanoid로 다시 임포트해야 칩비에 쓸 수 있음 |
+| 낚시 흐름 | `FishingSession`: Idle → Casting(`CastSeconds` 0.6초) → Waiting → Biting(E 누를 시간 1초) → Minigame → Result(Caught/Escaped) | 던지기 클립 0~120프레임은 4초라 지금 0.6초와 안 맞음 |
+| 물 주기 | `FarmService`에서 E 한 번에 즉시 물 줌 | 클립 5.6초 동안 무엇을 할지 정해야 함 |
+| ⚠ 이벤트 구독 | `RequestBoardWindow`가 `Inventory.SlotChanged`를 람다로 구독하고 풀지 않음 | 데이터가 씬을 넘어 살아남으면 사라진 UI를 계속 부름 → 유지 작업에서 같이 고친다 |
+
+### 9-2. ① 플레이어 데이터 유지
+**Unity 방식 비교**: Unity는 씬을 바꾸면 씬의 오브젝트를 모두 지운다. 남기는 방법은 (a) `DontDestroyOnLoad` 오브젝트(씬을 넘어 살아남는 GameObject), (b) 정적 변수에 일반 C# 객체 보관. 자체 엔진으로 치면 "레벨이 바뀌어도 남는 게임 인스턴스 데이터".
+- **추천: (b) 일반 C# `PlayerProgress`(Core) + 정적 보관소 `GameSession`(Core, `SceneTravel`과 같은 방식)**
+  - `PlayerProgress`: `Inventory`, `ScoreBook`, `MaterialJournal`, `RequestTracker`, (나중에 `StatBlock`) — 플레이어가 들고 다니는 것만
+  - `GameSession.Progress`: 처음 필요할 때 한 번 만들고(시작 아이템도 이때만 지급), 이후 씬은 같은 것을 받는다. 도메인 리로드를 끈 플레이 모드 대비 초기화(`RuntimeInitializeOnLoadMethod`)
+  - `GameContext.Create`가 새로 만들지 않고 `PlayerProgress`를 받아 쓴다. 씬마다 다시 만드는 것(밭·낚시 세션·메시지·화면 상태)은 그대로 씬 소속
+  - 이유: Core가 Unity 오브젝트 없이 유지 로직을 가져 단위 테스트 가능, 매 프레임 비용 없음. (a)는 GameObject 하나를 씬 사이로 끌고 다니며 씬 생성 도구·씬 배치와 엮여 복잡해진다
+- 씬을 넘는 데이터에 이벤트를 다는 UI·부품은 **반드시 OnDestroy에서 구독을 푼다** → 지금 코드 전수 점검(위 ⚠ 포함), 단위 테스트에 "두 번째 씬 진입 후 이전 구독자 없음" 추가
+- 복도는 지금처럼 플레이어 데이터를 쓰지 않는다 (나중에 복도에 인벤토리 바가 생기면 같은 `GameSession`을 받으면 됨)
+- **파일 저장 (사용자 결정 Q1: 지금 만든다)** — 게임을 껐다 켜도 유지. 저장 슬롯 고르기·불러오기 화면은 다음 대화에서 확장 (인수인계 문서 `Docs/HANDOFF_SAVE_LOAD.md`를 이 단계 끝에 작성)
+  - Core `SaveData`: `[Serializable]` 순수 데이터(버전 번호 포함) — 인벤토리 칸(아이템 ID·개수)·선택 칸, 실기·필기 점수, 도감(전달한 아이템 ID), 의뢰(완료 ID·진행 중 ID·진행도), **밭(심은 칸·씨앗 ID·물 준 상태 등)**, 마지막 씬·도착 지점(선택). 에셋 참조 대신 **ID 문자열**로 저장
+  - Core `DefinitionCatalog`(ScriptableObject, `Data/`): 아이템·씨앗·의뢰·물고기 정의 목록 — 저장된 ID를 다시 에셋으로 찾는 표. 에디터 메뉴로 자동 채움
+  - Core `SaveMapper`: `PlayerProgress`·밭 ↔ `SaveData` 변환 (모르는 ID는 건너뛰고 경고) — 단위 테스트로 "저장 → 불러오기 결과가 같음"
+  - Core `ISaveStore` 인터페이스(슬롯 번호로 읽기·쓰기) ← Gameplay `JsonFileSaveStore`: `JsonUtility`로 `Application.persistentDataPath/save_<슬롯>.json` (Windows: `AppData/LocalLow/<회사>/<제품>/`). 지금은 슬롯 0 고정, 다음 대화에서 슬롯 선택 확장
+  - 저장 시점: 씬을 떠날 때(페이드 아웃 직후), 게임 종료 때. 불러오기: 게임 시작 후 `GameSession`을 처음 만들 때 파일이 있으면 불러옴, 없으면 시작 아이템 지급
+  - 쓰기 안전: 임시 파일에 쓴 뒤 바꿔치기 (쓰다 꺼져도 이전 저장이 남게)
+  - 밭 유지: 밭(`FarmGrid`)은 씬마다 새로 만들되 `GameSession`이 가진 밭 저장본으로 채운다 → 씬 이동·파일 저장 모두 같은 경로
+  - 에디터 메뉴: `VoxelMagic/저장/저장 폴더 열기`, `저장 지우기(슬롯 0)` (시험용)
+
+### 9-3. ② 이동 애니메이션 통일 + ③ 텃밭 달리기
+결론: **방식이 다르므로 통일한다.** 복도 방식(상태 패턴이 Idle/Walk/Run 결정 → 애니 뷰는 상태 바뀔 때만 크로스페이드)으로 맞춘다.
+- Core: 상태 판단(Idle/Walk/Run 전환 규칙, 가속·감속)을 이동 방식에서 떼어 낸다
+  - `MoveIntent`에 2D 방향(`Vector2`)을 담을 수 있게 하고, 상태들은 "목표 속도"만 정한다. 실제로 움직이는 건 이동기(motor)가 한다: 복도 `SideScrollMotor`(x만), 텃밭 `PlanarMotor`(새로, 바닥 평면 2D 속도·가속·감속) — 둘 다 같은 인터페이스(다형성)
+  - 기존 복도 단위 테스트가 그대로 통과해야 함 (동작 변화 없음)
+- Gameplay: 텃밭 `PlayerMover`는 입력 → 상태 머신 → `PlanarMotor` 속도를 `CharacterController.Move`에 적용. 회전은 지금처럼 카메라 기준
+- 애니 뷰 하나로: 복도 `CharacterAnimatorView`를 "상태 머신만 아는" 공용 뷰로 바꿔 텃밭에서도 씀 → `PlayerAvatarAnimator` 삭제(질문 없이 지우지 않음 — 제작 때 확인). 재생 속도는 `AvatarSetup` 상태별 값(`AvatarAnimationSpeed`, 복도와 같음)
+- 입력: `GameControls`의 `Gameplay` 맵에 `Run`(Shift) 추가
+- 속도 값: 텃밭용 `CharacterMoveConfig` 에셋을 따로 만든다 (복도와 같은 종류, 다른 값 — 쿼터뷰라 크기 감이 다름). 처음 값: 걷기 4, 달리기 9 (2.25배, Q2)
+- 낚시 중 움직이면 낚시 취소, 창이 열리면 멈춤 등 지금 규칙은 그대로
+
+### 9-4. ④ 낚시·물 주기 동작 애니메이션
+**Animator 구성** (앞 결정대로 Unity 기능 그대로):
+- 클립 임포트: 3종을 Humanoid로 다시 임포트(기존 메뉴 `AvatarPipeline` 기능). `Fishing Cast`는 임포트 설정에서 **두 클립으로 자른다**: `Fishing Cast_Throw`(0~120), `Fishing Cast_Reel`(120~263). 반복 여부: Fishing Idle·Reel 반복, 나머지 한 번
+- 역재생: **거꾸로 뒤집은 클립을 에디터 도구로 미리 만든다**(`.anim`, `Animations/Mixamo/Reversed/`) — `Fishing Cast_Throw_Reverse`(낚아채기), `Fishing Cast_Reel_Reverse`(올리기 왕복의 돌아오는 쪽)
+  - 이유: Animator 상태 속도를 −1로 거꾸로 돌릴 수도 있지만, 끝났을 때 다음 상태로 넘어가는 전환(Exit Time)이 거꾸로 재생에서 믿을 만하지 않다. 뒤집은 클립이면 모두 정방향 재생이라 Animator가 단순해진다. 비용은 파일 2개(작음)
+- 상태 (Base 레이어, 전신 — 낚시·물 주기는 서서 하는 동작이고 움직이면 취소되므로 상체 레이어 불필요):
+
+| 동작 | 상태 | 클립 | 흐름 |
+|---|---|---|---|
+| 던지기 | `FishCast` | Throw (0~120) | 한 번 → 끝나면 `FishWait` |
+| 입질 기다리기 | `FishWait` | Fishing Idle (반복) | 입질 와도 그대로 (질문 Q3) |
+| 입질 후 올리기 | `FishReel` ↔ `FishReelBack` | Reel → Reel_Reverse → Reel … | 미니게임 동안 왕복 반복 |
+| 낚아채기 | `FishHook` | Throw_Reverse (120~0) | 한 번 → 끝나면 Idle |
+| 물 주기 | `Water` | Watering | 한 번 → 끝나면 Idle |
+
+- 아바타마다 Controller 따로 만드는 지금 방식 대신 **공용 기본 Controller 1개 + 아바타별 `AnimatorOverrideController`**로 바꾼다(앞 결정). 새 상태들은 기본 Controller에 한 번만 추가 → 새 FBX 아바타도 클립만 연결. `AvatarSetup`에 동작 클립 칸 추가(던지기·대기·올리기·물 주기, 뒤집은 클립은 자동)
+  - 기존 아바타 Controller 6개(`Animations/Avatars/*.controller`)는 Override로 바꾼다 → **기존 에셋 교체라 제작 전 확인 필요** (질문 Q6)
+- 연결 부품 (Gameplay, 얇게):
+  - `CharacterActionView`: 낚시 세션 상태·물 주기 요청을 받아 Animator 상태를 재생 (상태 해시 미리 계산). 동작 중에는 이동 애니가 끼어들지 않게 이동 뷰와 우선순위 정리
+  - 타이밍: 클립의 "놓는 순간" 등에 **Animation Event**를 넣고, `CharacterAnimationEvents`(모델 오브젝트에 붙는 수신 부품)가 C# 이벤트로 바꿔 낚시·농사 로직에 전달 (Animator는 같은 오브젝트의 함수만 부를 수 있어서 필요한 부품)
+- 게임 로직 타이밍 (질문 Q4·Q5로 확정):
+  - 낚시: `Casting` 상태 길이를 던지기 클립에 맞추고, 찌는 "놓는 순간" 이벤트에서 날아간다. 클립 재생 속도는 데이터로 조절 (4초가 길면 배속)
+  - 물 주기: E → 물 주기 클립 재생, 물이 실제로 들어가는 순간은 이벤트 시점. 재생 중 이동 막을지 결정
+- 애니메이션 랩: 새 클립(자른 것·뒤집은 것)이 목록에 보여 미리 확인 가능 (랩 코드 변경 없음 예상)
+
+### 9-5. 제작 순서 (각 단계: 플레이 확인 → 보고 → 사용자 확인) — 1~4 완료 (2026-11-11 동작 속도·물 주기 구간 다듬음). 현재 상태 요약: `HANDOFF_CHARACTER_STATUS.md`
+1. ① 데이터 유지·파일 저장: Core `PlayerProgress`·`GameSession`·`SaveData`·`SaveMapper`·`DefinitionCatalog` + 단위 테스트, `JsonFileSaveStore`, `GameBootstrap` 변경, 구독 해제 점검 → 텃밭 ↔ 복도 왕복 후 인벤토리·점수·의뢰·밭 유지, 플레이 껐다 켜도 유지 확인 → `HANDOFF_SAVE_LOAD.md` 작성
+2. ②③ 이동 통일: Core 상태 머신 분리 + `PlanarMotor` + 테스트(복도 기존 테스트 포함), 입력 Run 추가, 텃밭 이동·애니 교체 → 복도·텃밭 Idle/Walk/Run 확인
+3. ④-1 클립 준비: Humanoid 재임포트, Cast 자르기, 뒤집은 클립 도구, 랩에서 미리보기
+4. ④-2 Animator·연결: 공용 Controller + Override, `AvatarSetup` 동작 칸, 동작 뷰·이벤트 → 낚시 전 과정·물 주기 플레이 확인
+5. 기록: CHANGELOG·SETUP(입력 맵 변경)·이 문서
+
+### 9-6. 질문 (Q0·Q1·Q3·Q4·Q5 답함 — 2026-11-10)
+- 답: Q0 **이 브랜치에서**, Q1 **파일 저장까지 지금 만들고 다음 대화용 지침 작성**, Q3·Q4 **미니게임부터 올리기 왕복, 잡으면 낚아채기, 놓치거나 거두면(취소) 낚아채기 없이 Idle, 입질 1초는 기다리기 자세**, Q5 **물 주기 중 이동 막고, 물은 클립 중 정한 순간(이벤트)에 들어감, 재생 속도는 데이터로 조절**
+- Q2 (2026-11-10): 텃밭 **이동 속도 4는 그대로**(사용자: 딱 좋음). 대신 **걷기 애니메이션 재생 속도가 너무 빠름** — 지금은 재생 속도 = 이동 속도 ÷ 기준 속도(1)라 약 4배로 재생 중. 통일 후 재생 속도는 `AvatarSetup` 상태별 값으로 정하고 걷기 재생 속도를 낮춘다. **달리기는 이동 속도·재생 속도 모두 걷기의 2.25배** (이동 9)
+- Q6: **공용 Controller + 아바타별 Override로 교체 승인**
+- "제작 시작" 승인 (2026-11-10)
+- **Q0 브랜치**: 지금 `feature/character-system`(뒷산 브랜치 머지됨). 이 작업은 텃밭·복도·캐릭터 시스템을 모두 건드림 — 여기서 할지, 새 브랜치를 만들어 주실지
+- **Q1 저장 범위**: 씬 이동 사이 유지만(게임 끄면 초기화)? 또 밭(심은 작물·물 준 상태)도 유지할지 — 밭은 플레이어가 아니라 텃밭 맵 상태라 따로 묻는다
+- **Q2 텃밭 달리기 속도**: 걷기 4 기준 달리기 몇? (복도 비율 3.6/1.6 ≈ 2.25배면 9)
+- **Q3 입질(Biting, E 누를 1초)**: 기다리기 자세 그대로? 아니면 이때부터 올리기 왕복?
+- **Q4 낚아채기 시점**: 잡기 성공(Caught) 때만? 놓쳤을 때(Escaped)·E로 거둘 때(취소)는 어떤 동작?
+- **Q5 물 주기**: 클립 5.6초 동안 이동 막기? 물이 들어가는 순간은 클립 중 언제(랩에서 같이 정하기)? 던지기 4초도 그대로 쓸지 배속할지
+- **Q6 Controller 교체**: 기존 아바타 Controller 6개를 공용 Controller + Override로 바꿔도 되는지

@@ -1,5 +1,152 @@
 # 변경 기록
 
+## 2026-11-12 — 채집 슬롯·드랍 밸런스 (서식지 종류별, 슬롯 2칸·0~1개) (브랜치 `Back-mountain-map`)
+- 사용자 요청: 슬롯 2칸, 서식지마다 0~1개 무작위 (너무 얻기 쉽지 않게, 밸런스는 추후 조절)
+- `GatheringConfig`: `_fillRatio`(슬롯 절반·최소 1개) 대신 서식지 종류별 `HabitatBalance` 목록 — 슬롯 수, 최소·최대 개수, 추가분 확률, 슬롯 배치 모양. 기본값 슬롯 2·0~1개·확률 0.5(가정) → 서식지가 비어 있을 확률 50%
+- `GatherSpawner`: 개수 = 최소 + (최대 − 최소)개를 각각 확률로 굴림, 슬롯 수 이하. 0개 가능. 의뢰 재료 보장(맵 전체 최소 1개)은 그대로
+- 에디터 창 `VoxelMagic/뒷산/채집 밸런스` (`Editor/Mountain/GatheringBalanceTool`): 종류별 값 편집, 평균 개수·빈 확률 표시, 씬 서식지 슬롯 수 표시(안 맞으면 경고), "슬롯 수 적용" = 기본 도형 프리팹 4종 + 씬의 서식지(기능 붙이기로 만든 것 포함) 슬롯을 늘리거나(배치 모양대로, 서식지 크기 비율 유지) 줄이고(뒤쪽부터) 모든 슬롯을 지면에 맞춤
+- 기능 붙이기 도구의 기본 슬롯도 같은 데이터(슬롯 수·배치 모양)를 씀. 채집 배치 메뉴는 데이터가 비면 기본값을 채움
+- 적용: 프리팹 4종(4·3·3·4칸 → 2칸), 씬 서식지 13개 모두 2칸 (사용자가 만든 `Mountain_Pine_v5_Droop (2)` 포함)
+- 확인: 테스트 136개 통과(0~1개·최대 제한 테스트 추가) / 플레이 새 하루 400번: 서식지당 평균 0.49개, 빈 서식지 51%, 2개 이상 0번, 다른 서식지 재료 0, 맵 전체 평균 6.4개 / 산딸기 의뢰 중에는 100번 모두 1개 이상 / 콘솔 에러 0
+
+## 2026-11-12 — FBX에 기능 붙이기 도구 + 초입 나무 FBX 교체 + 이동 속도 치트 (브랜치 `Back-mountain-map`)
+- 메뉴 `VoxelMagic/뒷산/선택한 오브젝트에 기능 붙이기/` (`Editor/Mountain/BackMountainAttachTool`): 서식지 4종·포획 풀숲·의뢰 게시판·크리처. 선택한 오브젝트 위에 기능 루트(지면 높이)를 씌우고 FBX를 그 아래 `Visual`로 옮김 (위치·회전·크기·FBX 콜라이더 유지)
+  - 서식지 슬롯: FBX 아래 "Slot…" 빈 오브젝트가 있으면 그 자리(쓰고 나면 지움), 없으면 기본 도형 프리팹 슬롯 배치를 FBX 가로 반지름 × 0.8에 맞춰 늘림. 슬롯은 지면 높이로, 서식지는 슬롯 쪽이 길을 보게 돌림. `[Prototype]/Gathering` 아래로
+  - 풀숲: `GrassTuft` + 흔들 대상 `Visual`(밑동 축), `Capture/Zone` 아래로. 게시판·크리처: 상호작용 영역 BoxCollider(트리거, FBX 렌더 범위)·안내 위치(맨 위 + 0.4 m), `Requests` 아래로
+- 초입 기본 도형 나무 3그루(`Habitat_TreeShade_1~3`)를 끄고 사용자 나무 FBX(Oak_v5·Oak_v4·Pine_v5, 사용자가 붙인 줄기 BoxCollider 복사)를 같은 자리에 놓은 뒤 도구로 그늘 서식지 기능을 붙임
+- 버그 수정: 꺼 둔 서식지·풀숲도 연결 단계에서 이벤트를 구독해 재료 재배치 때 IndexOutOfRange → `MountainBootstrap`은 켜진 서식지·풀숲만 번호를 주고, 번호가 없는 것은 `Bind`에서 건너뜀
+- 개발용 이동 속도 치트 (모든 맵, 에디터·개발 빌드만): F9로 걷기·달리기 ×3 켜고 끄기, 왼쪽 위에 "[치트] 이동 속도 ×3" 표시. `Core/Characters/Locomotion/MoveSpeedCheat`(배율) + `Gameplay/Debug/MoveSpeedCheatKey`(플레이 시작 때 스스로 생김, 씬 수정 없음). 걷기·달리기 애니 재생도 같은 배율. 플레이를 끝내면 꺼짐
+- 플레이어를 초입 T (8, 0.1, −4.5)로 되돌림
+- 확인: 테스트 135개 통과(치트 테스트 1개 추가, 이동 테스트는 치트 초기화) / 플레이: 켜진 서식지 12개(꺼진 3개는 재료 0), 새 나무 3그루에 그늘 재료 배치, 참나무 슬롯에서 "E: 줍기" → 그늘버섯 가방, 줄기로 걸어가면 0.7 m에서 막힘, 치트 끔 4·5.5 → 켬 12·16.5 m/s, 한글 표시 정상 / 풀숲·게시판·크리처 변환은 임시 상자로 구조만 확인하고 지움 / 콘솔 에러 0. FarmPond·복도에서 치트는 같은 이동 코드라 동작할 것으로 보지만 그 씬에서 직접 확인은 안 함
+
+## 2026-11-11 — 뒷산 플레이어 그림자 구멍 수정 + 인수인계 문서 (브랜치 `Back-mountain-map`)
+- 원인: 뒷산 해(`Directional Light`)에 Depth Bias 0.1·Normal Bias 0 값은 있었지만 **Use Pipeline Settings가 켜져 있어** URP 기본값(Normal Bias 0.5)을 씀 → 복셀 아바타 그림자에 구멍 (2026-11-03 FarmPond와 같은 문제)
+- 수정: `VoxelShadowSettings.Apply`로 씬 조명만 파이프라인 설정 끔 + Depth 0.1·Normal 0 (FarmPond와 같은 값). 프로젝트 URP 설정은 그대로
+- 확인: 같은 카메라 위치 전/후 캡처 비교 — 바뀐 화소 306개(0.13%), 모두 어두워지는 쪽(그림자 구멍이 메워짐), 밝아진 곳 0
+- 문서: `Docs/HANDOFF_BACKMOUNTAIN.md` 새로 작성, `BACKMOUNTAIN_PROTOTYPE_GUIDE.md` 끝에 "추가 항목"(남은 기능·FBX 교체·최적화 표), `CLAUDE.md` 작업 표에 뒷산 줄 추가(사용자 승인)
+
+## 2026-11-11 — 뒷산 배경 바위산(봉우리 청크) 제작 (브랜치 `Back-mountain-map`)
+- 새 FBX 11개 `Art/Map/Mountain/Backdrop/`: 봉우리 `Spire_A·B·C·D` × 길이축 x·z (8개, 각 1.4천~2.8천 삼각형) + 이끼 둔덕 `AP1~AP3` (3개, 합 약 2.4만). 메시는 보이는 면(윗면·−X·−Z)만, 콜라이더 없음
+- 팔레트 `Mountain_palette.png` 12~15번 칸에 바위 4색 추가(#B5AA9A·#9A8F82·#7C7268·#5E564E). 1~11번 색은 그대로라 기존 바닥 FBX 영향 없음. 머티리얼은 기존 `Mountain_Voxel` 재사용
+- 씬 `BackMountain`에 `MountainBackdrop`(앞줄·뒷줄·둔덕, 총 23개, 약 6만 삼각형) 배치. 그림자 끔. 씬 저장은 사용자 확인 후
+- 봉우리 FBX를 8개 → 4개(`Spire_A~D`)로 줄임: 보이지 않던 +X/+Z 면까지 채워(삼각형 약 +60%, 씬 합계 약 8.3만) X·Z 방향 변형을 FBX가 아닌 인스턴스의 Y축 90° 회전으로 처리. 씬의 고유 메시는 23개 → 7개. 옛 `Spire_?x/?z.fbx` 8개는 `Backdrop/_Unused/`로 옮겨 둠(삭제는 사용자)
+- 제작 스크립트·배치표: `Source/Backdrop/` (`gen_spires.py`, `gen_apron.py`, `layout.py`, `export_fbx.py`, `placement.json`)
+
+## 2026-11-11 — 뒷산 맵 줄이기 + 맵별 이동 속도 (브랜치 `Back-mountain-map`)
+- 맵별 이동 속도: `Data/Config/MoveConfig_BackMountain.asset`(걷기 4·달리기 5.5, 사용자가 올린 값)을 만들어 뒷산 `PlayerMover`·`AvatarAnimationSpeed`에 연결. FarmPond가 쓰는 `MoveConfig`는 걷기 3·달리기 4.5로 되돌림. 코드 변경 없음 (이동 설정은 씬의 플레이어마다 연결하는 에셋)
+- 뒷산 씬에서 `Mountain_Floor_C3`·`Mountain_Floor_D` 청크 삭제 (사용자 요청, FBX 파일은 남김). 길 끝(C2 동쪽 변 x = 48)에 투명 벽 `[Prototype]/PathEndWall (invisible)` (높이 3 m)
+- 확인: 플레이에서 뒷산 플레이어가 `MoveConfig_BackMountain` 사용, 길 끝에서 동쪽으로 달려도 x 47.57에서 멈춤(낙하 없음), 남은 청크 T·A1~A3·B·C1·C2 / 콘솔 에러 0
+
+## 2026-11-11 — 뒷산 포획 다듬기: 근처 길 신호 흔들림 + 놓침 비율 (브랜치 `Back-mountain-map`)
+- 사용자 의도: 근처 산길을 지나갈 때 맨 앞 풀 하나만 짧게 흔들려 "여기에 뭔가 온다"를 알리기. 다가가는 풀마다 흔들리던 것과, 멀어지면 흔들림이 뚝 끊기던 것을 고침
+- `CaptureZone`: 구역 안 '앞쪽 풀숲' 흔들기를 없애고, 근처 길 영역(`NearPath`, x 8.5~20 · z 53.5~60)에 걸어 들어오면 `_frontTuft` 하나만 한 번 흔듦. 길을 벗어났다 다시 와야 하고 쿨다운 8초(가정). 영역은 기본 카메라(Pitch 55·거리 12)에서 맨 앞 풀숲이 화면 안에 보이는 구간으로 잡음
+- `CaptureService.PassBy`: 구역 밖에서도 됨 (입질 중인 풀숲은 그대로). 흔들림은 상태가 끝나도 `GrassTuft`가 잦아들게 멈춤 (`CaptureConfig` 지나갈 때 0.6초·세기 0.7·잦아듦 0.35초, 가정)
+- 맨 앞 풀숲 `GrassTuft_02`를 (12.5, 66) → (12.5, 65.3)으로 길 쪽에 붙임
+- `MagicCircleStub`: 무작위 정확도 대신 성공 확률(가정 0.85)로 요구 정확도 이상/미만을 돌려줌 → 놓침 약 15%
+- 확인: 테스트 134개 통과 / 플레이: 산길(z 44 → 코너 → x 24)을 걸을 때 맨 앞 풀숲만 1번 (8.5, 53.9)에서 흔들림, 곧바로 되돌아 걸어도 0번(쿨다운), 구역 안에서 풀숲 사이를 걸어도 0번 / 흔들림 세기 0.6초 유지 후 0.84초에 0으로 잦아듦 / 스텁 2000번: 요구 0.5·0.6·0.8 모두 성공 84~87% / 콘솔 에러 0 / 자동 저장 끔
+
+## 2026-11-11 — 뒷산 낚시 UI 정리 + 포획 (브랜치 `Back-mountain-map`)
+- 뒷산 씬에서 뺌 (사용자: 그 맵에서 하는 동작의 UI만): `HUDCanvas/FishingMinigame`, 플레이어 `BiteIndicator`, `CharacterActionView`(낚시·물 주기 동작). Core의 낚시·농사 서비스는 공용 `GameContext`가 만들어 그대로 있으나 뒷산에서 쓰는 곳 없음
+- `ControlsHintView._sceneText`: 씬별 조작법 문구 (비우면 기본). 뒷산: 이동·Shift 달리기·E·1~5·스크롤 카메라 줌·Q·Esc
+- 포획 Core: `AnimalDefinition`(요구 정확도), `CaptureConfig`(입질 간격 5초·흔들림 3초·동시 1~2개·지나갈 때 0.4초/3 m/±60°, 모두 가정), `CaptureService`(구역 안에서만 입질, 구역 밖에서는 흔들리던 것만 끝까지, 포획 중 풀숲은 멈춰 기다림, 성공/실패, 다음 결과 강제), `IMagicCircleDrawer`(실제 마법진으로 바꿔 끼울 자리), `MountainMessages`(중앙 문구)
+- Gameplay: `GrassTuft`(흔들림·"E: 포획"), `CaptureZone`(영역 안/밖, 앞쪽 가장 가까운 풀숲 지나갈 때 흔들기), `MagicCircleStub`(1초 뒤 0.3~1 무작위 정확도, 가정). `MountainBootstrap`이 포획도 조립. 디버그 키 F4 입질 즉시·F5/F6 다음 마법진 성공/실패
+- UI: `CenterBannerView`("OOO 포획!"·"놓쳤다", 1.5초), 디버그 안내에 마법진 강제 상태
+- 데이터·씬: 동물 3종 `Data/Mountain/Animals/`(산토끼 0.5·다람쥐 0.6·여우 0.8), `Data/Config/CaptureConfig`, 프리팹 `Prefabs/Mountain/GrassTuft`. 메뉴 `VoxelMagic/뒷산/포획 구역 만들기·배치` → `[Prototype]/Capture`: 바닥 16×16 m(윗면 4.2), 트리거(0.5 m 안쪽·높이 3 m), 풀숲 12개, "산 동물 조심" 팻말, 투명 벽(서·북·동 1.2 m). 정의 목록 다시 채움
+- 확인: 테스트 133개 통과(새 5개) / 플레이: 길(10, 57)은 구역 밖·입질 없음, 걸어서 z 64.56에서 구역 진입(단차 없음), 앞 풀숲 2개 지나갈 때 흔들림, F4 입질 → "E: 포획" → 강제 성공 "여우 포획!"·가방·획득 정보 / 강제 실패 "놓쳤다"·흔들림 멈춤 / 콘솔 에러 0 / 자동 저장 끔. 실시간 5초 간격·3초 흔들림은 에디터가 백그라운드라 프레임이 안 돌아 단위 테스트로만 확인
+
+## 2026-11-11 — 뒷산 프로토타입: 등반 확인 + 채집 (브랜치 `Back-mountain-map`)
+- 지침: `Docs/BACKMOUNTAIN_PROTOTYPE_GUIDE.md`. 씬 `BackMountain`
+- `feature/character-system`을 `Back-mountain-map`에 병합 (사용자 선택, 충돌 없음) → Shift 달리기·이동/동작 애니·저장이 들어옴
+- 씬: 청크 9개에 Mesh Collider (FBX는 그대로). FarmPond의 `_Bootstrap`·Player·Main Camera·UI·SceneTransition을 복사(참조 유지), 플레이어 T 시작점 (8, 0.1, −4.5). 원래 카메라는 `Main Camera (Map Preview, off)`로 꺼 둠
+- 등반: 길 중심선을 따라 4 m/s로 오르내림 → 막힘·낙하 없음 (오름 34초, 내림 33초). B 북쪽 변은 포획 구역 바닥 전까지 열려 있음
+- 채집 Core: `GatherMaterialDefinition`(서식지·방과후/밤·힌트·모양), `GatheringConfig`(채움 비율, 가정 0.5), `GatherSpawner`(자기 서식지·시간대만, 직전 빈 슬롯 우선, 의뢰 재료 보장), `GatheringService`, `MountainContext`(GameContext는 그대로)
+- Gameplay: `MountainBootstrap`(실행 순서 −900), `GatherHabitat`, `GatherPickup`(InteractableBase, "E: 줍기"), `MountainDebugInput`(F1 새 하루, F3 시간대 전환, Inspector에서 키 변경). UI: `DebugKeyHintView`(조작법 위)
+- 데이터·에셋: 재료 12종 `Data/Mountain/Gather/` (서식지마다 방과후 2 + 밤 1), 서식지 프리팹 4종 `Prefabs/Mountain/`, 머티리얼 `Materials/Mountain/`. 메뉴 `VoxelMagic/뒷산/채집 서식지 만들기·배치`로 `[Prototype]/Gathering`에 12개 배치(지면 맞춤). 정의 목록 다시 채움
+- 확인: 테스트 125개 통과(새 5개) / 플레이: 줍기·누적·가방 가득 참 안내, 새 하루 재배치, 밤엔 밤 재료만 / 콘솔 에러 0 / 시험 중 자동 저장 끔(저장 파일 안 바뀜)
+
+## 2026-11-11 — 뒷산 의뢰 연동 + 인벤토리 우클릭 버리기 (브랜치 `Back-mountain-map`)
+- 의뢰 4종 `Data/Mountain/Requests/` (그늘버섯 1 / 산딸기 3 / 쑥 1 + 돌이끼 1 / 달빛버섯 1(밤)), 재료 5종에 크리처 설명 추가. 메뉴 `VoxelMagic/뒷산/의뢰 데이터 만들기`
+- 씬: FarmPond의 `RequestBoard`·`Creature`를 `[Prototype]/Requests`로 복사 (게시판 (11, 2), 크리처 (4.6, 0.7)). 게시판 창 920×820·목록 높이 650 (의뢰 4개가 들어가게, 이 씬만)
+- `RequestBoardWindow._boardRequests`: 채우면 그 게시판에는 그 의뢰만 (비우면 예전처럼 전체 목록 → FarmPond 그대로)
+- `RequestEntryView`·`QuestTrackerPanel`: 채집 재료면 서식지 힌트를 같이 표시. 의뢰를 내려놓으면 추적 패널 숨김
+- Core: `RequestTracker.Abandon()`, `Inventory.DiscardSlot()`, `GatherSpawner.EnsureRequired()`, `GatheringService`가 의뢰를 받으면 필요한 재료를 1개 이상 보장 (다른 재료는 그대로)
+- 디버그: F2 의뢰 교체(`MountainDebugInput._swapRequests`, 완료한 의뢰는 건너뜀). `InventoryBar._debugRightClickDiscard`를 켜면 칸 우클릭 시 그 칸을 통째로 버림 (뒷산 씬만 켬)
+- 확인: 테스트 128개 통과 / 플레이: 게시판에 뒷산 의뢰 4개·힌트, F2 교체·다시 처음으로, 의뢰를 받자 그늘버섯 1개 보장, 우클릭으로 산딸기 2개 버림(왼쪽 클릭은 선택만), 줍기 → 크리처 전달 → 필기 +15·대사·추적 "완료!" / 콘솔 에러 0 / 자동 저장 끔
+
+## 2026-11-11 — 동작 애니메이션 다듬기 + 옛 Controller 정리
+- 옛 Controller 삭제 (사용자 승인, GUID로 사용처 0 확인): `Animations/Avatars/Student_Male.controller`, `Student_Male_v05.controller`. `Student_Chibi_v2.controller`는 Prototype·TileMapEditor 씬이 써서 남김
+- 물 주기 휘적임 한 번 줄임: `ClipImportPlan`의 `Watering` 구간 0~168 → **84~168** (두 번째 왕복만, 끝 자세 = 기본 자세), 길이 5.60 → 2.80초, 물 들어가는 이벤트 0.3 → **0.4**(1.12초). Override는 같은 클립 이름이라 그대로 연결됨
+- 재생 속도 (`Data/Config/CharacterActionConfig`): 던지기 1 → **2**(4초 → 2초, 찌 놓는 순간 1.04초), 낚아채기 1 → **2.5**(4초 → 1.6초) — 사용자: 던지기·성공 동작이 너무 길어 획득 정보 UI가 훨씬 먼저 뜸
+- `CharacterActionView`: 이미 그 이동 상태(예: 낚아채기가 끝나 Idle)면 다시 섞지 않음 (Idle→Idle 다시 섞기 없앰)
+- 확인 (텃밭 플레이, 0.05초씩 진행): 던지기 1.05초에 놓음·1.65초 기다리기, 낚아채기 1.6초 뒤 Idle, 물 주기 1.20초에 물·2.90초 끝 / 테스트 120개 통과 / 콘솔 에러 0 / 시험 저장 파일 지움
+
+## 2026-11-10 — 캐릭터 시스템 단계 2-④-2: 공용 Controller + 낚시·물 주기 애니메이션 연결
+- 설계: `DESIGN_CHARACTER.md` 9-4 (사용자 답: 입질 1초는 기다리기 자세, 미니게임부터 올리기 왕복, 잡으면 낚아채기, 놓치거나 거두면 Idle, 물 주기 중 이동 막고 물은 클립 중간에)
+- **공용 Controller**: `Animations/Avatars/Base/CharacterBase.controller` (상태 9개: Idle/Walk/Run + FishCast·FishWait·FishReel·FishReelBack·FishHook·Water, 파라미터 IdleSpeed·WalkSpeed·RunSpeed·ActionSpeed, 이어짐: FishCast→FishWait, FishReel↔FishReelBack, FishHook·Water→Idle) + 빈 열쇠 클립 `Base/Placeholders/*.anim`. 아바타 6개 모두 `Animations/Avatars/<아바타>.overrideController`로 바꾸고 `AvatarSetup._controller` 연결, 복도 프리팹 3개(Chibi_v2·Male·Male_v05) Animator도 Override로
+- 메뉴 `VoxelMagic/아바타/공용 Controller 다시 만들기 (모든 아바타)`(`CharacterControllerBuilder`), 메뉴 3(복도 캐릭터 만들기)도 이제 Override를 만듦
+- Core: `CharacterActionId`(동작 이름표 = Controller 상태 이름), `CharacterActionConfig`(동작별 재생 속도·섞기·물 주기 안전 시간, `Data/Config/CharacterActionConfig`), `AvatarSetup` 동작 클립 칸 6개(모든 아바타에 같은 Humanoid 클립 자동 연결)
+- Core 낚시: `FishingSession.WaitForCastRelease`·`ReleaseCast`·`CastReleased`·`IsCastReleased` — 던지기가 "놓는 순간"까지 기다렸다가 `CastSeconds` 동안 날아감, 신호가 없으면 `FishingConfig._castReleaseTimeoutSeconds`(6초) 뒤 스스로 놓음
+- Core 물 주기: `FarmService.UseWateringAction`·`IsWatering`·`WateringStarted`·`ApplyPendingWater`·`FinishWatering`·`WateringFinished` — 물 주기 동작 중에는 이동·상호작용 막고, 물은 이벤트 순간(이벤트 없으면 끝날 때) 한 번
+- Gameplay: `CharacterAnimationEvents`(모델, 클립 이벤트 `OnActionEvent(문자열)` → C# 이벤트), `CharacterActionView`(플레이어, 낚시 상태·물 주기 → Animator 상태, 끝나면 이동 상태로), `FishingDriver`(찌·줄은 놓는 순간부터), `PlayerMover`·`PlayerInteractor`(물 주는 중 멈춤·E 막음), 애니메이션 랩 인스턴스에도 이벤트 수신 부품
+- 클립 이벤트 (`ClipImportPlan` 새 칸 `Events`): `Fishing Cast_Throw` CastRelease 0.52(2.08초, 손이 앞으로 가장 빠른 순간), `Watering` WaterApply 0.3(1.68초, 지팡이를 처음 다 뻗은 순간) — 표에서 바꾸고 '동작 클립 준비' 다시 실행
+- 텃밭 씬: 메뉴 '텃밭 플레이어 이동·애니 통일'이 Override Controller·이벤트 수신·동작 뷰까지 연결, 씬 저장
+- 확인: 테스트 120개 통과(새 7개) / 텃밭 플레이(Animator·세션을 0.05초씩 직접 진행): 던지기 시작 → 찌 숨김 → 클립 이벤트로 2.10초에 놓음·찌 보임 → 0.6초 뒤 기다리기, Animator FishCast→FishWait 자동 → 입질 중 FishWait 유지 → E로 미니게임 FishReel↔FishReelBack 왕복(4.85초마다) → 잡음 FishHook → 끝나 Idle / 놓침 → Idle / 물 주기 Water 재생, 1.75초에 물, 5.65초 끝날 때까지 IsWatering, 끝나면 Idle / 기다리기 화면에서 지팡이 끝→연못 찌 줄 / 복도: Override로 Idle/Walk/Run 클립 그대로 / 콘솔 에러 0 / 시험 저장 파일 지움
+- 확인 못 함: 실제 키보드(E·WASD)로 처음부터 끝까지, 실제 프레임 속도에서의 모습 — 사용자 플레이로 확인 필요
+- 옛 Controller: `Student_Chibi_v2.controller`는 Prototype·TileMapEditor 씬이 아직 씀, `Student_Male.controller`·`Student_Male_v05.controller`는 이제 아무도 안 씀 (지우지 않음)
+
+## 2026-11-10 — 캐릭터 시스템 단계 2-④-1: 낚시·물 주기 클립 준비 + 이동 설정 이름 변경
+- 이동 설정 `Data/Config/FarmMoveConfig` → **`MoveConfig`** (복도를 뺀 3D 맵 플레이어 공용, 사용자 결정. GUID 그대로라 씬 연결 유지). 값은 사용자가 맞춘 걷기 3·달리기 4.5, 재생 배율 1.6·1.6. 코드 경로·툴팁 갱신
+- Editor: `ClipImportPlan`(에디터 전용 SO, `Data/Avatars/ClipImportPlan` — 파일·프레임 구간·반복·뒤집기 표), `ActionClipTools` + 메뉴 `VoxelMagic/아바타/동작 클립 준비 (ClipImportPlan)`: 표대로 Humanoid 재임포트(메뉴 2와 같은 루트 고정), 구간별 클립, 뒤집은 `.anim` 생성
+- 클립 (사용자 지정 구간): `Fishing Cast` → `Fishing Cast_Throw`(0~120, 4.00초)·`Fishing Cast_Reel`(120~끝, 4.77초), `Fishing Idle`(반복, 3.53초), `Watering`(5.60초). 뒤집은 클립 `Animations/Mixamo/Reversed/Fishing Cast_Throw_Reverse.anim`(낚아채기)·`Fishing Cast_Reel_Reverse.anim`(올리기 왕복의 돌아오는 쪽)
+- `AvatarPipeline` 자동 클립 연결: 키워드가 든 클립 중 이름이 가장 짧은 것 ("Fishing Idle"이 Idle로 잘못 연결되지 않게)
+- 확인 (랩, Student_Chibi_v2): 6개 클립 모두 Humanoid로 목록에 보임·재생 / 뒤집은 클립 = 원본 t ↔ 길이−t 손 위치 차이 0.00cm / 이음새 던지기 끝↔올리기 시작, 올리기 끝↔뒤집은 올리기 시작, 뒤집은 올리기 끝↔올리기 시작 모두 0cm / 던지기 1.2초 3/4 화면에서 손잡이를 쥔 지팡이 / 콘솔 에러 0
+- 알아 둘 점: `Fishing Idle` 첫 자세는 던지기 끝과 손 위치 27.6cm 차이 → 4단계 Animator에서 섞어서 넘김. 랩 목록에서 뒤집은 클립처럼 이름이 길면 글자가 두 줄로 겹쳐 보임(표시만)
+
+## 2026-11-10 — 캐릭터 시스템 단계 2-②③: 텃밭·복도 이동 통일 + 텃밭 달리기 + 걷기 재생 속도
+- 설계: `DESIGN_CHARACTER.md` 9-3 (사용자: 텃밭 이동 속도 4는 그대로, 걷기 애니 재생이 너무 빠름 → 낮춤, 달리기는 이동·재생 모두 2.25배)
+- Core `Characters/Locomotion/`: `ICharacterMotor`(이동기 계약)·`ILocomotionSource`(이동 상태 알림), `PlanarMotor`(바닥 평면 가속·감속, 대각선 정규화), `LocomotionStateMachine`(Idle/Walk/Run 공용 상태 머신)
+- Core 변경: `MoveIntent`에 `Planar`(바닥 평면 방향)와 평면용 생성자, `CharacterBody.Motor`를 `ICharacterMotor`로, Idle/Walk/Run `Tick`이 `Motor.Drive` 호출, `SideScrollMotor`가 `ICharacterMotor` 구현, 복도 `CharacterStateMachine`은 방향 전환·끝 막힘만 하고 나머지는 `LocomotionStateMachine`에 맡김 (공개 API 그대로), `CharacterMoveConfig`에 상태별 애니메이션 재생 배율(`AnimationScaleFor`)
+- Gameplay: 텃밭 `PlayerMover`가 공용 상태 머신 + `PlanarMotor` + Shift 달리기, 이동 방향은 지금처럼 `PlayerConfig` 카메라 Yaw 기준. `CharacterAnimatorView`를 `ILocomotionSource` 공용으로(복도는 그대로 Bind, 텃밭은 `PlayerMover`가 연결). `AvatarAnimationSpeed`가 장면 이동 설정의 배율을 곱함. `GameInputReader.Run`
+- 입력: `GameControls` `Gameplay` 맵에 `Run`(왼쪽 Shift) — SETUP.md 입력 액션
+- 데이터: `Data/Config/FarmMoveConfig`(→ 같은 날 `MoveConfig`로 이름 변경, 복도를 뺀 3D 맵 공용. 처음 값: 걷기 4·달리기 9, 가속 40·감속 50, 재생 배율 걷기 1.6·달리기 3.6 — 예전 걷기 재생은 이동 속도 ÷ 1 = 4배였음)
+- Editor: 메뉴 `VoxelMagic/캐릭터/텃밭 플레이어 이동·애니 통일`(`PlayerLocomotionSetup`), `PrototypeSceneBuilder`도 같은 처리 (실행 안 함)
+- 텃밭 씬(FarmPond): Model에 `CharacterAnimatorView`·`AvatarAnimationSpeed`, `PlayerMover`에 이동 설정·애니 뷰 연결, 옛 `PlayerAvatarAnimator`는 **끄기만**(삭제 안 함, Prototype 씬은 아직 사용)
+- 확인: 테스트 113개 통과(새 6개, 복도 상태 머신 기존 테스트 그대로 통과) / 텃밭 플레이: 상태 머신에 입력을 넣어 Idle → D 걷기(속력 4, 방향 = 카메라 오른쪽) → Shift 달리기(9) → W+D 달리기(대각선도 9) → 놓기 Idle, Animator Idle/Walk/Run 따라감, 재생 값 Walk 1.6·Run 3.6 / 복도 플레이: 걷기 1.6·달리기 3.6·좌우 방향·Animator 그대로 / 콘솔 에러 0
+- 확인 못 함: 실제 키보드 입력(에디터 포커스가 없어 가상 키가 액션에 안 들어감 — 사용자 플레이로 확인 필요)
+- 이동 방향 질문(D가 화면 대각선으로 간다는 보고): 코드는 카메라 기준이라 D = 화면 오른쪽으로 측정됨. 사용자가 카메라 Yaw를 바꿔 직접 시험하기로 함 (이동은 Yaw를 따라감)
+
+## 2026-11-10 — 캐릭터 시스템 단계 2-①: 플레이어 데이터 유지 + 파일 저장
+- 설계: `DESIGN_CHARACTER.md` 9번 (사용자 "제작 시작" 승인, 저장은 파일까지)
+- Core `Session/`: `PlayerProgress`(인벤토리·점수·도감·의뢰 + 밭 보관본, 나중에 스탯 자리), `GameSession`(정적 보관소, 저장 직전 `Capturing`), `SaveData`·`SlotRecord`·`FarmPlotRecord`(JSON용, 버전 1), `ISaveStore`, `DefinitionCatalog`(ID → 에셋), `SaveMapper`(진행 상태 ↔ 저장 데이터, 모르는 ID 건너뜀)
+- Core 변경: `GameContext.Create`가 `PlayerProgress`를 받아 씀(플레이어 데이터는 씬을 넘어 유지, 밭 격자·낚시·메시지·화면 상태는 씬마다 새로), `Inventory`·`ScoreBook`·`MaterialJournal`·`RequestTracker`에 불러오기용 `Restore`(internal), `MaterialJournal.DeliveredIds`, `RequestTracker.CompletedRequests`
+- Gameplay: `Save/JsonFileSaveStore`(임시 파일에 쓴 뒤 바꿔치기), `Save/GameSaveSystem`(처음 한 번 불러오기/새 게임, 저장, 종료 때 저장), `GameBootstrap`(세션에서 진행 상태 받기, 연결 뒤 밭 다시 심기, 씬을 떠날 때 밭 보관), `SceneTransitionDirector`(페이드 아웃 뒤 로드 전에 저장)
+- UI: 씬을 넘는 데이터 구독을 OnDestroy에서 풀도록 수정 — `QuestTrackerPanel`(해제 없던 것 + 씬에 들어올 때 진행 중 의뢰 바로 표시), `RequestBoardWindow`(람다 구독 → 메서드)
+- Editor: `Save/SaveTools` 메뉴 `VoxelMagic/저장/`, `PrototypeSceneBuilder`가 정의 목록 연결 (실행 안 함)
+- 데이터·씬: `Data/Save/DefinitionCatalog`(아이템 10·의뢰 3), `FarmPond` 씬 `_Bootstrap`에 연결·`_autoSave` 켬 (씬 diff: 이 두 줄 + 기존 컴포넌트 필드 `_probeHeight` 기본값 기록 한 줄)
+- 확인: 테스트 107개 통과(새 6개: JSON 왕복, 모르는 ID, 인벤토리 이벤트, 진행 중 의뢰 재지급 없음, 점수 범위, 세션 보관) / 플레이: 텃밭에서 아이템·점수·의뢰·밭(물 준 칸 포함) 바꿈 → 복도(진행 상태 그대로, 저장 파일 생성) → 텃밭(인벤토리 같은 객체, 밭 2칸·물 상태·뷰, 의뢰 추적 패널 표시) → 인벤토리 이벤트 구독자에 사라진 씬 UI 없음 → 플레이 끄기(저장) → 다시 켜기(파일에서 그대로 불러옴) / 콘솔 에러 0 / 시험 저장 파일은 지움
+- 덤: Unity가 `Animations/Mixamo/Y Bot@Watering.fbx.meta`를 만듦(사용자가 넣은 FBX의 임포트)
+
+## 2026-11-10 — 뒷산 바닥 복셀 FBX 9개 (브랜치 `Farm-pond-map`)
+- 설계: `Docs/DESIGN_MOUNTAIN_FLOOR.md`. 복셀 1칸 0.0667 m, 청크 16 × 16 m(입장 꼬리 T만 6 × 5 m), 윗면 y = 0 기준 절대 높이로 구움(길 높이 0 → 약 11 m)
+- 만든 것 (`Art/Map/Mountain/`): `Mountain_Floor_T/A1/A2/A3/B/C1/C2/C3/D.fbx`, `Mountain_palette.png`(256 × 1, Point·Mip 끔·무압축), `Mountain_Voxel.mat`(`M_Voxel` 복사 + 팔레트), `MountainFloor_All.prefab`(청크 9개를 (x, 0, z)에 조립한 확인용), `Source/`(청크별 메시 데이터 `.npz`, 생성 스크립트 `hf.py`·`gen_mesh.py` — 파이썬, 유니티는 무시). 확인 씬 `Scenes/Tools/MountainFloorPreview.unity`
+- 색: FarmPond 구운 아틀라스에서 읽은 길 `#8A5A36` + 외곽선 1복셀 `#4C321E`, 흙 `#6A4A33` 한 색, 연못 이끼색 `#507848` 덩어리. 연갈색 흙 없음. 바깥 둘레에 1.5 m(22복셀) 흙 단면 (윗 0.4 m 짙은 흙 + 그 아래 더 어두운 흙). 아랫면·안쪽 없음, 포획 구역이 붙을 B 북쪽 변은 단면 없이 열어 둠
+- 임포트: 배율 1·회전 0(축·단위 구움 처리), Read/Write 끔, 메시 압축 끔, 콜라이더 없음, 머티리얼은 `Mountain_Voxel` 하나를 모든 청크가 공유
+- 확인: 청크 경계 상자 (0~16, y, 0~16) 정확, 윗면 법선 전부 위, 윗면 면적 = 칸 수, 이웃 칸 단차 2복셀 이하, 삼각형 청크당 약 4만~5만 (총 약 38만). 이음새 틈 없음(화면 확인)
+- 도구: 높이장 → 청크 greedy 메시(`.npz`) → Blender에서 FBX. MagicaVoxel로 고치고 싶으면 `gen_mesh.py`가 청크별 `.vox`도 만든다 (청크당 약 5 MB라 프로젝트에는 넣지 않음)
+- FarmPond 씬·기존 에셋은 건드리지 않음 (`MountainFloorPreview`는 새 씬)
+
+## 2026-11-09 — 씬 이동: 복도 ↔ FarmPond, 보이지 않는 트리거 + 픽셀 계단 원형 페이드
+- Core: `SceneFlow/SceneTravel`(이동 중 여부·도착 지점 ID·이벤트, 정적), `IScreenFade` / `Data/Config/SceneTransitionConfig`(페이드 아웃·멈춤·인 0.4·0.05·0.4초, 블록 12 px@1080p, 디더 3블록, 색, 원 중심 = 플레이어, 정렬 순서 500) → `Data/Config/SceneTransitionConfig.asset`
+- Gameplay: `SceneFlow/SceneTransitionDirector`(씬마다 하나: 입력 막기 → 페이드 아웃 → 비동기 로드 → 새 씬 진행자가 가린 채 시작 → 페이드 인 → 입력 풀기), `SceneTransitionTrigger`(보이지 않는 BoxCollider 범위에 플레이어 발 + 0.2 m 점이 들어오는 순간 이동. 물리 이벤트가 아니라 쿼터뷰·횡스크롤 공용), `SceneSpawnPoint`(도착 ID가 맞으면 부트스트랩보다 먼저 플레이어를 옮김, 횡스크롤은 이동 계산기 x도). `SideScrollMotor.Teleport` 추가
+- 입력 막기: `GameInputReader`·`SideScrollInputReader`가 이동 중에는 게임플레이 액션 맵을 끔. 페이드 판이 클릭도 막음. 환경설정 UI는 다른 액션 맵 + 더 높은 정렬 순서로 만들면 영향 없음
+- UI: `SceneFlow/PixelCircleFadeView` + 셰이더 `Art/Shaders/PixelCircleFade.shader`(화면을 블록으로 잘라 원 밖을 칠하고 테두리는 4×4 Bayer 디더) + `Art/Materials/UI_PixelCircleFade.mat`. 이미지 시퀀스 대신 셰이더로 (해상도 무관, 숫자로 조절)
+- Editor: `SceneFlow/SceneTransitionRigBuilder`(진행자+페이드 캔버스, 트리거, 도착 지점 만들기). `CorridorSceneBuilder`는 원기둥 포털 대신 트리거 + 돌아올 도착 지점(`FromFarm`, 포털 왼쪽 1.2 m)을 만들고 부트스트랩 연결 맨 앞에 넣음
+- `CorridorConfig` 포털: 이동 씬 `FarmPond`, 도착 ID `FromCorridor`, 트리거 폭 0.4 m 추가 / 지름·트리거 반지름·색 삭제. `ScenePortal.cs` 삭제 (`Art/Materials/CorridorPortal.mat`은 안 쓰지만 남겨 둠)
+- 씬: 복도 — 원기둥 포털 지우고 `Portal_FarmPond`(트리거 x 33.28, 도착 `FromFarm` x 32.08) + `SceneTransition`. FarmPond — `World/Portal_Corridor`(꼬리 길 끝 트리거 (80, 1, −7.5) 4×2×1 m, 도착 `FromCorridor` (80, 0.1, −4.5)) + `SceneTransition`
+- Build Settings: `FarmPond` 추가 (`SETUP.md`)
+- 확인 (플레이 모드, 프레임 한 칸씩 진행): FarmPond 꼬리 끝 → 원형 픽셀 페이드 → 복도 x 32.08 도착 → 입력 다시 켜짐 / 복도 포털 → FarmPond (80, −4.5) 도착, 게임플레이 키 켜짐 / 화면: 블록 계단 + 디더 테두리 원이 플레이어 중심으로 좁아짐 / 콘솔 에러 0
+- 처음엔 복도 캐릭터 발 높이가 트리거 바닥과 똑같아 잡히지 않아서, 발 + 0.2 m 점으로 검사하게 고침
+
 ## 2026-11-09 — 타일 맵 굽기: 충돌체를 칠한 칸 모양대로 BoxCollider 여러 개로
 - 원인: 칠한 범위 전체를 감싸는 상자 하나라, 포탈 길(꼬리)을 빼면 옆의 빈 허공까지 덮어 플레이어가 허공을 걸었음
 - Editor: `TileFloorBaker.AddFloorCollider` — 칠한 칸을 가로로 묶고 같은 폭의 다음 줄과 합쳐 직사각형마다 BoxCollider 하나 (빈 칸은 덮지 않음). 결과 표시는 "충돌체 N개 (칸 모양)"
