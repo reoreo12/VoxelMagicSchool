@@ -47,6 +47,7 @@
 |---|---|---|---|
 | 2026-11-04 | `Scenes/Corridor_SideScroll.unity`, `Scenes/Prototype_FarmFishing.unity` 추가 (기존 `Assets/Scenes/SampleScene.unity`는 그대로 0번) | 복도 오른쪽 문 포털에서 실행 중 농장 씬을 열기 위해 (`SceneManager.LoadScene`은 목록에 있는 씬만 열 수 있음) | 사용자 승인 |
 | 2026-11-09 | `Scenes/FarmPond.unity` 추가 (3번, 기존 목록 그대로) | 복도 ↔ 정식 텃밭·연못 씬 이동 (보이지 않는 트리거 + 픽셀 원형 페이드) | 사용자 승인 ("제작 시작") |
+| 2026-11-17 | `Scenes/BackMountain.unity`(4번), `Scenes/Creature_Cave.unity`(5번) 추가 (기존 목록 그대로) | 복도 왼쪽 문 ↔ 뒷산, 뒷산 동굴 입구 ↔ 크리처 굴 씬 이동 | 사용자 승인 ("제작 시작") |
 
 ## 임포트 설정
 

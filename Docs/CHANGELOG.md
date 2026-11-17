@@ -1,5 +1,23 @@
 # 변경 기록
 
+## 2026-11-17 — 크리처 굴 정식 씬 + 뒷산·복도 포탈 (브랜치 `Creature-cave-map`)
+- 새 씬 `Scenes/Creature_Cave.unity`: 타일 맵 에디터의 `Map_Creature_Cave`(구운 바닥·소품·횃불·조명 스위치·바닥 빛)를 옮겨 옴 + BackMountain의 `_Bootstrap`·`Player`·`Main Camera`·`Directional Light`·`SceneTransition`·`UI`(공통 UI만: 뒷산 전용 `DebugKeyHint`·`CenterBanner` 제외)
+  - 콜라이더(씬 인스턴스에만, 메시 크기): `Low_Table`·`Candle_Stand`·`Bookshelf_Filled`·`Book_Stack`·`Cardboard_Box`. `Cat_Bed`는 사용자가 직접
+  - 바닥 둘레 보이지 않는 벽 `Map_Creature_Cave/Bounds (invisible)` (바닥 칸 테두리마다 높이 3 m 상자, 바닥 밖으로 떨어지지 않게)
+  - `Requests`: 기본 도형 의뢰 게시판(뒷산에서 가져옴, 입구 왼쪽 (97, 0, 0.35)) + `Cave_Creature_Cat`(`CreatureNpc`·`CreatureReactions`·BoxCollider 0.80×0.77×0.67·머리 위 안내 위치)
+  - 조명 스위치의 태양을 이 씬의 `Directional Light`로, 원래 값은 이 씬 기준으로 다시 저장
+  - 포탈 `Portal_BackMountain`: 통로 끝 트리거 → 뒷산 `FromCave`, 도착 지점 `FromBackMountain`(통로 안 (99, 0.1, −3.5)). 플레이어 기본 위치도 같은 곳
+- 크리처 애니메이션: `Cat_Attack_L`·`Cat_Attack_R`·`Cat_Jump` 클립 반복 끔, 컨트롤러에서 끝나면 `Cat_Idle`로 (`Cat_Get_Hit`과 같은 전이). `Cat_Sleep_Start` → `Cat_Sleep`(반복) 상태 추가
+- `CreatureReactions`(Gameplay, 새 스크립트): 말 걸면 반응 하나를 무작위로(직전과 다르게) 재생. 반복 동작은 머무는 시간 뒤 Idle로 크로스페이드. 목록·시간은 Inspector
+- `CreatureNpc`: 반응이 연결돼 있으면 전달할 수 없을 때 "말 걸기"(E → 반응). 연결 안 된 기존 기본 도형 크리처는 동작 그대로. `GameTexts.Talk` 추가
+- BackMountain 씬: `Portal_Creature_Cave`(동굴 입구 안쪽 트리거, 도착 지점 `FromCave` 입구 앞), `Portal_Corridor`(시작 T 남쪽 끝 트리거, 도착 지점 `FromCorridor` (8, 0.1, −3.5))
+- Corridor_SideScroll 씬: 왼쪽 문 앞 `Portal_BackMountain`(오른쪽 포탈과 좌우 대칭, 도착 지점 `FromBackMountain`), 부트스트랩 연결 목록에 추가. `CorridorConfig`에 왼쪽 포탈 설정 추가, `CorridorSceneBuilder`가 왼쪽 포탈도 만듦
+- Build Settings에 `BackMountain`·`Creature_Cave` 추가 (SETUP.md)
+- BackMountain·FarmPond의 기본 도형 크리처 → 고양이 크리처: `Creature` 루트(위치·`CreatureNpc`)는 그대로, 상자·눈을 지우고 `Cave_Creature_Cat`을 `Visual`로 넣음(옛 눈 방향을 보게), BoxCollider 0.80×0.77×0.67, 머리 위 `PromptAnchor`, `CreatureReactions` 연결 → 전달할 수 없을 때 "말 걸기"로 무작위 반응. `Prototype_FarmFishing`은 그대로
+- 개발용 `CreatureReactionClickDebug`(Gameplay/Debug, 에디터·개발 빌드만): F8 프리 카메라가 켜져 있을 때 마우스 왼쪽 클릭 → 연결한 크리처의 무작위 반응(E 말 걸기와 같음). Creature_Cave의 `Cave_Creature_Cat`에만 붙임. `FreeCameraToggle.AnyOn`(정적, 켜짐 여부) 추가
+- 개발용 프리 카메라(`FreeCameraToggle`, F8 그대로: 다른 디버그 키는 F5·F6·F9라 겹치지 않음): 켜 있는 동안 플레이어 입력 리더(`GameInputReader`·`SideScrollInputReader`)를 꺼서 WASD가 카메라만 움직이게 함, 돌아가면 다시 켬. 켠 채로 씬이 바뀌면 프리 카메라를 끔. 원래 플레이 시작 때 스스로 생겨 모든 씬에서 동작 (씬 수정 없음)
+- 버그 수정: BackMountain(과 거기서 가져온 Creature_Cave) 플레이어의 `PlayerMover._moveConfig`가 비어 이동이 안 되던 문제 → 두 씬에 `VoxelMagic/캐릭터/텃밭 플레이어 이동·애니 통일`과 같은 연결 적용 (FarmPond와 같은 `MoveConfig`, `CharacterAnimatorView`, 공용 Controller, `CharacterActionView`, 옛 `PlayerAvatarAnimator` 끔)
+
 ## 2026-11-16 — 동굴 바닥 타일을 타일 맵 에디터 팔레트에 추가 (브랜치 `feature/tool-tile-editor`)
 - 처음 넣은 `Tile/cave/cave_cobblestone.png`(와 타일 에셋)는 사용자 요청으로 삭제. 대신 `Tile/cave_floor_tiles_v3/` 26장(`cave_stone_01~06`, `cave_stone_moss_<방향>_NN`)을 씀
 - 임포트 설정 적용(Sprite·Point·압축 없음·32 PPU) → 타일 `Art/Map/TileAssets/cave_floor_tiles_v3/floors/*.asset` 26개

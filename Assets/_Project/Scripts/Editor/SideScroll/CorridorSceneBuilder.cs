@@ -103,6 +103,9 @@ namespace VoxelMagic.EditorTools
             var portal = config.PortalEnabled
                 ? BuildPortal(config, bounds, moveConfig.GroundY, moveConfig.Z, transition, character.transform)
                 : null;
+            var leftPortal = config.LeftPortalEnabled
+                ? BuildLeftPortal(config, bounds, moveConfig.GroundY, moveConfig.Z, transition, character.transform)
+                : null;
             var interactor = input.gameObject.AddComponent<SideScrollInteractor>();
             interactor.SetRef("_input", input).SetRef("_character", character.transform);
 
@@ -114,10 +117,9 @@ namespace VoxelMagic.EditorTools
             bootstrap.SetRef("_config", config)
                 .SetRef("_moveConfig", moveConfig)
                 .SetRef("_corridor", corridor)
-                .SetRefList("_bindRoots", portal != null
+                .SetRefList("_bindRoots", BindRoots(
                     // 도착 지점이 먼저 캐릭터 x를 옮겨야 카메라가 그 자리에서 시작한다
-                    ? new Object[] { portal, camera.gameObject, character, hud, input.gameObject, lighting }
-                    : new Object[] { camera.gameObject, character, hud, input.gameObject, lighting });
+                    portal, leftPortal, camera.gameObject, character, hud, input.gameObject, lighting));
 
             // 에디터에서도 플레이 때와 같은 화면이 보이도록 카메라를 복도 왼쪽 끝에 맞춘다.
             camera.orthographicSize = SideScrollMath.OrthographicSizeFor(bounds.Height);
@@ -238,6 +240,28 @@ namespace VoxelMagic.EditorTools
             SceneTransitionRigBuilder.CreateSpawn(config.ReturnSpawnId,
                 new Vector3(x - config.ReturnSpawnOffset, groundY, z), Quaternion.identity, character, root.transform);
             return root;
+        }
+
+        // 왼쪽 문 앞: 오른쪽 포털과 좌우 대칭 (도착 지점은 포털 오른쪽, 오른쪽을 봄)
+        private static GameObject BuildLeftPortal(CorridorConfig config, CorridorBounds bounds, float groundY, float z,
+            SceneTransitionDirector director, Transform character)
+        {
+            var root = new GameObject("Portal_" + config.LeftPortalSceneName);
+            float x = bounds.MinX + config.LeftPortalInsetFromLeft;
+            SceneTransitionRigBuilder.CreateTrigger("Trigger", new Vector3(x, groundY + config.PortalHeight * 0.5f, z),
+                new Vector3(config.PortalWidth, config.PortalHeight, 2f), config.LeftPortalSceneName,
+                config.LeftPortalArrivalSpawnId, director, character, root.transform);
+            SceneTransitionRigBuilder.CreateSpawn(config.LeftReturnSpawnId,
+                new Vector3(x + config.ReturnSpawnOffset, groundY, z), Quaternion.identity, character, root.transform);
+            return root;
+        }
+
+        private static Object[] BindRoots(params GameObject[] roots)
+        {
+            var list = new System.Collections.Generic.List<Object>();
+            foreach (var root in roots)
+                if (root != null) list.Add(root);
+            return list.ToArray();
         }
 
         private static void EnsureFolder(string path)

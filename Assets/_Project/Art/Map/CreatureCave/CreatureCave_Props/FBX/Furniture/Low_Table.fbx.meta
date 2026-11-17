@@ -3,9 +3,24 @@ guid: e136227715e25914a94e5b48a5f10f75
 ModelImporter:
   serializedVersion: 22200
   internalIDToNameTable: []
-  externalObjects: {}
+  externalObjects:
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: cave_palette
+    second: {fileID: 2100000, guid: 1972510fda272cd44b15991f76786d34, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: cave_palette_emissive
+    second: {fileID: 2100000, guid: 9019cc038518207469780406b4f4584b, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: cave_palette_glass
+    second: {fileID: 2100000, guid: fa654ec9447502143b573f637feaac04, type: 2}
   materials:
-    materialImportMode: 2
+    materialImportMode: 1
     materialName: 0
     materialSearch: 1
     materialLocation: 1

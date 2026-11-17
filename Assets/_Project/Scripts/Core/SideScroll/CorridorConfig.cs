@@ -65,6 +65,14 @@ namespace VoxelMagic.Core
         [SerializeField] private string _returnSpawnId = "FromFarm";
         [Tooltip("돌아온 도착 지점이 포털에서 왼쪽으로 떨어진 거리 (m, 바로 다시 밟지 않게)")]
         [SerializeField, Min(0f)] private float _returnSpawnOffset = 1.2f;
+        [Header("왼쪽 문 포털: 크기는 오른쪽 포털과 같음 (바꾸면 복도 씬 다시 만들기)")]
+        [SerializeField] private bool _leftPortalEnabled = true;
+        [SerializeField] private string _leftPortalSceneName = "BackMountain";
+        [SerializeField] private string _leftPortalArrivalSpawnId = "FromCorridor";
+        [Tooltip("복도 왼쪽 끝에서 안쪽으로 떨어진 거리")]
+        [SerializeField, Min(0f)] private float _leftPortalInsetFromLeft = 2.56f;
+        [Tooltip("왼쪽 포털로 돌아올 때의 도착 지점 ID (포털 오른쪽에 놓임, 거리는 위 '돌아온 도착 지점' 값)")]
+        [SerializeField] private string _leftReturnSpawnId = "FromBackMountain";
         [Tooltip("캐릭터 발에서 이 높이의 점으로 포털 안인지 잰다")]
         [SerializeField, Min(0f)] private float _interactProbeHeight = 0.5f;
 
@@ -151,6 +159,11 @@ namespace VoxelMagic.Core
         public string ReturnSpawnId => _returnSpawnId;
         public float ReturnSpawnOffset => _returnSpawnOffset;
         public float InteractProbeHeight => _interactProbeHeight;
+        public bool LeftPortalEnabled => _leftPortalEnabled;
+        public string LeftPortalSceneName => _leftPortalSceneName;
+        public string LeftPortalArrivalSpawnId => _leftPortalArrivalSpawnId;
+        public float LeftPortalInsetFromLeft => _leftPortalInsetFromLeft;
+        public string LeftReturnSpawnId => _leftReturnSpawnId;
         public bool NightAtStart => _nightAtStart;
         public BackdropSet DayBackdrop => _dayBackdrop;
         public BackdropSet NightBackdrop => _nightBackdrop;
