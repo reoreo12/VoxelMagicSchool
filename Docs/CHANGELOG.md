@@ -14,8 +14,10 @@
 - Corridor_SideScroll 씬: 왼쪽 문 앞 `Portal_BackMountain`(오른쪽 포탈과 좌우 대칭, 도착 지점 `FromBackMountain`), 부트스트랩 연결 목록에 추가. `CorridorConfig`에 왼쪽 포탈 설정 추가, `CorridorSceneBuilder`가 왼쪽 포탈도 만듦
 - Build Settings에 `BackMountain`·`Creature_Cave` 추가 (SETUP.md)
 - BackMountain·FarmPond의 기본 도형 크리처 → 고양이 크리처: `Creature` 루트(위치·`CreatureNpc`)는 그대로, 상자·눈을 지우고 `Cave_Creature_Cat`을 `Visual`로 넣음(옛 눈 방향을 보게), BoxCollider 0.80×0.77×0.67, 머리 위 `PromptAnchor`, `CreatureReactions` 연결 → 전달할 수 없을 때 "말 걸기"로 무작위 반응. `Prototype_FarmFishing`은 그대로
+- BackMountain·FarmPond의 기본 도형 의뢰 게시판(`RequestBoard`) 삭제 (참조하던 곳 없음). Creature_Cave 게시판은 사용자가 새 메시로 교체
+- 개발용 임시 치트 `RequestCheatKeys`(Gameplay/Debug, 에디터·개발 빌드만, 플레이 시작 때 "[Cheat] Requests" 자동 생성, 모든 씬): F10 = 의뢰 게시판 창 열기(같은 `RequestBoardWindow`), F11 = 크리처에게 의뢰 전달·완료(못 하면 부족 재료/의뢰 없음 토스트). GameBootstrap이 없는 복도에서는 동작 안 함. `CreatureNpc.TryDeliver`(정적)로 전달 로직을 크리처 E와 공유
 - 개발용 `CreatureReactionClickDebug`(Gameplay/Debug, 에디터·개발 빌드만): F8 프리 카메라가 켜져 있을 때 마우스 왼쪽 클릭 → 연결한 크리처의 무작위 반응(E 말 걸기와 같음). Creature_Cave의 `Cave_Creature_Cat`에만 붙임. `FreeCameraToggle.AnyOn`(정적, 켜짐 여부) 추가
-- 개발용 프리 카메라(`FreeCameraToggle`, F8 그대로: 다른 디버그 키는 F5·F6·F9라 겹치지 않음): 켜 있는 동안 플레이어 입력 리더(`GameInputReader`·`SideScrollInputReader`)를 꺼서 WASD가 카메라만 움직이게 함, 돌아가면 다시 켬. 켠 채로 씬이 바뀌면 프리 카메라를 끔. 원래 플레이 시작 때 스스로 생겨 모든 씬에서 동작 (씬 수정 없음)
+- 개발용 프리 카메라(`FreeCameraToggle`, F8 그대로: 다른 디버그 키는 뒷산 F1~F6, 이동 치트 F9, 의뢰 치트 F10·F11이라 겹치지 않음): 켜 있는 동안 플레이어 입력 리더(`GameInputReader`·`SideScrollInputReader`)를 꺼서 WASD가 카메라만 움직이게 함, 돌아가면 다시 켬. 켠 채로 씬이 바뀌면 프리 카메라를 끔. 원래 플레이 시작 때 스스로 생겨 모든 씬에서 동작 (씬 수정 없음)
 - 버그 수정: BackMountain(과 거기서 가져온 Creature_Cave) 플레이어의 `PlayerMover._moveConfig`가 비어 이동이 안 되던 문제 → 두 씬에 `VoxelMagic/캐릭터/텃밭 플레이어 이동·애니 통일`과 같은 연결 적용 (FarmPond와 같은 `MoveConfig`, `CharacterAnimatorView`, 공용 Controller, `CharacterActionView`, 옛 `PlayerAvatarAnimator` 끔)
 
 ## 2026-11-16 — 동굴 바닥 타일을 타일 맵 에디터 팔레트에 추가 (브랜치 `feature/tool-tile-editor`)

@@ -30,9 +30,16 @@ namespace VoxelMagic.Gameplay
                 if (_reactions != null) _reactions.PlayRandom();
                 return;
             }
-            if (Context.Requests.Deliver(out var report) != DeliverResult.Success) return;
-            Context.Messages.ShowCreatureSpeech(BuildLines(report));
-            Context.Screen.Open(GameWindow.CreatureDialog);
+            TryDeliver(Context);
+        }
+
+        /// <summary>의뢰를 전달하고 완료 대사 창을 연다 (크리처 E, 의뢰 치트 키가 같이 씀). 전달할 수 없으면 false.</summary>
+        public static bool TryDeliver(GameContext context)
+        {
+            if (context.Requests.Deliver(out var report) != DeliverResult.Success) return false;
+            context.Messages.ShowCreatureSpeech(BuildLines(report));
+            context.Screen.Open(GameWindow.CreatureDialog);
+            return true;
         }
 
         private static List<string> BuildLines(DeliveryReport report)
