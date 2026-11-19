@@ -24,6 +24,7 @@
 | 2026-10-30 | MCP for Unity (`com.coplaydev.unity-mcp`) | `https://github.com/CoplayDev/unity-mcp.git?path=/MCPForUnity#v10.3.0` | Claude Code가 에디터를 조작(씬 구성, 플레이 모드, 콘솔 확인)하기 위함. STT_Prototype과 같은 버전으로 고정 | 사용자 승인 |
 | 2026-11-05 | 2D Tilemap Editor (`com.unity.2d.tilemap`) | 1.0.0 (Unity 레지스트리, 6000.0.38f1에 맞는 유일한 버전) | 타일 에디터 테스트 씬: `Window > 2D > Tile Palette` 창으로 바닥 칠하기 (`DESIGN_TILEMAP.md`) | 사용자 승인 |
 | 2026-11-05 | 2D Tilemap Extras (`com.unity.2d.tilemap.extras`) | 4.1.2 (Unity 레지스트리 추천 버전. 최신 10.0.1은 이 에디터와 맞지 않음) | Rule Tile로 풀↔흙 경계 자동 배치 (`DESIGN_TILEMAP.md` 6장) | 사용자 승인 |
+| 2026-11-19 | 2D Sprite (`com.unity.2d.sprite`) | 1.0.0 (Unity 레지스트리) | UI 스프라이트 9-slice 경계 확인·수정(Sprite Editor), 시트 자르기 API(`ISpriteEditorDataProvider`). 브랜치 `feature/tool-UI-editor`, `UI_SPEC.md` | 사용자 승인 ("UI 제작에 필요하다면 설치") |
 
 ## 에셋 가져오기
 
@@ -31,6 +32,13 @@
 |---|---|---|---|---|
 | 2026-10-30 | Pretendard 폰트 v1.3.9 (Regular) | `Assets/_Project/Fonts/Pretendard/` (원본 otf, `OFL.txt`) | 한글 TMP 고정 폰트 에셋의 원본. GitHub `orioncactus/pretendard` 저장소에서 받음. SIL OFL 1.1이라 게임에 넣어 배포 가능 | 사용자 승인 |
 | 2026-10-30 | TMP Essential Resources | `Assets/TextMesh Pro/` (Fonts, Resources, Shaders, Sprites) | 한글 TMP 폰트 사용. uGUI 2.0에 포함된 리소스를 가져온 것이라 외부 다운로드 없음 | 사용자 승인 |
+
+## 프로젝트 설정
+
+| 날짜 | 변경 | 이유 | 승인 |
+|---|---|---|---|
+| 2026-11-19 | Editor Settings > Sprite Packer Mode: Disabled → **Sprite Atlas V2 - Enabled** | UI 스프라이트를 `Art/UI/UiAtlas.spriteatlasv2` 하나로 묶어 드로우콜을 줄임 (`UI_SPEC.md` 4-A-5) | 사용자 승인 (Claude 선택 위임) |
+| 2026-11-19 | `.gitignore`에 `Assets/_Project/Art/UI/Sprout Lands*/`와 `.meta` 추가 (원본 폴더 + `Sprout Lands (수정본)/`) | Sprout Lands 팩은 재배포 금지(수정본 포함). 팀원 저장소에는 이 스프라이트가 없으므로, 이를 쓰는 UI는 팀원 쪽에서 빈 이미지로 보인다 | 사용자 승인 |
 
 ## 입력 액션
 
@@ -58,6 +66,7 @@
 | 2026-11-05 | `Art/Map/Tile/**/*.png` (타일 팩 9개 테마 387장, 사용자 결정: 팩 전체) | Sprite·Single·Full Rect, PPU 32, 가운데 기준점, Point, 압축 없음, Mip Map 끔, Alpha Is Transparency, Clamp | `Data/Tiles/TileMapConfig`의 타일 픽셀 수정 → 메뉴 `VoxelMagic/타일 맵/타일 팩 임포트 설정 적용 (전체)` |
 | 2026-11-06 | `Art/Characters/Student_Chibi/Sprites/Student_Chibi_sheet.png` | Sprite·Single, PPU 210(키 1.28), Point, 압축 없음, Mip Map 끔, Alpha Is Transparency, Clamp (칸은 `Data/Avatars/Student_Chibi_2D` 안의 스프라이트) | 메뉴 `VoxelMagic/아바타/선택한 2D 스프라이트 준비` (json 선택) |
 | 2026-11-09 | `Art/Map/Farm/farm_grid.fbx`, `farm_grid.png` | FBX: 카메라·조명 가져오기 끔, 애니메이션 없음 / PNG: Point, Mip Map 끔, 압축 없음, Clamp | 모델 임포트 설정 (Inspector) |
+| 2026-11-19 | `Art/UI/**/*.png` (`_preview` 제외) | Sprite·Full Rect, PPU 16, Point, 압축 없음, Mip Map 끔, Alpha Is Transparency, Clamp. 9-slice 경계·시트 자르기는 규칙 에셋 값 (`UI_SPEC.md` 4장) | `Data/Tools/UI/UiImportRules` 수정 → 메뉴 `VoxelMagic/UI/임포트 규칙 적용` |
 | 2026-11-09 | `Art/Map/Farm/Farm_Field_Dry.fbx`, `Farm_Field_Wet.fbx`, `farm_field_dry_palette.png`, `farm_field_wet_palette.png` (밭 칸, 지금 씬이 쓰는 것) | FBX: 카메라·조명 가져오기 끔, 애니메이션 없음(Animation Type None) / PNG: Point, Mip Map 끔, 압축 없음, Clamp | 모델 임포트 설정 (Inspector) |
 
 ## 아바타 임포트 설정 (메뉴 `VoxelMagic/아바타/`로 적용)
@@ -84,7 +93,7 @@
 | VoxelMagic.Editor | `Assets/_Project/Scripts/Editor` (에디터 전용) | Core, Unity.TextMeshPro |
 | VoxelMagic.Tests | `Assets/_Project/Tests` (EditMode 테스트) | Core, Test Runner, NUnit |
 | VoxelMagic.Tools (2026-11-03, 11-06 `VoxelMagic.Sandbox`에서 이름 변경) | `Assets/_Project/Scripts/Tools` (애니메이션 랩, 자동 참조 끔) | Core, **Gameplay**(2026-11-06 추가: 농장과 같은 소켓·장착 부품을 랩에서 그대로 사용), Unity.InputSystem, Unity.TextMeshPro, UnityEngine.UI |
-| VoxelMagic.Tools.Editor (2026-11-03, 11-06 `VoxelMagic.Sandbox.Editor`에서 이름 변경) | `Assets/_Project/Scripts/Tools/Editor` (에디터 전용) | Tools, Core, Gameplay, Editor, TMP, UI, InputSystem |
+| VoxelMagic.Tools.Editor (2026-11-03, 11-06 `VoxelMagic.Sandbox.Editor`에서 이름 변경) | `Assets/_Project/Scripts/Tools/Editor` (에디터 전용) | Tools, Core, Gameplay, Editor, TMP, UI, InputSystem, **Unity.2D.Sprite.Editor**(2026-11-19 추가: UI 시트 자르기) |
 
 ## 저장 파일 (2026-11-10)
 - 위치: `Application.persistentDataPath/Saves/save_<슬롯>.json` → Windows: `C:/Users/<사용자>/AppData/LocalLow/DefaultCompany/VoxelMagicSchool/Saves/` (회사·제품 이름은 Player Settings 값, 바꾸면 위치도 바뀜)

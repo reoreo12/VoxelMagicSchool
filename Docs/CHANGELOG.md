@@ -1,5 +1,12 @@
 # 변경 기록
 
+## 2026-11-19 — UI 준비 단계 (브랜치 `feature/tool-UI-editor`, `UI_SPEC.md`)
+- Sprout Lands를 `.gitignore`에 추가. 사용자가 색을 수정한 `Weather_UI_Free_Noon_ver.png`는 원본과 분리해 `Art/UI/Sprout Lands (수정본)/weather/`로 이동(GUID 유지)
+- 패키지 `com.unity.2d.sprite` 1.0.0 설치, Sprite Packer Mode를 Sprite Atlas V2로 (SETUP.md)
+- UI 임포트 규칙: `Tools/Editor/UI/UiImportRules`(규칙 데이터) + `UiImportRuleApplier`(메뉴 `VoxelMagic/UI/임포트 규칙 적용`). 규칙 에셋 `Data/Tools/UI/UiImportRules.asset`. `Art/UI` PNG 96장에 적용, 9-slice 경계(책·탭·leaf·바 프레임·종이 패널·스크롤바), `score_ui/v2/score_digits_sheet` 11×12 칸 10장으로 자름. Sprout Lands 시트 자르기는 퀵슬롯·시간대 UI 단계에서
+- Sprite Atlas `Art/UI/UiAtlas.spriteatlasv2`: 지금 쓰는 스프라이트 71개 (회전 끔, Tight Packing 끔, 패딩 4, Point, 압축 없음). 미리보기·ver1 숫자·초기 탭 아이콘·별 v3·아이콘 받침·가로 지팡이 원본은 넣지 않음
+- 종이 패널 Tiled 확인: Unity Tiled가 Border(가장자리)도 길이 방향으로 반복한다. 76·140·144·300 폭과 22~200 높이에서 직접 이어 붙인 예상 이미지와 픽셀 단위로 일치 (Canvas Reference PPU 16, Pixel Perfect). 조각 분리 스크립트는 필요 없음
+
 ## 2026-11-17 — 크리처 굴 정식 씬 + 뒷산·복도 포탈 (브랜치 `Creature-cave-map`)
 - 새 씬 `Scenes/Creature_Cave.unity`: 타일 맵 에디터의 `Map_Creature_Cave`(구운 바닥·소품·횃불·조명 스위치·바닥 빛)를 옮겨 옴 + BackMountain의 `_Bootstrap`·`Player`·`Main Camera`·`Directional Light`·`SceneTransition`·`UI`(공통 UI만: 뒷산 전용 `DebugKeyHint`·`CenterBanner` 제외)
   - 콜라이더(씬 인스턴스에만, 메시 크기): `Low_Table`·`Candle_Stand`·`Bookshelf_Filled`·`Book_Stack`·`Cardboard_Box`. `Cat_Bed`는 사용자가 직접

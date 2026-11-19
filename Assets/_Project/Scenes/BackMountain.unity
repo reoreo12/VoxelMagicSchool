@@ -23660,7 +23660,7 @@ BoxCollider:
   m_LayerOverridePriority: 0
   m_IsTrigger: 0
   m_ProvidesContacts: 0
-  m_Enabled: 1
+  m_Enabled: 0
   serializedVersion: 3
   m_Size: {x: 1.7426467, y: 1.0572859, z: 0.7467248}
   m_Center: {x: -2.5620198, y: -0.33832538, z: 1.8430616}
@@ -24267,7 +24267,7 @@ Camera:
   m_Enabled: 1
   serializedVersion: 2
   m_ClearFlags: 2
-  m_BackGroundColor: {r: 0.2830189, g: 0.21798143, b: 0.17221431, a: 0}
+  m_BackGroundColor: {r: 0.1792453, g: 0.16616827, b: 0.1547259, a: 0}
   m_projectionMatrixMode: 1
   m_GateFitMode: 2
   m_FOVAxisMode: 0
