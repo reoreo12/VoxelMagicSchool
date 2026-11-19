@@ -1,4 +1,4 @@
-// 아바타 한 벌의 데이터: 모델, 목표 키, Idle/Walk/Run 클립과 상태별 재생 속도, 생성된 Controller·프리팹.
+// 아바타 한 벌의 데이터: 모델, 목표 키, Idle/Walk/Run 클립과 상태별 재생 속도, 동작(낚시·물 주기) 클립, 생성된 Controller(공용 Controller의 Override)·프리팹.
 // 새 아바타는 메뉴(VoxelMagic/아바타/1. 선택한 캐릭터 모델 준비)가 이 에셋을 만들고, 재생 속도는 플레이 중 바꿔도 바로 반영된다.
 using UnityEngine;
 
@@ -24,8 +24,21 @@ namespace VoxelMagic.Core
         [SerializeField, Range(0.1f, 3f)] private float _walkSpeed = 1f;
         [SerializeField, Range(0.1f, 3f)] private float _runSpeed = 1f;
 
+        [Header("동작 클립 (Humanoid, 비우면 그 동작은 공용 Controller의 빈 클립)")]
+        [SerializeField] private AnimationClip _fishCast;
+        [SerializeField] private AnimationClip _fishWait;
+        [SerializeField] private AnimationClip _fishReel;
+        [Tooltip("올리기를 뒤집은 클립 (메뉴 '동작 클립 준비'가 만듦)")]
+        [SerializeField] private AnimationClip _fishReelBack;
+        [Tooltip("던지기를 뒤집은 클립")]
+        [SerializeField] private AnimationClip _fishHook;
+        [SerializeField] private AnimationClip _water;
+
         [Header("2D 버전 (있으면 복도에서 2D/3D 전환)")]
         [SerializeField] private SpriteCharacterSet _sprites;
+
+        [Header("소켓 (손 등 장착 위치, 아바타별 보정)")]
+        [SerializeField] private SocketProfile _socketProfile;
 
         [Header("생성됨 (메뉴 3)")]
         [SerializeField] private RuntimeAnimatorController _controller;
@@ -35,11 +48,26 @@ namespace VoxelMagic.Core
         public float TargetHeight => _targetHeight;
         public float ColliderRadius => _colliderRadius;
         public SpriteCharacterSet Sprites => _sprites;
+        public SocketProfile SocketProfile => _socketProfile;
         public RuntimeAnimatorController Controller => _controller;
         public GameObject CharacterPrefab => _characterPrefab;
 
         public AnimationClip ClipFor(CharacterStateId state) =>
             state == CharacterStateId.Run ? _run : state == CharacterStateId.Walk ? _walk : _idle;
+
+        public AnimationClip ActionClip(CharacterActionId action)
+        {
+            switch (action)
+            {
+                case CharacterActionId.FishCast: return _fishCast;
+                case CharacterActionId.FishWait: return _fishWait;
+                case CharacterActionId.FishReel: return _fishReel;
+                case CharacterActionId.FishReelBack: return _fishReelBack;
+                case CharacterActionId.FishHook: return _fishHook;
+                case CharacterActionId.Water: return _water;
+                default: return null;
+            }
+        }
 
         public float SpeedFor(CharacterStateId state) =>
             state == CharacterStateId.Run ? _runSpeed : state == CharacterStateId.Walk ? _walkSpeed : _idleSpeed;

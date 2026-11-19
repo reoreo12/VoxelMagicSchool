@@ -19,6 +19,8 @@ namespace VoxelMagic.Core
         [SerializeField, Min(1)] private int _chunkSize = 16;
         [Tooltip("굽기: 아틀라스에서 타일마다 둘레에 늘여 붙이는 여백 (px)")]
         [SerializeField, Range(0, 8)] private int _atlasPadding = 2;
+        [Tooltip("굽기: 바닥 충돌체(BoxCollider) 두께 (m). 윗면 = 바닥 높이, 아래로 이만큼")]
+        [SerializeField, Min(0.01f)] private float _colliderThickness = 0.5f;
         [Tooltip("타일 → 바닥 종류 표 (굽기 때 칸마다 바닥 종류를 함께 굽는다)")]
         [SerializeField] private GroundSurfaceTable _surfaceTable;
         [Tooltip("새 맵 기본 크기 (가로 × 세로 칸)")]
@@ -34,6 +36,7 @@ namespace VoxelMagic.Core
         public int SampleSize => _sampleSize;
         public int ChunkSize => _chunkSize;
         public int AtlasPadding => _atlasPadding;
+        public float ColliderThickness => _colliderThickness;
         public GroundSurfaceTable SurfaceTable => _surfaceTable;
         public Vector2Int NewMapSize => _newMapSize;
 

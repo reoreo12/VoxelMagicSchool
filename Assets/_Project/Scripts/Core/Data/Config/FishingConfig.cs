@@ -24,7 +24,10 @@ namespace VoxelMagic.Core
     [CreateAssetMenu(menuName = "VoxelMagic/Config/Fishing", fileName = "FishingConfig")]
     public sealed class FishingConfig : ScriptableObject
     {
+        [Tooltip("찌를 놓은 뒤 물에 닿기까지 (초)")]
         [SerializeField, Min(0f)] private float _castSeconds = 0.6f;
+        [Tooltip("던지기 애니메이션의 '놓는 순간' 신호를 이만큼 기다려도 안 오면 스스로 놓는다 (초)")]
+        [SerializeField, Min(0f)] private float _castReleaseTimeoutSeconds = 6f;
         [SerializeField] private FloatRange _biteWaitSeconds = new FloatRange(2f, 6f);
         [SerializeField, Min(0.1f)] private float _biteWindowSeconds = 1f;
         [Tooltip("입질을 놓치면 다시 기다릴지 (끄면 낚시가 끝난다)")]
@@ -38,6 +41,7 @@ namespace VoxelMagic.Core
         [SerializeField] private List<FishWeight> _pondFish = new List<FishWeight>();
 
         public float CastSeconds => _castSeconds;
+        public float CastReleaseTimeoutSeconds => _castReleaseTimeoutSeconds;
         public FloatRange BiteWaitSeconds => _biteWaitSeconds;
         public float BiteWindowSeconds => _biteWindowSeconds;
         public bool RewaitOnMissedBite => _rewaitOnMissedBite;

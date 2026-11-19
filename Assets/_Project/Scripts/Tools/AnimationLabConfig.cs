@@ -1,4 +1,4 @@
-// 애니메이션 랩 설정: 재생·섞기·A↔B 전환 범위, 프레임 단위, 측정 부드럽게, 카메라 조작 감도.
+// 애니메이션 랩 설정: 재생·섞기·A↔B 전환 범위, 프레임 단위, 측정 부드럽게, 시작 장착물, 카메라 조작 감도.
 using UnityEngine;
 using VoxelMagic.Core;
 
@@ -31,9 +31,14 @@ namespace VoxelMagic.Tools
         [SerializeField] private Vector2Int _pixelSizeRange = new Vector2Int(2, 8);
         [SerializeField, Min(1)] private int _defaultPixelSize = 4;
 
+        [Header("장착물")]
+        [Tooltip("랩을 열 때 장착물 목록의 첫 번째를 손에 들려 둘지")]
+        [SerializeField] private bool _equipFirstAttachmentOnStart = true;
+
         [Header("카메라")]
         [SerializeField, Min(0.01f)] private float _orbitSpeed = 0.25f;
-        [SerializeField, Min(0.01f)] private float _zoomSpeed = 0.002f;
+        [Tooltip("휠 한 칸마다 거리가 줄거나 느는 비율 (0.25 = 25%)")]
+        [SerializeField, Range(0.01f, 0.6f)] private float _zoomSpeed = 0.25f;
         [SerializeField, Min(0.0001f)] private float _panSpeed = 0.003f;
         [SerializeField, Min(0.1f)] private float _minDistance = 0.8f;
         [SerializeField, Min(0.2f)] private float _maxDistance = 10f;
@@ -54,6 +59,7 @@ namespace VoxelMagic.Tools
         public CharacterMoveConfig MoveConfig => _moveConfig;
         public Vector2Int PixelSizeRange => _pixelSizeRange;
         public int DefaultPixelSize => _defaultPixelSize;
+        public bool EquipFirstAttachmentOnStart => _equipFirstAttachmentOnStart;
         public float OrbitSpeed => _orbitSpeed;
         public float ZoomSpeed => _zoomSpeed;
         public float PanSpeed => _panSpeed;

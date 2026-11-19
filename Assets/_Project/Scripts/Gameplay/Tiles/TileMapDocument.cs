@@ -15,6 +15,8 @@ namespace VoxelMagic.Gameplay
         [SerializeField] private Tilemap _paint;
         [Tooltip("칠한 칸이 없을 때 맵 가운데를 정하는 크기 (칸)")]
         [SerializeField] private Vector2Int _sizeHint = new Vector2Int(10, 10);
+        [Tooltip("굽기 때 칠한 범위만 한 BoxCollider를 바닥 프리팹에 함께 넣는다 (게임 씬에서 그대로 밟고 걸을 수 있게)")]
+        [SerializeField] private bool _bakeCollider = true;
         [SerializeField, HideInInspector] private float _bakedCellSize;
         [SerializeField, HideInInspector] private GameObject _bakedFloor;
 
@@ -22,6 +24,9 @@ namespace VoxelMagic.Gameplay
         public Grid Grid => _grid;
         public Tilemap Paint => _paint;
         public Vector2Int SizeHint => _sizeHint;
+        public bool BakeCollider => _bakeCollider;
+
+        public void SetBakeCollider(bool bake) => _bakeCollider = bake;
         public float BakedCellSize => _bakedCellSize;
         public GameObject BakedFloor => _bakedFloor;
         public bool HasBake => _bakedFloor != null;

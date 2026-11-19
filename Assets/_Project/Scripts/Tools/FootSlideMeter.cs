@@ -29,6 +29,7 @@ namespace VoxelMagic.Tools
 
         public void Sample(Transform root, Animator animator, float deltaTime, float playbackSpeed, float smoothing)
         {
+            if (!animator.isHuman) return;   // Generic 모델(동물형 등)은 발·골반 뼈 매핑이 없어 재지 않는다.
             var leftBone = animator.GetBoneTransform(HumanBodyBones.LeftFoot);
             var rightBone = animator.GetBoneTransform(HumanBodyBones.RightFoot);
             var hips = animator.GetBoneTransform(HumanBodyBones.Hips);

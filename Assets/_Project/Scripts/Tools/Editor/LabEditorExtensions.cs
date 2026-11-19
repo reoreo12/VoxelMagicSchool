@@ -26,6 +26,23 @@ namespace VoxelMagic.Tools.EditorTools
             return target;
         }
 
+        public static T SetString<T>(this T target, string field, string value) where T : Object =>
+            Set(target, field, p => p.stringValue = value);
+
+        public static T SetFloat<T>(this T target, string field, float value) where T : Object =>
+            Set(target, field, p => p.floatValue = value);
+
+        public static T SetBool<T>(this T target, string field, bool value) where T : Object =>
+            Set(target, field, p => p.boolValue = value);
+
+        private static T Set<T>(T target, string field, System.Action<SerializedProperty> assign) where T : Object
+        {
+            var so = new SerializedObject(target);
+            assign(so.FindProperty(field));
+            so.ApplyModifiedPropertiesWithoutUndo();
+            return target;
+        }
+
         public static GameObject Prim(PrimitiveType type, string name, Transform parent, Vector3 localPosition, Vector3 scale, Material material)
         {
             var go = GameObject.CreatePrimitive(type);

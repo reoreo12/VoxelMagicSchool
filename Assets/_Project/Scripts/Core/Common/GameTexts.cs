@@ -19,12 +19,14 @@ namespace VoxelMagic.Core
         public const string Harvest = "뽑기";
         public const string CastLine = "낚싯줄 던지기";
         public const string Deliver = "전달하기";
+        public const string Talk = "말 걸기";
 
         public const string NotEnoughCells = "칸이 부족해요";
         public const string AlreadyPlanted = "이미 심어져 있어요";
         public const string NeedWandToWater = "지팡이로 물을 주자";
         public const string NeedWandToFish = "지팡이를 들고 낚시하자";
         public const string InventoryFull = "가방이 가득 찼어요";
+        public const string DiscardedFormat = "{0} {1}개를 버렸다";
         public const string NoActiveRequest = "게시판에서 의뢰를 받아 오자";
         public const string MissingItems = "의뢰 물품이 부족해요";
 

@@ -39,12 +39,15 @@
 | 2026-11-02 | `Input/GameControls.inputactions`에 `SideScroll` 맵 추가 (Move: 1D Axis A/D·←/→, Run: Left Shift). 기존 `Gameplay` 맵은 그대로 | 복도 횡스크롤 조작. W/S는 바인딩 자체가 없음 | 사용자 승인 |
 | 2026-11-04 | `SideScroll` 맵에 `ToggleCameraFollow`(C), `Interact`(E) 추가 | 복도 카메라 고정/부드럽게 전환, 오른쪽 문 포털 | 사용자 승인 |
 | 2026-11-04 | `SideScroll` 맵에 `ToggleNight`(N) 추가 | 복도 낮/밤 전환 | 사용자 승인 |
+| 2026-11-10 | `Gameplay` 맵에 `Run`(Left Shift, Button) 추가 | 텃밭·연못 달리기 (복도 Run과 같은 키) | 사용자 승인 (설계 9-3) |
 
 ## 빌드 씬 목록 (Build Settings)
 
 | 날짜 | 변경 | 이유 | 승인 |
 |---|---|---|---|
 | 2026-11-04 | `Scenes/Corridor_SideScroll.unity`, `Scenes/Prototype_FarmFishing.unity` 추가 (기존 `Assets/Scenes/SampleScene.unity`는 그대로 0번) | 복도 오른쪽 문 포털에서 실행 중 농장 씬을 열기 위해 (`SceneManager.LoadScene`은 목록에 있는 씬만 열 수 있음) | 사용자 승인 |
+| 2026-11-09 | `Scenes/FarmPond.unity` 추가 (3번, 기존 목록 그대로) | 복도 ↔ 정식 텃밭·연못 씬 이동 (보이지 않는 트리거 + 픽셀 원형 페이드) | 사용자 승인 ("제작 시작") |
+| 2026-11-17 | `Scenes/BackMountain.unity`(4번), `Scenes/Creature_Cave.unity`(5번) 추가 (기존 목록 그대로) | 복도 왼쪽 문 ↔ 뒷산, 뒷산 동굴 입구 ↔ 크리처 굴 씬 이동 | 사용자 승인 ("제작 시작") |
 
 ## 임포트 설정
 
@@ -54,6 +57,8 @@
 | 2026-11-04 | `Art/Lights/lamp_floor_glow.png` (복도 씬 생성 도구가 그림, 흰색 + 계단식 알파 원) | Sprite·Single, PPU = 그림 크기(1유닛), 가운데 기준점, Point, Clamp, 압축 없음, Mip Map 끔 | `CorridorConfig` 바닥 빛 도트 크기·단계 수정 → 복도 씬 다시 만들기 |
 | 2026-11-05 | `Art/Map/Tile/**/*.png` (타일 팩 9개 테마 387장, 사용자 결정: 팩 전체) | Sprite·Single·Full Rect, PPU 32, 가운데 기준점, Point, 압축 없음, Mip Map 끔, Alpha Is Transparency, Clamp | `Data/Tiles/TileMapConfig`의 타일 픽셀 수정 → 메뉴 `VoxelMagic/타일 맵/타일 팩 임포트 설정 적용 (전체)` |
 | 2026-11-06 | `Art/Characters/Student_Chibi/Sprites/Student_Chibi_sheet.png` | Sprite·Single, PPU 210(키 1.28), Point, 압축 없음, Mip Map 끔, Alpha Is Transparency, Clamp (칸은 `Data/Avatars/Student_Chibi_2D` 안의 스프라이트) | 메뉴 `VoxelMagic/아바타/선택한 2D 스프라이트 준비` (json 선택) |
+| 2026-11-09 | `Art/Map/Farm/farm_grid.fbx`, `farm_grid.png` | FBX: 카메라·조명 가져오기 끔, 애니메이션 없음 / PNG: Point, Mip Map 끔, 압축 없음, Clamp | 모델 임포트 설정 (Inspector) |
+| 2026-11-09 | `Art/Map/Farm/Farm_Field_Dry.fbx`, `Farm_Field_Wet.fbx`, `farm_field_dry_palette.png`, `farm_field_wet_palette.png` (밭 칸, 지금 씬이 쓰는 것) | FBX: 카메라·조명 가져오기 끔, 애니메이션 없음(Animation Type None) / PNG: Point, Mip Map 끔, 압축 없음, Clamp | 모델 임포트 설정 (Inspector) |
 
 ## 아바타 임포트 설정 (메뉴 `VoxelMagic/아바타/`로 적용)
 
@@ -78,8 +83,16 @@
 | VoxelMagic.UI | `Assets/_Project/Scripts/UI` | Core, Unity.TextMeshPro, UnityEngine.UI |
 | VoxelMagic.Editor | `Assets/_Project/Scripts/Editor` (에디터 전용) | Core, Unity.TextMeshPro |
 | VoxelMagic.Tests | `Assets/_Project/Tests` (EditMode 테스트) | Core, Test Runner, NUnit |
-| VoxelMagic.Tools (2026-11-03, 11-06 `VoxelMagic.Sandbox`에서 이름 변경) | `Assets/_Project/Scripts/Tools` (애니메이션 랩, 자동 참조 끔) | Core, Unity.InputSystem, Unity.TextMeshPro, UnityEngine.UI |
+| VoxelMagic.Tools (2026-11-03, 11-06 `VoxelMagic.Sandbox`에서 이름 변경) | `Assets/_Project/Scripts/Tools` (애니메이션 랩, 자동 참조 끔) | Core, **Gameplay**(2026-11-06 추가: 농장과 같은 소켓·장착 부품을 랩에서 그대로 사용), Unity.InputSystem, Unity.TextMeshPro, UnityEngine.UI |
 | VoxelMagic.Tools.Editor (2026-11-03, 11-06 `VoxelMagic.Sandbox.Editor`에서 이름 변경) | `Assets/_Project/Scripts/Tools/Editor` (에디터 전용) | Tools, Core, Gameplay, Editor, TMP, UI, InputSystem |
+
+## 저장 파일 (2026-11-10)
+- 위치: `Application.persistentDataPath/Saves/save_<슬롯>.json` → Windows: `C:/Users/<사용자>/AppData/LocalLow/DefaultCompany/VoxelMagicSchool/Saves/` (회사·제품 이름은 Player Settings 값, 바꾸면 위치도 바뀜)
+- 프로젝트 폴더 밖에 게임이 실행 중 쓰는 파일이다 (git에 안 들어감). 지금은 슬롯 0만 사용
+- 저장 시점: 씬 이동(페이드 아웃 뒤, 로드 전), 게임 종료(에디터는 플레이 끄기). `_Bootstrap`의 `_autoSave`를 끄면 저장 안 함
+- 불러오기: 게임 시작 후 텃밭 씬 부트스트랩이 처음 진행 상태를 만들 때 파일이 있으면 불러옴, 없으면 시작 아이템 지급
+- ID 표: `Data/Save/DefinitionCatalog` — 새 아이템·의뢰를 만들면 메뉴 `VoxelMagic/저장/정의 목록 채우기`를 다시 실행 (안 하면 그 아이템은 저장은 되지만 불러올 때 건너뜀)
+- 메뉴: `VoxelMagic/저장/` 정의 목록 채우기(+ 지금 씬 부트스트랩 연결) · 저장 폴더 열기 · 저장 지우기(슬롯 0)
 
 ## 연결 메모
 - 한글 폰트: `Fonts/Pretendard SDF.asset`은 고정(Static) 아틀라스라 플레이해도 파일이 바뀌지 않는다. 문자 목록에 없는 글자를 쓰려면 `VoxelMagic/한글 폰트 다시 굽기`를 실행한다.

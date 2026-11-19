@@ -31,6 +31,7 @@ namespace VoxelMagic.Core
         }
 
         public IReadOnlyList<RequestDefinition> Catalog => _catalog;
+        public IEnumerable<RequestDefinition> CompletedRequests => _completed;
         public RequestDefinition Active { get; private set; }
         public bool HasActive => Active != null;
         public IReadOnlyList<RequirementProgress> Progress => _progress;
@@ -62,6 +63,16 @@ namespace VoxelMagic.Core
             ActiveChanged?.Invoke(Active);
             RefreshProgress();
             return AcceptResult.Success;
+        }
+
+        /// <summary>진행 중 의뢰를 완료 없이 내려놓는다 (디버그 의뢰 교체용). 수락 때 받은 아이템은 그대로 둔다.</summary>
+        public void Abandon()
+        {
+            if (!HasActive) return;
+            Active = null;
+            _progress.Clear();
+            ActiveChanged?.Invoke(null);
+            ProgressChanged?.Invoke();
         }
 
         public DeliverResult CanDeliver()
@@ -101,6 +112,19 @@ namespace VoxelMagic.Core
             ActiveChanged?.Invoke(null);
             ProgressChanged?.Invoke();
             return DeliverResult.Success;
+        }
+
+        /// <summary>저장 파일에서 불러온 완료·진행 중 의뢰로 맞춘다. 수락 때 받은 아이템은 인벤토리에 이미 있으므로 다시 주지 않는다.</summary>
+        internal void Restore(IEnumerable<RequestDefinition> completed, RequestDefinition active)
+        {
+            _completed.Clear();
+            foreach (var request in completed)
+                if (request != null) _completed.Add(request);
+            Active = active != null && !_completed.Contains(active) ? active : null;
+            _progress.Clear();
+            ActiveChanged?.Invoke(Active);
+            RefreshProgress();
+            ProgressChanged?.Invoke();
         }
 
         private void RefreshProgress()

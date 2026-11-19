@@ -21,11 +21,14 @@ MonoBehaviour:
   _meterSmoothing: 0.05
   _inPlaceTolerance: 0.2
   _moveConfig: {fileID: 11400000, guid: 72c564143fdcbd3499455a2c37848c8c, type: 2}
+  _pixelSizeRange: {x: 2, y: 8}
+  _defaultPixelSize: 4
+  _equipFirstAttachmentOnStart: 1
   _orbitSpeed: 0.25
-  _zoomSpeed: 0.002
+  _zoomSpeed: 0.25
   _panSpeed: 0.003
-  _minDistance: 0.8
-  _maxDistance: 10
+  _minDistance: 0.25
+  _maxDistance: 20
   _distancePerHeight: 2.6
   _focusHeightRatio: 0.45
   _pitchRange: {x: -20, y: 80}

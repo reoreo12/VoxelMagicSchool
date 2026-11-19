@@ -1,0 +1,61 @@
+{
+ "parts": [
+  {
+   "part": "Stack_Book_Brown_L",
+   "yaw_deg": 0,
+   "x_m": 0.0,
+   "y_m": 0.0,
+   "z_m": 0.0
+  },
+  {
+   "part": "Closed_Book_Red",
+   "yaw_deg": 17,
+   "x_m": 0.02,
+   "y_m": -0.01,
+   "z_m": 0.1667
+  },
+  {
+   "part": "Stack_Paper",
+   "yaw_deg": -34,
+   "x_m": -0.03,
+   "y_m": -0.03,
+   "z_m": 0.3
+  },
+  {
+   "part": "Stack_Book_Teal_Thin",
+   "yaw_deg": -11,
+   "x_m": -0.01,
+   "y_m": 0.01,
+   "z_m": 0.3167
+  },
+  {
+   "part": "Closed_Book_Navy",
+   "yaw_deg": 26,
+   "x_m": 0.02,
+   "y_m": 0.0,
+   "z_m": 0.4167
+  },
+  {
+   "part": "Stack_Paper",
+   "yaw_deg": 52,
+   "x_m": 0.04,
+   "y_m": 0.02,
+   "z_m": 0.55
+  },
+  {
+   "part": "Closed_Book_Green",
+   "yaw_deg": -7,
+   "x_m": -0.01,
+   "y_m": -0.01,
+   "z_m": 0.5667
+  },
+  {
+   "part": "Stack_Book_Brown_S",
+   "yaw_deg": 38,
+   "x_m": 0.01,
+   "y_m": 0.01,
+   "z_m": 0.7
+  }
+ ],
+ "total_height_m": 0.8
+}

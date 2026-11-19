@@ -1,0 +1,104 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8af9faea9e1bfab4d98b6a09b8465caa, type: 3}
+  m_Name: Creature_Cave_Cells
+  m_EditorClassIdentifier: 
+  _mapName: Creature_Cave
+  _cellSize: 1
+  _tiles:
+  - {fileID: 11400000, guid: bf079ef3af273d44ca2fd005f7c762b8, type: 2}
+  - {fileID: 11400000, guid: 947d33c257cc86640bd770ffa827fc2a, type: 2}
+  - {fileID: 11400000, guid: 0b5db3e2ca3e28c4da22864e33e9527b, type: 2}
+  - {fileID: 11400000, guid: 6c12789a02610184f801c8577fb5c9f8, type: 2}
+  - {fileID: 11400000, guid: 783a56c3544f44b4bba47f8c54dcb7e0, type: 2}
+  - {fileID: 11400000, guid: ed466712bdbc966429312839af1efdd4, type: 2}
+  - {fileID: 11400000, guid: 38b43b0f16a5d17478693147ea58e99c, type: 2}
+  - {fileID: 11400000, guid: f9410983c3e9000418961644668a1652, type: 2}
+  - {fileID: 11400000, guid: 7c3a5bc1c3852344ab2f5e3db76206d2, type: 2}
+  - {fileID: 11400000, guid: f501e0e8f324c1849b84da8fd5418bab, type: 2}
+  - {fileID: 11400000, guid: 157975f61a9a72f49aeda3174b139e33, type: 2}
+  - {fileID: 11400000, guid: 5b8ba3890676e0541b85703d300664b5, type: 2}
+  - {fileID: 11400000, guid: 6b325a3ffcd24384e88c8d66f4648d32, type: 2}
+  - {fileID: 11400000, guid: 8af3406a3f92434459c57c775e9a7994, type: 2}
+  - {fileID: 11400000, guid: bbd2692614939184d84874c1a1aca808, type: 2}
+  - {fileID: 11400000, guid: 23c70a7590505584eae7fdd3ee2c211d, type: 2}
+  - {fileID: 11400000, guid: a7b068b107989734ab1407a751c79d2c, type: 2}
+  - {fileID: 11400000, guid: 04d7cf8cf08fc2547bad4d3df4ea1ab3, type: 2}
+  - {fileID: 11400000, guid: 89623d159c3e9984b9c3b9b82f0743ca, type: 2}
+  - {fileID: 11400000, guid: 0359777df9c10164897f3eec71534659, type: 2}
+  - {fileID: 11400000, guid: a4c7f305a84bd574986ebecf52b96447, type: 2}
+  - {fileID: 11400000, guid: f6abf6277153f43449e629e49f37317a, type: 2}
+  - {fileID: 11400000, guid: 1ea325f787670974d9bb14c226fff556, type: 2}
+  _positions:
+  - {x: 4, y: -5}
+  - {x: 5, y: -5}
+  - {x: 4, y: -4}
+  - {x: 5, y: -4}
+  - {x: 4, y: -3}
+  - {x: 5, y: -3}
+  - {x: 4, y: -2}
+  - {x: 5, y: -2}
+  - {x: 4, y: -1}
+  - {x: 5, y: -1}
+  - {x: 2, y: 0}
+  - {x: 3, y: 0}
+  - {x: 4, y: 0}
+  - {x: 5, y: 0}
+  - {x: 6, y: 0}
+  - {x: 7, y: 0}
+  - {x: 1, y: 1}
+  - {x: 2, y: 1}
+  - {x: 3, y: 1}
+  - {x: 4, y: 1}
+  - {x: 5, y: 1}
+  - {x: 6, y: 1}
+  - {x: 7, y: 1}
+  - {x: 8, y: 1}
+  - {x: 1, y: 2}
+  - {x: 2, y: 2}
+  - {x: 3, y: 2}
+  - {x: 4, y: 2}
+  - {x: 5, y: 2}
+  - {x: 6, y: 2}
+  - {x: 7, y: 2}
+  - {x: 8, y: 2}
+  - {x: 1, y: 3}
+  - {x: 2, y: 3}
+  - {x: 3, y: 3}
+  - {x: 4, y: 3}
+  - {x: 5, y: 3}
+  - {x: 6, y: 3}
+  - {x: 7, y: 3}
+  - {x: 8, y: 3}
+  - {x: 1, y: 4}
+  - {x: 2, y: 4}
+  - {x: 3, y: 4}
+  - {x: 4, y: 4}
+  - {x: 5, y: 4}
+  - {x: 6, y: 4}
+  - {x: 7, y: 4}
+  - {x: 8, y: 4}
+  - {x: 1, y: 5}
+  - {x: 2, y: 5}
+  - {x: 3, y: 5}
+  - {x: 4, y: 5}
+  - {x: 5, y: 5}
+  - {x: 6, y: 5}
+  - {x: 7, y: 5}
+  - {x: 8, y: 5}
+  - {x: 2, y: 6}
+  - {x: 3, y: 6}
+  - {x: 4, y: 6}
+  - {x: 5, y: 6}
+  - {x: 6, y: 6}
+  - {x: 7, y: 6}
+  _tileIndices: 0000000001000000020000000300000004000000050000000600000007000000020000000300000008000000090000000a0000000b0000000900000001000000000000000a0000000a0000000a0000000c0000000a0000000c0000000d000000060000000a0000000b0000000a0000000a0000000a0000000c00000003000000020000000a0000000a0000000b0000000a0000000e0000000a00000007000000040000000a0000000c0000000a0000000a0000000f0000000a00000005000000100000000c0000000f0000000a0000000a0000000a0000000c00000011000000120000001300000014000000150000001300000016000000

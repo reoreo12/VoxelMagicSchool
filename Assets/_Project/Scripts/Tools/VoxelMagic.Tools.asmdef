@@ -3,6 +3,7 @@
     "rootNamespace": "VoxelMagic.Tools",
     "references": [
         "VoxelMagic.Core",
+        "VoxelMagic.Gameplay",
         "VoxelMagic.UI",
         "Unity.InputSystem",
         "Unity.TextMeshPro",

@@ -28,13 +28,34 @@ namespace VoxelMagic.UI
             _tracker.ActiveChanged += OnActiveChanged;
             _tracker.ProgressChanged += Redraw;
             _tracker.Completed += OnCompleted;
-            _screen.TrackerToggled += _ => Redraw();
+            _screen.TrackerToggled += OnTrackerToggled;
             SetVisible(false);
+            // 씬을 옮겨 왔을 때 이미 진행 중인 의뢰가 있으면 바로 보여 준다.
+            if (_tracker.HasActive) OnActiveChanged(_tracker.Active);
         }
+
+        // 의뢰 추적은 씬을 넘어 유지되므로 OnDestroy에서 꼭 구독을 푼다.
+        private void OnDestroy()
+        {
+            if (_tracker != null)
+            {
+                _tracker.ActiveChanged -= OnActiveChanged;
+                _tracker.ProgressChanged -= Redraw;
+                _tracker.Completed -= OnCompleted;
+            }
+            if (_screen != null) _screen.TrackerToggled -= OnTrackerToggled;
+        }
+
+        private void OnTrackerToggled(bool _) => Redraw();
 
         private void OnActiveChanged(RequestDefinition active)
         {
-            if (active == null) return;
+            if (active == null)
+            {
+                // 완료가 아니라 내려놓은 경우(디버그 의뢰 교체)는 바로 숨긴다.
+                if (_completedTitle == null) Hide();
+                return;
+            }
             _completedTitle = null;
             _hideTimer = 0f;
             Show();
@@ -84,6 +105,8 @@ namespace VoxelMagic.UI
                         .Append(GameTexts.TrackerDone).Append(' ').Append(progress).Append("</color>\n");
                 else
                     _builder.Append(GameTexts.TrackerTodo).Append(' ').Append(progress).Append('\n');
+                if (!progress.IsMet && progress.Item is GatherMaterialDefinition gather && !string.IsNullOrEmpty(gather.HabitatHint))
+                    _builder.Append("<size=80%><color=#B8C4A8>   ").Append(gather.HabitatHint).Append("</color></size>\n");
             }
             _body.text = _builder.ToString().TrimEnd('\n');
         }
