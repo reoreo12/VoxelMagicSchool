@@ -38,13 +38,13 @@ MonoBehaviour:
     _barTitleGap: 4
   _quickSlots:
     _slotCount: 5
-    _slotSize: {x: 40, y: 44}
+    _slotSize: {x: 32, y: 36}
     _slotGap: 2
     _innerMargin: 2
     _borderSide: 4
     _borderBottom: 6
     _bottomMargin: 8
-    _iconSize: 32
+    _iconSize: 24
     _selectionOutset: 2
     _selectionMoveSeconds: 0.08
     _selectionTopLeft: {fileID: 2095984601, guid: 85acf4bfda616c04fbbbea6d820019a9, type: 3}
@@ -101,6 +101,41 @@ MonoBehaviour:
     - {fileID: 21300000, guid: 0b5463353028d5046bb64e34d646b11b, type: 3}
     - {fileID: 21300000, guid: 15bfd14e606d31c439d90391d09a5f0d, type: 3}
     - {fileID: 21300000, guid: 5f8f521fa7355e84585aa356635590f3, type: 3}
+  _time:
+    _margin: 8
+    _scale: 1.5
+    _backing:
+      x: 8
+      y: 8
+      width: 41
+      height: 18
+    _backingColor: {r: 0.76862746, g: 0.6039216, b: 0.42352942, a: 1}
+    _iconPosition: {x: 8, y: 8}
+    _roulettePosition: {x: 35, y: 8}
+    _arrowPivot: {x: 35.08, y: 18.1}
+    _arrowPivotInSprite: {x: 0, y: 4}
+    _datePosition: {x: 3, y: 36}
+    _dateSize: {x: 48, y: 16}
+    _pausedPosition: {x: 0, y: 56}
+    _dateStyle: 5
+    _afterSchoolStartHour: 16
+    _nightStartHour: 19
+    _nightEndHour: 24
+    _startAngle: 75
+    _boundaryAngle: 0
+    _endAngle: -75
+    _previewDay: 1
+    _previewHour: 16
+    _tooltipOffset: {x: -8, y: 12}
+    _frame: {fileID: 952465741, guid: 455ad42b9a35d634b91e1fece7fc4f7d, type: 3}
+    _roulette: {fileID: -754629294, guid: 614c8de0451911a46ab3ff85fedbdb54, type: 3}
+    _arrow: {fileID: 2124064162, guid: 614c8de0451911a46ab3ff85fedbdb54, type: 3}
+    _afterSchoolIcon: {fileID: 1392401110, guid: 60e5e2e9af0bfd34cb3f3de36510f709, type: 3}
+    _nightIcon: {fileID: -245857414, guid: 60e5e2e9af0bfd34cb3f3de36510f709, type: 3}
+  _tooltip:
+    _padding: {x: 5, y: 3}
+    _screenMargin: 4
+    _textStyle: 0
   _texts: {fileID: 11400000, guid: 352cc08e03e545b4c8f802b1ffd4165f, type: 2}
   _textStyles:
   - _id: 0
@@ -197,3 +232,6 @@ MonoBehaviour:
   - _id: 9
     _sprite: {fileID: 21300000, guid: d71581965160b4c4fa9eb8aa49425fdb, type: 3}
     _imageType: 1
+  - _id: 10
+    _sprite: {fileID: 21300000, guid: 5c1af70882c7dd04eabb6073c0faa3d2, type: 3}
+    _imageType: 2

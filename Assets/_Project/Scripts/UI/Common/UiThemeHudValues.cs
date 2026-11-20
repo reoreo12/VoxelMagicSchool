@@ -139,6 +139,106 @@ namespace VoxelMagic.UI
         }
     }
 
+    /// <summary>공용 툴팁(종이 바탕 + 글자 한 줄). 맨 위 Overlay 층에 하나만 둔다.</summary>
+    [System.Serializable]
+    public sealed class TooltipValues
+    {
+        [SerializeField, Tooltip("글자 둘레 여백 (x 좌우, y 위아래)")] private Vector2Int _padding = new Vector2Int(5, 3);
+        [SerializeField, Tooltip("화면 가장자리에서 최소 거리")] private int _screenMargin = 4;
+        [SerializeField] private UiTextStyle _textStyle = UiTextStyle.Body;
+
+        public Vector2Int Padding => _padding;
+        public int ScreenMargin => _screenMargin;
+        public UiTextStyle TextStyle => _textStyle;
+    }
+
+    /// <summary>화면 오른쪽 위 시간대 HUD(UI_SPEC 8장, 13장). 위치는 틀 그림 왼쪽 위 기준 1배 px, 아래가 +y.</summary>
+    [System.Serializable]
+    public sealed class TimeValues
+    {
+        [SerializeField, Tooltip("화면 오른쪽·위 모서리 여백 (확대 뒤 화면 px)")] private int _margin = 8;
+        [SerializeField, Min(0.5f), Tooltip("틀·아이콘·룰렛 확대 배수 (0.5 단위). 그 밖의 값은 도트 폭이 고르지 않고 조각 사이에 틈이 생긴다")] private float _scale = 1.5f;
+
+        [Header("조각 위치 (틀 왼쪽 위 기준, 1배 px)")]
+        [SerializeField, Tooltip("틀 뒤 받침 칸(틀 구멍 뒤를 채워 조각 사이 틈이 비치지 않게). x, y, 폭, 높이")] private RectInt _backing = new RectInt(8, 8, 41, 18);
+        [SerializeField, Tooltip("받침 색 (틀 안쪽 테두리 색)")] private Color _backingColor = new Color32(196, 154, 108, 255);
+        [SerializeField, Tooltip("왼쪽 칸 시간대 그림 (틀보다 앞에 그린다)")] private Vector2Int _iconPosition = new Vector2Int(8, 8);
+        [SerializeField, Tooltip("오른쪽 칸 룰렛")] private Vector2Int _roulettePosition = new Vector2Int(35, 8);
+        [SerializeField, Tooltip("화살표 회전 중심 = 룰렛 반원의 중심 (0.5 단위 가능)")] private Vector2 _arrowPivot = new Vector2(34f, 16.5f);
+        [SerializeField, Tooltip("화살표 그림 안의 회전 중심 (그림 왼쪽 위 기준)")] private Vector2Int _arrowPivotInSprite = new Vector2Int(0, 4);
+        [SerializeField, Tooltip("날짜 글자 칸 위치 (아래 패널 안)")] private Vector2Int _datePosition = new Vector2Int(3, 36);
+        [SerializeField, Tooltip("날짜 글자 칸 크기")] private Vector2Int _dateSize = new Vector2Int(48, 16);
+        [SerializeField, Tooltip("개발용 '멈춰 있음' 글자 위치 (8-2)")] private Vector2Int _pausedPosition = new Vector2Int(0, 56);
+        [SerializeField, Tooltip("날짜 글자 스타일 (수락한 의뢰 제목처럼 굵게)")] private UiTextStyle _dateStyle = UiTextStyle.HudTitle;
+
+        [Header("시각 → 화살표 각도 (임시값, 8-1 [미정])")]
+        [SerializeField, Range(0, 24), Tooltip("방과후 시작 시각")] private int _afterSchoolStartHour = 16;
+        [SerializeField, Range(0, 24), Tooltip("밤 시작 시각 (방과후 끝)")] private int _nightStartHour = 19;
+        [SerializeField, Range(0, 24), Tooltip("밤 끝 시각")] private int _nightEndHour = 24;
+        [SerializeField, Tooltip("방과후 시작 때 화살표 각도 (0 = 오른쪽, +는 위로)")] private int _startAngle = 75;
+        [SerializeField, Tooltip("방과후→밤 경계 각도 (룰렛 색 경계)")] private int _boundaryAngle = 0;
+        [SerializeField, Tooltip("밤 끝 때 화살표 각도")] private int _endAngle = -75;
+
+        [Header("시계 연결 전 미리보기")]
+        [SerializeField, Min(1)] private int _previewDay = 1;
+        [SerializeField, Range(0, 24)] private int _previewHour = 16;
+
+        [Header("툴팁")]
+        [SerializeField, Tooltip("마우스 끝에서 툴팁까지 (확대 뒤 화면 px, x +오른쪽 y +아래)")] private Vector2Int _tooltipOffset = new Vector2Int(-8, 12);
+
+        [Header("스프라이트")]
+        [SerializeField, Tooltip("나무 틀 + 날짜 패널 (수정본 v2 시트: 날짜 판 가운데, 잎 없음)")] private Sprite _frame;
+        [SerializeField, Tooltip("룰렛 반원 (위 주황 = 방과후, 아래 파랑 = 밤)")] private Sprite _roulette;
+        [SerializeField, Tooltip("가로 화살표 한 개 (회전해서 씀)")] private Sprite _arrow;
+        [SerializeField, Tooltip("방과후 큰 아이콘 (노을 해)")] private Sprite _afterSchoolIcon;
+        [SerializeField, Tooltip("밤 큰 아이콘 (달)")] private Sprite _nightIcon;
+
+        public int Margin => _margin;
+        public float Scale => Mathf.Max(0.5f, Mathf.Round(_scale * 2f) / 2f);
+        public RectInt Backing => _backing;
+        public Color BackingColor => _backingColor;
+        public Vector2Int IconPosition => _iconPosition;
+        public Vector2Int RoulettePosition => _roulettePosition;
+        public Vector2 ArrowPivot => _arrowPivot;
+        public Vector2Int ArrowPivotInSprite => _arrowPivotInSprite;
+        public Vector2Int DatePosition => _datePosition;
+        public Vector2Int DateSize => _dateSize;
+        public Vector2Int PausedPosition => _pausedPosition;
+        public UiTextStyle DateStyle => _dateStyle;
+        public int PreviewDay => Mathf.Max(1, _previewDay);
+        public int PreviewHour => _previewHour;
+        public int NightStartHour => _nightStartHour;
+        public Vector2Int TooltipOffset => _tooltipOffset;
+        public Sprite Frame => _frame;
+        public Sprite Roulette => _roulette;
+        public Sprite Arrow => _arrow;
+        public Sprite Icon(bool night) => night ? _nightIcon : _afterSchoolIcon;
+
+        /// <summary>정시 → 화살표 각도(정수 도). 방과후는 시작~경계, 밤은 경계~끝 각도에 나눠 놓아 구간 길이가 달라도 색 경계에서 바뀐다(스텝, 13장).</summary>
+        public int ArrowAngle(int hour)
+        {
+            if (hour < _nightStartHour)
+                return Lerp(_startAngle, _boundaryAngle, _afterSchoolStartHour, _nightStartHour, hour);
+            return Lerp(_boundaryAngle, _endAngle, _nightStartHour, _nightEndHour, hour);
+        }
+
+        private static int Lerp(int from, int to, int startHour, int endHour, int hour)
+        {
+            if (endHour <= startHour) return from;
+            float t = Mathf.Clamp01((hour - startHour) / (float)(endHour - startHour));
+            return Mathf.RoundToInt(Mathf.Lerp(from, to, t));
+        }
+
+        public void SetSprites(Sprite frame, Sprite roulette, Sprite arrow, Sprite afterSchool, Sprite night)
+        {
+            _frame = frame;
+            _roulette = roulette;
+            _arrow = arrow;
+            _afterSchoolIcon = afterSchool;
+            _nightIcon = night;
+        }
+    }
+
     /// <summary>점수 한 묶음(글자 + 숫자)의 손 조정 값. 묶음 전체, 글자만, 숫자만 따로 옮긴다. 가운데 정렬 계산에는 들어가지 않는다.</summary>
     [System.Serializable]
     public sealed class ScoreGroupOffsets

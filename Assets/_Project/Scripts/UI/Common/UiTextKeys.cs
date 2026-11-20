@@ -9,5 +9,15 @@ namespace VoxelMagic.UI
         public const string ScoreWritten = "ui.score.written";
         /// <summary>"실기 예상 점수" (9-1)</summary>
         public const string ScorePractical = "ui.score.practical";
+        /// <summary>"방과후" (8-1)</summary>
+        public const string TimeAfterSchool = "ui.time.afterSchool";
+        /// <summary>"밤" (8-1)</summary>
+        public const string TimeNight = "ui.time.night";
+        /// <summary>"{0} {1}:00" — {0} 시간대 이름, {1} 두 자리 시 (8-1 툴팁, 분은 표시하지 않음)</summary>
+        public const string TimeTooltip = "ui.time.tooltip";
+        /// <summary>"{0}일째" — 날짜 패널 (8-1 [미정], 임시)</summary>
+        public const string TimeDay = "ui.time.day";
+        /// <summary>"멈춰 있음" — 개발 빌드에서만 (8-2)</summary>
+        public const string TimePaused = "ui.time.paused";
     }
 }

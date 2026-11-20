@@ -19,3 +19,13 @@ MonoBehaviour:
     _text: "\uD544\uAE30 \uC608\uC0C1 \uC810\uC218"
   - _key: ui.score.practical
     _text: "\uC2E4\uAE30 \uC608\uC0C1 \uC810\uC218"
+  - _key: ui.time.afterSchool
+    _text: "\uBC29\uACFC\uD6C4"
+  - _key: ui.time.night
+    _text: "\uBC24"
+  - _key: ui.time.tooltip
+    _text: '{0} {1}:00'
+  - _key: ui.time.day
+    _text: "{0}\uC77C\uC9F8"
+  - _key: ui.time.paused
+    _text: "\uBA48\uCDB0 \uC788\uC74C"

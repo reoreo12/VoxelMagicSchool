@@ -169,3 +169,72 @@ MonoBehaviour:
       _top: 0
       _right: 0
       _bottom: 0
+  - _pathPattern: Sprout Lands - UI Pack - Basic packemojis-free/weather/Weather_Icons_smal_freel.png
+    _left: 0
+    _top: 0
+    _right: 0
+    _bottom: 0
+    _sliceGrid: 0
+    _cellSize: {x: 0, y: 0}
+    _slices:
+    - _name: time_icon_night
+      _x: 7
+      _yFromTop: 39
+      _width: 18
+      _height: 17
+      _left: 0
+      _top: 0
+      _right: 0
+      _bottom: 0
+    - _name: time_icon_after_school
+      _x: 7
+      _yFromTop: 71
+      _width: 18
+      _height: 17
+      _left: 0
+      _top: 0
+      _right: 0
+      _bottom: 0
+  - _pathPattern: "Sprout Lands (\uC218\uC815\uBCF8)/weather/Weather_UI_Free_v2.png"
+    _left: 0
+    _top: 0
+    _right: 0
+    _bottom: 0
+    _sliceGrid: 0
+    _cellSize: {x: 0, y: 0}
+    _slices:
+    - _name: time_frame
+      _x: 7
+      _yFromTop: 7
+      _width: 56
+      _height: 54
+      _left: 0
+      _top: 0
+      _right: 0
+      _bottom: 0
+  - _pathPattern: "Sprout Lands (\uC218\uC815\uBCF8)/weather/Weather_UI_Free_Noon_ver.png"
+    _left: 0
+    _top: 0
+    _right: 0
+    _bottom: 0
+    _sliceGrid: 0
+    _cellSize: {x: 0, y: 0}
+    _slices:
+    - _name: time_roulette
+      _x: 17
+      _yFromTop: 71
+      _width: 13
+      _height: 17
+      _left: 0
+      _top: 0
+      _right: 0
+      _bottom: 0
+    - _name: time_arrow
+      _x: 4
+      _yFromTop: 85
+      _width: 10
+      _height: 8
+      _left: 0
+      _top: 0
+      _right: 0
+      _bottom: 0

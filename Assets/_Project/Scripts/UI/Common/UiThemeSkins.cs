@@ -31,7 +31,9 @@ namespace VoxelMagic.UI
         /// <summary>숨겨진 칸 등 다른 밝기의 칸 (확장 인벤토리용 예비)</summary>
         QuickSlotAlt,
         /// <summary>세로 상태 바 프레임 (7-2)</summary>
-        StatusBarFrame
+        StatusBarFrame,
+        /// <summary>마우스를 올렸을 때 뜨는 툴팁 배경 (종이, 8-1)</summary>
+        Tooltip
     }
 
     public enum UiTextStyle

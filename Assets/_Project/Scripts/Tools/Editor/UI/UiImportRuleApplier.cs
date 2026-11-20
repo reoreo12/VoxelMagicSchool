@@ -60,6 +60,16 @@ namespace VoxelMagic.Tools.EditorTools.UiWorkbench
                 new UiSliceRect("inv_select_tr", 308, 0, 11, 12),
                 new UiSliceRect("inv_select_bl", 273, 36, 11, 12),
                 new UiSliceRect("inv_select_br", 308, 36, 11, 12));
+            // 시간대 UI(UI_SPEC 8-1): 틀(날짜 패널 포함)은 v2 시트(날짜 판 가운데, 잎 없음), 룰렛(방과후 주황·밤 파랑)·가로 화살표는 Noon 수정본,
+            // 큰 아이콘은 원본 작은 날씨 아이콘의 왼쪽 열(노을 = 방과후, 달 = 밤).
+            yield return UiImportRule.Named("Sprout Lands (수정본)/weather/Weather_UI_Free_v2.png",
+                new UiSliceRect("time_frame", 7, 7, 56, 54));
+            yield return UiImportRule.Named("Sprout Lands (수정본)/weather/Weather_UI_Free_Noon_ver.png",
+                new UiSliceRect("time_roulette", 17, 71, 13, 17),
+                new UiSliceRect("time_arrow", 4, 85, 10, 8));
+            yield return UiImportRule.Named("Sprout Lands - UI Pack - Basic packemojis-free/weather/Weather_Icons_smal_freel.png",
+                new UiSliceRect("time_icon_night", 7, 39, 18, 17),
+                new UiSliceRect("time_icon_after_school", 7, 71, 18, 17));
         }
 
         public static string ApplyAll()

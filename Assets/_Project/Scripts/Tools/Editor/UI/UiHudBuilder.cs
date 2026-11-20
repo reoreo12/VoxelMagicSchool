@@ -98,12 +98,13 @@ namespace VoxelMagic.Tools.EditorTools.UiWorkbench
             }
         }
 
-        internal static void Replace(Transform parent, GameObject prefab)
+        internal static GameObject Replace(Transform parent, GameObject prefab)
         {
             var old = parent.Find(prefab.name);
             if (old != null) Object.DestroyImmediate(old.gameObject);
             var instance = (GameObject)PrefabUtility.InstantiatePrefab(prefab, parent);
             instance.name = prefab.name;
+            return instance;
         }
 
         internal static ThemedButton AddButton(Transform parent, string name, UiButtonSkin skin, UiTheme theme)

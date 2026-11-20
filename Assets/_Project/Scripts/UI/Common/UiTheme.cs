@@ -96,6 +96,8 @@ namespace VoxelMagic.UI
         [SerializeField] private QuickSlotValues _quickSlots = new QuickSlotValues();
         [SerializeField] private StatusBarValues _statusBars = new StatusBarValues();
         [SerializeField] private ScoreValues _scores = new ScoreValues();
+        [SerializeField] private TimeValues _time = new TimeValues();
+        [SerializeField] private TooltipValues _tooltip = new TooltipValues();
         [SerializeField, Tooltip("화면 문구 표(키 → 문장)")] private TextTable _texts;
         [SerializeField] private List<TextStyleValues> _textStyles = new List<TextStyleValues>();
         [SerializeField] private List<ButtonSkinValues> _buttons = new List<ButtonSkinValues>();
@@ -109,6 +111,8 @@ namespace VoxelMagic.UI
         public QuickSlotValues QuickSlots => _quickSlots;
         public StatusBarValues StatusBars => _statusBars;
         public ScoreValues Scores => _scores;
+        public TimeValues Time => _time;
+        public TooltipValues Tooltip => _tooltip;
         public ITextSource Texts => _texts;
 
         public TextStyleValues TextStyle(UiTextStyle id) => _textStyles.Find(s => s.Id == id);
