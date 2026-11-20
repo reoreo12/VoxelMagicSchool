@@ -98,7 +98,7 @@ namespace VoxelMagic.Tools.EditorTools.UiWorkbench
             }
         }
 
-        private static void Replace(Transform parent, GameObject prefab)
+        internal static void Replace(Transform parent, GameObject prefab)
         {
             var old = parent.Find(prefab.name);
             if (old != null) Object.DestroyImmediate(old.gameObject);
@@ -106,7 +106,7 @@ namespace VoxelMagic.Tools.EditorTools.UiWorkbench
             instance.name = prefab.name;
         }
 
-        private static ThemedButton AddButton(Transform parent, string name, UiButtonSkin skin, UiTheme theme)
+        internal static ThemedButton AddButton(Transform parent, string name, UiButtonSkin skin, UiTheme theme)
         {
             var button = Instantiate("W_Button", parent, name).GetComponent<ThemedButton>();
             button.SetSkin(skin);
@@ -114,7 +114,7 @@ namespace VoxelMagic.Tools.EditorTools.UiWorkbench
             return button;
         }
 
-        private static GameObject Instantiate(string preset, Transform parent, string name)
+        internal static GameObject Instantiate(string preset, Transform parent, string name)
         {
             var prefab = AssetDatabase.LoadAssetAtPath<GameObject>($"{UiWidgetPresetBuilder.WidgetFolder}/{preset}.prefab");
             var go = (GameObject)PrefabUtility.InstantiatePrefab(prefab, parent);
@@ -122,14 +122,14 @@ namespace VoxelMagic.Tools.EditorTools.UiWorkbench
             return go;
         }
 
-        private static void Assign(Object target, string field, Object value)
+        internal static void Assign(Object target, string field, Object value)
         {
             var so = new SerializedObject(target);
             so.FindProperty(field).objectReferenceValue = value;
             so.ApplyModifiedPropertiesWithoutUndo();
         }
 
-        private static GameObject SavePrefab(GameObject go)
+        internal static GameObject SavePrefab(GameObject go)
         {
             var prefab = PrefabUtility.SaveAsPrefabAsset(go, $"{HudFolder}/{go.name}.prefab");
             Object.DestroyImmediate(go);

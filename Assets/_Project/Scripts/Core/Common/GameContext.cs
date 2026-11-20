@@ -23,11 +23,15 @@ namespace VoxelMagic.Core
         public TimePause Pause { get; private set; }
         public ScreenStack Screens { get; private set; }
         public HudState Hud { get; private set; }
+        /// <summary>마력·기력(UI 상태 바가 읽음). 규칙 쪽 모델이 생기면 SetVitals로 연결한다. 없으면 null.</summary>
+        public IPlayerVitals Vitals { get; private set; }
         public GameMessages Messages { get; private set; }
 
         public PlayerProgress Progress { get; private set; }
 
         /// <summary>플레이어 데이터(인벤토리·점수·도감·의뢰)는 씬을 넘어 유지되는 progress의 것을 쓰고, 나머지는 씬마다 새로 만든다.</summary>
+        public void SetVitals(IPlayerVitals vitals) => Vitals = vitals;
+
         public static GameContext Create(GameBalanceConfig balance, FarmConfig farm, FishingConfig fishing,
             PlayerConfig player, PlayerProgress progress, IRandom random)
         {

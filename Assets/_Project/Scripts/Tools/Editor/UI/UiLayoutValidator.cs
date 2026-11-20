@@ -57,8 +57,8 @@ namespace VoxelMagic.Tools.EditorTools.UiWorkbench
                 issues.Add(new Issue(rect, $"가로 {rect.sizeDelta.x} 홀수 + 가운데 기준점 → 0.5px 어긋남"));
             if (!stretchY && IsOdd(rect.sizeDelta.y) && Mathf.Approximately(rect.pivot.y, 0.5f))
                 issues.Add(new Issue(rect, $"세로 {rect.sizeDelta.y} 홀수 + 가운데 기준점 → 0.5px 어긋남"));
-            if (rect.localScale != Vector3.one && rect.localScale != new Vector3(-1, 1, 1))
-                issues.Add(new Issue(rect, $"Scale이 1이 아님 {rect.localScale} (좌우 반전 -1만 허용)"));
+            if (!IsAllowedScale(rect.localScale))
+                issues.Add(new Issue(rect, $"Scale이 가로세로 같은 0.5 단위 배수가 아님 {rect.localScale}"));
         }
 
         private static void CheckGraphic(Graphic graphic, List<Issue> issues)
@@ -90,7 +90,19 @@ namespace VoxelMagic.Tools.EditorTools.UiWorkbench
             foreach (var handler in graphic.GetComponents<IEventSystemHandler>())
                 if (!(handler is Graphic)) return true;
             var selectable = graphic.GetComponentInParent<Selectable>(true);
-            return selectable != null && (selectable.targetGraphic == graphic || selectable is Scrollbar);
+            if (selectable != null && (selectable.targetGraphic == graphic || selectable is Scrollbar)) return true;
+            // 부모가 클릭·드래그를 받는 경우(예: 퀵슬롯 칸) 이 그래픽이 클릭 대상이 된다.
+            for (var parent = graphic.transform.parent; parent != null; parent = parent.parent)
+                if (parent.GetComponent<IPointerClickHandler>() != null || parent.GetComponent<IBeginDragHandler>() != null
+                    || parent.GetComponent<IScrollHandler>() != null) return true;
+            return false;
+        }
+
+        // 가로세로 같은 배수만 허용한다. 정수 배가 가장 선명하고, 0.5 단위(1.5 등)는 캔버스가 짝수 배일 때만 고르다(테마에서 사용자가 고른 값).
+        private static bool IsAllowedScale(Vector3 scale)
+        {
+            float x = Mathf.Abs(scale.x);
+            return IsInt(x * 2f) && x >= 0.5f && Mathf.Approximately(x, scale.y) && Mathf.Approximately(scale.z, 1f);
         }
 
         private static bool IsInt(float value) => Mathf.Abs(value - Mathf.Round(value)) < Epsilon;

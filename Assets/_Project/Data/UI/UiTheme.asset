@@ -36,6 +36,35 @@ MonoBehaviour:
     _barPaddingY: 3
     _barButtonInset: 5
     _barTitleGap: 4
+  _quickSlots:
+    _slotCount: 5
+    _slotSize: {x: 40, y: 44}
+    _slotGap: 2
+    _innerMargin: 2
+    _borderSide: 4
+    _borderBottom: 6
+    _bottomMargin: 8
+    _iconSize: 32
+    _selectionOutset: 2
+    _selectionMoveSeconds: 0.08
+    _selectionTopLeft: {fileID: 2095984601, guid: 85acf4bfda616c04fbbbea6d820019a9, type: 3}
+    _selectionTopRight: {fileID: 635226595, guid: 85acf4bfda616c04fbbbea6d820019a9, type: 3}
+    _selectionBottomLeft: {fileID: 1107980624, guid: 85acf4bfda616c04fbbbea6d820019a9, type: 3}
+    _selectionBottomRight: {fileID: 1248349939, guid: 85acf4bfda616c04fbbbea6d820019a9, type: 3}
+  _statusBars:
+    _margin: 8
+    _scale: 1.5
+    _iconScale: 1.125
+    _barHeight: 80
+    _barGap: 4
+    _iconGap: 2
+    _fillInset: 5
+    _manaFill: {fileID: 21300000, guid: 8eb8728c6ef7ed845a3686edc94ce81b, type: 3}
+    _staminaFill: {fileID: 21300000, guid: b4c8c5395d87c02489ff9087ea6fd1ff, type: 3}
+    _manaCap: {fileID: 21300000, guid: 22ab4b2a77672fe46a89ba8f70902a68, type: 3}
+    _staminaCap: {fileID: 21300000, guid: 6571776816fe7a144afeb5742ec09752, type: 3}
+    _manaIcon: {fileID: 21300000, guid: 926fbb60e88f53e4a85b21b35dbdde87, type: 3}
+    _staminaIcon: {fileID: 21300000, guid: 019827a79c5a0d44ba8e02a9fa18c1d2, type: 3}
   _texts: {fileID: 11400000, guid: 352cc08e03e545b4c8f802b1ffd4165f, type: 2}
   _textStyles:
   - _id: 0
@@ -113,4 +142,16 @@ MonoBehaviour:
     _imageType: 1
   - _id: 5
     _sprite: {fileID: 21300000, guid: 5c28281b2bc100b49a1e8d87efa28cef, type: 3}
+    _imageType: 1
+  - _id: 6
+    _sprite: {fileID: 1922709061, guid: 85acf4bfda616c04fbbbea6d820019a9, type: 3}
+    _imageType: 1
+  - _id: 7
+    _sprite: {fileID: 2008636851, guid: 85acf4bfda616c04fbbbea6d820019a9, type: 3}
+    _imageType: 1
+  - _id: 8
+    _sprite: {fileID: -1514007330, guid: 85acf4bfda616c04fbbbea6d820019a9, type: 3}
+    _imageType: 1
+  - _id: 9
+    _sprite: {fileID: 21300000, guid: d71581965160b4c4fa9eb8aa49425fdb, type: 3}
     _imageType: 1

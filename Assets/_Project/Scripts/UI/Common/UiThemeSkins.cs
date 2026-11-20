@@ -23,7 +23,15 @@ namespace VoxelMagic.UI
         QuestDetail,
         QuestToast,
         ScrollTrack,
-        ScrollHandle
+        ScrollHandle,
+        /// <summary>퀵슬롯 바 배경 (Sprout 어두운 칸 9-slice, 7-1)</summary>
+        QuickSlotBar,
+        /// <summary>퀵슬롯 칸 (가장 밝은 칸)</summary>
+        QuickSlot,
+        /// <summary>숨겨진 칸 등 다른 밝기의 칸 (확장 인벤토리용 예비)</summary>
+        QuickSlotAlt,
+        /// <summary>세로 상태 바 프레임 (7-2)</summary>
+        StatusBarFrame
     }
 
     public enum UiTextStyle

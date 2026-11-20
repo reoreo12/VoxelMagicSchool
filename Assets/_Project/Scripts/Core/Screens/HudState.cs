@@ -1,4 +1,5 @@
-// 팝업이 아닌 HUD의 보기 상태. 지금은 의뢰 목록 드롭다운의 펼침/접힘만 둔다(화살표 버튼과 Q 키가 같이 쓴다).
+// 팝업이 아닌 HUD의 보기 상태: 의뢰 목록 드롭다운의 펼침/접힘(화살표 버튼과 Q 키가 같이 씀),
+// 마우스가 휠을 쓰는 HUD(퀵슬롯) 위에 있는지(그때 휠은 카메라 줌 대신 HUD가 쓴다).
 using System;
 
 namespace VoxelMagic.Core
@@ -18,5 +19,10 @@ namespace VoxelMagic.Core
         }
 
         public void ToggleQuestList() => SetQuestListExpanded(!IsQuestListExpanded);
+
+        /// <summary>마우스가 휠을 받는 HUD 위에 있으면 true. 게임 입력은 이때 휠로 카메라를 줌하지 않는다.</summary>
+        public bool IsPointerOverScrollHud { get; private set; }
+
+        public void SetPointerOverScrollHud(bool over) => IsPointerOverScrollHud = over;
     }
 }

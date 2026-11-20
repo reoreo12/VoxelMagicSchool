@@ -24,6 +24,19 @@ namespace VoxelMagic.Tools.EditorTools.UiWorkbench
 
         internal void ResetRules(IEnumerable<UiImportRule> rules) => _rules = new List<UiImportRule>(rules);
 
+        /// <summary>같은 경로 패턴이 없는 기본 규칙만 뒤에 붙인다(사용자가 고친 규칙은 그대로). 붙였으면 true.</summary>
+        internal bool AddMissing(IEnumerable<UiImportRule> rules)
+        {
+            bool added = false;
+            foreach (var rule in rules)
+            {
+                if (_rules.Exists(r => r.PathPattern == rule.PathPattern)) continue;
+                _rules.Add(rule);
+                added = true;
+            }
+            return added;
+        }
+
         // 루트 기준 상대 경로(예: "book_ui/tabs/tab_red_normal.png")에 맞는 첫 규칙. 없으면 null(공통 값만 적용).
         public UiImportRule Find(string relativePath)
         {
@@ -40,12 +53,16 @@ namespace VoxelMagic.Tools.EditorTools.UiWorkbench
         [SerializeField, Tooltip("9-slice 경계 (왼쪽·위·오른쪽·아래, UI_SPEC 표기 순서)")] private int _left, _top, _right, _bottom;
         [SerializeField, Tooltip("켜면 Sprite Mode Multiple로 칸 크기대로 자른다")] private bool _sliceGrid;
         [SerializeField] private Vector2Int _cellSize;
+        [SerializeField, Tooltip("채우면 이 칸들만 이름을 붙여 자른다(스프라이트시트에서 필요한 조각만, 위쪽 기준 좌표)")]
+        private List<UiSliceRect> _slices = new List<UiSliceRect>();
 
         [NonSerialized] private Regex _regex;
 
         public string PathPattern => _pathPattern;
         public bool SliceGrid => _sliceGrid;
         public Vector2Int CellSize => _cellSize;
+        public IReadOnlyList<UiSliceRect> Slices => _slices;
+        public bool SliceNamed => _slices != null && _slices.Count > 0;
         public bool HasBorder => _left + _top + _right + _bottom > 0;
 
         // Unity의 spriteBorder는 (x=왼쪽, y=아래, z=오른쪽, w=위) 순서라 여기서 바꿔 준다.
@@ -63,5 +80,35 @@ namespace VoxelMagic.Tools.EditorTools.UiWorkbench
 
         public static UiImportRule Grid(string pattern, Vector2Int cellSize) =>
             new() { _pathPattern = pattern, _sliceGrid = true, _cellSize = cellSize };
+
+        public static UiImportRule Named(string pattern, params UiSliceRect[] slices) =>
+            new() { _pathPattern = pattern, _slices = new List<UiSliceRect>(slices) };
+    }
+
+    /// <summary>스프라이트시트에서 자를 한 조각. 좌표는 그림의 왼쪽 위 기준(px), 경계는 왼쪽·위·오른쪽·아래.</summary>
+    [Serializable]
+    public struct UiSliceRect
+    {
+        [SerializeField] private string _name;
+        [SerializeField] private int _x, _yFromTop, _width, _height;
+        [SerializeField] private int _left, _top, _right, _bottom;
+
+        public UiSliceRect(string name, int x, int yFromTop, int width, int height, int left = 0, int top = 0, int right = 0, int bottom = 0)
+        {
+            _name = name;
+            _x = x;
+            _yFromTop = yFromTop;
+            _width = width;
+            _height = height;
+            _left = left;
+            _top = top;
+            _right = right;
+            _bottom = bottom;
+        }
+
+        public string Name => _name;
+
+        public Rect ToUnityRect(int textureHeight) => new Rect(_x, textureHeight - _yFromTop - _height, _width, _height);
+        public Vector4 ToUnityBorder() => new Vector4(_left, _bottom, _right, _top);
     }
 }

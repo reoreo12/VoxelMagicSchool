@@ -1,4 +1,4 @@
-// 새 Input System 액션을 읽는 유일한 곳. 이동·E·카메라 줌(스크롤)은 이벤트로 내보내고, 나머지 키는 Core 명령으로 바꾼다.
+// 새 Input System 액션을 읽는 유일한 곳. 이동·E·카메라 줌(스크롤, HUD 위가 아닐 때)은 이벤트로 내보내고, 나머지 키는 Core 명령으로 바꾼다.
 using System;
 using UnityEngine;
 using UnityEngine.InputSystem;
@@ -70,7 +70,8 @@ namespace VoxelMagic.Gameplay
             float value = ctx.ReadValue<float>();
             if (Mathf.Approximately(value, 0f) || _context == null) return;
             if (_context.Fishing.State == FishingState.Minigame) _context.Fishing.Scroll(Mathf.Sign(value));
-            else if (!_context.Screens.HasAny) ZoomRequested?.Invoke(Mathf.Sign(value));
+            // 마우스가 퀵슬롯 같은 HUD 위에 있으면 휠은 그 HUD가 쓴다(칸 바꾸기). 게임 화면 위일 때만 카메라 줌.
+            else if (!_context.Screens.HasAny && !_context.Hud.IsPointerOverScrollHud) ZoomRequested?.Invoke(Mathf.Sign(value));
         }
 
         private void OnCancel()

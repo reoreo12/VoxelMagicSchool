@@ -25,6 +25,7 @@ MonoBehaviour:
     _bottom: 10
     _sliceGrid: 0
     _cellSize: {x: 0, y: 0}
+    _slices: []
   - _pathPattern: book_ui/book_spine.png
     _left: 0
     _top: 8
@@ -32,6 +33,7 @@ MonoBehaviour:
     _bottom: 10
     _sliceGrid: 0
     _cellSize: {x: 0, y: 0}
+    _slices: []
   - _pathPattern: book_ui/tabs/*.png
     _left: 4
     _top: 4
@@ -39,6 +41,7 @@ MonoBehaviour:
     _bottom: 4
     _sliceGrid: 0
     _cellSize: {x: 0, y: 0}
+    _slices: []
   - _pathPattern: book_ui/page_turn/leaf_edge.png
     _left: 0
     _top: 6
@@ -46,6 +49,7 @@ MonoBehaviour:
     _bottom: 6
     _sliceGrid: 0
     _cellSize: {x: 0, y: 0}
+    _slices: []
   - _pathPattern: book_ui/page_turn/leaf_*.png
     _left: 2
     _top: 6
@@ -53,6 +57,7 @@ MonoBehaviour:
     _bottom: 6
     _sliceGrid: 0
     _cellSize: {x: 0, y: 0}
+    _slices: []
   - _pathPattern: bar_ui/bar_frame_vertical.png
     _left: 5
     _top: 5
@@ -60,6 +65,7 @@ MonoBehaviour:
     _bottom: 5
     _sliceGrid: 0
     _cellSize: {x: 0, y: 0}
+    _slices: []
   - _pathPattern: quest_ui/quest_*_paper.png
     _left: 6
     _top: 6
@@ -67,6 +73,7 @@ MonoBehaviour:
     _bottom: 6
     _sliceGrid: 0
     _cellSize: {x: 0, y: 0}
+    _slices: []
   - _pathPattern: quest_ui/scrollbar/scroll_track.png
     _left: 0
     _top: 4
@@ -74,6 +81,7 @@ MonoBehaviour:
     _bottom: 4
     _sliceGrid: 0
     _cellSize: {x: 0, y: 0}
+    _slices: []
   - _pathPattern: quest_ui/scrollbar/scroll_handle.png
     _left: 0
     _top: 3
@@ -81,6 +89,7 @@ MonoBehaviour:
     _bottom: 3
     _sliceGrid: 0
     _cellSize: {x: 0, y: 0}
+    _slices: []
   - _pathPattern: score_ui/v2/score_digits_sheet.png
     _left: 0
     _top: 0
@@ -88,3 +97,75 @@ MonoBehaviour:
     _bottom: 0
     _sliceGrid: 1
     _cellSize: {x: 11, y: 12}
+    _slices: []
+  - _pathPattern: Sprout Lands - UI Pack - Basic packemojis-free/Inventory/Inventory_Spritesheet.png
+    _left: 0
+    _top: 0
+    _right: 0
+    _bottom: 0
+    _sliceGrid: 0
+    _cellSize: {x: 0, y: 0}
+    _slices:
+    - _name: inv_slot_light
+      _x: 233
+      _yFromTop: 121
+      _width: 30
+      _height: 32
+      _left: 4
+      _top: 5
+      _right: 4
+      _bottom: 7
+    - _name: inv_slot_mid
+      _x: 281
+      _yFromTop: 121
+      _width: 30
+      _height: 32
+      _left: 4
+      _top: 5
+      _right: 4
+      _bottom: 7
+    - _name: inv_bar_dark
+      _x: 329
+      _yFromTop: 121
+      _width: 30
+      _height: 32
+      _left: 4
+      _top: 5
+      _right: 4
+      _bottom: 7
+    - _name: inv_select_tl
+      _x: 273
+      _yFromTop: 0
+      _width: 11
+      _height: 12
+      _left: 0
+      _top: 0
+      _right: 0
+      _bottom: 0
+    - _name: inv_select_tr
+      _x: 308
+      _yFromTop: 0
+      _width: 11
+      _height: 12
+      _left: 0
+      _top: 0
+      _right: 0
+      _bottom: 0
+    - _name: inv_select_bl
+      _x: 273
+      _yFromTop: 36
+      _width: 11
+      _height: 12
+      _left: 0
+      _top: 0
+      _right: 0
+      _bottom: 0
+    - _name: inv_select_br
+      _x: 308
+      _yFromTop: 36
+      _width: 11
+      _height: 12
+      _left: 0
+      _top: 0
+      _right: 0
+      _bottom: 0
