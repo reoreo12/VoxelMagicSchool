@@ -15,3 +15,7 @@ MonoBehaviour:
   _entries:
   - _key: ui.quest.bar.title
     _text: "\uC218\uB77D\uD55C \uC758\uB8B0({0})"
+  - _key: ui.score.written
+    _text: "\uD544\uAE30 \uC608\uC0C1 \uC810\uC218"
+  - _key: ui.score.practical
+    _text: "\uC2E4\uAE30 \uC608\uC0C1 \uC810\uC218"

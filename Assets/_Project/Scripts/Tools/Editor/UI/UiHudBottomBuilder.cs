@@ -51,7 +51,7 @@ namespace VoxelMagic.Tools.EditorTools.UiWorkbench
             theme.QuickSlots.SetSelectionSprites(Sheet("inv_select_tl"), Sheet("inv_select_tr"), Sheet("inv_select_bl"), Sheet("inv_select_br"));
             theme.StatusBars.SetSprites(Load("bar_ui/bar_fill_mana.png"), Load("bar_ui/bar_fill_stamina.png"),
                 Load("bar_ui/bar_cap_mana.png"), Load("bar_ui/bar_cap_stamina.png"),
-                Load("Ninja Adventure - Asset Pack/Skill/Alchemy.png"), Load("bar_ui/icon/icon_stamina.png"));
+                Load("Ninja Adventure - Asset Pack/Skill/Alchemy.png"), Load("bar_ui/icons/icon_stamina.png"));
             EditorUtility.SetDirty(theme);
             AssetDatabase.SaveAssets();
         }

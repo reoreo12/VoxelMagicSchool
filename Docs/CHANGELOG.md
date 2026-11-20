@@ -1,5 +1,15 @@
 # 변경 기록
 
+## 2026-11-20 — (e) 점수 HUD (브랜치 `feature/tool-UI-editor`, `UI_SPEC.md` 9장·13장)
+- UI `ScoreNumberView`: v2 숫자를 피치 9로 이어 붙이고(폭 9n+2), 자릿수별 밑줄(1~2자리 → 2번, 3 → 3번, 4 → 4번)을 가로 가운데 내림으로 바로 아래에. 숫자 4개·밑줄 1개를 미리 만들어 켜고 끔, 값이 같으면 갱신 안 함, 문자열 없이 자릿수 계산
+- UI `ScoreHudView`: 화면 위 가운데에 "필기 예상 점수" + 숫자(v1 밑줄), 여백, "실기 예상 점수" + 숫자(v2 밑줄). `ScoreBook.ScoreChanged`로만 갱신, 숫자 폭이 바뀌면 다시 가운데 정렬(왼쪽 끝 기준 정수 px)
+- 테마 `Scores`(위 여백 8, 묶음 사이 24, 글자–숫자 4, 숫자 배수 2, 피치 9, 최대 4자리, 숫자·밑줄 스프라이트) — 임시값. 새 글자 스타일 `HudLabel`(갈무리11 Bold, 임시 밝은 종이색 `#F4E8CC` — 게임 화면 위에 바로 놓여서). 문구 `ui.score.written`·`ui.score.practical`
+- 프리팹 `HUD_Score`(HudDynamic 층), 메뉴 `VoxelMagic/UI/HUD 만들기/점수`. 세 게임 씬의 기존 프로토타입 `ScoreHud`(실기·필기 채움 바)를 끔
+- 기력 아이콘: 사용자가 옮긴 `bar_ui/icons/icon_stamina.png`를 쓰도록 테마·빌더·아틀라스 갱신(옛 `bar_ui/icon/`에 같은 파일이 남아 있음)
+- 테마 `Scores › Written Offsets` · `Practical Offsets` 추가(각각 `Group`·`Label`·`Number`, x +오른쪽 / y +아래, px): 필기·실기 묶음 전체, 이름 글자만, 숫자만 따로 손으로 옮긴다. 자동 배치(가운데 정렬·간격) 위에 더해지고 줄 가운데 계산에는 들어가지 않는다
+- `CLAUDE.md` 작업 표에 UI 작업 줄 추가(`Docs/HANDOFF_UI.md` → `Docs/UI_SPEC.md`), 사용자 승인
+- 확인(Creature_Cave 1080p): 필기 85·실기 9, 필기 100·실기 100(3자리 밑줄). 지금 점수 규칙(`ScoreBook`)은 100 상한이라 4자리는 게임에서 볼 수 없음. 규칙 검사 0개, EditMode 153개 통과
+
 ## 2026-11-20 — (d) 퀵슬롯 바 + 마력·기력 상태 바 (브랜치 `feature/tool-UI-editor`, `UI_SPEC.md` 7-1·7-2)
 - 임포트 규칙에 이름 붙인 조각 자르기(`UiSliceRect`, 그림 왼쪽 위 기준 좌표) 추가. 기존 규칙 에셋에는 새 기본 규칙만 덧붙임. Sprout 인벤토리 시트에서 7조각: `inv_bar_dark`(329,121 30×32)·`inv_slot_light`(233,121)·`inv_slot_mid`(281,121) 경계 4/5/4/7, 선택 프레임 중간 색 모서리 `inv_select_tl/tr/bl/br`(273·308, 0·36, 11×12). 아틀라스에는 아직 넣지 않음(Sprout은 git 제외라 아틀라스 항목이 팀원 쪽에서 비게 됨 — 결정 필요)
 - Core: `ItemDefinition`에 `Icon`(Sprite) 추가, `IPlayerVitals`(마력·기력 0~1 + 바뀜 알림) 추가, `GameContext.Vitals`/`SetVitals`(아직 규칙 모델이 없어 null → 바는 가득 찬 상태로 보임)

@@ -5,5 +5,9 @@ namespace VoxelMagic.UI
     {
         /// <summary>"수락한 의뢰({0})" — {0}은 의뢰 개수 (10-1). "의뢰"와 괄호 사이 띄어쓰기 없음.</summary>
         public const string QuestBarTitle = "ui.quest.bar.title";
+        /// <summary>"필기 예상 점수" (9-1)</summary>
+        public const string ScoreWritten = "ui.score.written";
+        /// <summary>"실기 예상 점수" (9-1)</summary>
+        public const string ScorePractical = "ui.score.practical";
     }
 }

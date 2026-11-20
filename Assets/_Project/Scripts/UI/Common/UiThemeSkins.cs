@@ -44,7 +44,9 @@ namespace VoxelMagic.UI
         /// <summary>더 작은 글씨 (갈무리7 8px).</summary>
         Tiny,
         /// <summary>HUD 바 제목 (굵게, 띄어쓰기 조금 넓게).</summary>
-        HudTitle
+        HudTitle,
+        /// <summary>게임 화면 위에 바로 놓이는 HUD 글자 (점수 이름 등). 배경 없이 읽히는 색.</summary>
+        HudLabel
     }
 
     [Serializable]

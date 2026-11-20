@@ -64,7 +64,43 @@ MonoBehaviour:
     _manaCap: {fileID: 21300000, guid: 22ab4b2a77672fe46a89ba8f70902a68, type: 3}
     _staminaCap: {fileID: 21300000, guid: 6571776816fe7a144afeb5742ec09752, type: 3}
     _manaIcon: {fileID: 21300000, guid: 926fbb60e88f53e4a85b21b35dbdde87, type: 3}
-    _staminaIcon: {fileID: 21300000, guid: 019827a79c5a0d44ba8e02a9fa18c1d2, type: 3}
+    _staminaIcon: {fileID: 21300000, guid: 45b6d1c5a0ba5ea4887ca0444f801b78, type: 3}
+  _scores:
+    _topMargin: 8
+    _groupGap: 24
+    _labelGap: 4
+    _writtenOffsets:
+      _group: {x: -10, y: 0}
+      _label: {x: -14, y: 7}
+      _number: {x: 0, y: 0}
+    _practicalOffsets:
+      _group: {x: 10, y: 0}
+      _label: {x: -14, y: 7}
+      _number: {x: 0, y: 0}
+    _numberScale: 2
+    _digitPitch: 9
+    _maxDigits: 4
+    _digits:
+    - {fileID: 362134638, guid: d336d01255c13514a80419430ce5de9d, type: 3}
+    - {fileID: 1645204810, guid: d336d01255c13514a80419430ce5de9d, type: 3}
+    - {fileID: 2077294097, guid: d336d01255c13514a80419430ce5de9d, type: 3}
+    - {fileID: 1011241927, guid: d336d01255c13514a80419430ce5de9d, type: 3}
+    - {fileID: 966905016, guid: d336d01255c13514a80419430ce5de9d, type: 3}
+    - {fileID: -369398808, guid: d336d01255c13514a80419430ce5de9d, type: 3}
+    - {fileID: 1505268735, guid: d336d01255c13514a80419430ce5de9d, type: 3}
+    - {fileID: 1376483711, guid: d336d01255c13514a80419430ce5de9d, type: 3}
+    - {fileID: 337931980, guid: d336d01255c13514a80419430ce5de9d, type: 3}
+    - {fileID: -2067910741, guid: d336d01255c13514a80419430ce5de9d, type: 3}
+    _writtenUnderlines:
+    - {fileID: 21300000, guid: 4ac13ce884f442443908f1b108de9213, type: 3}
+    - {fileID: 21300000, guid: 8b41a49f830d96945893753644214e51, type: 3}
+    - {fileID: 21300000, guid: e2323b429ccf7b44995506efebc8097d, type: 3}
+    - {fileID: 21300000, guid: 93f9174670630ab4da55e5dae3418228, type: 3}
+    _practicalUnderlines:
+    - {fileID: 21300000, guid: f9d9f23a846b0be489803e6e08b98f6e, type: 3}
+    - {fileID: 21300000, guid: 0b5463353028d5046bb64e34d646b11b, type: 3}
+    - {fileID: 21300000, guid: 15bfd14e606d31c439d90391d09a5f0d, type: 3}
+    - {fileID: 21300000, guid: 5f8f521fa7355e84585aa356635590f3, type: 3}
   _texts: {fileID: 11400000, guid: 352cc08e03e545b4c8f802b1ffd4165f, type: 2}
   _textStyles:
   - _id: 0
@@ -103,6 +139,12 @@ MonoBehaviour:
     _sizeMultiplier: 1
     _color: {r: 0.36078432, g: 0.25490198, b: 0.15686275, a: 1}
     _extraWordSpacingPx: 2
+  - _id: 6
+    _bold: 1
+    _fontOverride: {fileID: 0}
+    _sizeMultiplier: 1
+    _color: {r: 0.95686275, g: 0.9098039, b: 0.8, a: 1}
+    _extraWordSpacingPx: 0
   _buttons:
   - _id: 0
     _normal: {fileID: 21300000, guid: e661cc30ab37247419140ce4d3323739, type: 3}

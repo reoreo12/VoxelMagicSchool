@@ -98,4 +98,59 @@ namespace VoxelMagic.UI
             if (_staminaIcon == null) _staminaIcon = staminaIcon;
         }
     }
+
+    [Serializable]
+    public sealed class ScoreValues
+    {
+        [SerializeField, Tooltip("화면 위에서 점수 줄까지")] private int _topMargin = 8;
+        [SerializeField, Tooltip("필기 묶음과 실기 묶음 사이")] private int _groupGap = 24;
+        [SerializeField, Tooltip("글자(필기 예상 점수)와 숫자 사이 (가로)")] private int _labelGap = 4;
+        [SerializeField, Tooltip("필기 묶음 미세 조정 (x +오른쪽, y +아래, px). 자동 배치 위에 더한다")] private ScoreGroupOffsets _writtenOffsets = new ScoreGroupOffsets();
+        [SerializeField, Tooltip("실기 묶음 미세 조정 (x +오른쪽, y +아래, px). 자동 배치 위에 더한다")] private ScoreGroupOffsets _practicalOffsets = new ScoreGroupOffsets();
+        [SerializeField, Min(1), Tooltip("숫자·밑줄 확대 배수 (정수 배)")] private int _numberScale = 2;
+        [SerializeField, Tooltip("숫자 칸 간격(피치). 칸 폭 11, 간격 −2 → 9 (9-2)")] private int _digitPitch = 9;
+        [SerializeField, Tooltip("미리 만들어 두는 자릿수 (9-2, 최대 4자리)")] private int _maxDigits = 4;
+        [SerializeField, Tooltip("v2 숫자 0~9 (9-2: 숫자는 항상 v2)")] private Sprite[] _digits = new Sprite[10];
+        [SerializeField, Tooltip("필기 밑줄 v1: score_underline_1~4")] private Sprite[] _writtenUnderlines = new Sprite[4];
+        [SerializeField, Tooltip("실기 밑줄 v2: score_underline_1~4")] private Sprite[] _practicalUnderlines = new Sprite[4];
+
+        public int TopMargin => _topMargin;
+        public int GroupGap => _groupGap;
+        public int LabelGap => _labelGap;
+        public ScoreGroupOffsets Offsets(bool written) => (written ? _writtenOffsets : _practicalOffsets) ?? ScoreGroupOffsets.None;
+        public int NumberScale => Mathf.Max(1, _numberScale);
+        public int DigitPitch => _digitPitch;
+        public int MaxDigits => Mathf.Max(1, _maxDigits);
+        public Sprite Digit(int value) => _digits != null && value >= 0 && value < _digits.Length ? _digits[value] : null;
+
+        /// <summary>자릿수에 맞는 밑줄(9-2): 1~2자리 → 2번, 3자리 → 3번, 4자리 → 4번(1번은 쓰지 않음).</summary>
+        public Sprite Underline(bool written, int digitCount)
+        {
+            var set = written ? _writtenUnderlines : _practicalUnderlines;
+            int index = Mathf.Clamp(Mathf.Max(2, digitCount), 2, 4) - 1;
+            return set != null && index < set.Length ? set[index] : null;
+        }
+
+        public void SetSprites(Sprite[] digits, Sprite[] written, Sprite[] practical)
+        {
+            _digits = digits;
+            _writtenUnderlines = written;
+            _practicalUnderlines = practical;
+        }
+    }
+
+    /// <summary>점수 한 묶음(글자 + 숫자)의 손 조정 값. 묶음 전체, 글자만, 숫자만 따로 옮긴다. 가운데 정렬 계산에는 들어가지 않는다.</summary>
+    [System.Serializable]
+    public sealed class ScoreGroupOffsets
+    {
+        public static readonly ScoreGroupOffsets None = new ScoreGroupOffsets();
+
+        [SerializeField, Tooltip("글자와 숫자를 함께 옮김")] private Vector2Int _group;
+        [SerializeField, Tooltip("글자(예상 점수)만 옮김. y 0 = 숫자 줄 가운데")] private Vector2Int _label;
+        [SerializeField, Tooltip("숫자(밑줄 포함)만 옮김")] private Vector2Int _number;
+
+        public Vector2Int Group => _group;
+        public Vector2Int Label => _label;
+        public Vector2Int Number => _number;
+    }
 }
