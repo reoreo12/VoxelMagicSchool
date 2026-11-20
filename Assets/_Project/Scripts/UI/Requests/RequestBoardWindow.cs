@@ -1,4 +1,4 @@
-// 의뢰 게시판 창. ScreenState가 게시판을 열면 보이고, 수락 버튼은 RequestTracker에 수락을 요청한다.
+// 의뢰 게시판 창. 화면 스택이 게시판을 열면 보이고, 수락 버튼은 RequestTracker에 수락을 요청한다.
 // 씬마다 게시판에 걸 의뢰를 따로 정할 수 있다 (비우면 전체 목록).
 using System.Collections.Generic;
 using UnityEngine;
@@ -17,13 +17,13 @@ namespace VoxelMagic.UI
 
         private readonly List<RequestEntryView> _entries = new List<RequestEntryView>();
         private RequestTracker _tracker;
-        private ScreenState _screen;
+        private ScreenStack _screens;
         private Inventory _inventory;
 
         public void Bind(GameContext context)
         {
             _tracker = context.Requests;
-            _screen = context.Screen;
+            _screens = context.Screens;
 
             IReadOnlyList<RequestDefinition> requests = _boardRequests.Count > 0 ? _boardRequests : _tracker.Catalog;
             foreach (var request in requests)
@@ -33,9 +33,10 @@ namespace VoxelMagic.UI
                 entry.Setup(request, OnAccept);
                 _entries.Add(entry);
             }
-            _closeButton.onClick.AddListener(() => _screen.Close(GameWindow.RequestBoard));
+            _closeButton.onClick.AddListener(() => _screens.Close(GameScreen.RequestBoard));
 
-            _screen.WindowChanged += OnWindowChanged;
+            _screens.Opened += OnOpened;
+            _screens.Closed += OnClosed;
             _inventory = context.Inventory;
             // 의뢰·인벤토리는 씬을 넘어 유지되므로 OnDestroy에서 꼭 구독을 푼다.
             _tracker.ActiveChanged += OnActiveChanged;
@@ -45,7 +46,11 @@ namespace VoxelMagic.UI
 
         private void OnDestroy()
         {
-            if (_screen != null) _screen.WindowChanged -= OnWindowChanged;
+            if (_screens != null)
+            {
+                _screens.Opened -= OnOpened;
+                _screens.Closed -= OnClosed;
+            }
             if (_tracker != null) _tracker.ActiveChanged -= OnActiveChanged;
             if (_inventory != null) _inventory.SlotChanged -= OnSlotChanged;
         }
@@ -57,17 +62,22 @@ namespace VoxelMagic.UI
             if (IsVisible) RefreshEntries();
         }
 
-        private void OnWindowChanged(GameWindow window)
+        private void OnOpened(GameScreen screen)
         {
-            bool open = window == GameWindow.RequestBoard;
-            if (open) RefreshEntries();
-            SetVisible(open);
+            if (screen != GameScreen.RequestBoard) return;
+            RefreshEntries();
+            SetVisible(true);
+        }
+
+        private void OnClosed(GameScreen screen)
+        {
+            if (screen == GameScreen.RequestBoard) SetVisible(false);
         }
 
         private void OnAccept(RequestDefinition request)
         {
             if (_tracker.Accept(request) == AcceptResult.Success)
-                _screen.Close(GameWindow.RequestBoard);
+                _screens.Close(GameScreen.RequestBoard);
             else
                 RefreshEntries();
         }

@@ -20,7 +20,9 @@ namespace VoxelMagic.Core
         public RequestTracker Requests { get; private set; }
         public FishingSession Fishing { get; private set; }
         public PromptChannel Prompt { get; private set; }
-        public ScreenState Screen { get; private set; }
+        public TimePause Pause { get; private set; }
+        public ScreenStack Screens { get; private set; }
+        public HudState Hud { get; private set; }
         public GameMessages Messages { get; private set; }
 
         public PlayerProgress Progress { get; private set; }
@@ -40,13 +42,15 @@ namespace VoxelMagic.Core
                 Progress = progress,
                 Messages = new GameMessages(),
                 Prompt = new PromptChannel(),
-                Screen = new ScreenState(),
                 Journal = progress.Journal,
                 Inventory = progress.Inventory,
                 Score = progress.Score,
                 Requests = progress.Requests,
                 FarmGrid = new FarmGrid(farm.GridSize, new InstantGrowthRule())
             };
+            context.Pause = new TimePause();
+            context.Screens = new ScreenStack(context.Pause);
+            context.Hud = new HudState();
             context.Farm = new FarmService(context.FarmGrid, context.Inventory, random, context.Messages);
             context.Fishing = new FishingSession(fishing, context.Inventory, random, context.Messages,
                 balance.AcquiredInfoSeconds);

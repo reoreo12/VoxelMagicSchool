@@ -38,7 +38,7 @@ namespace VoxelMagic.Gameplay
         {
             if (context.Requests.Deliver(out var report) != DeliverResult.Success) return false;
             context.Messages.ShowCreatureSpeech(BuildLines(report));
-            context.Screen.Open(GameWindow.CreatureDialog);
+            context.Screens.Open(GameScreen.CreatureDialog);
             return true;
         }
 

@@ -40,14 +40,14 @@ namespace VoxelMagic.Gameplay
         private void OnOpenBoard(InputAction.CallbackContext _)
         {
             var context = FindContext();
-            if (context == null || context.Screen.IsModalOpen) return;
-            context.Screen.Open(GameWindow.RequestBoard);
+            if (context == null || context.Screens.HasAny) return;
+            context.Screens.Open(GameScreen.RequestBoard);
         }
 
         private void OnDeliver(InputAction.CallbackContext _)
         {
             var context = FindContext();
-            if (context == null || context.Screen.IsModalOpen) return;
+            if (context == null || context.Screens.HasAny) return;
             if (CreatureNpc.TryDeliver(context)) return;
             context.Messages.ShowToast(context.Requests.CanDeliver() == DeliverResult.MissingItems
                 ? $"{GameTexts.MissingItems}: {context.Requests.DescribeMissing()}"

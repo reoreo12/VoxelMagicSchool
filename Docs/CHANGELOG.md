@@ -1,5 +1,25 @@
 # 변경 기록
 
+## 2026-11-20 — UI 에디터 씬 · 픽셀 폰트 · 위젯 프리셋 (브랜치 `feature/tool-UI-editor`, `UI_SPEC.md` 1-1·3장)
+- 폰트 설계 크기 측정: 갈무리11은 12px에서 글자 테두리가 격자에 완전히 맞음(부드러운 렌더 중간 알파 0%). 스타더스트 3.0은 정수 격자에 맞는 크기가 없고, 13px에서 획이 고르게 1px로 나옴(14px은 윗줄이 잘림). Regular·Bold 같은 결과
+- 픽셀 폰트 TMP 에셋 `Fonts/Pixel/`: `Galmuri11`·`Galmuri11 Bold`(12px)·`Stardust3`·`Stardust3 Bold`(13px). RASTER_HINTED, Point 필터, 고정(Static) 아틀라스 1024 한 장(KS X 1001 2,350자 + 기호 + ASCII + Core·UI·Data에 쓰인 글자, 약 2,560자). 각각 예비 Dynamic 에셋(`… Fallback`, 256, 빌드 때 글자 비움)을 fallback으로 연결. 폰트에 없는 글자: `−`(스타더스트 둘, 갈무리 Bold), `↔`(갈무리 Bold)
+- 설정 `Data/UI/PixelFontSet.asset`, 메뉴 `VoxelMagic/UI/픽셀 폰트 다시 굽기`(`Editor/Fonts/PixelFontAssetBuilder`). 글자 모으기·GUID 유지 저장을 `FontCharsetCollector`·`FontAssetFileWriter`로 빼고 Pretendard 빌더(`KoreanFontAssetBuilder`)도 같이 쓰게 정리(동작 같음, ASCII는 항상 포함)
+- 위젯: `ThemedWidget`(기반) + `ThemedText`(글자 스타일·문구 키, Raycast 끔) · `ThemedButton`(3상태 Sprite Swap, 스프라이트 크기 그대로) · `ThemedPanel`(Sliced/Tiled). 테마에 글자 스타일·버튼 모양(책·가방·화살표 위/아래·닫기)·패널 모양(의뢰 종이 4종·스크롤 트랙/핸들)·문구 표 연결 추가(`UiThemeSkins`). 임시 글자색 `#5C4128`, 임시 폰트 갈무리11
+- 위젯 프리셋 `Prefabs/UI/Widgets/`: `W_Text`, `W_Button`, `W_PaperPanel`, `W_Scrollbar`(트랙 8 + 핸들 6) — 메뉴 `VoxelMagic/UI/테마 기본값·위젯 프리셋 만들기`
+- UI 작업대 창(메뉴 `VoxelMagic/UI/UI 작업대`, `Data/Tools/UI/UiWorkbenchConfig.asset`): ① 해상도 — 16:9·16:10·21:9·4:3 10개 버튼으로 Game View 해상도 전환(리플렉션, 실패하면 경고만), 배율·가상 크기 표시 ② 검사 · 굽기 — 선택한 UI의 규칙 위반 목록(정수 위치·크기, 홀수 + 가운데 기준점, 불필요한 Raycast, LayoutGroup·ContentSizeFitter·Mask, Point 아닌 스프라이트, 설계 크기의 정수 배가 아닌 글자, Scale) → 클릭하면 그 오브젝트 선택, `Prefabs/UI/`로 프리팹 굽기 ③ 테마 · 도구 — 임포트 규칙·폰트 굽기·프리셋·씬 열기 버튼 + 테마 인스펙터
+- `UiRaycastBlocker`(일부러 클릭을 받는 판 표시, 검사 예외) → UI_Root의 InputBlocker에 붙임
+- UI 에디터 씬 `Scenes/Tools/UIEditor.unity`(빌드 목록에 넣지 않음, 메뉴 `VoxelMagic/UI/UI 에디터 씬 열기`): 카메라·EventSystem(Input System)·UI_Root + 폰트 비교판 `FontCompareBoard`(Tools 어셈블리). 크림 종이(Tiled)·갈색·어두운 배경 × 폰트 4종, 인스펙터에서 문장 3개 중 선택·크기 배수 1~3·배경 하나만 보기
+- 확인: 1920×1080(3배)에서 스크린샷 — 도트가 정수 배로 선명, 종이 Tiled 찢김 반복 정상. UI_Root 전체 규칙 검사 위반 0개. EditMode 153개 통과
+
+## 2026-11-19 — UI 공통 기반 (브랜치 `feature/tool-UI-editor`, `UI_SPEC.md` 4-A·13장)
+- Core `Screens/`: `ScreenStack`(팝업 화면 스택, ESC는 맨 위부터 닫고 비어 있으면 `MenuRequested`, `Submitted`), `ScreenPolicy`(화면별 시간 정지 단계·ESC 닫힘·뒤쪽 입력 막기·조작 막기, 기본값은 13장 결정), `TimePause`(전체 정지 / 게임 시계만 정지 참조 카운트), `HudState`(의뢰 목록 펼침/접힘)
+- Core `Common/TextTable`(키 → 문장 ScriptableObject, `ITextSource`). 없는 키는 `#키`로 보임
+- 기존 `ScreenState` 삭제 → `GameContext.Screens`·`Pause`·`Hud`. 사용처 교체: `GameInputReader`(ESC: 화면 닫기 → 낚시 취소 → 메뉴 요청, Q: 의뢰 목록 토글), `PlayerMover`·`PlayerInteractor`(`BlocksGameplay`), `CreatureNpc`·`RequestBoard`·`RequestCheatKeys`, UI `CreatureDialogView`·`RequestBoardWindow`·`QuestTrackerPanel`. 동작은 그대로이고, 의뢰 게시판이 열리면 이제 전체 정지(timeScale 0), 크리처 대화는 게임 시계만 정지
+- Gameplay `TimeScaleDriver`: `TimePause` 전체 정지를 `Time.timeScale`에 반영, `GameBootstrap`이 만들고 씬이 내려갈 때 원래 값으로 되돌림
+- UI `Common/`: `UiTheme`(캔버스 기준 높이 360·PPU 16·최소 배율, 층별 정렬 순서, 입력 막기 판 색(지금 투명 = 딤 없음), 폰트), `PixelCanvasScaler`(정수 배율, Pixel Perfect, 에디터에서도 동작), `UiLayerCanvas`(층 캔버스 정렬 순서를 테마에서), `UiScreen`·`IUiScreen`(팝업 기반, 숨기면 비활성), `UiScreenRouter`(스택 → 화면 보이기/숨기기, 입력 막기 판 위치)
+- 에디터 `Tools/Editor/UI/UiRootPrefabBuilder`(메뉴 `VoxelMagic/UI/UI 루트 프리팹 만들기`): `Prefabs/UI/UI_Root.prefab`(HudStatic 0 / HudDynamic 10 / HudAnimated 20 / Popup 100 / Overlay 200), `Data/UI/UiTheme.asset`, `Data/UI/Texts_ko.asset`. UI_Root는 아직 어느 씬에도 넣지 않음(첫 화면 제작 때 배치)
+- 테스트 `ScreenStackTests` 17개(스택·시간 정지·ESC·메뉴 요청·정수 배율·문구 표). EditMode 전체 통과
+
 ## 2026-11-19 — UI 준비 단계 (브랜치 `feature/tool-UI-editor`, `UI_SPEC.md`)
 - Sprout Lands를 `.gitignore`에 추가. 사용자가 색을 수정한 `Weather_UI_Free_Noon_ver.png`는 원본과 분리해 `Art/UI/Sprout Lands (수정본)/weather/`로 이동(GUID 유지)
 - 패키지 `com.unity.2d.sprite` 1.0.0 설치, Sprite Packer Mode를 Sprite Atlas V2로 (SETUP.md)

@@ -1,4 +1,4 @@
-// 크리처 대사 창. 받은 대사를 한 줄씩 보여 주고, E(ScreenState.Submit)나 클릭으로 넘기며, 마지막 줄 뒤에 창을 닫는다.
+// 크리처 대사 창. 받은 대사를 한 줄씩 보여 주고, E(화면 스택 Submit)나 클릭으로 넘기며, 마지막 줄 뒤에 창을 닫는다.
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
@@ -16,27 +16,29 @@ namespace VoxelMagic.UI
 
         private readonly List<string> _lines = new List<string>();
         private GameMessages _messages;
-        private ScreenState _screen;
+        private ScreenStack _screens;
         private int _index;
 
         public void Bind(GameContext context)
         {
             _messages = context.Messages;
-            _screen = context.Screen;
+            _screens = context.Screens;
             _speaker.text = GameTexts.CreatureName;
             _messages.CreatureSpeechRequested += OnSpeech;
-            _screen.WindowChanged += OnWindowChanged;
-            _screen.Submitted += Advance;
+            _screens.Opened += OnOpened;
+            _screens.Closed += OnClosed;
+            _screens.Submitted += Advance;
             _nextButton.onClick.AddListener(Advance);
             SetVisible(false);
         }
 
         private void OnDestroy()
         {
-            if (_screen == null) return;
+            if (_screens == null) return;
             _messages.CreatureSpeechRequested -= OnSpeech;
-            _screen.WindowChanged -= OnWindowChanged;
-            _screen.Submitted -= Advance;
+            _screens.Opened -= OnOpened;
+            _screens.Closed -= OnClosed;
+            _screens.Submitted -= Advance;
         }
 
         private void OnSpeech(IReadOnlyList<string> lines)
@@ -46,20 +48,24 @@ namespace VoxelMagic.UI
             _index = 0;
         }
 
-        private void OnWindowChanged(GameWindow window)
+        private void OnOpened(GameScreen screen)
         {
-            bool open = window == GameWindow.CreatureDialog;
-            SetVisible(open);
-            if (!open) return;
-            if (_lines.Count == 0) _screen.Close(GameWindow.CreatureDialog);
+            if (screen != GameScreen.CreatureDialog) return;
+            SetVisible(true);
+            if (_lines.Count == 0) _screens.Close(GameScreen.CreatureDialog);
             else ShowCurrent();
+        }
+
+        private void OnClosed(GameScreen screen)
+        {
+            if (screen == GameScreen.CreatureDialog) SetVisible(false);
         }
 
         private void Advance()
         {
-            if (!IsVisible) return;
+            if (!IsVisible || _screens.Top != GameScreen.CreatureDialog) return;
             _index++;
-            if (_index >= _lines.Count) _screen.Close(GameWindow.CreatureDialog);
+            if (_index >= _lines.Count) _screens.Close(GameScreen.CreatureDialog);
             else ShowCurrent();
         }
 

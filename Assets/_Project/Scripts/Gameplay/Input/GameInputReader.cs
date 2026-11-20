@@ -41,7 +41,7 @@ namespace VoxelMagic.Gameplay
             }
             _map.FindAction("Interact", true).performed += _ => InteractPressed?.Invoke();
             _map.FindAction("Scroll", true).performed += OnScroll;
-            _map.FindAction("ToggleTracker", true).performed += _ => _context?.Screen.ToggleTracker();
+            _map.FindAction("ToggleTracker", true).performed += _ => _context?.Hud.ToggleQuestList();
             _map.FindAction("Cancel", true).performed += _ => OnCancel();
         }
 
@@ -70,14 +70,16 @@ namespace VoxelMagic.Gameplay
             float value = ctx.ReadValue<float>();
             if (Mathf.Approximately(value, 0f) || _context == null) return;
             if (_context.Fishing.State == FishingState.Minigame) _context.Fishing.Scroll(Mathf.Sign(value));
-            else if (!_context.Screen.IsModalOpen) ZoomRequested?.Invoke(Mathf.Sign(value));
+            else if (!_context.Screens.HasAny) ZoomRequested?.Invoke(Mathf.Sign(value));
         }
 
         private void OnCancel()
         {
             if (_context == null) return;
-            if (_context.Screen.IsModalOpen) _context.Screen.CloseCurrent();
-            else _context.Fishing.Cancel();
+            // ESC는 열린 화면을 맨 위부터 닫고, 없으면 낚시를 취소하고, 그것도 아니면 책(메뉴 탭)을 연다 (UI_SPEC 5-2).
+            if (_context.Screens.Cancel()) return;
+            if (_context.Fishing.IsBusy) _context.Fishing.Cancel();
+            else _context.Screens.RequestMenu();
         }
     }
 }

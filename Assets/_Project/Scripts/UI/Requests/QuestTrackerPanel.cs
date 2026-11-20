@@ -14,7 +14,7 @@ namespace VoxelMagic.UI
 
         private readonly StringBuilder _builder = new StringBuilder();
         private RequestTracker _tracker;
-        private ScreenState _screen;
+        private HudState _hud;
         private float _completeDisplaySeconds;
         private float _hideTimer;
         private string _completedTitle;
@@ -22,13 +22,13 @@ namespace VoxelMagic.UI
         public void Bind(GameContext context)
         {
             _tracker = context.Requests;
-            _screen = context.Screen;
+            _hud = context.Hud;
             _completeDisplaySeconds = context.Balance.QuestCompleteDisplaySeconds;
 
             _tracker.ActiveChanged += OnActiveChanged;
             _tracker.ProgressChanged += Redraw;
             _tracker.Completed += OnCompleted;
-            _screen.TrackerToggled += OnTrackerToggled;
+            _hud.QuestListToggled += OnTrackerToggled;
             SetVisible(false);
             // 씬을 옮겨 왔을 때 이미 진행 중인 의뢰가 있으면 바로 보여 준다.
             if (_tracker.HasActive) OnActiveChanged(_tracker.Active);
@@ -43,7 +43,7 @@ namespace VoxelMagic.UI
                 _tracker.ProgressChanged -= Redraw;
                 _tracker.Completed -= OnCompleted;
             }
-            if (_screen != null) _screen.TrackerToggled -= OnTrackerToggled;
+            if (_hud != null) _hud.QuestListToggled -= OnTrackerToggled;
         }
 
         private void OnTrackerToggled(bool _) => Redraw();
@@ -79,19 +79,19 @@ namespace VoxelMagic.UI
         private void Redraw()
         {
             if (!IsVisible) return;
-            string arrow = _screen.IsTrackerCollapsed ? GameTexts.TrackerCollapsed : GameTexts.TrackerExpanded;
+            string arrow = !_hud.IsQuestListExpanded ? GameTexts.TrackerCollapsed : GameTexts.TrackerExpanded;
 
             if (_completedTitle != null && !_tracker.HasActive)
             {
                 _header.text = $"{arrow} {_completedTitle}";
-                _body.text = _screen.IsTrackerCollapsed ? string.Empty
+                _body.text = !_hud.IsQuestListExpanded ? string.Empty
                     : $"<color=#{ColorUtility.ToHtmlStringRGB(_doneColor)}>{GameTexts.TrackerCompleted}</color>";
                 return;
             }
             if (!_tracker.HasActive) return;
 
             _header.text = $"{arrow} {_tracker.Active.Title}";
-            if (_screen.IsTrackerCollapsed)
+            if (!_hud.IsQuestListExpanded)
             {
                 _body.text = string.Empty;
                 return;

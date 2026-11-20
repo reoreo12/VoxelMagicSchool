@@ -1,4 +1,4 @@
-// 의뢰 게시판. E를 누르면 의뢰 목록 창을 열어 달라고 ScreenState에 요청한다.
+// 의뢰 게시판. E를 누르면 의뢰 목록 창을 열어 달라고 화면 스택에 요청한다.
 using VoxelMagic.Core;
 
 namespace VoxelMagic.Gameplay
@@ -9,6 +9,6 @@ namespace VoxelMagic.Gameplay
             => InteractionPrompt.Available(GameTexts.ViewRequests, PromptAnchor);
 
         public override void Interact(in InteractionContext context)
-            => Context.Screen.Open(GameWindow.RequestBoard);
+            => Context.Screens.Open(GameScreen.RequestBoard);
     }
 }
