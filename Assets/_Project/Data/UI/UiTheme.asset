@@ -70,37 +70,38 @@ MonoBehaviour:
     _groupGap: 24
     _labelGap: 4
     _writtenOffsets:
-      _group: {x: -10, y: 0}
-      _label: {x: -14, y: 7}
+      _group: {x: -17, y: 0}
+      _label: {x: -17, y: 10}
       _number: {x: 0, y: 0}
     _practicalOffsets:
-      _group: {x: 10, y: 0}
-      _label: {x: -14, y: 7}
+      _group: {x: 17, y: 0}
+      _label: {x: -17, y: 10}
       _number: {x: 0, y: 0}
     _numberScale: 2
     _digitPitch: 9
     _maxDigits: 4
+    _outlinePx: 1
     _digits:
-    - {fileID: 362134638, guid: d336d01255c13514a80419430ce5de9d, type: 3}
-    - {fileID: 1645204810, guid: d336d01255c13514a80419430ce5de9d, type: 3}
-    - {fileID: 2077294097, guid: d336d01255c13514a80419430ce5de9d, type: 3}
-    - {fileID: 1011241927, guid: d336d01255c13514a80419430ce5de9d, type: 3}
-    - {fileID: 966905016, guid: d336d01255c13514a80419430ce5de9d, type: 3}
-    - {fileID: -369398808, guid: d336d01255c13514a80419430ce5de9d, type: 3}
-    - {fileID: 1505268735, guid: d336d01255c13514a80419430ce5de9d, type: 3}
-    - {fileID: 1376483711, guid: d336d01255c13514a80419430ce5de9d, type: 3}
-    - {fileID: 337931980, guid: d336d01255c13514a80419430ce5de9d, type: 3}
-    - {fileID: -2067910741, guid: d336d01255c13514a80419430ce5de9d, type: 3}
+    - {fileID: 21300000, guid: 6896711c31c6e394287281722b937c7e, type: 3}
+    - {fileID: 21300000, guid: 5feb0fcea66e73b48b8c7f22e9fcc020, type: 3}
+    - {fileID: 21300000, guid: 8f8a04cb6457e6849910f4a99e781fb4, type: 3}
+    - {fileID: 21300000, guid: b4cb82121cb28d44ba2f0dd2df576213, type: 3}
+    - {fileID: 21300000, guid: b57f35db2154b144b893a25ff3855f29, type: 3}
+    - {fileID: 21300000, guid: 7b96ebd9919aca24d9759f12f08c37dc, type: 3}
+    - {fileID: 21300000, guid: a350f1782cc9ff941a04a5299dffdfeb, type: 3}
+    - {fileID: 21300000, guid: 59063cb1e9dd08d4bba45ae80390a26e, type: 3}
+    - {fileID: 21300000, guid: 56774a715d79a5849a52614c7cf57252, type: 3}
+    - {fileID: 21300000, guid: 60f2ecaa84e8022408e69720ebdc789a, type: 3}
     _writtenUnderlines:
-    - {fileID: 21300000, guid: 4ac13ce884f442443908f1b108de9213, type: 3}
-    - {fileID: 21300000, guid: 8b41a49f830d96945893753644214e51, type: 3}
-    - {fileID: 21300000, guid: e2323b429ccf7b44995506efebc8097d, type: 3}
-    - {fileID: 21300000, guid: 93f9174670630ab4da55e5dae3418228, type: 3}
+    - {fileID: 21300000, guid: a71c605186d016449ab1530870a2d4d8, type: 3}
+    - {fileID: 21300000, guid: 0727ab90e47ed8e4e89c4f38fd5e8c94, type: 3}
+    - {fileID: 21300000, guid: 9699703082c70d24a9bd55d6d98273de, type: 3}
+    - {fileID: 21300000, guid: 0dad6e1cfe8bd9e4fb6afa65299b4a06, type: 3}
     _practicalUnderlines:
-    - {fileID: 21300000, guid: f9d9f23a846b0be489803e6e08b98f6e, type: 3}
-    - {fileID: 21300000, guid: 0b5463353028d5046bb64e34d646b11b, type: 3}
-    - {fileID: 21300000, guid: 15bfd14e606d31c439d90391d09a5f0d, type: 3}
-    - {fileID: 21300000, guid: 5f8f521fa7355e84585aa356635590f3, type: 3}
+    - {fileID: 21300000, guid: 6dc880bb4468eb0488b0dc2cb43008f2, type: 3}
+    - {fileID: 21300000, guid: 70a98bb66e7108b45bc7366c88e418e7, type: 3}
+    - {fileID: 21300000, guid: 2fc7e635c1a9f86479804070dcb462bf, type: 3}
+    - {fileID: 21300000, guid: baaa5a0e38da1c6429a23bfdb04a28e4, type: 3}
   _time:
     _margin: 8
     _scale: 1.5
@@ -135,6 +136,27 @@ MonoBehaviour:
   _tooltip:
     _padding: {x: 5, y: 3}
     _screenMargin: 4
+    _textStyle: 0
+  _questList:
+    _barGap: 0
+    _paddingX: 9
+    _paddingY: 10
+    _itemGap: 4
+    _requirementIndent: 8
+    _maxVisibleItems: 4
+    _scrollbarWidth: 8
+    _scrollbarGap: 2
+    _wheelStep: 16
+    _titleStyle: 3
+    _titlePixelBold: 1
+    _requirementStyle: 3
+    _completedColor: {r: 0.2901961, g: 0.5647059, b: 0.78431374, a: 1}
+  _questToast:
+    _margin: 8
+    _padding: {x: 7, y: 5}
+    _closeGap: 4
+    _showSeconds: 3
+    _fadeSeconds: 0.4
     _textStyle: 0
   _texts: {fileID: 11400000, guid: 352cc08e03e545b4c8f802b1ffd4165f, type: 2}
   _textStyles:
@@ -182,13 +204,13 @@ MonoBehaviour:
     _extraWordSpacingPx: 0
   _buttons:
   - _id: 0
-    _normal: {fileID: 21300000, guid: e661cc30ab37247419140ce4d3323739, type: 3}
-    _hover: {fileID: 21300000, guid: 8c00198d07fed2e4fb8939c2de4cc15a, type: 3}
-    _pressed: {fileID: 21300000, guid: 22e113ddd5dfd0f4ab654fd073028368, type: 3}
+    _normal: {fileID: 21300000, guid: c87daf77a58f6ff459e3b45ce80236cc, type: 3}
+    _hover: {fileID: 21300000, guid: 8cc22e469cabcdd4cb97bd01528bdddf, type: 3}
+    _pressed: {fileID: 21300000, guid: 386cade7d7640584cb7e12c26083eed5, type: 3}
   - _id: 1
-    _normal: {fileID: 21300000, guid: 1c8605e427a03de4a871f1bcf2456e27, type: 3}
-    _hover: {fileID: 21300000, guid: cd36b829a1ad0654ab57a4634841edd1, type: 3}
-    _pressed: {fileID: 21300000, guid: 2e4f9dbcc0f634c4ab6ca873bd10d9e2, type: 3}
+    _normal: {fileID: 21300000, guid: 59a3f8971a850cd48a23466b5e3c6b8a, type: 3}
+    _hover: {fileID: 21300000, guid: e0e812d6dac225742ab2d3f093b03843, type: 3}
+    _pressed: {fileID: 21300000, guid: b3f7d5ad40949284ab4d276b777e98a0, type: 3}
   - _id: 2
     _normal: {fileID: 21300000, guid: f121cc33184b3f3429e317a5625235f9, type: 3}
     _hover: {fileID: 21300000, guid: b51949cb7a4752e40a645a02c34bc99e, type: 3}

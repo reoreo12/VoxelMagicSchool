@@ -29,3 +29,9 @@ MonoBehaviour:
     _text: "{0}\uC77C\uC9F8"
   - _key: ui.time.paused
     _text: "\uBA48\uCDB0 \uC788\uC74C"
+  - _key: ui.quest.toast
+    _text: "\uC758\uB8B0 \uC644\uB8CC: {0}"
+  - _key: ui.quest.requirement
+    _text: '{0} {1}/{2}'
+  - _key: ui.quest.itemTitle
+    _text: "\xB7 {0}"

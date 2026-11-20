@@ -13,6 +13,8 @@ namespace VoxelMagic.UI
 
         private TMP_Text _label;
         private string _current;
+        private bool _overrideColor;
+        private Color _colorOverride;
 
         private TMP_Text Label => _label != null ? _label : _label = GetComponent<TMP_Text>();
 
@@ -24,6 +26,15 @@ namespace VoxelMagic.UI
         }
 
         public UiTextStyle Style => _style;
+
+        /// <summary>스타일 색 대신 쓸 색(예: 완료한 의뢰 글자). use가 false면 스타일 색으로 돌아간다.</summary>
+        public void SetColorOverride(bool use, Color color)
+        {
+            if (_overrideColor == use && (!use || _colorOverride == color)) return;
+            _overrideColor = use;
+            _colorOverride = color;
+            ApplyTheme();
+        }
 
         public void SetStyle(UiTextStyle style)
         {
@@ -47,7 +58,7 @@ namespace VoxelMagic.UI
                 var font = style.FontFrom(theme.Fonts);
                 if (font != null) label.font = font;
                 label.fontSize = style.SizeFrom(theme.Fonts);
-                label.color = style.Color;
+                label.color = _overrideColor ? _colorOverride : style.Color;
                 label.enableAutoSizing = false;
                 label.fontStyle = FontStyles.Normal;
                 // TMP 띄어쓰기 단위는 글자 크기의 1/100이라 px로 바꿔 넣는다(정수 px가 되도록 테마에서 px로 받음).

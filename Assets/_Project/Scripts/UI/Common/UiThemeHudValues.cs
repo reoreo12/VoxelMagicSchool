@@ -110,6 +110,7 @@ namespace VoxelMagic.UI
         [SerializeField, Min(1), Tooltip("숫자·밑줄 확대 배수 (정수 배)")] private int _numberScale = 2;
         [SerializeField, Tooltip("숫자 칸 간격(피치). 칸 폭 11, 간격 −2 → 9 (9-2)")] private int _digitPitch = 9;
         [SerializeField, Tooltip("미리 만들어 두는 자릿수 (9-2, 최대 4자리)")] private int _maxDigits = 4;
+        [SerializeField, Min(0), Tooltip("숫자·밑줄 그림의 외곽선 두께(px). 외곽선 v2 = 1. 밑줄을 그만큼 위로 올려 원래 자리와 맞춘다")] private int _outlinePx;
         [SerializeField, Tooltip("v2 숫자 0~9 (9-2: 숫자는 항상 v2)")] private Sprite[] _digits = new Sprite[10];
         [SerializeField, Tooltip("필기 밑줄 v1: score_underline_1~4")] private Sprite[] _writtenUnderlines = new Sprite[4];
         [SerializeField, Tooltip("실기 밑줄 v2: score_underline_1~4")] private Sprite[] _practicalUnderlines = new Sprite[4];
@@ -121,6 +122,7 @@ namespace VoxelMagic.UI
         public int NumberScale => Mathf.Max(1, _numberScale);
         public int DigitPitch => _digitPitch;
         public int MaxDigits => Mathf.Max(1, _maxDigits);
+        public int OutlinePx => Mathf.Max(0, _outlinePx);
         public Sprite Digit(int value) => _digits != null && value >= 0 && value < _digits.Length ? _digits[value] : null;
 
         /// <summary>자릿수에 맞는 밑줄(9-2): 1~2자리 → 2번, 3자리 → 3번, 4자리 → 4번(1번은 쓰지 않음).</summary>
@@ -137,6 +139,58 @@ namespace VoxelMagic.UI
             _writtenUnderlines = written;
             _practicalUnderlines = practical;
         }
+    }
+
+    /// <summary>의뢰 드롭다운 목록 패널(UI_SPEC 10-2~10-4, 13장). 가로는 의뢰 바와 같고 세로만 항목에 맞춰 바뀐다.</summary>
+    [System.Serializable]
+    public sealed class QuestListValues
+    {
+        [SerializeField, Tooltip("의뢰 바 아래 끝에서 패널까지 (0 = 바로 아래에 붙임)")] private int _barGap = 0;
+        [SerializeField, Tooltip("패널 안쪽 왼쪽·오른쪽 여백 (종이 가장자리 그늘에 글자가 묻히지 않게)")] private int _paddingX = 9;
+        [SerializeField, Tooltip("맨 위 항목 위와 맨 아래 항목 아래 여백 (항상 같음, 10-2)")] private int _paddingY = 10;
+        [SerializeField, Tooltip("항목 사이 간격 (임시값 하나로 통일, 13장)")] private int _itemGap = 4;
+        [SerializeField, Tooltip("아이템 줄 들여쓰기 (제목의 항목 기호 뒤 글자에 맞춤)")] private int _requirementIndent = 8;
+        [SerializeField, Min(1), Tooltip("이 개수(제목 + 아이템 1줄 기준)만큼 보이면 더 늘리지 않고 스크롤 (10-2: 대략 4개)")] private int _maxVisibleItems = 4;
+        [SerializeField, Tooltip("스크롤바 폭 (트랙 8)")] private int _scrollbarWidth = 8;
+        [SerializeField, Tooltip("목록과 스크롤바 사이")] private int _scrollbarGap = 2;
+        [SerializeField, Min(1), Tooltip("휠 한 칸에 움직이는 px")] private int _wheelStep = 16;
+        [SerializeField, Tooltip("의뢰 제목 글자 (갈무리9 10px)")] private UiTextStyle _titleStyle = UiTextStyle.Small;
+        [SerializeField, Tooltip("갈무리9에는 굵은체가 없어 제목을 1px 오른쪽에 한 번 더 그려 굵게 보이게 한다")] private bool _titlePixelBold = true;
+        [SerializeField, Tooltip("재료 줄 글자 (갈무리9 10px)")] private UiTextStyle _requirementStyle = UiTextStyle.Small;
+        [SerializeField, Tooltip("완료(납품 가능)한 의뢰 글자색 (13장 임시 #4A90C8)")] private Color _completedColor = new Color32(0x4A, 0x90, 0xC8, 0xFF);
+
+        public int BarGap => _barGap;
+        public int PaddingX => _paddingX;
+        public int PaddingY => _paddingY;
+        public int ItemGap => _itemGap;
+        public int RequirementIndent => _requirementIndent;
+        public int MaxVisibleItems => Mathf.Max(1, _maxVisibleItems);
+        public int ScrollbarWidth => _scrollbarWidth;
+        public int ScrollbarGap => _scrollbarGap;
+        public int WheelStep => Mathf.Max(1, _wheelStep);
+        public UiTextStyle TitleStyle => _titleStyle;
+        public bool TitlePixelBold => _titlePixelBold;
+        public UiTextStyle RequirementStyle => _requirementStyle;
+        public Color CompletedColor => _completedColor;
+    }
+
+    /// <summary>의뢰 완료 알림 창(UI_SPEC 10-6, 13장 임시: 3초, 페이드, 여러 건은 하나씩).</summary>
+    [System.Serializable]
+    public sealed class QuestToastValues
+    {
+        [SerializeField, Tooltip("화면 왼쪽·아래 모서리 여백")] private int _margin = 8;
+        [SerializeField, Tooltip("글자 둘레 여백 (x 좌우, y 위아래)")] private Vector2Int _padding = new Vector2Int(7, 5);
+        [SerializeField, Tooltip("글자와 X 버튼 사이")] private int _closeGap = 4;
+        [SerializeField, Min(0f), Tooltip("완전히 보이는 시간(초, 시간 정지와 무관)")] private float _showSeconds = 3f;
+        [SerializeField, Min(0f), Tooltip("사라지는 페이드 시간(초)")] private float _fadeSeconds = 0.4f;
+        [SerializeField] private UiTextStyle _textStyle = UiTextStyle.Body;
+
+        public int Margin => _margin;
+        public Vector2Int Padding => _padding;
+        public int CloseGap => _closeGap;
+        public float ShowSeconds => _showSeconds;
+        public float FadeSeconds => _fadeSeconds;
+        public UiTextStyle TextStyle => _textStyle;
     }
 
     /// <summary>공용 툴팁(종이 바탕 + 글자 한 줄). 맨 위 Overlay 층에 하나만 둔다.</summary>

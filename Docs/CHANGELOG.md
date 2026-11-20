@@ -1,5 +1,22 @@
 # 변경 기록
 
+## 2026-11-20 — 외곽선 v2 비교 (책·가방 버튼, 점수 숫자·밑줄)
+- 사용자 외곽선 그림: `menu_icons/buttons/btn_{book,bag}_{normal,hover,pressed}_v2.png`(20×20), `score_ui/v2/digits/score_digit_N_v2.png`(13×14), `score_ui/underline/score_underline_N_v2.png`·`score_ui/v2/underline/score_underline_N_v2.png`(가로세로 +2)
+- 메뉴 `VoxelMagic/UI/외곽선 버전/외곽선 v2 쓰기`·`원본 쓰기`: 테마의 버튼·숫자·밑줄 스프라이트와 `Scores › Outline Px`(0/1)만 바꿈
+- `ScoreNumberView`: 숫자를 왼쪽 자리부터 채우고 그리는 순서도 왼쪽 → 오른쪽(이웃 외곽선 겹침). 피치 9 그대로. 밑줄은 `숫자 칸 높이 − 2 × 외곽선`에 둬서 원래 밑줄 자리와 같게. 테마가 바뀌면 숫자를 다시 그림
+- 사용자 결정: 외곽선 v2 채택
+- 외곽선 버튼은 20px × 2배 = 40이라 아이콘 줄이 8px 커지고, 그 아래 의뢰 바·목록도 8px 내려감
+
+## 2026-11-20 — (f) 의뢰 드롭다운 목록·완료 알림 (브랜치 `feature/tool-UI-editor`, `UI_SPEC.md` 10-2~10-4·10-6·13장)
+- Core `IAcceptedRequestList` 확장: `Accepted`(항목 = 의뢰·제목·수락 순서·요구 아이템별 진행·진행률·완료), `RequestBecameComplete`(조건을 다 채워 납품 가능해진 순간). `RequestTracker`가 진행이 바뀔 때마다 항목을 다시 만들고 `AcceptedListChanged`를 냄. 저장에서 불러온 의뢰가 이미 납품 가능하면 알림을 다시 내지 않음. 보상까지 받은(납품한) 의뢰는 목록에서 빠짐
+- UI `QuestListView`(HudDynamic `HUD_QuestList`): 의뢰 바 바로 아래, 폭 = 바 폭, 높이 = 항목에 맞춤(위아래 여백 같음). 정렬은 완료 → 진행률 높은 순 → 먼저 수락한 순(사용자 결정). 제목 + 아이템마다 한 줄 `무 0/3`(사용자 결정). 완료 항목 글자 `#4A90C8`. 제목+1줄 항목 4개 높이를 넘으면 RectMask2D로 자르고 휠·스크롤바(끌기 가능)로 스크롤, 항목은 보이는 만큼만 풀에서 재사용(가상 스크롤). 목록 위 휠은 카메라 줌 대신 스크롤. 항목이 없으면 패널을 숨김. 항목 클릭은 `ItemClicked`(자세히 패널 연결 자리)
+- UI `QuestToastView`(HudAnimated `HUD_QuestToast`): 화면 왼쪽 아래 `의뢰 완료: 제목`, 3초 + 페이드 0.4초(unscaled), 여러 건은 차례로, X로 지금 알림 닫기(사용자 요청). 의뢰 바를 꺼도 뜸
+- `ThemedText.SetColorOverride`(완료 글자색), 테마 `Quest List`·`Quest Toast`, 문구 `ui.quest.toast`·`ui.quest.requirement`, 메뉴 `VoxelMagic/UI/HUD 만들기/의뢰 목록·완료 알림`, 미리보기 메뉴 `VoxelMagic/UI/미리보기/`(가짜 의뢰 6건, 알림 2건 — 지금 규칙은 한 번에 하나만 수락해서)
+- 세 게임 씬의 옛 프로토타입 `QuestTracker`(오른쪽 위)를 끔
+- 사용자 피드백 반영: 목록 글자를 갈무리9 10px(`Small`)로 줄임. 갈무리9에는 굵은체가 없어 의뢰 제목은 1px 오른쪽에 한 번 더 그려 굵게(`Quest List › Title Pixel Bold`). 제목 앞 항목 기호 `· {0}`(문구 `ui.quest.itemTitle`), 재료 줄 들여쓰기 8. 여백 왼쪽·오른쪽 6 → 9, 위·아래 5 → 10(10-2: 위아래는 항상 같게)
+- 치트(`RequestCheatKeys`, 에디터·개발 빌드): F7 = 진행 중 의뢰의 모자란 재료 1개 넣기, F12 = `[Cheat] Requests` Inspector의 `Item To Add`를 `Amount To Add`만큼 넣기(F1~F6·F8~F11은 다른 디버그 키가 씀). 인벤토리에 실제로 들어가므로 자동 저장이 켜져 있으면 저장 파일에 남음
+- 확인(Creature_Cave 1080p, 자동 저장 끔): 의뢰 수락 → `무 0/3`, 무 3개 → 파란 글자 + 왼쪽 아래 알림, 가짜 6건 정렬·스크롤·스크롤바. EditMode 153개 통과. 왼쪽 아래 옛 조작 안내(`ControlsHintView`)와 알림이 겹침
+
 ## 2026-11-20 — 시간대 UI 배치 (브랜치 `feature/tool-UI-editor`, `UI_SPEC.md` 8장·13장)
 - Core `IGameTime`(날짜·정시·시간대 `TimeOfDay` Day=방과후/Night=밤, `TimeChanged`)과 `GameContext.Time`·`SetTime`. 게임 시계는 아직 없음 → 연결 전에는 테마의 미리보기 값(1일째, 16시)을 보임
 - 임포트 규칙: 수정본 날씨 시트에서 `time_frame`(6,7 65×54, 틀 + 날짜 패널 한 조각)·`time_roulette`(17,71 13×17)·`time_arrow`(4,85 10×8, 가로), 원본 작은 날씨 아이콘에서 `time_icon_after_school`(노을, 7,71)·`time_icon_night`(달, 7,39) 18×17

@@ -19,6 +19,12 @@ namespace VoxelMagic.Core
         public event Action ProgressChanged;
         public event Action<DeliveryReport> Completed;
         public event Action AcceptedListChanged;
+        public event Action<AcceptedRequestEntry> RequestBecameComplete;
+
+        private readonly List<AcceptedRequestEntry> _entries = new List<AcceptedRequestEntry>();
+        private int _nextAcceptOrder;
+        private int _activeOrder;
+        private bool _wasReady;
 
         public RequestTracker(IEnumerable<RequestDefinition> catalog, Inventory inventory, ScoreBook scoreBook,
             MaterialJournal journal, int newItemKindBonus)
@@ -29,7 +35,8 @@ namespace VoxelMagic.Core
             _journal = journal;
             _newItemKindBonus = newItemKindBonus;
             _inventory.SlotChanged += _ => RefreshProgress();
-            ActiveChanged += _ => AcceptedListChanged?.Invoke();
+            // 목록 항목은 진행이 바뀔 때마다 다시 만들고, 납품 가능해지는 순간을 알린다(UI 완료 알림, 10-6).
+            ProgressChanged += RebuildEntries;
         }
 
         public IReadOnlyList<RequestDefinition> Catalog => _catalog;
@@ -38,6 +45,7 @@ namespace VoxelMagic.Core
         public bool HasActive => Active != null;
         /// <summary>지금 규칙은 한 번에 하나만 수락한다 (UI는 개수 제한이 없다고 가정하고 만든다).</summary>
         public int AcceptedCount => HasActive ? 1 : 0;
+        public IReadOnlyList<AcceptedRequestEntry> Accepted => _entries;
         public IReadOnlyList<RequirementProgress> Progress => _progress;
         public bool IsReadyToDeliver => HasActive && _progress.All(p => p.IsMet);
 
@@ -61,6 +69,8 @@ namespace VoxelMagic.Core
             if (result != AcceptResult.Success) return result;
 
             Active = request;
+            _activeOrder = _nextAcceptOrder++;
+            _wasReady = false;
             foreach (var given in request.GivenItems)
                 _inventory.TryAdd(given.Item, given.Amount);
 
@@ -126,9 +136,25 @@ namespace VoxelMagic.Core
                 if (request != null) _completed.Add(request);
             Active = active != null && !_completed.Contains(active) ? active : null;
             _progress.Clear();
+            _wasReady = true; // 불러온 의뢰가 이미 납품 가능해도 완료 알림을 다시 띄우지 않는다
             ActiveChanged?.Invoke(Active);
             RefreshProgress();
             ProgressChanged?.Invoke();
+        }
+
+        private void RebuildEntries()
+        {
+            _entries.Clear();
+            bool ready = false;
+            if (HasActive)
+            {
+                var entry = new AcceptedRequestEntry(Active, _activeOrder, _progress.ToArray());
+                _entries.Add(entry);
+                ready = entry.IsComplete;
+                if (ready && !_wasReady) RequestBecameComplete?.Invoke(entry);
+            }
+            _wasReady = ready;
+            AcceptedListChanged?.Invoke();
         }
 
         private void RefreshProgress()

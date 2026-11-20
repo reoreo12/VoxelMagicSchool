@@ -58,6 +58,8 @@ namespace VoxelMagic.UI
             root.anchoredPosition = Vector2.zero;
             if (_writtenLabel != null) _writtenLabel.SetKey(UiTextKeys.ScoreWritten);
             if (_practicalLabel != null) _practicalLabel.SetKey(UiTextKeys.ScorePractical);
+            if (_writtenNumber != null) _writtenNumber.Invalidate();
+            if (_practicalNumber != null) _practicalNumber.Invalidate();
             Relayout();
         }
 

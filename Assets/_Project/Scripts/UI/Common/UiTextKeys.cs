@@ -19,5 +19,11 @@ namespace VoxelMagic.UI
         public const string TimeDay = "ui.time.day";
         /// <summary>"멈춰 있음" — 개발 빌드에서만 (8-2)</summary>
         public const string TimePaused = "ui.time.paused";
+        /// <summary>"의뢰 완료: {0}" — {0} 의뢰 제목 (10-6 완료 알림, 임시)</summary>
+        public const string QuestToast = "ui.quest.toast";
+        /// <summary>"{0} {1}/{2}" — 아이템 이름, 지금 개수, 필요 개수 (10-2 목록 항목 한 줄)</summary>
+        public const string QuestRequirement = "ui.quest.requirement";
+        /// <summary>"· {0}" — 목록 항목의 의뢰 제목 앞 항목 기호 (사용자 요청)</summary>
+        public const string QuestItemTitle = "ui.quest.itemTitle";
     }
 }
