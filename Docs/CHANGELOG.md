@@ -1,5 +1,34 @@
 # 변경 기록
 
+## 2026-11-20 — UI 배율 2배 + 왼쪽 위 HUD 피드백
+- 테마 기준 높이 360 → **480** (사용자 결정): 1080p 2배(가상 960×540), 1440p 3배, 4K 4배, 720p·768p 1배. UI_SPEC 13장 갱신
+- 책·가방 아이콘 정수 배 확대: 테마 `TopLeft › Icon Scale`(기본 2 → 32×32). `ThemedButton`에 크기 배수(`SetSizeScale`)를 두어 버튼이 다시 그려져도 크기가 유지됨
+- 의뢰 바: `Bar Size` 대신 `Bar Width`(144) + `Bar Padding Y`(3). 바 높이 = 제목 글자 줄 높이(16) + 여백 × 2 = 22. 제목은 바 세로 가운데 줄 높이 칸에 둠
+- 글자 스타일에 `띄어쓰기 더(px)` 추가, 새 스타일 `HudTitle`(갈무리11 Bold, 띄어쓰기 +2px) → 바 제목에 적용("의뢰"와 "(0)" 사이가 붙어 보이던 문제). 스타일에 `LineHeightFrom` 추가
+- 확인: Creature_Cave 1920×1080(2배) 캡처, UI_Root 규칙 검사 0개
+- 바 제목 문구를 `수락한 의뢰({0})`로 ("의뢰"와 개수 사이 띄어쓰기 없음, 사용자 결정). 크기 값은 지금 상태로 확정(아이콘 2배, 바 22, 여백 3)
+
+## 2026-11-20 — Silver · 네오둥근모 Pro 비교
+- 사용자가 넣은 `Silver.ttf`, `NeoDunggeunmoPro-Regular.ttf` 설계 크기 측정: Silver 19px(한글 높이 11, 줄 높이 21), 네오둥근모 Pro 16px(한글 높이 13, 줄 높이 16). 둘 다 Bold 없음. `Fonts/Pixel/Silver`·`NeoDunggeunmo` 고정 + 예비 에셋. 네오둥근모에 없는 기호 19개(※ ℃ Ⅰ~Ⅴ 화살표 ★☆♡♥♪ 등)
+- 의뢰 바 6개(갈무리11 Bold·갈무리11·갈무리9·갈무리7·Silver·네오둥근모)를 1080p에서 나란히 캡처(플레이 중 임시, 저장 안 함)
+- 버그 수정: 테마를 인스펙터에서 바꿀 때 "SendMessage cannot be called during OnValidate" 경고 → 위젯이 편집 모드에서는 한 박자 뒤(delayCall)에 적용. 폰트 재굽기 때 "Main Object Name does not match filename" 경고 → 같은 파일 이름으로 `_Baking` 임시 폴더에 저장 후 복사
+
+## 2026-11-20 — 작은 갈무리 폰트 시험 + 값 바로 고쳐 보기 (브랜치 `feature/tool-UI-editor`)
+- 갈무리9·갈무리7(Regular만 있음, Bold 없음)을 받아 `Art/Font/`에 넣음(SETUP.md). 설계 크기 측정: 갈무리9 10px(줄 높이 13), 갈무리7 8px(줄 높이 11). `Fonts/Pixel/Galmuri9`·`Galmuri7` 고정 에셋 + 예비 에셋
+- 글자 스타일에 `폰트 지정`(비우면 테마 기본) 추가. 글자 크기는 이제 쓰는 폰트 에셋의 설계 크기 × 배수(테마의 공용 설계 크기 값은 없앰). 새 스타일 `Small`(갈무리9 10px)·`Tiny`(갈무리7 8px)
+- 문구 표(`Texts_ko`)를 고치면 테마 변경으로 넘겨 화면 글자가 바로 바뀜
+- 버그 수정: 폰트를 다시 구우면 에셋 이름이 "… (Baking)"으로 남던 문제(`FontAssetFileWriter`)
+- 의뢰 바 제목에 Small·Tiny를 넣어 1080p 캡처 비교. 프리팹은 아직 Bold(갈무리11 Bold 12px) 그대로, 사용자 선택 대기
+
+## 2026-11-20 — (a) 왼쪽 위 책·가방 버튼 + 의뢰 드롭다운 바 (브랜치 `feature/tool-UI-editor`, `UI_SPEC.md` 5-4·10-1)
+- Core `IAcceptedRequestList`(수락한 의뢰 수 + 바뀜 알림, UI 연결 창구). `RequestTracker`가 구현(지금 규칙은 한 번에 하나라 0 또는 1)
+- UI `TopLeftMenuView`(책 → 책 화면, 가방 → 확장 인벤토리를 화면 스택에 연다. 아직 없는 화면은 열지 않고 로그만), `QuestBarView`(화살표로 목록 펼침/접힘 즉시 전환, 펼침 = 위 화살표·접힘 = 아래 화살표, "수락한 의뢰 (n)"은 개수가 바뀔 때만 다시 씀, X는 아이콘만), `PixelLayout`(정수 px 배치), `UiTextKeys`, `UiScreenRouter.HasScreen`
+- 테마 `TopLeft` 값(임시): 모서리 여백 8, 아이콘 간격 4, 아이콘 줄과 바 사이 4, 바 144×22, 바 버튼 안쪽 5, 버튼–제목 4. 문구 표에 `ui.quest.bar.title` = "수락한 의뢰 ({0})"
+- 프리팹 `Prefabs/UI/HUD/HUD_TopLeftMenu`(HudStatic 층), `HUD_QuestBar`(HudDynamic 층) — 위젯 프리셋을 조합, UI_Root에 넣음. 메뉴 `VoxelMagic/UI/HUD 만들기/왼쪽 위 메뉴·의뢰 바`
+- 게임 씬 `FarmPond`·`BackMountain`·`Creature_Cave`에 UI_Root 배치, `_Bootstrap`(GameBootstrap) 연결 목록에 추가. 기존 프로토타입 UI(오른쪽 위 의뢰 토글, 점수, 인벤토리 줄)는 그대로 두고 해당 단계에서 교체. 화살표와 Q가 같은 펼침 상태를 쓴다
+- 사용자 피드백 반영: 의뢰 바 높이 22 → **16**(테마 값, 갈무리11 줄 높이 16과 같음), 바 제목을 **갈무리11 Bold**로 (`ThemedText.SetStyle`). 글자 크기는 갈무리11의 최소 정수 배(12px)라 더 줄이려면 더 작은 폰트가 필요
+- 확인(Creature_Cave, 1920×1080 = 3배): 책·가방(16px) 줄 아래 의뢰 바, 화살표 전환, 의뢰 수락 시 (0) → (1), 책 버튼은 책 화면이 없어 열리지 않고 시간도 그대로. UI_Root 규칙 검사 0개, EditMode 153개 통과
+
 ## 2026-11-20 — UI 에디터 씬 · 픽셀 폰트 · 위젯 프리셋 (브랜치 `feature/tool-UI-editor`, `UI_SPEC.md` 1-1·3장)
 - 폰트 설계 크기 측정: 갈무리11은 12px에서 글자 테두리가 격자에 완전히 맞음(부드러운 렌더 중간 알파 0%). 스타더스트 3.0은 정수 격자에 맞는 크기가 없고, 13px에서 획이 고르게 1px로 나옴(14px은 윗줄이 잘림). Regular·Bold 같은 결과
 - 픽셀 폰트 TMP 에셋 `Fonts/Pixel/`: `Galmuri11`·`Galmuri11 Bold`(12px)·`Stardust3`·`Stardust3 Bold`(13px). RASTER_HINTED, Point 필터, 고정(Static) 아틀라스 1024 한 장(KS X 1001 2,350자 + 기호 + ASCII + Core·UI·Data에 쓰인 글자, 약 2,560자). 각각 예비 Dynamic 에셋(`… Fallback`, 256, 빌드 때 글자 비움)을 fallback으로 연결. 폰트에 없는 글자: `−`(스타더스트 둘, 갈무리 Bold), `↔`(갈무리 Bold)

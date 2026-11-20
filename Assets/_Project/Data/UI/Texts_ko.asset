@@ -12,4 +12,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4ade70dd2b71eaf449d40c7cc3e89a19, type: 3}
   m_Name: Texts_ko
   m_EditorClassIdentifier: 
-  _entries: []
+  _entries:
+  - _key: ui.quest.bar.title
+    _text: "\uC218\uB77D\uD55C \uC758\uB8B0({0})"

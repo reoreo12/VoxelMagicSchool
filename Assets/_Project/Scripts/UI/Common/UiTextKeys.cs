@@ -1,0 +1,9 @@
+// UI 문구 표(TextTable)의 키 이름 모음. 화면 코드는 문자열 대신 이 키로 문구를 가져온다(UI_SPEC 4-A-3).
+namespace VoxelMagic.UI
+{
+    public static class UiTextKeys
+    {
+        /// <summary>"수락한 의뢰({0})" — {0}은 의뢰 개수 (10-1). "의뢰"와 괄호 사이 띄어쓰기 없음.</summary>
+        public const string QuestBarTitle = "ui.quest.bar.title";
+    }
+}

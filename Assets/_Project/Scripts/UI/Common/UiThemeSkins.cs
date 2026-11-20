@@ -30,7 +30,13 @@ namespace VoxelMagic.UI
     {
         Body,
         BodyBold,
-        Title
+        Title,
+        /// <summary>작은 글씨 (갈무리9 10px). HUD 바 제목 등.</summary>
+        Small,
+        /// <summary>더 작은 글씨 (갈무리7 8px).</summary>
+        Tiny,
+        /// <summary>HUD 바 제목 (굵게, 띄어쓰기 조금 넓게).</summary>
+        HudTitle
     }
 
     [Serializable]
@@ -79,23 +85,47 @@ namespace VoxelMagic.UI
     {
         [SerializeField] private UiTextStyle _id;
         [SerializeField] private bool _bold;
+        [SerializeField, Tooltip("비우면 테마 기본 폰트(굵게면 Bold). 채우면 이 폰트를 쓴다 (예: 작은 글씨용 갈무리9)")] private TMP_FontAsset _fontOverride;
         [SerializeField, Min(1), Tooltip("글자 크기 = 폰트 설계 크기 × 이 값 (정수 배만)")] private int _sizeMultiplier = 1;
         [SerializeField] private Color _color = Color.black;
+        [SerializeField, Tooltip("띄어쓰기를 이만큼(px, 정수) 더 넓힌다")] private int _extraWordSpacingPx;
 
-        public TextStyleValues(UiTextStyle id, bool bold, int sizeMultiplier, Color color)
+        public TextStyleValues(UiTextStyle id, bool bold, int sizeMultiplier, Color color, TMP_FontAsset fontOverride = null, int extraWordSpacingPx = 0)
         {
+            _extraWordSpacingPx = extraWordSpacingPx;
             _id = id;
             _bold = bold;
             _sizeMultiplier = sizeMultiplier;
             _color = color;
+            _fontOverride = fontOverride;
         }
 
         public UiTextStyle Id => _id;
         public bool Bold => _bold;
         public int SizeMultiplier => _sizeMultiplier;
         public Color Color => _color;
+        public int ExtraWordSpacingPx => _extraWordSpacingPx;
 
-        public TMP_FontAsset FontFrom(UiTheme.FontValues fonts) => _bold && fonts.Bold != null ? fonts.Bold : fonts.Regular;
-        public int SizeFrom(UiTheme.FontValues fonts) => fonts.DesignSize * Math.Max(1, _sizeMultiplier);
+        /// <summary>쓰는 폰트의 줄 높이(px, 올림).</summary>
+        public int LineHeightFrom(UiTheme.FontValues fonts)
+        {
+            var font = FontFrom(fonts);
+            if (font == null) return SizeFrom(fonts);
+            return Mathf.CeilToInt(font.faceInfo.lineHeight / font.faceInfo.pointSize * SizeFrom(fonts));
+        }
+
+        public TMP_FontAsset FontFrom(UiTheme.FontValues fonts)
+        {
+            if (_fontOverride != null) return _fontOverride;
+            return _bold && fonts.Bold != null ? fonts.Bold : fonts.Regular;
+        }
+
+        /// <summary>글자 크기 = 쓰는 폰트의 설계 크기(폰트 에셋의 Sampling 크기) × 배수. 정수 배만 나온다.</summary>
+        public int SizeFrom(UiTheme.FontValues fonts)
+        {
+            var font = FontFrom(fonts);
+            int design = font != null ? Mathf.Max(1, Mathf.RoundToInt(font.faceInfo.pointSize)) : 12;
+            return design * Math.Max(1, _sizeMultiplier);
+        }
     }
 }

@@ -31,6 +31,8 @@
 | 날짜 | 내용 | 위치 | 이유 | 승인 |
 |---|---|---|---|---|
 | 2026-10-30 | Pretendard 폰트 v1.3.9 (Regular) | `Assets/_Project/Fonts/Pretendard/` (원본 otf, `OFL.txt`) | 한글 TMP 고정 폰트 에셋의 원본. GitHub `orioncactus/pretendard` 저장소에서 받음. SIL OFL 1.1이라 게임에 넣어 배포 가능 | 사용자 승인 |
+| 2026-11-20 | 갈무리9·갈무리7 픽셀 폰트 (Regular, v2.40.4 배포본) + 라이선스 | `Assets/_Project/Art/Font/Galmuri9.ttf`, `Galmuri7.ttf`, `Galmuri_LICENSE.txt` | 의뢰 바 등 작은 글씨 시험 (갈무리11보다 작은 같은 가족). GitHub `quiple/galmuri` 저장소 `dist/`에서 받음. SIL OFL 1.1 (게임에 넣어 배포 가능, 폰트 단독 판매 금지) | 사용자 승인 |
+| 2026-11-20 | Silver(`Silver.ttf`), 네오둥근모 Pro(`NeoDunggeunmoPro-Regular.ttf`) | `Assets/_Project/Art/Font/` | 작은 글씨 후보 비교. 사용자가 직접 넣음. **라이선스 파일 없음 → 확인 필요** | 사용자 제공 |
 | 2026-10-30 | TMP Essential Resources | `Assets/TextMesh Pro/` (Fonts, Resources, Shaders, Sprites) | 한글 TMP 폰트 사용. uGUI 2.0에 포함된 리소스를 가져온 것이라 외부 다운로드 없음 | 사용자 승인 |
 
 ## 프로젝트 설정

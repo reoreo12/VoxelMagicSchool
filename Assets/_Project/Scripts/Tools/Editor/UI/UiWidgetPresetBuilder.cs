@@ -34,7 +34,7 @@ namespace VoxelMagic.Tools.EditorTools.UiWorkbench
                 PixelFontAssetBuilder.GetOrCreateSet();
                 var regular = AssetDatabase.LoadAssetAtPath<TMP_FontAsset>("Assets/_Project/Fonts/Pixel/Galmuri11.asset");
                 var bold = AssetDatabase.LoadAssetAtPath<TMP_FontAsset>("Assets/_Project/Fonts/Pixel/Galmuri11 Bold.asset");
-                theme.SetFonts(regular, bold, 12);
+                theme.SetFonts(regular, bold);
             }
             if (theme.Texts == null) theme.SetTexts(UiRootPrefabBuilder.GetOrCreateTextTable());
 
@@ -44,6 +44,10 @@ namespace VoxelMagic.Tools.EditorTools.UiWorkbench
                     new TextStyleValues(UiTextStyle.Body, false, 1, TextBrown),
                     new TextStyleValues(UiTextStyle.BodyBold, true, 1, TextBrown),
                     new TextStyleValues(UiTextStyle.Title, true, 1, TextBrown),
+                    new TextStyleValues(UiTextStyle.Small, false, 1, TextBrown, PixelFont("Galmuri9")),
+                    new TextStyleValues(UiTextStyle.Tiny, false, 1, TextBrown, PixelFont("Galmuri7")),
+                    // 바 제목: 굵게 + 띄어쓰기 2px 더 (사용자 피드백 2026-11-20, "의뢰"와 "(0)" 사이가 붙어 보임)
+                    new TextStyleValues(UiTextStyle.HudTitle, true, 1, TextBrown, null, 2),
                 },
                 new[]
                 {
@@ -127,6 +131,9 @@ namespace VoxelMagic.Tools.EditorTools.UiWorkbench
             handleImage.raycastTarget = true; // 핸들은 끌 수 있어야 한다
             return root;
         }
+
+        private static TMP_FontAsset PixelFont(string name) =>
+            AssetDatabase.LoadAssetAtPath<TMP_FontAsset>($"Assets/_Project/Fonts/Pixel/{name}.asset");
 
         private static ButtonSkinValues ButtonSkin(UiButtonSkin id, string prefix) =>
             new ButtonSkinValues(id, Sprite(prefix + "normal.png"), Sprite(prefix + "hover.png"), Sprite(prefix + "pressed.png"));

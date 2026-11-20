@@ -38,3 +38,19 @@ MonoBehaviour:
     _assetName: Stardust3 Bold
     _samplingSize: 13
     _renderMode: 4122
+  - _source: {fileID: 12800000, guid: b51e6a89298818e4594de5717ebbf249, type: 3}
+    _assetName: Galmuri9
+    _samplingSize: 10
+    _renderMode: 4122
+  - _source: {fileID: 12800000, guid: 0309cc149d254ad4dbe1ac3da538071f, type: 3}
+    _assetName: Galmuri7
+    _samplingSize: 8
+    _renderMode: 4122
+  - _source: {fileID: 12800000, guid: 97958b7c640f47c4d9addf47bf70d7cd, type: 3}
+    _assetName: Silver
+    _samplingSize: 19
+    _renderMode: 4122
+  - _source: {fileID: 12800000, guid: 06ca2b1f1cf357144864e038fbc41422, type: 3}
+    _assetName: NeoDunggeunmo
+    _samplingSize: 16
+    _renderMode: 4122

@@ -9,12 +9,21 @@ namespace VoxelMagic.UI
     public sealed class ThemedButton : ThemedWidget
     {
         [SerializeField] private UiButtonSkin _skin;
+        [SerializeField, Min(1), Tooltip("스프라이트 크기 × 이 값 (정수 배만)")] private int _sizeScale = 1;
 
         public Button Button => GetComponent<Button>();
 
         public void SetSkin(UiButtonSkin skin)
         {
             _skin = skin;
+            ApplyTheme();
+        }
+
+        public void SetSizeScale(int scale)
+        {
+            scale = Mathf.Max(1, scale);
+            if (_sizeScale == scale) return;
+            _sizeScale = scale;
             ApplyTheme();
         }
 
@@ -27,7 +36,7 @@ namespace VoxelMagic.UI
             image.type = Image.Type.Simple;
             image.raycastTarget = true;
             // 스프라이트 1px = UI 1단위(PPU 16 = 캔버스 기준 PPU 16). SetNativeSize는 캔버스 밖에서 값이 달라 직접 넣는다.
-            ((RectTransform)transform).sizeDelta = values.Normal.rect.size;
+            ((RectTransform)transform).sizeDelta = values.Normal.rect.size * Mathf.Max(1, _sizeScale);
 
             var button = Button;
             button.transition = Selectable.Transition.SpriteSwap;

@@ -53,26 +53,46 @@ namespace VoxelMagic.UI
         {
             [SerializeField] private TMP_FontAsset _regular;
             [SerializeField] private TMP_FontAsset _bold;
-            [SerializeField, Tooltip("폰트 설계 크기(px). 글자 크기는 이 값의 정수 배만 쓴다")] private int _designSize = 12;
 
             public FontValues() { }
 
-            public FontValues(TMP_FontAsset regular, TMP_FontAsset bold, int designSize)
+            public FontValues(TMP_FontAsset regular, TMP_FontAsset bold)
             {
                 _regular = regular;
                 _bold = bold;
-                _designSize = designSize;
             }
 
             public TMP_FontAsset Regular => _regular;
             public TMP_FontAsset Bold => _bold;
-            public int DesignSize => _designSize;
+        }
+
+        [Serializable]
+        public sealed class TopLeftValues
+        {
+            [SerializeField, Tooltip("화면 왼쪽·위 모서리 여백 (임시값, UI_SPEC 5-4)")] private int _margin = 8;
+            [SerializeField, Min(1), Tooltip("책·가방 아이콘 확대 배수 (정수 배만, 16px 아이콘 × 이 값)")] private int _iconScale = 2;
+            [SerializeField, Tooltip("책 아이콘과 가방 아이콘 사이")] private int _iconGap = 4;
+            [SerializeField, Tooltip("아이콘 줄과 의뢰 바 사이")] private int _barGap = 4;
+            [SerializeField, Tooltip("의뢰 바 가로 길이 (고정, 10-2)")] private int _barWidth = 144;
+            [SerializeField, Tooltip("의뢰 바 제목 글자 위아래 여백. 바 높이 = 글자 줄 높이 + 여백 × 2")] private int _barPaddingY = 3;
+            [SerializeField, Tooltip("바 왼쪽·오른쪽 끝에서 화살표·X 버튼까지")] private int _barButtonInset = 5;
+            [SerializeField, Tooltip("버튼과 제목 글자 사이")] private int _barTitleGap = 4;
+
+            public int Margin => _margin;
+            public int IconScale => Mathf.Max(1, _iconScale);
+            public int IconGap => _iconGap;
+            public int BarGap => _barGap;
+            public int BarWidth => _barWidth;
+            public int BarPaddingY => _barPaddingY;
+            public int BarButtonInset => _barButtonInset;
+            public int BarTitleGap => _barTitleGap;
         }
 
         [SerializeField] private CanvasValues _canvas = new CanvasValues();
         [SerializeField] private LayerValues _layers = new LayerValues();
         [SerializeField] private ModalValues _modal = new ModalValues();
         [SerializeField] private FontValues _fonts = new FontValues();
+        [SerializeField] private TopLeftValues _topLeft = new TopLeftValues();
         [SerializeField, Tooltip("화면 문구 표(키 → 문장)")] private TextTable _texts;
         [SerializeField] private List<TextStyleValues> _textStyles = new List<TextStyleValues>();
         [SerializeField] private List<ButtonSkinValues> _buttons = new List<ButtonSkinValues>();
@@ -82,6 +102,7 @@ namespace VoxelMagic.UI
         public LayerValues Layers => _layers;
         public ModalValues Modal => _modal;
         public FontValues Fonts => _fonts;
+        public TopLeftValues TopLeft => _topLeft;
         public ITextSource Texts => _texts;
 
         public TextStyleValues TextStyle(UiTextStyle id) => _textStyles.Find(s => s.Id == id);
@@ -96,12 +117,30 @@ namespace VoxelMagic.UI
             foreach (var p in panels) if (Panel(p.Id) == null) _panels.Add(p);
         }
 
-        public void SetFonts(TMP_FontAsset regular, TMP_FontAsset bold, int designSize) => _fonts = new FontValues(regular, bold, designSize);
+        public void SetFonts(TMP_FontAsset regular, TMP_FontAsset bold) => _fonts = new FontValues(regular, bold);
         public void SetTexts(TextTable texts) => _texts = texts;
 
         /// <summary>인스펙터에서 값을 바꾸면 이 테마를 쓰는 화면이 다시 적용한다(에디터 미리보기용).</summary>
         public event Action Changed;
 
-        private void OnValidate() => Changed?.Invoke();
+        // 문구 표를 고쳐도 화면이 바로 다시 그려지도록 테마 변경으로 넘겨 준다.
+        private void OnEnable()
+        {
+            if (_texts != null) _texts.Changed += RaiseChanged;
+        }
+
+        private void OnDisable()
+        {
+            if (_texts != null) _texts.Changed -= RaiseChanged;
+        }
+
+        private void OnValidate()
+        {
+            OnDisable();
+            OnEnable();
+            RaiseChanged();
+        }
+
+        private void RaiseChanged() => Changed?.Invoke();
     }
 }

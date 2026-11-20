@@ -35,6 +35,9 @@ namespace VoxelMagic.Core
 
         private Dictionary<string, string> _lookup;
 
+        /// <summary>문구가 바뀌었을 때 (에디터에서 고쳐도 화면이 바로 다시 그려지게).</summary>
+        public event Action Changed;
+
         public IReadOnlyList<Entry> Entries => _entries;
 
         public string Get(string key) => TryGet(key, out var text) ? text : "#" + key;
@@ -53,9 +56,14 @@ namespace VoxelMagic.Core
             if (index >= 0) _entries[index] = new Entry(key, text);
             else _entries.Add(new Entry(key, text));
             _lookup = null;
+            Changed?.Invoke();
         }
 
-        private void OnValidate() => _lookup = null;
+        private void OnValidate()
+        {
+            _lookup = null;
+            Changed?.Invoke();
+        }
 
         private void BuildLookup()
         {

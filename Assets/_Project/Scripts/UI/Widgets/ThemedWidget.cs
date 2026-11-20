@@ -14,27 +14,50 @@ namespace VoxelMagic.UI
         public void SetTheme(UiTheme theme)
         {
             if (_theme == theme) return;
-            if (isActiveAndEnabled && _theme != null) _theme.Changed -= ApplyTheme;
+            if (isActiveAndEnabled && _theme != null) _theme.Changed -= RequestApply;
             _theme = theme;
-            if (isActiveAndEnabled && _theme != null) _theme.Changed += ApplyTheme;
+            if (isActiveAndEnabled && _theme != null) _theme.Changed += RequestApply;
             ApplyTheme();
         }
 
         protected virtual void OnEnable()
         {
-            if (_theme != null) _theme.Changed += ApplyTheme;
+            if (_theme != null) _theme.Changed += RequestApply;
             ApplyTheme();
         }
 
         protected virtual void OnDisable()
         {
-            if (_theme != null) _theme.Changed -= ApplyTheme;
+            if (_theme != null) _theme.Changed -= RequestApply;
         }
 
         protected virtual void OnValidate()
         {
-            if (isActiveAndEnabled) ApplyTheme();
+            if (isActiveAndEnabled) RequestApply();
         }
+
+        // 인스펙터에서 값을 바꾸는 순간(OnValidate 안)에는 RectTransform을 바꿀 수 없어서, 에디터에서는 한 박자 뒤에 적용한다.
+        private void RequestApply()
+        {
+#if UNITY_EDITOR
+            if (!Application.isPlaying)
+            {
+                if (_applyQueued) return;
+                _applyQueued = true;
+                UnityEditor.EditorApplication.delayCall += () =>
+                {
+                    _applyQueued = false;
+                    if (this != null && isActiveAndEnabled) ApplyTheme();
+                };
+                return;
+            }
+#endif
+            ApplyTheme();
+        }
+
+#if UNITY_EDITOR
+        private bool _applyQueued;
+#endif
 
         public void ApplyTheme()
         {

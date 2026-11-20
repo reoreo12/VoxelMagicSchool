@@ -40,6 +40,9 @@ namespace VoxelMagic.UI
             UpdateBlocker();
         }
 
+        /// <summary>이 화면이 만들어져 있는지 (아직 없는 화면을 열어 빈 채로 시간만 멈추는 일을 막는다).</summary>
+        public bool HasScreen(GameScreen id) => _screens.ContainsKey(id);
+
         private void OnDestroy()
         {
             if (_stack == null) return;

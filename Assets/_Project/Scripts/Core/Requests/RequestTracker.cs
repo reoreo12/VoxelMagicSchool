@@ -5,7 +5,7 @@ using System.Linq;
 
 namespace VoxelMagic.Core
 {
-    public sealed class RequestTracker
+    public sealed class RequestTracker : IAcceptedRequestList
     {
         private readonly List<RequestDefinition> _catalog;
         private readonly HashSet<RequestDefinition> _completed = new HashSet<RequestDefinition>();
@@ -18,6 +18,7 @@ namespace VoxelMagic.Core
         public event Action<RequestDefinition> ActiveChanged;
         public event Action ProgressChanged;
         public event Action<DeliveryReport> Completed;
+        public event Action AcceptedListChanged;
 
         public RequestTracker(IEnumerable<RequestDefinition> catalog, Inventory inventory, ScoreBook scoreBook,
             MaterialJournal journal, int newItemKindBonus)
@@ -28,12 +29,15 @@ namespace VoxelMagic.Core
             _journal = journal;
             _newItemKindBonus = newItemKindBonus;
             _inventory.SlotChanged += _ => RefreshProgress();
+            ActiveChanged += _ => AcceptedListChanged?.Invoke();
         }
 
         public IReadOnlyList<RequestDefinition> Catalog => _catalog;
         public IEnumerable<RequestDefinition> CompletedRequests => _completed;
         public RequestDefinition Active { get; private set; }
         public bool HasActive => Active != null;
+        /// <summary>지금 규칙은 한 번에 하나만 수락한다 (UI는 개수 제한이 없다고 가정하고 만든다).</summary>
+        public int AcceptedCount => HasActive ? 1 : 0;
         public IReadOnlyList<RequirementProgress> Progress => _progress;
         public bool IsReadyToDeliver => HasActive && _progress.All(p => p.IsMet);
 

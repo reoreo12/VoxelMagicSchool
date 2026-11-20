@@ -13,7 +13,11 @@ namespace VoxelMagic.EditorTools
         {
             font.name = Path.GetFileNameWithoutExtension(assetPath);
             var replace = File.Exists(assetPath);
-            var savePath = replace ? Path.ChangeExtension(assetPath, null) + " (Baking).asset" : assetPath;
+            // 덮어쓸 때는 옆의 임시 폴더에 같은 파일 이름으로 먼저 저장한다(이름이 달라 생기는 경고 방지).
+            var folder = Path.GetDirectoryName(assetPath).Replace('\\', '/');
+            var bakingFolder = folder + "/_Baking";
+            var savePath = replace ? $"{bakingFolder}/{Path.GetFileName(assetPath)}" : assetPath;
+            if (replace && !AssetDatabase.IsValidFolder(bakingFolder)) AssetDatabase.CreateFolder(folder, "_Baking");
 
             Directory.CreateDirectory(Path.GetDirectoryName(assetPath));
             AssetDatabase.CreateAsset(font, savePath);
@@ -26,12 +30,15 @@ namespace VoxelMagic.EditorTools
             }
             font.material.name = font.name + " Material";
             if (!AssetDatabase.Contains(font.material)) AssetDatabase.AddObjectToAsset(font.material, font);
+            // 서브 에셋을 붙이며 이름이 바뀌지 않도록 최종 이름을 한 번 더 넣고 저장한다.
+            font.name = Path.GetFileNameWithoutExtension(assetPath);
+            EditorUtility.SetDirty(font);
             AssetDatabase.SaveAssets();
 
             if (replace)
             {
                 File.Copy(savePath, assetPath, true);
-                AssetDatabase.DeleteAsset(savePath);
+                AssetDatabase.DeleteAsset(bakingFolder);
                 AssetDatabase.ImportAsset(assetPath, ImportAssetOptions.ForceUpdate);
             }
 

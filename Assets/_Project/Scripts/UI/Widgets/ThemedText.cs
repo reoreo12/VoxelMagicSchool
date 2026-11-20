@@ -23,6 +23,14 @@ namespace VoxelMagic.UI
             Label.SetText(text);
         }
 
+        public UiTextStyle Style => _style;
+
+        public void SetStyle(UiTextStyle style)
+        {
+            _style = style;
+            ApplyTheme();
+        }
+
         public void SetKey(string key)
         {
             _textKey = key;
@@ -42,6 +50,8 @@ namespace VoxelMagic.UI
                 label.color = style.Color;
                 label.enableAutoSizing = false;
                 label.fontStyle = FontStyles.Normal;
+                // TMP 띄어쓰기 단위는 글자 크기의 1/100이라 px로 바꿔 넣는다(정수 px가 되도록 테마에서 px로 받음).
+                label.wordSpacing = style.ExtraWordSpacingPx * 100f / Mathf.Max(1, label.fontSize);
             }
             if (!string.IsNullOrEmpty(_textKey) && theme.Texts != null) SetText(theme.Texts.Get(_textKey));
         }

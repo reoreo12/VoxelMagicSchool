@@ -30,6 +30,9 @@ namespace VoxelMagic.EditorTools
                 new PixelFontSet.Entry(Load("Galmuri11-Bold.ttf"), "Galmuri11 Bold", 12),
                 new PixelFontSet.Entry(Load("PF스타더스트 3.0.ttf"), "Stardust3", 13),
                 new PixelFontSet.Entry(Load("PF스타더스트 3.0 Bold.ttf"), "Stardust3 Bold", 13),
+                // 2026-11-20 측정: 갈무리9는 10px, 갈무리7은 8px에서 격자에 맞는다(작은 글씨용, Bold 없음).
+                new PixelFontSet.Entry(Load("Galmuri9.ttf"), "Galmuri9", 10),
+                new PixelFontSet.Entry(Load("Galmuri7.ttf"), "Galmuri7", 8),
             });
             AssetDatabase.CreateAsset(set, SetPath);
             AssetDatabase.SaveAssets();

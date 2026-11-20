@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: UiTheme
   m_EditorClassIdentifier: 
   _canvas:
-    _referenceHeight: 360
+    _referenceHeight: 480
     _referencePixelsPerUnit: 16
     _minScale: 1
   _layers:
@@ -27,21 +27,53 @@ MonoBehaviour:
   _fonts:
     _regular: {fileID: 11400000, guid: 9fa631a826f3f41498165906aae102ed, type: 2}
     _bold: {fileID: 11400000, guid: 58250c39abc89aa4e81cc7157b9ae992, type: 2}
-    _designSize: 12
+  _topLeft:
+    _margin: 8
+    _iconScale: 2
+    _iconGap: 4
+    _barGap: 4
+    _barWidth: 144
+    _barPaddingY: 3
+    _barButtonInset: 5
+    _barTitleGap: 4
   _texts: {fileID: 11400000, guid: 352cc08e03e545b4c8f802b1ffd4165f, type: 2}
   _textStyles:
   - _id: 0
     _bold: 0
+    _fontOverride: {fileID: 0}
     _sizeMultiplier: 1
     _color: {r: 0.36078432, g: 0.25490198, b: 0.15686275, a: 1}
+    _extraWordSpacingPx: 0
   - _id: 1
     _bold: 1
+    _fontOverride: {fileID: 0}
     _sizeMultiplier: 1
     _color: {r: 0.36078432, g: 0.25490198, b: 0.15686275, a: 1}
+    _extraWordSpacingPx: 0
   - _id: 2
     _bold: 1
+    _fontOverride: {fileID: 0}
     _sizeMultiplier: 1
     _color: {r: 0.36078432, g: 0.25490198, b: 0.15686275, a: 1}
+    _extraWordSpacingPx: 0
+  - _id: 3
+    _bold: 0
+    _fontOverride: {fileID: 11400000, guid: 86c53de135500264886434858a2e1777, type: 2}
+    _sizeMultiplier: 1
+    _color: {r: 0.36078432, g: 0.25490198, b: 0.15686275, a: 1}
+    _extraWordSpacingPx: 0
+  - _id: 4
+    _bold: 0
+    _fontOverride: {fileID: 11400000, guid: e3db84c7608d41e4c90cde92a90f4b58, type: 2}
+    _sizeMultiplier: 1
+    _color: {r: 0.36078432, g: 0.25490198, b: 0.15686275, a: 1}
+    _extraWordSpacingPx: 0
+  - _id: 5
+    _bold: 1
+    _fontOverride: {fileID: 0}
+    _sizeMultiplier: 1
+    _color: {r: 0.36078432, g: 0.25490198, b: 0.15686275, a: 1}
+    _extraWordSpacingPx: 2
   _buttons:
   - _id: 0
     _normal: {fileID: 21300000, guid: e661cc30ab37247419140ce4d3323739, type: 3}
