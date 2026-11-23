@@ -46,6 +46,13 @@ namespace VoxelMagic.Core
         /// <summary>지금 규칙은 한 번에 하나만 수락한다 (UI는 개수 제한이 없다고 가정하고 만든다).</summary>
         public int AcceptedCount => HasActive ? 1 : 0;
         public IReadOnlyList<AcceptedRequestEntry> Accepted => _entries;
+
+        public int ExpectedReward(AcceptedRequestEntry entry)
+        {
+            if (entry?.Request == null) return 0;
+            int newKinds = entry.Request.Requirements.Select(r => r.Item).Distinct().Count(item => item != null && !_journal.HasDelivered(item));
+            return ScoreCalculator.RequestReward(entry.Request.BaseReward, newKinds, _newItemKindBonus);
+        }
         public IReadOnlyList<RequirementProgress> Progress => _progress;
         public bool IsReadyToDeliver => HasActive && _progress.All(p => p.IsMet);
 

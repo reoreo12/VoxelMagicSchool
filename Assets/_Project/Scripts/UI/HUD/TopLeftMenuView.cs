@@ -12,10 +12,12 @@ namespace VoxelMagic.UI
         [SerializeField, Tooltip("열 화면이 만들어져 있는지 확인용")] private UiScreenRouter _router;
 
         private ScreenStack _screens;
+        private BookState _bookState;
 
         public void Bind(GameContext context)
         {
             _screens = context.Screens;
+            _bookState = context.Book;
             _book.Button.onClick.AddListener(() => OpenIfReady(GameScreen.Book));
             _bag.Button.onClick.AddListener(() => OpenIfReady(GameScreen.Inventory));
         }
@@ -28,6 +30,7 @@ namespace VoxelMagic.UI
                 Debug.Log($"[UI] {screen} 화면은 아직 만들어지지 않았습니다.");
                 return;
             }
+            if (screen == GameScreen.Book) _bookState?.PrepareForIcon(); // 책 아이콘은 마지막에 직접 고른 탭으로(5-2)
             _screens.Open(screen);
         }
 

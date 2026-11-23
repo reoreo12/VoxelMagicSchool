@@ -23,6 +23,8 @@ namespace VoxelMagic.Core
         public TimePause Pause { get; private set; }
         public ScreenStack Screens { get; private set; }
         public HudState Hud { get; private set; }
+        /// <summary>책(메뉴) 화면의 탭·먼저 보여 줄 의뢰.</summary>
+        public BookState Book { get; private set; }
         /// <summary>마력·기력(UI 상태 바가 읽음). 규칙 쪽 모델이 생기면 SetVitals로 연결한다. 없으면 null.</summary>
         public IPlayerVitals Vitals { get; private set; }
         /// <summary>날짜·시각(UI 시간대 HUD가 읽음). 게임 시계가 생기면 SetTime으로 연결한다. 없으면 null.</summary>
@@ -58,6 +60,7 @@ namespace VoxelMagic.Core
             context.Pause = new TimePause();
             context.Screens = new ScreenStack(context.Pause);
             context.Hud = new HudState();
+            context.Book = new BookState();
             context.Farm = new FarmService(context.FarmGrid, context.Inventory, random, context.Messages);
             context.Fishing = new FishingSession(fishing, context.Inventory, random, context.Messages,
                 balance.AcquiredInfoSeconds);

@@ -1,5 +1,6 @@
-// 테마 안의 하단 HUD 값: 퀵슬롯(UI_SPEC 7-1)과 세로 상태 바(7-2). 숫자는 임시값이며 사용자 피드백으로 조정한다.
+// 테마 안의 HUD·화면 값 묶음: 퀵슬롯·상태 바·점수·시간대·의뢰 목록·알림·툴팁·책. 숫자는 임시값이며 사용자 피드백으로 조정한다.
 using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace VoxelMagic.UI
@@ -193,6 +194,128 @@ namespace VoxelMagic.UI
         public UiTextStyle TextStyle => _textStyle;
     }
 
+    /// <summary>책(메뉴) 화면(UI_SPEC 5장): 왼쪽 페이지 + 책등 + 오른쪽 페이지, 오른쪽 가장자리에 사이드 탭. 크기는 화면 960×540 기준 px.</summary>
+    [System.Serializable]
+    public sealed class BookValues
+    {
+        [SerializeField, Tooltip("페이지 한 장 크기 (두 장 같음). 책 폭 = 페이지 × 2 + 책등 (임시, 프리뷰 비율)")] private Vector2Int _pageSize = new Vector2Int(220, 300);
+        [SerializeField, Tooltip("페이지 가장자리에서 내용까지")] private int _contentInset = 16;
+        [SerializeField, Tooltip("책 위 끝에서 첫 탭까지")] private int _firstTabY = 12;
+        [SerializeField, Tooltip("탭 사이 간격 (탭 높이 + 2)")] private int _tabStep = 34;
+        [SerializeField, Tooltip("탭 왼쪽이 표지 아래로 들어가는 폭 (5-1)")] private int _tabTuck = 4;
+        [SerializeField, Tooltip("탭 크기: 평상시 (9-slice로 늘려 외곽선은 1px 그대로, 원본 20×20)")] private Vector2Int _tabSize = new Vector2Int(37, 32);
+        [SerializeField, Tooltip("탭 크기: 선택 (평상시보다 4 더 튀어나옴, 원본 24×20)")] private Vector2Int _tabSelectedSize = new Vector2Int(41, 32);
+        [SerializeField, Min(1), Tooltip("탭 아이콘 배수 (12×12 × 정수 배)")] private int _tabIconScale = 2;
+        [SerializeField, Tooltip("탭 그림 외곽선 두께. 아이콘은 표지 밖으로 보이는 안쪽 칸의 가운데에 둔다")] private int _tabOutline = 1;
+        [SerializeField, Tooltip("구분선 색")] private Color _lineColor = new Color32(191, 160, 112, 255);
+        [SerializeField] private Sprite _pageLeft;
+        [SerializeField] private Sprite _pageRight;
+        [SerializeField] private Sprite _spine;
+        [SerializeField, Tooltip("탭마다 색 스프라이트와 아이콘 (위에서 아래 순서는 BookTab 순서)")] private List<BookTabValues> _tabs = new List<BookTabValues>();
+
+        [Header("페이지 넘김 (5-3)")]
+        [SerializeField, Min(0.001f), Tooltip("한 프레임 시간(초, 시간 정지와 무관). 9프레임 × 0.045 ≈ 0.4초")] private float _turnFrameSeconds = 0.045f;
+        [SerializeField, Min(1), Tooltip("프레임 수 k = 0 ~ n−1, p = (k+1)/(n+1)")] private int _turnFrames = 9;
+        [SerializeField, Tooltip("페이지 표지 테두리 두께: 넘어가는 종이는 이 안쪽을 덮는다")] private int _paperInset = 4;
+        [SerializeField, Tooltip("가장 많이 들어 올리는 높이(px) = round(이 값 × sin(πp))")] private int _turnLift = 4;
+        [SerializeField, Tooltip("폭 비율이 이 값 이상이면 leaf_0")] private float _leafFlatRatio = 0.8f;
+        [SerializeField, Tooltip("폭 비율이 이 값 이상이면 leaf_1, 아래면 leaf_2")] private float _leafCurveRatio = 0.45f;
+        [SerializeField] private Sprite[] _leaves = new Sprite[3];
+        [SerializeField] private Sprite _leafEdge;
+        [SerializeField] private Sprite _turnShadow;
+
+        [Header("의뢰 탭")]
+        [SerializeField, Tooltip("목록 한 칸 높이")] private int _rowHeight = 22;
+        [SerializeField, Tooltip("칸 안 글자 왼쪽 여백")] private int _rowTextInset = 5;
+        [SerializeField, Tooltip("머리(수락한 의뢰(n)) 아래 구분선까지")] private int _headerGap = 4;
+        [SerializeField, Tooltip("체크 상자와 글자 사이")] private int _checkboxGap = 4;
+        [SerializeField, Tooltip("본문 제목 → 대사 사이")] private int _titleGap = 6;
+        [SerializeField, Tooltip("본문 묶음 사이 (대사 → 재료 → 보상)")] private int _sectionGap = 10;
+        [SerializeField, Tooltip("재료 줄 들여쓰기")] private int _requirementIndent = 8;
+        [SerializeField, Tooltip("'보상'과 값 사이")] private int _rewardGap = 8;
+        [SerializeField] private Sprite _checkboxOn;
+        [SerializeField] private Sprite _checkboxOnHover;
+        [SerializeField] private Sprite _checkboxOff;
+        [SerializeField] private Sprite _checkboxOffHover;
+
+        public Vector2Int PageSize => _pageSize;
+        public int ContentInset => _contentInset;
+        public int FirstTabY => _firstTabY;
+        public int TabStep => _tabStep;
+        public int TabTuck => _tabTuck;
+        public Vector2Int TabSize(bool selected) => selected ? _tabSelectedSize : _tabSize;
+        public int TabIconScale => Mathf.Max(1, _tabIconScale);
+        public int TabOutline => Mathf.Max(0, _tabOutline);
+        public Color LineColor => _lineColor;
+        public Sprite PageLeft => _pageLeft;
+        public Sprite PageRight => _pageRight;
+        public Sprite Spine => _spine;
+        public int SpineWidth => _spine != null ? Mathf.RoundToInt(_spine.rect.width) : 8;
+        public BookTabValues Tab(VoxelMagic.Core.BookTab id) => _tabs.Find(t => t.Id == id);
+        public float TurnFrameSeconds => Mathf.Max(0.001f, _turnFrameSeconds);
+        public int TurnFrames => Mathf.Max(1, _turnFrames);
+        public int PaperInset => Mathf.Max(0, _paperInset);
+        public int TurnLift => _turnLift;
+        public Sprite LeafEdge => _leafEdge;
+        public Sprite TurnShadow => _turnShadow;
+        /// <summary>폭 비율에 맞는 넘어가는 종이 모양 (평평 → 휘어짐 → 많이 휘어짐).</summary>
+        public Sprite Leaf(float ratio)
+        {
+            int index = ratio >= _leafFlatRatio ? 0 : ratio >= _leafCurveRatio ? 1 : 2;
+            return _leaves != null && index < _leaves.Length ? _leaves[index] : null;
+        }
+
+        public void SetTurnSprites(Sprite[] leaves, Sprite edge, Sprite shadow)
+        {
+            _leaves = leaves;
+            _leafEdge = edge;
+            _turnShadow = shadow;
+        }
+        public int RowHeight => _rowHeight;
+        public int RowTextInset => _rowTextInset;
+        public int HeaderGap => _headerGap;
+        public int CheckboxGap => _checkboxGap;
+        public int TitleGap => _titleGap;
+        public int SectionGap => _sectionGap;
+        public int RequirementIndent => _requirementIndent;
+        public int RewardGap => _rewardGap;
+        public Sprite Checkbox(bool on, bool hover) => on ? (hover && _checkboxOnHover != null ? _checkboxOnHover : _checkboxOn) : (hover && _checkboxOffHover != null ? _checkboxOffHover : _checkboxOff);
+
+        public void SetSprites(Sprite left, Sprite right, Sprite spine, IEnumerable<BookTabValues> tabs, Sprite[] checkbox)
+        {
+            _pageLeft = left;
+            _pageRight = right;
+            _spine = spine;
+            _tabs = new List<BookTabValues>(tabs);
+            _checkboxOn = checkbox[0];
+            _checkboxOnHover = checkbox[1];
+            _checkboxOff = checkbox[2];
+            _checkboxOffHover = checkbox[3];
+        }
+    }
+
+    [System.Serializable]
+    public sealed class BookTabValues
+    {
+        [SerializeField] private VoxelMagic.Core.BookTab _id;
+        [SerializeField] private Sprite _normal;
+        [SerializeField] private Sprite _selected;
+        [SerializeField] private Sprite _icon;
+
+        public BookTabValues(VoxelMagic.Core.BookTab id, Sprite normal, Sprite selected, Sprite icon)
+        {
+            _id = id;
+            _normal = normal;
+            _selected = selected;
+            _icon = icon;
+        }
+
+        public VoxelMagic.Core.BookTab Id => _id;
+        public Sprite Normal => _normal;
+        public Sprite Selected => _selected;
+        public Sprite Icon => _icon;
+    }
+
     /// <summary>공용 툴팁(종이 바탕 + 글자 한 줄). 맨 위 Overlay 층에 하나만 둔다.</summary>
     [System.Serializable]
     public sealed class TooltipValues
@@ -235,6 +358,7 @@ namespace VoxelMagic.UI
 
         [Header("시계 연결 전 미리보기")]
         [SerializeField, Min(1)] private int _previewDay = 1;
+        [SerializeField, Min(1), Tooltip("플레이하는 날 수. 날짜 판 = D-(이 값 − 며칠째 + 1): 1일째 D-8 … 마지막 날 D-1. 게임 시계가 생기면 규칙 쪽 값으로 옮길 것")] private int _playDays = 8;
         [SerializeField, Range(0, 24)] private int _previewHour = 16;
 
         [Header("툴팁")]
@@ -260,6 +384,8 @@ namespace VoxelMagic.UI
         public Vector2Int PausedPosition => _pausedPosition;
         public UiTextStyle DateStyle => _dateStyle;
         public int PreviewDay => Mathf.Max(1, _previewDay);
+        /// <summary>며칠째 → 남은 날 n (D-n). 마지막 날이 1.</summary>
+        public int DaysLeft(int day) => Mathf.Max(0, Mathf.Max(1, _playDays) - day + 1);
         public int PreviewHour => _previewHour;
         public int NightStartHour => _nightStartHour;
         public Vector2Int TooltipOffset => _tooltipOffset;

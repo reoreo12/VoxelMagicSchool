@@ -1,5 +1,30 @@
 # 변경 기록
 
+## 2026-11-23 — 책 페이지 넘김 연출(5-3) + 탭 휠 전환
+- UI `BookPageTurner`: README 규칙 그대로 9프레임 × 45ms(unscaled), 폭 = round(W × |cos(πp)|)(W = 책등 가운데 ~ 반대편 표지 안쪽), 들어 올림 round(4 × sin(πp)), 폭 비율 0.8↑ leaf_0 / 0.45↑ leaf_1 / 그 아래 leaf_2, k=4 leaf_edge, 반대편은 Scale X −1. 그림자(shadow_strip)는 종이 바깥 가장자리에 붙이고 종이 안쪽(RectMask2D)에서 자름, k=4는 양쪽
+- `BookView`: 탭을 바꾸면 한 장씩 넘김. 앞으로(아래 탭)는 k=0에 오른쪽 내용·탭 선택 그림, k=8에 왼쪽 내용을 바꾸고 뒤로는 반대. 멀리 있는 탭은 이어서 넘기고 넘기는 중 입력은 마지막 탭만 목표로 남김. 책을 열 때는 넘기지 않고 바로 보임. `BookPage.SetHalves`로 왼쪽·오른쪽 내용을 따로 켜고 끔
+- 탭 위 휠(사용자 요청): 위 = 이전 탭, 아래 = 다음 탭, 양 끝에서 멈춤, 마지막 탭으로 기억(`BookTabView.Scrolled`)
+- 테마 `Book › 페이지 넘김`(프레임 시간·수, 표지 두께 4, 들어 올림 4, leaf 비율 경계, leaf·단면·그림자 스프라이트)
+- 확인(플레이 모드): 프레임별 종이·그림자 위치를 뽑아 실제 스프라이트로 그려 README 프리뷰와 같은 모양인지 확인, 휠 아래 1칸·끝에서 멈춤·위 1칸, 의뢰 → 설정까지 이어 넘긴 뒤 설정 페이지만 남음. Unity 창이 포커스가 없을 때는 게임 화면이 다시 그려지지 않아 움직임은 캡처로 못 봄 → 사용자 확인 필요
+
+## 2026-11-20 — (b) 책 화면 틀 + 의뢰 목록 탭 (자세히 패널 대신)
+- 사용자 결정: 자세히 패널(10-5) 대신 책의 맨 앞 탭 "의뢰 목록"에서 목록과 자세한 내용을 본다. 탭 순서 의뢰 목록 → 마법 스펠 → 마법진 → 환경 설정 → 나가기/종료 메뉴. 책은 프리뷰 비율로 크게(페이지 220×300 × 2 + 책등 8 = 448×300, 임시)
+- Core `BookState`(지금 탭·직접 고른 마지막 탭·먼저 보여 줄 의뢰)와 `GameContext.Book`. 책 아이콘 = 마지막으로 직접 고른 탭(처음 의뢰 목록), ESC(열린 화면 없음) = 메뉴 탭(마지막 탭으로 기억 안 함, 5-2 제안), HUD 의뢰 항목 = 의뢰 탭 + 그 의뢰
+- Core `HudState.IsQuestBarVisible`: 의뢰 바 X가 바·목록을 끄고, 책 의뢰 탭의 `화면에 의뢰 목록 표시` 체크 상자로 다시 켬(저장은 환경 설정 저장을 만들 때)
+- Core `IAcceptedRequestList.ExpectedReward`: 처음 납품하는 재료 보너스까지 포함한 필기 점수 예상값(규칙은 `ScoreCalculator`)
+- UI `BookScreen`·`BookView`(책 그림·사이드 탭 5개, 탭 아이콘 가운데 정렬)·`BookPage`(빈 페이지)·`QuestBookPage`(왼쪽: `수락한 의뢰(n)`, 구분선, 의뢰 버튼 목록 — 고른 칸 진한 종이 + 굵게, 완료 파란 글자, 넘치면 휠·스크롤바, 맨 아래 체크 상자 / 오른쪽: 제목·대사·필요한 재료·`보상 필기 점수 +n`)·`QuestBookRowView`·`ThemedCheckbox`
+- `UiTextWrap.ByWords`: 한글 대사를 낱말 단위로 줄바꿈(TMP 기본은 글자마다 끊어 "상식/이야"가 됨, 프로젝트 TMP 설정은 건드리지 않음)
+- 팝업 바깥(입력 막기 판)을 누르면 ESC처럼 맨 위 화면을 닫음(`UiRaycastBlocker.Clicked`)
+- 테마 `Book`(페이지 크기·여백·탭 위치·탭 색·아이콘·체크 상자·의뢰 탭 간격), 문구 `ui.book.quest.*`. 메뉴 `VoxelMagic/UI/화면 만들기/책`(UI_Root의 Popup 층)
+- 확인(Creature_Cave 1080p, 자동 저장 끔): 의뢰 항목 → 의뢰 탭 + 그 의뢰(timeScale 0), ESC → 메뉴 탭, 바깥 클릭 → 닫힘, 책 아이콘 → 처음 의뢰 탭·직접 고른 탭 기억, 체크 상자 ↔ 의뢰 바 숨김. EditMode 153개 통과
+- 사용자 피드백 반영: 사이드 탭을 9-slice로 키움(평상시 37×32, 선택 41×32, 외곽선 1px 그대로, 간격 34), 탭 아이콘 2배(24)로 표지 밖 안쪽 칸 가운데에. `화면에 의뢰 목록 표시` 글씨를 체크 상자 크기에 맞춰 `Small`(갈무리9 10px)로
+- 딤 켬: 팝업 뒤 입력 막기 판 색 = 검정 알파 0.6(테마 `Modal › Blocker Color`). 리니어 색 공간이라 0.45로는 약하게 보여 0.6으로(화면 밝기 약 65%)
+- 남은 것: 탭 전환 페이지 넘김 연출(5-3), 다른 탭 내용, 체크 상자 상태 저장
+
+## 2026-11-20 — 날짜 판 D-n, 완료 알림 X 수정
+- 버그: 완료 알림의 X가 눌리지 않았음. 알림이 있는 `HudAnimated` 층에 GraphicRaycaster가 없었음(연출 전용 층으로 만들었기 때문) → UI_Root의 `HudAnimated`에 추가, `UiRootPrefabBuilder`도 같게. 플레이 중 X 위치 레이캐스트가 `Close`에 맞고 다음 알림으로 넘어가는 것 확인
+- 사용자 결정: 8일 플레이, 날짜 판은 `D-{n}`(문구 `ui.time.day`). n = 플레이 날 수 − 며칠째 + 1 → 1일째 D-8 … 마지막 날 D-1. 날 수는 테마 `Time › Play Days`(8), 게임 시계가 생기면 규칙 쪽 값으로 옮길 것
+
 ## 2026-11-20 — 외곽선 v2 비교 (책·가방 버튼, 점수 숫자·밑줄)
 - 사용자 외곽선 그림: `menu_icons/buttons/btn_{book,bag}_{normal,hover,pressed}_v2.png`(20×20), `score_ui/v2/digits/score_digit_N_v2.png`(13×14), `score_ui/underline/score_underline_N_v2.png`·`score_ui/v2/underline/score_underline_N_v2.png`(가로세로 +2)
 - 메뉴 `VoxelMagic/UI/외곽선 버전/외곽선 v2 쓰기`·`원본 쓰기`: 테마의 버튼·숫자·밑줄 스프라이트와 `Scores › Outline Px`(0/1)만 바꿈

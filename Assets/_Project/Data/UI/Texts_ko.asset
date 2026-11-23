@@ -26,7 +26,7 @@ MonoBehaviour:
   - _key: ui.time.tooltip
     _text: '{0} {1}:00'
   - _key: ui.time.day
-    _text: "{0}\uC77C\uC9F8"
+    _text: D-{0}
   - _key: ui.time.paused
     _text: "\uBA48\uCDB0 \uC788\uC74C"
   - _key: ui.quest.toast
@@ -35,3 +35,13 @@ MonoBehaviour:
     _text: '{0} {1}/{2}'
   - _key: ui.quest.itemTitle
     _text: "\xB7 {0}"
+  - _key: ui.book.quest.showHud
+    _text: "\uD654\uBA74\uC5D0 \uC758\uB8B0 \uBAA9\uB85D \uD45C\uC2DC"
+  - _key: ui.book.quest.needs
+    _text: "\uD544\uC694\uD55C \uC7AC\uB8CC"
+  - _key: ui.book.quest.reward
+    _text: "\uBCF4\uC0C1"
+  - _key: ui.book.quest.rewardValue
+    _text: "\uD544\uAE30 \uC810\uC218 +{0}"
+  - _key: ui.book.quest.line
+    _text: "\u201C{0}\u201D"

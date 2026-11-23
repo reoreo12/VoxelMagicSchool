@@ -41,7 +41,8 @@ namespace VoxelMagic.Tools.EditorTools.UiWorkbench
 
             CreateLayer(root.transform, UiLayer.HudStatic, theme, raycast: true);
             CreateLayer(root.transform, UiLayer.HudDynamic, theme, raycast: true);
-            CreateLayer(root.transform, UiLayer.HudAnimated, theme, raycast: false);
+            // 완료 알림의 X 버튼이 있어서 클릭을 받는다(입력 막기 판은 Popup 층이라 영향 없음).
+            CreateLayer(root.transform, UiLayer.HudAnimated, theme, raycast: true);
             var popup = CreateLayer(root.transform, UiLayer.Popup, theme, raycast: true);
             CreateLayer(root.transform, UiLayer.Overlay, theme, raycast: true);
 

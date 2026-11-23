@@ -15,7 +15,7 @@ namespace VoxelMagic.UI
         public const string TimeNight = "ui.time.night";
         /// <summary>"{0} {1}:00" — {0} 시간대 이름, {1} 두 자리 시 (8-1 툴팁, 분은 표시하지 않음)</summary>
         public const string TimeTooltip = "ui.time.tooltip";
-        /// <summary>"{0}일째" — 날짜 패널 (8-1 [미정], 임시)</summary>
+        /// <summary>"D-{0}" — 날짜 패널, {0} 남은 날 (8-1, 사용자 결정: 8일 플레이)</summary>
         public const string TimeDay = "ui.time.day";
         /// <summary>"멈춰 있음" — 개발 빌드에서만 (8-2)</summary>
         public const string TimePaused = "ui.time.paused";
@@ -25,5 +25,15 @@ namespace VoxelMagic.UI
         public const string QuestRequirement = "ui.quest.requirement";
         /// <summary>"· {0}" — 목록 항목의 의뢰 제목 앞 항목 기호 (사용자 요청)</summary>
         public const string QuestItemTitle = "ui.quest.itemTitle";
+        /// <summary>"화면에 의뢰 목록 표시" — 책 의뢰 탭의 토글 (10-1)</summary>
+        public const string BookQuestShowHud = "ui.book.quest.showHud";
+        /// <summary>"필요한 재료" — 책 의뢰 탭 본문</summary>
+        public const string BookQuestNeeds = "ui.book.quest.needs";
+        /// <summary>"보상"</summary>
+        public const string BookQuestReward = "ui.book.quest.reward";
+        /// <summary>"필기 점수 +{0}"</summary>
+        public const string BookQuestRewardValue = "ui.book.quest.rewardValue";
+        /// <summary>"“{0}”" — 크리처 대사 따옴표</summary>
+        public const string BookQuestLine = "ui.book.quest.line";
     }
 }

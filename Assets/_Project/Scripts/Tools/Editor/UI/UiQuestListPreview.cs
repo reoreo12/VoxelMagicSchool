@@ -62,6 +62,7 @@ namespace VoxelMagic.Tools.EditorTools.UiWorkbench
             public readonly List<AcceptedRequestEntry> Entries = new List<AcceptedRequestEntry>();
             public int AcceptedCount => Entries.Count;
             public IReadOnlyList<AcceptedRequestEntry> Accepted => Entries;
+            public int ExpectedReward(AcceptedRequestEntry entry) => 10;
             public event Action AcceptedListChanged { add { } remove { } }
             public event Action<AcceptedRequestEntry> RequestBecameComplete { add { } remove { } }
         }

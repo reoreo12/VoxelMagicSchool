@@ -1,5 +1,5 @@
 // 수락한 의뢰 드롭다운 바(UI_SPEC 10-1). 왼쪽 화살표로 목록을 즉시 펼치고 접으며(아래 ↔ 위 화살표), "수락한 의뢰 (n)"을 보여 준다.
-// 오른쪽 X는 환경 설정 페이지가 생길 때까지 기능 없이 아이콘만 둔다(13장). 바는 시간을 멈추지 않는다. 위치는 책·가방 아이콘 줄 아래.
+// 오른쪽 X는 바와 목록을 끄고, 책 의뢰 탭의 토글로 다시 켠다(10-1). 바는 시간을 멈추지 않는다. 위치는 책·가방 아이콘 줄 아래.
 using UnityEngine;
 using VoxelMagic.Core;
 
@@ -23,7 +23,10 @@ namespace VoxelMagic.UI
             _requests.AcceptedListChanged += RefreshTitle;
             _hud.QuestListToggled += OnToggled;
             _arrow.Button.onClick.AddListener(_hud.ToggleQuestList);
-            // _close: 바 전체 끄기는 환경 설정의 "의뢰 목록 표시" 토글과 함께 붙인다(10-1).
+            // X: 바(와 목록) 전체를 끈다. 다시 켜기는 책 의뢰 탭의 "화면에 의뢰 목록 표시"(10-1).
+            _close.Button.onClick.AddListener(() => _hud.SetQuestBarVisible(false));
+            _hud.QuestBarVisibilityChanged += OnBarVisibility;
+            OnBarVisibility(_hud.IsQuestBarVisible);
             RefreshArrow();
             RefreshTitle();
         }
@@ -33,9 +36,15 @@ namespace VoxelMagic.UI
         {
             if (_requests != null) _requests.AcceptedListChanged -= RefreshTitle;
             if (_hud != null) _hud.QuestListToggled -= OnToggled;
+            if (_hud != null) _hud.QuestBarVisibilityChanged -= OnBarVisibility;
         }
 
         private void OnToggled(bool _) => RefreshArrow();
+
+        private void OnBarVisibility(bool visible)
+        {
+            if (gameObject.activeSelf != visible) gameObject.SetActive(visible);
+        }
 
         private void RefreshArrow()
         {

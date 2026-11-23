@@ -66,7 +66,7 @@ namespace VoxelMagic.Tools.EditorTools.UiWorkbench
             Seed(UiTextKeys.TimeAfterSchool, "방과후");
             Seed(UiTextKeys.TimeNight, "밤");
             Seed(UiTextKeys.TimeTooltip, "{0} {1}:00");
-            Seed(UiTextKeys.TimeDay, "{0}일째");
+            Seed(UiTextKeys.TimeDay, "D-{0}");
             Seed(UiTextKeys.TimePaused, "멈춰 있음");
             EditorUtility.SetDirty(table);
             AssetDatabase.SaveAssets();

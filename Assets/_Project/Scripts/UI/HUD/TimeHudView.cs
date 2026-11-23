@@ -106,7 +106,7 @@ namespace VoxelMagic.UI
             var values = Theme.Time;
             SetSprite(_icon, values.Icon(night), values.IconPosition);
             _arrow.rectTransform.localRotation = Quaternion.Euler(0f, 0f, values.ArrowAngle(hour));
-            if (_date != null && Theme.Texts != null) _date.SetText(string.Format(Theme.Texts.Get(UiTextKeys.TimeDay), day));
+            if (_date != null && Theme.Texts != null) _date.SetText(string.Format(Theme.Texts.Get(UiTextKeys.TimeDay), Theme.Time.DaysLeft(day)));
             if (_hovering) ShowTooltip(_pointer); // 시각이 바뀌면 떠 있는 툴팁 글자도 바꾼다
         }
 

@@ -100,6 +100,7 @@ namespace VoxelMagic.UI
         [SerializeField] private TooltipValues _tooltip = new TooltipValues();
         [SerializeField] private QuestListValues _questList = new QuestListValues();
         [SerializeField] private QuestToastValues _questToast = new QuestToastValues();
+        [SerializeField] private BookValues _book = new BookValues();
         [SerializeField, Tooltip("화면 문구 표(키 → 문장)")] private TextTable _texts;
         [SerializeField] private List<TextStyleValues> _textStyles = new List<TextStyleValues>();
         [SerializeField] private List<ButtonSkinValues> _buttons = new List<ButtonSkinValues>();
@@ -117,6 +118,7 @@ namespace VoxelMagic.UI
         public TooltipValues Tooltip => _tooltip;
         public QuestListValues QuestList => _questList;
         public QuestToastValues QuestToast => _questToast;
+        public BookValues Book => _book;
         public ITextSource Texts => _texts;
 
         public TextStyleValues TextStyle(UiTextStyle id) => _textStyles.Find(s => s.Id == id);

@@ -23,7 +23,7 @@ MonoBehaviour:
     _popup: 100
     _overlay: 200
   _modal:
-    _blockerColor: {r: 0, g: 0, b: 0, a: 0}
+    _blockerColor: {r: 0, g: 0, b: 0, a: 0.6}
   _fonts:
     _regular: {fileID: 11400000, guid: 9fa631a826f3f41498165906aae102ed, type: 2}
     _bold: {fileID: 11400000, guid: 58250c39abc89aa4e81cc7157b9ae992, type: 2}
@@ -70,11 +70,11 @@ MonoBehaviour:
     _groupGap: 24
     _labelGap: 4
     _writtenOffsets:
-      _group: {x: -17, y: 0}
+      _group: {x: -20, y: 0}
       _label: {x: -17, y: 10}
       _number: {x: 0, y: 0}
     _practicalOffsets:
-      _group: {x: 17, y: 0}
+      _group: {x: 20, y: 0}
       _label: {x: -17, y: 10}
       _number: {x: 0, y: 0}
     _numberScale: 2
@@ -126,6 +126,7 @@ MonoBehaviour:
     _boundaryAngle: 0
     _endAngle: -75
     _previewDay: 1
+    _playDays: 8
     _previewHour: 16
     _tooltipOffset: {x: -8, y: 12}
     _frame: {fileID: 952465741, guid: 455ad42b9a35d634b91e1fece7fc4f7d, type: 3}
@@ -158,6 +159,65 @@ MonoBehaviour:
     _showSeconds: 3
     _fadeSeconds: 0.4
     _textStyle: 0
+  _book:
+    _pageSize: {x: 220, y: 300}
+    _contentInset: 16
+    _firstTabY: 12
+    _tabStep: 34
+    _tabTuck: 4
+    _tabSize: {x: 37, y: 32}
+    _tabSelectedSize: {x: 41, y: 32}
+    _tabIconScale: 2
+    _tabOutline: 1
+    _lineColor: {r: 0.7490196, g: 0.627451, b: 0.4392157, a: 1}
+    _pageLeft: {fileID: 21300000, guid: 84e131e454bbcb84eaf7bf6d41c6aac4, type: 3}
+    _pageRight: {fileID: 21300000, guid: e2e7b8351e2b6c2449492d150259090c, type: 3}
+    _spine: {fileID: 21300000, guid: 42754a6d8e0a63246bb2d961218bb4d2, type: 3}
+    _tabs:
+    - _id: 0
+      _normal: {fileID: 21300000, guid: 1bd237d10c632d84ca25571cf615448f, type: 3}
+      _selected: {fileID: 21300000, guid: f584662445f5f06428cf7f843eafe048, type: 3}
+      _icon: {fileID: 21300000, guid: 2c38c33a6a414ad47b6d7397c12c18f5, type: 3}
+    - _id: 1
+      _normal: {fileID: 21300000, guid: 7922a63eddf81a042a12fdd0a7476b46, type: 3}
+      _selected: {fileID: 21300000, guid: 7821fb9876fdf344ca3cdb9ced76ff0c, type: 3}
+      _icon: {fileID: 21300000, guid: 4616561a5aa2b1645b6fc109b198ffdd, type: 3}
+    - _id: 2
+      _normal: {fileID: 21300000, guid: 5bb72606d485d704bb5314c7c5c00f06, type: 3}
+      _selected: {fileID: 21300000, guid: 822eae905b4c48d4cbce1fbdfb67458f, type: 3}
+      _icon: {fileID: 21300000, guid: 1f0cd6c367db4d94b845872dbdd6c901, type: 3}
+    - _id: 3
+      _normal: {fileID: 21300000, guid: 10ec10db09bffdd4c9c91a1ae5c9debc, type: 3}
+      _selected: {fileID: 21300000, guid: e3000d4025f72064fa9514d268220f8c, type: 3}
+      _icon: {fileID: 21300000, guid: 37933cba7de7d304285f68bc370716ea, type: 3}
+    - _id: 4
+      _normal: {fileID: 21300000, guid: e2d7bab3d1e7f6b429958787ef0b1f06, type: 3}
+      _selected: {fileID: 21300000, guid: 95b3675391c7308449a764b4ff939b4f, type: 3}
+      _icon: {fileID: 21300000, guid: da25fecd1ba793a47b2c485989ca6d6a, type: 3}
+    _turnFrameSeconds: 0.045
+    _turnFrames: 9
+    _paperInset: 4
+    _turnLift: 4
+    _leafFlatRatio: 0.8
+    _leafCurveRatio: 0.45
+    _leaves:
+    - {fileID: 21300000, guid: 4547bcf3564101248b2c7f214af98dc1, type: 3}
+    - {fileID: 21300000, guid: 5d00ce453c302ee4d8705c46b9501f0b, type: 3}
+    - {fileID: 21300000, guid: c178721b812ef4f46a2d1267b2a52e8f, type: 3}
+    _leafEdge: {fileID: 21300000, guid: 3877da92347511a46a531f42ce85deee, type: 3}
+    _turnShadow: {fileID: 21300000, guid: 6b202cb6e463c3548b30f3a674ce78a8, type: 3}
+    _rowHeight: 22
+    _rowTextInset: 5
+    _headerGap: 4
+    _checkboxGap: 4
+    _titleGap: 6
+    _sectionGap: 10
+    _requirementIndent: 8
+    _rewardGap: 8
+    _checkboxOn: {fileID: 21300000, guid: 54673e13af7ffe84999ecb849572806f, type: 3}
+    _checkboxOnHover: {fileID: 21300000, guid: d245453f3f0bd5f4c97ff8dde13ae73f, type: 3}
+    _checkboxOff: {fileID: 21300000, guid: 1bf8e0cc64158d84e8fbdb0ed1f69092, type: 3}
+    _checkboxOffHover: {fileID: 21300000, guid: 5fa9501c353bb554495016ed6df03d98, type: 3}
   _texts: {fileID: 11400000, guid: 352cc08e03e545b4c8f802b1ffd4165f, type: 2}
   _textStyles:
   - _id: 0

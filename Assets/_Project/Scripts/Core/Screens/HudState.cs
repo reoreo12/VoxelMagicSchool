@@ -24,5 +24,17 @@ namespace VoxelMagic.Core
         public bool IsPointerOverScrollHud { get; private set; }
 
         public void SetPointerOverScrollHud(bool over) => IsPointerOverScrollHud = over;
+
+        /// <summary>의뢰 드롭다운 바(와 목록)를 화면에 보일지. 바의 X로 끄고 책 의뢰 탭의 토글로 다시 켠다(10-1).</summary>
+        public bool IsQuestBarVisible { get; private set; } = true;
+
+        public event Action<bool> QuestBarVisibilityChanged;
+
+        public void SetQuestBarVisible(bool visible)
+        {
+            if (IsQuestBarVisible == visible) return;
+            IsQuestBarVisible = visible;
+            QuestBarVisibilityChanged?.Invoke(visible);
+        }
     }
 }

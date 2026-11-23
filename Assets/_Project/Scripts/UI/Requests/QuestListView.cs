@@ -22,6 +22,8 @@ namespace VoxelMagic.UI
         private readonly List<QuestListItemView> _pool = new List<QuestListItemView>();
         private IAcceptedRequestList _requests;
         private HudState _hud;
+        private BookState _book;
+        private ScreenStack _screens;
         private int _contentHeight;
         private int _viewHeight;
         private int _itemWidth;
@@ -33,18 +35,25 @@ namespace VoxelMagic.UI
         /// <summary>항목을 눌렀을 때 (자세히 패널이 받는다, 10-5).</summary>
         public event Action<AcceptedRequestEntry> ItemClicked;
 
-        public void Bind(GameContext context) => Bind(context.Requests, context.Hud);
+        public void Bind(GameContext context)
+        {
+            _book = context.Book;
+            _screens = context.Screens;
+            Bind(context.Requests, context.Hud);
+        }
 
         /// <summary>목록 원본을 바꿔 연결한다(게임 컨텍스트, 또는 에디터 미리보기의 가짜 목록).</summary>
         public void Bind(IAcceptedRequestList requests, HudState hud)
         {
             if (_requests != null) _requests.AcceptedListChanged -= Rebuild;
             if (_hud != null) _hud.QuestListToggled -= OnToggled;
+            if (_hud != null) _hud.QuestBarVisibilityChanged -= OnToggled;
             _requests = requests;
             _hud = hud;
             _scroll = 0;
             if (_requests != null) _requests.AcceptedListChanged += Rebuild;
             if (_hud != null) _hud.QuestListToggled += OnToggled;
+            if (_hud != null) _hud.QuestBarVisibilityChanged += OnToggled;
             Rebuild();
         }
 
@@ -52,6 +61,7 @@ namespace VoxelMagic.UI
         {
             if (_requests != null) _requests.AcceptedListChanged -= Rebuild;
             if (_hud != null) _hud.QuestListToggled -= OnToggled;
+            if (_hud != null) _hud.QuestBarVisibilityChanged -= OnToggled;
         }
 
         private void OnToggled(bool _) => Rebuild();
@@ -74,7 +84,7 @@ namespace VoxelMagic.UI
         {
             if (Theme == null || _bar == null || _viewport == null || _background == null) return;
             var values = Theme.QuestList;
-            bool expanded = _hud == null || _hud.IsQuestListExpanded;
+            bool expanded = _hud == null || (_hud.IsQuestListExpanded && _hud.IsQuestBarVisible);
 
             _sorted.Clear();
             if (_requests != null) _sorted.AddRange(_requests.Accepted);
@@ -179,7 +189,14 @@ namespace VoxelMagic.UI
             return view;
         }
 
-        private void OnItemClicked(AcceptedRequestEntry entry) => ItemClicked?.Invoke(entry);
+        // 항목을 누르면 책을 의뢰 탭 + 그 의뢰로 연다(자세히 패널 대신, 사용자 결정 2026-11-20).
+        private void OnItemClicked(AcceptedRequestEntry entry)
+        {
+            ItemClicked?.Invoke(entry);
+            if (_book == null || _screens == null || _screens.HasAny) return;
+            _book.PrepareForRequest(entry.Request);
+            _screens.Open(GameScreen.Book);
+        }
 
         private void OnScrollbar(float value)
         {

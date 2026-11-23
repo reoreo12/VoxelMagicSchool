@@ -32,6 +32,11 @@ namespace VoxelMagic.UI
             }
             _inputBlocker.color = _theme.Modal.BlockerColor;
             _inputBlocker.raycastTarget = true;
+            // 팝업 바깥(입력 막기 판)을 누르면 ESC처럼 맨 위 화면을 닫는다(10-5 결정을 책 의뢰 탭에도 적용).
+            var click = _inputBlocker.GetComponent<UiRaycastBlocker>();
+            if (click == null) click = _inputBlocker.gameObject.AddComponent<UiRaycastBlocker>();
+            click.Clicked -= OnBlockerClicked;
+            click.Clicked += OnBlockerClicked;
 
             _stack.Opened += OnOpened;
             _stack.Closed += OnClosed;
@@ -50,6 +55,8 @@ namespace VoxelMagic.UI
             _stack.Closed -= OnClosed;
             _stack.Changed -= UpdateBlocker;
         }
+
+        private void OnBlockerClicked() => _stack?.Cancel();
 
         private void OnOpened(GameScreen id)
         {

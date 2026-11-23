@@ -16,6 +16,9 @@ namespace VoxelMagic.Core
         /// <summary>수락·납품·포기, 또는 진행이 바뀌어 목록 내용이 바뀔 때.</summary>
         event Action AcceptedListChanged;
 
+        /// <summary>지금 납품하면 받을 필기 점수 예상값 (처음 납품하는 재료 보너스 포함). 점수 규칙은 Core가 계산한다.</summary>
+        int ExpectedReward(AcceptedRequestEntry entry);
+
         /// <summary>의뢰 조건을 다 채워 납품할 수 있게 된 순간 (완료 알림용, 10-6).</summary>
         event Action<AcceptedRequestEntry> RequestBecameComplete;
     }
