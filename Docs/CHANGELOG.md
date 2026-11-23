@@ -1,5 +1,12 @@
 # 변경 기록
 
+## 2026-11-23 — 책 메뉴 탭을 장 표지 + 오른쪽 버튼으로, 지침 갱신
+- 사용자 결정: 책의 모든 탭은 왼쪽 = 고르는 곳 또는 장 표지, 오른쪽 = 내용. 고를 것이 없는 탭은 왼쪽에 장 표지
+- UI `BookCoverView`(장 표지): 탭 아이콘 4배(48) + 이름 굵게 + 구분선 80 + 한 줄 문구(Small, #967854), 세로 가운데. 테마 `Book › 장 표지`
+- `MenuBookPage`: 왼쪽 장 표지(`메뉴` / `잠시 책을 덮고 쉬어 가요.`), 오른쪽 `나가기` 제목·구분선·`메인 화면으로`·`게임 종료`, 맨 아래 `책 닫기`. 문구 `ui.book.menu.caption`·`header`(임시)
+- 확인(플레이 모드): ESC → 메뉴 탭, 버튼은 오른쪽 페이지, 표지 아이콘 48×48이 왼쪽 내용 칸 가로 가운데. Unity 창 포커스가 없어 캡처는 못 함
+- `UI_INTEGRATION_GUIDE.md`: 페이지 규칙·장 표지·메뉴 탭 배치, 꺼진 채 내려간 뷰의 구독 해제(`if (this == null) { OnDestroy(); return; }`, 사용자 커밋 22c9c88에서 들어온 규칙), 새 탭 페이지는 `OnOpened`에서 다시 배치
+
 ## 2026-11-23 — 씬 이동 뒤 E 줍기 오류(MissingReferenceException) 수정
 - 원인: `GameBootstrap`은 꺼진 UI에도 `Bind`를 부르고, Unity는 한 번도 켜진 적 없는 오브젝트에 `OnDestroy`를 부르지 않는다. Creature_Cave의 꺼진 `InventoryBar`가 씬을 넘어 유지되는 `Inventory` 구독을 풀지 못하고 남아, 뒷산에서 줍기 → `SlotChanged`에서 파괴된 Image에 접근해 예외 → `GatheringService.TryPick`이 중간에 멈춤(가방에는 들어가고 서식지에는 남음)
 - 수정: 씬을 넘어 유지되는 Core(`Inventory`·`RequestTracker`·`ScoreBook`) 이벤트를 받는 처리기 맨 앞에 `if (this == null) { OnDestroy(); return; }` — 파괴된 구독자는 첫 이벤트 때 스스로 구독을 푼다. 대상: `InventoryBar`, `QuickSlotBarView`, `ScoreHud`, `ScoreHudView`, `QuestBarView`, `QuestListView`, `QuestBookPage`, `QuestToastView`, `QuestTrackerPanel`, `RequestBoardWindow`, `InventoryEquipmentLink`

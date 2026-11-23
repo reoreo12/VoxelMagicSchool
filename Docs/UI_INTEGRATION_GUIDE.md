@@ -1,4 +1,4 @@
-# UI 연결·제작 지침 (2026-11-23 기준)
+# UI 연결·제작 지침 (2026-11-23 기준, 메뉴 탭 장 표지 반영)
 
 다른 사람이나 다른 대화(모델)가 UI 작업을 이어받거나, 게임 규칙 쪽에서 이미 만든 UI에 기능을 붙일 때 읽는 문서다.
 브랜치 `feature/tool-UI-editor`. 함께 읽을 것: `Docs/HANDOFF_UI.md`(진행 상황·열린 질문) → `Docs/UI_SPEC.md` 13장(결정) → 이 문서.
@@ -18,6 +18,7 @@ GameBootstrap (씬마다, Gameplay)
 ```
 
 - UI 뷰는 `IGameContextBinder.Bind(GameContext)`에서 필요한 서비스를 받아 **이벤트를 구독**하고, `OnDestroy`에서 구독을 푼다(점수·의뢰·인벤토리는 씬을 넘어 유지되므로 꼭 풀 것).
+- **꺼진 채 씬이 내려간 뷰**는 Unity가 `OnDestroy`를 부르지 않아 구독이 남는다(한 번도 켜지지 않은 오브젝트). 그래서 씬을 넘어 유지되는 서비스(점수·의뢰 등)의 이벤트 핸들러는 첫 줄에 `if (this == null) { OnDestroy(); return; }`를 둔다(`ScoreHudView`·`QuestListView`·`QuestToastView`·`QuestBookPage` 참고).
 - 매 프레임 값을 읽지 않는다. 값이 바뀔 때 이벤트로만 다시 그린다.
 - `UI_Root.prefab`이 들어간 씬: `FarmPond`, `BackMountain`, `Creature_Cave`. 각 씬의 `GameBootstrap._bindRoots`에 UI_Root가 연결돼 있다. 새 씬에 UI를 넣으려면 UI_Root 프리팹을 놓고 `_bindRoots`에 추가한다.
 - **주의(바인딩 시점)**: `StatusBarsView`(마력·기력)와 `TimeHudView`(시간)는 `Bind` 때 한 번 `context.Vitals` / `context.Time`을 읽는다. 그래서 `SetVitals`·`SetTime`은 **`GameBootstrap.Awake`에서 `GameContext.Create` 직후, 바인딩 반복문 전에** 불러야 한다. 나중에 넣어야 한다면 GameContext에 "바뀜" 이벤트를 더하고 뷰가 다시 구독하도록 고친다.
@@ -81,11 +82,13 @@ GameBootstrap (씬마다, Gameplay)
 | 상태 | `Core/Screens/BookState`(`context.Book`): `Tab`, `LastChosenTab`, `FocusRequest`, `PrepareForIcon()`(책 아이콘 = 마지막으로 고른 탭), `PrepareForMenu()`(ESC = 메뉴 탭), `PrepareForRequest(r)`(의뢰 탭 + 그 의뢰), `ChooseTab(t)`. 여는 것은 `context.Screens.Open(GameScreen.Book)` |
 | 탭 순서 | 의뢰 목록 → 마법 스펠 → 마법진 → 환경 설정 → 나가기/종료 메뉴 (`BookTab` enum 순서 = 위→아래) |
 | 탭 전환 | 페이지 넘김 연출(9프레임, unscaled), 탭 위 휠 = 이전·다음 탭 |
-| 메뉴 탭 | `UI/Book/MenuBookPage`: **배치만**. `책 닫기`만 동작. `메인 화면으로`·`게임 종료`는 `MainMenuRequested`·`QuitRequested` 이벤트에 기능을 붙인다(붙이기 전에는 로그만). 실수 방지 확인 창은 [잠정] |
+| 페이지 규칙 | **모든 탭: 왼쪽 = 고르는 곳 또는 장 표지, 오른쪽 = 내용**(사용자 결정 2026-11-23). 고를 것이 있는 탭(의뢰 목록, 앞으로 마법 스펠·마법진·환경 설정 분류)은 왼쪽에 목록, 고를 것이 없는 탭(메뉴)은 왼쪽에 장 표지 |
+| 장 표지 | `UI/Book/BookCoverView`: 탭 아이콘 정수 배(4배 = 48) + 탭 이름(굵게) + 구분선 + 한 줄 문구(Small, 옅은 색), 세로 가운데. 아이콘은 테마 탭 값에서, 문구는 Texts 키. 테마 `Book › 장 표지` |
+| 메뉴 탭 | `UI/Book/MenuBookPage`: 왼쪽 장 표지(`메뉴` / `잠시 책을 덮고 쉬어 가요.` 임시), 오른쪽 `나가기`(임시) 제목 + 버튼. **배치만**. `책 닫기`만 동작. `메인 화면으로`·`게임 종료`는 `MainMenuRequested`·`QuitRequested` 이벤트에 기능을 붙인다(붙이기 전에는 로그만). 실수 방지 확인 창은 [잠정] |
 | 환경 설정 탭 | 빈 페이지. 소리·화면 설정 위젯(그림 없음) + "의뢰 목록 표시" 토글(지금은 의뢰 탭에 있음). **켜짐 상태 저장**(`HudState.IsQuestBarVisible`)은 설정 저장을 만들 때 |
 | 마법 스펠·마법진 탭 | 빈 페이지. 주문 아이콘 6종·마법진 도감 그림 없음 |
 | 페이지 안 버튼 | `BookMenuButton`(그림 `book_ui/buttons/btn_page_*`, 테마 `Book › Page Button`): 글자 모양 기준으로 좌우·상하 여백을 같게 맞춘다. 새 페이지 버튼도 이것을 쓴다 |
-| 새 탭 페이지 만들기 | `BookPage`를 상속(`Relayout()`에서 `Left`·`Right` 칸 안에 배치, `OnOpened()`는 펼쳐질 때), `UiBookBuilder`에 페이지 생성 추가 |
+| 새 탭 페이지 만들기 | `BookPage`를 상속(`Relayout()`에서 `Left`·`Right` 칸 안에 배치, `OnOpened()`는 펼쳐질 때 — 글자 크기를 재는 배치는 숨겨진 동안 정확하지 않으니 `OnOpened`에서 다시 배치), `UiBookBuilder`에 페이지 생성 추가. 왼쪽 페이지 규칙(목록 또는 `BookCoverView` 장 표지)을 따른다 |
 
 ### 2-7. 화면 스택·시간 정지·입력
 - 팝업 종류: `Core/Screens/ScreenPolicy`의 `GameScreen`(Book, Inventory, RequestBoard, RequestDetail(지금 안 씀), CreatureDialog).
@@ -118,7 +121,7 @@ GameBootstrap (씬마다, Gameplay)
 
 ### 3-2. 위젯·뷰 패턴
 - 테마를 따르는 것은 `ThemedWidget`을 상속하고 `Apply(UiTheme theme)`에서 **테마 값으로 크기·위치·스프라이트를 다시 입힌다**. 숫자를 코드에 박지 않는다. 편집 모드에서도 테마를 고치면 한 박자 뒤 적용된다.
-- Core에 연결되는 뷰는 `IGameContextBinder`도 구현한다. `Bind`에서 구독, `OnDestroy`에서 해제.
+- Core에 연결되는 뷰는 `IGameContextBinder`도 구현한다. `Bind`에서 구독, `OnDestroy`에서 해제, 씬을 넘어 유지되는 서비스의 핸들러는 첫 줄에 `if (this == null) { OnDestroy(); return; }`(1장 참고).
 - `ThemedWidget.OnEnable/OnDisable/OnValidate`를 덮어쓸 때는 **`protected override` + `base.` 호출**(안 하면 테마 구독이 깨진다).
 - 글자는 `ThemedText`(스타일: Body·BodyBold 12px 갈무리11, Small 10px 갈무리9, Tiny 8px 갈무리7, HudTitle·HudLabel 굵게). 직접 문자열 대신 `SetKey` 또는 `Theme.Texts.Get(키)`. 색만 바꿀 때 `SetColorOverride`.
 - 한글 긴 문장 줄바꿈은 `UiTextWrap.ByWords`(TMP 기본은 낱말 중간을 끊음).

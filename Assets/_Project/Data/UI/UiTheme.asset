@@ -214,6 +214,12 @@ MonoBehaviour:
     _sectionGap: 10
     _requirementIndent: 8
     _rewardGap: 8
+    _coverIconScale: 4
+    _coverIconGap: 12
+    _coverLineGap: 6
+    _coverLineWidth: 80
+    _coverCaptionStyle: 3
+    _coverCaptionColor: {r: 0.5882353, g: 0.47058824, b: 0.32941177, a: 1}
     _menuButtonHeight: 28
     _pageButtonNormal: {fileID: 21300000, guid: c3454f4b3967bc64b99de72792fb4f44, type: 3}
     _pageButtonHover: {fileID: 21300000, guid: 42d653fe6b4a02743b05c589534c5494, type: 3}

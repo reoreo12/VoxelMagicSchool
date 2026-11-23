@@ -69,6 +69,8 @@ namespace VoxelMagic.Tools.EditorTools.UiWorkbench
             Seed(UiTextKeys.BookQuestRewardValue, "필기 점수 +{0}");
             Seed(UiTextKeys.BookQuestLine, "“{0}”");
             Seed(UiTextKeys.BookMenuTitle, "메뉴");
+            Seed(UiTextKeys.BookMenuCaption, "잠시 책을 덮고 쉬어 가요.");
+            Seed(UiTextKeys.BookMenuHeader, "나가기");
             Seed(UiTextKeys.BookMenuMainMenu, "메인 화면으로");
             Seed(UiTextKeys.BookMenuQuit, "게임 종료");
             Seed(UiTextKeys.BookMenuClose, "책 닫기");
@@ -206,18 +208,40 @@ namespace VoxelMagic.Tools.EditorTools.UiWorkbench
         private static BookPage BuildMenuPage(Transform parent, UiTheme theme)
         {
             var go = PageRoot(parent, $"Page_{BookTab.Menu}", out var left, out var right);
-            var header = Text(left, "Header", UiTextStyle.HudTitle, theme, TextOverflowModes.Ellipsis, false);
-            var line = NewImage(left, "HeaderLine");
+            var cover = BuildCover(left, theme);
+            var header = Text(right, "Header", UiTextStyle.HudTitle, theme, TextOverflowModes.Ellipsis, false);
+            var line = NewImage(right, "HeaderLine");
             line.enabled = true;
             var page = go.AddComponent<MenuBookPage>();
             SetPageFields(page, BookTab.Menu, left, right);
+            UiHudBuilder.Assign(page, "_cover", cover);
             UiHudBuilder.Assign(page, "_header", header);
             UiHudBuilder.Assign(page, "_headerLine", line);
-            UiHudBuilder.Assign(page, "_mainMenu", BuildMenuButton(left, "MainMenu", theme));
-            UiHudBuilder.Assign(page, "_quit", BuildMenuButton(left, "Quit", theme));
-            UiHudBuilder.Assign(page, "_close", BuildMenuButton(left, "Close", theme));
+            UiHudBuilder.Assign(page, "_mainMenu", BuildMenuButton(right, "MainMenu", theme));
+            UiHudBuilder.Assign(page, "_quit", BuildMenuButton(right, "Quit", theme));
+            UiHudBuilder.Assign(page, "_close", BuildMenuButton(right, "Close", theme));
             page.SetTheme(theme);
             return page;
+        }
+
+        // 장 표지: 큰 탭 아이콘 + 이름 + 구분선 + 한 줄 문구 (고를 것이 없는 탭의 왼쪽 페이지).
+        private static BookCoverView BuildCover(Transform parent, UiTheme theme)
+        {
+            var go = new GameObject("Cover", typeof(RectTransform));
+            go.transform.SetParent(parent, false);
+            var icon = NewImage(go.transform, "Icon");
+            var title = Text(go.transform, "Title", UiTextStyle.BodyBold, theme, TextOverflowModes.Overflow, false);
+            title.GetComponent<TMP_Text>().alignment = TextAlignmentOptions.Top;
+            var line = NewImage(go.transform, "Line");
+            line.enabled = true;
+            var caption = Text(go.transform, "Caption", UiTextStyle.Small, theme, TextOverflowModes.Overflow, false);
+            caption.GetComponent<TMP_Text>().alignment = TextAlignmentOptions.Top;
+            var view = go.AddComponent<BookCoverView>();
+            UiHudBuilder.Assign(view, "_icon", icon);
+            UiHudBuilder.Assign(view, "_title", title);
+            UiHudBuilder.Assign(view, "_line", line);
+            UiHudBuilder.Assign(view, "_caption", caption);
+            return view;
         }
 
         private static BookMenuButton BuildMenuButton(Transform parent, string name, UiTheme theme)

@@ -1,4 +1,4 @@
-// 책의 마지막 탭 "나가기/종료 메뉴"(UI_SPEC 5-2, 13장): 왼쪽 페이지에 제목 + 메인 화면으로 / 게임 종료 / 책 닫기 버튼.
+// 책의 마지막 탭 "나가기/종료 메뉴"(UI_SPEC 5-2, 13장): 왼쪽 = 장 표지(아이콘·이름·한 줄), 오른쪽 = 제목 + 메인 화면으로 / 게임 종료 / 책 닫기 버튼.
 // 지금은 배치만: 책 닫기만 동작하고, 메인 화면·게임 종료는 기능이 생기면 MainMenuRequested·QuitRequested에 연결한다(확인 창 [잠정] 포함).
 using System;
 using UnityEngine;
@@ -9,7 +9,8 @@ namespace VoxelMagic.UI
 {
     public sealed class MenuBookPage : BookPage, IGameContextBinder
     {
-        [SerializeField] private ThemedText _header;
+        [SerializeField, Tooltip("왼쪽 페이지 장 표지")] private BookCoverView _cover;
+        [SerializeField, Tooltip("오른쪽 페이지 제목")] private ThemedText _header;
         [SerializeField] private Image _headerLine;
         [SerializeField] private BookMenuButton _mainMenu;
         [SerializeField] private BookMenuButton _quit;
@@ -57,14 +58,17 @@ namespace VoxelMagic.UI
         protected override void Relayout()
         {
             var theme = Theme;
-            if (theme == null || Left == null || _header == null) return;
+            if (theme == null || Left == null || Right == null || _header == null) return;
             var values = theme.Book;
             var texts = theme.Texts;
-            int width = LeftSize.x, height = LeftSize.y;
-            int headerLine = LineOf(theme, UiTextStyle.HudTitle);
 
+            if (_cover != null)
+                _cover.Show(values.Tab(Tab)?.Icon, texts?.Get(UiTextKeys.BookMenuTitle), texts?.Get(UiTextKeys.BookMenuCaption), theme, LeftSize);
+
+            int width = RightSize.x, height = RightSize.y;
+            int headerLine = LineOf(theme, UiTextStyle.HudTitle);
             _header.SetStyle(UiTextStyle.HudTitle);
-            if (texts != null) _header.SetText(texts.Get(UiTextKeys.BookMenuTitle));
+            if (texts != null) _header.SetText(texts.Get(UiTextKeys.BookMenuHeader));
             PixelLayout.PlaceTopLeft((RectTransform)_header.transform, 0, 0, width, headerLine);
             int y = headerLine + values.HeaderGap;
             if (_headerLine != null)

@@ -233,6 +233,14 @@ namespace VoxelMagic.UI
         [SerializeField, Tooltip("본문 묶음 사이 (대사 → 재료 → 보상)")] private int _sectionGap = 10;
         [SerializeField, Tooltip("재료 줄 들여쓰기")] private int _requirementIndent = 8;
         [SerializeField, Tooltip("'보상'과 값 사이")] private int _rewardGap = 8;
+        [Header("장 표지 (고를 것이 없는 탭의 왼쪽 페이지)")]
+        [SerializeField, Min(1), Tooltip("탭 아이콘 배수 (12×12 × 정수 배)")] private int _coverIconScale = 4;
+        [SerializeField, Tooltip("아이콘과 탭 이름 사이")] private int _coverIconGap = 12;
+        [SerializeField, Tooltip("이름·구분선·한 줄 문구 사이")] private int _coverLineGap = 6;
+        [SerializeField, Tooltip("구분선 길이")] private int _coverLineWidth = 80;
+        [SerializeField] private UiTextStyle _coverCaptionStyle = UiTextStyle.Small;
+        [SerializeField, Tooltip("한 줄 문구 색 (본문보다 옅게)")] private Color _coverCaptionColor = new Color32(150, 120, 84, 255);
+
         [Header("메뉴 탭")]
         [SerializeField, Tooltip("메뉴 버튼 높이")] private int _menuButtonHeight = 28;
         [SerializeField, Tooltip("책 페이지 버튼 그림 (9-slice 4, 찢김 없는 깔끔한 모양): 평상시·마우스 올림·누름")] private Sprite _pageButtonNormal;
@@ -285,6 +293,12 @@ namespace VoxelMagic.UI
         public int SectionGap => _sectionGap;
         public int RequirementIndent => _requirementIndent;
         public int RewardGap => _rewardGap;
+        public int CoverIconScale => Mathf.Max(1, _coverIconScale);
+        public int CoverIconGap => _coverIconGap;
+        public int CoverLineGap => _coverLineGap;
+        public int CoverLineWidth => _coverLineWidth;
+        public UiTextStyle CoverCaptionStyle => _coverCaptionStyle;
+        public Color CoverCaptionColor => _coverCaptionColor;
         public int MenuButtonHeight => _menuButtonHeight;
         public int MenuButtonGap => _menuButtonGap;
         public Sprite PageButton(bool hover, bool pressed) =>

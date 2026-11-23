@@ -53,3 +53,7 @@ MonoBehaviour:
     _text: "\uAC8C\uC784 \uC885\uB8CC"
   - _key: ui.book.menu.close
     _text: "\uCC45 \uB2EB\uAE30"
+  - _key: ui.book.menu.caption
+    _text: "\uC7A0\uC2DC \uCC45\uC744 \uB36E\uACE0 \uC26C\uC5B4 \uAC00\uC694."
+  - _key: ui.book.menu.header
+    _text: "\uB098\uAC00\uAE30"
