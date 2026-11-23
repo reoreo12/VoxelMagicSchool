@@ -39,7 +39,11 @@ namespace VoxelMagic.UI
             if (_requests != null) _requests.RequestBecameComplete -= OnCompleted;
         }
 
-        private void OnCompleted(AcceptedRequestEntry entry) => Enqueue(entry.Title);
+        private void OnCompleted(AcceptedRequestEntry entry)
+        {
+            if (this == null) { OnDestroy(); return; } // 꺼진 채 씬이 내려가 OnDestroy가 불리지 않은 구독자: 여기서 구독을 푼다
+            Enqueue(entry.Title);
+        }
 
         /// <summary>알림 한 건을 줄에 넣는다. 보이는 알림이 없으면 바로 띄운다.</summary>
         public void Enqueue(string title)

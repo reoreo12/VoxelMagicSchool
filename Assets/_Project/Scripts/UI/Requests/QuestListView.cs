@@ -82,6 +82,7 @@ namespace VoxelMagic.UI
         // 목록이 바뀌거나 펼침 상태·테마가 바뀔 때만: 정렬 → 항목 위치 누적 → 패널 크기 → 보이는 항목 배치.
         private void Rebuild()
         {
+            if (this == null) { OnDestroy(); return; } // 꺼진 채 씬이 내려가 OnDestroy가 불리지 않은 구독자: 여기서 구독을 푼다
             if (Theme == null || _bar == null || _viewport == null || _background == null) return;
             var values = Theme.QuestList;
             bool expanded = _hud == null || (_hud.IsQuestListExpanded && _hud.IsQuestBarVisible);

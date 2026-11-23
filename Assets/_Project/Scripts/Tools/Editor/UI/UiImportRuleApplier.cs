@@ -46,6 +46,7 @@ namespace VoxelMagic.Tools.EditorTools.UiWorkbench
             yield return UiImportRule.Create("book_ui/tabs/*.png", 4, 4, 4, 4);
             yield return UiImportRule.Create("book_ui/page_turn/leaf_edge.png", 0, 6, 0, 6);
             yield return UiImportRule.Create("book_ui/page_turn/leaf_*.png", 2, 6, 6, 6);
+            yield return UiImportRule.Create("book_ui/buttons/*.png", 4, 4, 4, 4); // 책 페이지 버튼(깔끔한 9-slice)
             yield return UiImportRule.Create("bar_ui/bar_frame_vertical.png", 5, 5, 5, 5);
             yield return UiImportRule.Create("quest_ui/quest_*_paper.png", 6, 6, 6, 6);
             yield return UiImportRule.Create("quest_ui/scrollbar/scroll_track.png", 0, 4, 0, 4);

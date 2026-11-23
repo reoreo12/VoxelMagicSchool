@@ -33,6 +33,14 @@ namespace VoxelMagic.UI
         public const string BookQuestReward = "ui.book.quest.reward";
         /// <summary>"필기 점수 +{0}"</summary>
         public const string BookQuestRewardValue = "ui.book.quest.rewardValue";
+        /// <summary>"메뉴" — 책 메뉴 탭 제목</summary>
+        public const string BookMenuTitle = "ui.book.menu.title";
+        /// <summary>"메인 화면으로"</summary>
+        public const string BookMenuMainMenu = "ui.book.menu.mainMenu";
+        /// <summary>"게임 종료"</summary>
+        public const string BookMenuQuit = "ui.book.menu.quit";
+        /// <summary>"책 닫기" (사용자 요청)</summary>
+        public const string BookMenuClose = "ui.book.menu.close";
         /// <summary>"“{0}”" — 크리처 대사 따옴표</summary>
         public const string BookQuestLine = "ui.book.quest.line";
     }

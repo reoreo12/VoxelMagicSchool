@@ -89,6 +89,7 @@ namespace VoxelMagic.UI
         // 목록이나 고른 의뢰가 바뀔 때만: 정렬 → 왼쪽 배치 → 오른쪽 본문.
         private void Rebuild()
         {
+            if (this == null) { OnDestroy(); return; } // 꺼진 채 씬이 내려가 OnDestroy가 불리지 않은 구독자: 여기서 구독을 푼다
             if (Theme == null || Left == null || Right == null || _viewport == null) return;
             _sorted.Clear();
             if (_requests != null) _sorted.AddRange(_requests.Accepted);

@@ -59,11 +59,16 @@ namespace VoxelMagic.UI
 
         private void OnSlotChanged(int index)
         {
+            if (this == null) { OnDestroy(); return; } // 꺼진 채 씬이 내려가 OnDestroy가 불리지 않은 구독자: 여기서 구독을 푼다
             if (index < 0 || index >= _slots.Count || index >= _inventory.SlotCount) return;
             _slots[index].Show(_inventory.GetSlot(index));
         }
 
-        private void OnSelectionChanged(int index) => MoveSelection(index, animate: true);
+        private void OnSelectionChanged(int index)
+        {
+            if (this == null) { OnDestroy(); return; } // 꺼진 채 씬이 내려가 OnDestroy가 불리지 않은 구독자: 여기서 구독을 푼다
+            MoveSelection(index, animate: true);
+        }
 
         private void MoveSelection(int index, bool animate)
         {

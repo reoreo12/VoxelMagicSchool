@@ -50,6 +50,7 @@ namespace VoxelMagic.UI
 
         private void OnActiveChanged(RequestDefinition active)
         {
+            if (this == null) { OnDestroy(); return; } // 꺼진 채 씬이 내려가 OnDestroy가 불리지 않은 구독자: 여기서 구독을 푼다
             if (active == null)
             {
                 // 완료가 아니라 내려놓은 경우(디버그 의뢰 교체)는 바로 숨긴다.
@@ -64,6 +65,7 @@ namespace VoxelMagic.UI
 
         private void OnCompleted(DeliveryReport report)
         {
+            if (this == null) { OnDestroy(); return; } // 꺼진 채 씬이 내려가 OnDestroy가 불리지 않은 구독자: 여기서 구독을 푼다
             _completedTitle = report.Request.Title;
             _hideTimer = _completeDisplaySeconds;
             Redraw();
@@ -78,6 +80,7 @@ namespace VoxelMagic.UI
 
         private void Redraw()
         {
+            if (this == null) { OnDestroy(); return; } // 꺼진 채 씬이 내려가 OnDestroy가 불리지 않은 구독자: 여기서 구독을 푼다
             if (!IsVisible) return;
             string arrow = !_hud.IsQuestListExpanded ? GameTexts.TrackerCollapsed : GameTexts.TrackerExpanded;
 

@@ -233,6 +233,12 @@ namespace VoxelMagic.UI
         [SerializeField, Tooltip("본문 묶음 사이 (대사 → 재료 → 보상)")] private int _sectionGap = 10;
         [SerializeField, Tooltip("재료 줄 들여쓰기")] private int _requirementIndent = 8;
         [SerializeField, Tooltip("'보상'과 값 사이")] private int _rewardGap = 8;
+        [Header("메뉴 탭")]
+        [SerializeField, Tooltip("메뉴 버튼 높이")] private int _menuButtonHeight = 28;
+        [SerializeField, Tooltip("책 페이지 버튼 그림 (9-slice 4, 찢김 없는 깔끔한 모양): 평상시·마우스 올림·누름")] private Sprite _pageButtonNormal;
+        [SerializeField] private Sprite _pageButtonHover;
+        [SerializeField] private Sprite _pageButtonPressed;
+        [SerializeField, Tooltip("메뉴 버튼 사이")] private int _menuButtonGap = 8;
         [SerializeField] private Sprite _checkboxOn;
         [SerializeField] private Sprite _checkboxOnHover;
         [SerializeField] private Sprite _checkboxOff;
@@ -279,6 +285,17 @@ namespace VoxelMagic.UI
         public int SectionGap => _sectionGap;
         public int RequirementIndent => _requirementIndent;
         public int RewardGap => _rewardGap;
+        public int MenuButtonHeight => _menuButtonHeight;
+        public int MenuButtonGap => _menuButtonGap;
+        public Sprite PageButton(bool hover, bool pressed) =>
+            pressed && _pageButtonPressed != null ? _pageButtonPressed : hover && _pageButtonHover != null ? _pageButtonHover : _pageButtonNormal;
+
+        public void SetPageButtonSprites(Sprite normal, Sprite hover, Sprite pressed)
+        {
+            _pageButtonNormal = normal;
+            _pageButtonHover = hover;
+            _pageButtonPressed = pressed;
+        }
         public Sprite Checkbox(bool on, bool hover) => on ? (hover && _checkboxOnHover != null ? _checkboxOnHover : _checkboxOn) : (hover && _checkboxOffHover != null ? _checkboxOffHover : _checkboxOff);
 
         public void SetSprites(Sprite left, Sprite right, Sprite spine, IEnumerable<BookTabValues> tabs, Sprite[] checkbox)

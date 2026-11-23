@@ -1,5 +1,19 @@
 # 변경 기록
 
+## 2026-11-23 — 씬 이동 뒤 E 줍기 오류(MissingReferenceException) 수정
+- 원인: `GameBootstrap`은 꺼진 UI에도 `Bind`를 부르고, Unity는 한 번도 켜진 적 없는 오브젝트에 `OnDestroy`를 부르지 않는다. Creature_Cave의 꺼진 `InventoryBar`가 씬을 넘어 유지되는 `Inventory` 구독을 풀지 못하고 남아, 뒷산에서 줍기 → `SlotChanged`에서 파괴된 Image에 접근해 예외 → `GatheringService.TryPick`이 중간에 멈춤(가방에는 들어가고 서식지에는 남음)
+- 수정: 씬을 넘어 유지되는 Core(`Inventory`·`RequestTracker`·`ScoreBook`) 이벤트를 받는 처리기 맨 앞에 `if (this == null) { OnDestroy(); return; }` — 파괴된 구독자는 첫 이벤트 때 스스로 구독을 푼다. 대상: `InventoryBar`, `QuickSlotBarView`, `ScoreHud`, `ScoreHudView`, `QuestBarView`, `QuestListView`, `QuestBookPage`, `QuestToastView`, `QuestTrackerPanel`, `RequestBoardWindow`, `InventoryEquipmentLink`
+- 확인(플레이 모드): Creature_Cave에서 시작 → 뒷산으로 이동 → 줍기 성공(가방 0→1, 슬롯 비움), 콘솔 에러 없음, `Inventory.SlotChanged` 구독자에 파괴된 객체 없음. EditMode 테스트 153개 통과
+- 새 UI가 씬을 넘는 Core 이벤트를 구독하면 같은 확인을 넣을 것
+
+## 2026-11-23 — 책 메뉴 탭(배치만) + UI 연결·제작 지침
+- UI `MenuBookPage`: 왼쪽 페이지에 `메뉴` 제목·구분선, `메인 화면으로`·`게임 종료` 버튼, 맨 아래 `책 닫기`(사용자 요청). 책 닫기만 동작(화면 스택에서 책 닫기 → 시간 다시 흐름). 메인 화면·게임 종료는 기능이 없어 로그만, 기능이 생기면 `MainMenuRequested`·`QuitRequested`에 연결
+- UI `BookMenuButton`: 가운데 글자, 마우스를 올리면 굵게
+- 사용자 피드백 반영: 찢김 없는 책 페이지 버튼 그림을 새로 그림(`Art/UI/book_ui/buttons/btn_page_{normal,hover,pressed}.png`, 12×12, 9-slice 4, 넘김 종이 외곽선색 #6B4B2A·모서리 1px 둥글게, 위 밝은 줄·아래 그늘 줄, 누름은 반대). 버튼 높이 24 → 28. 글자는 실제 글자 모양(textBounds) 기준으로 왼쪽=오른쪽, 위=아래 여백이 같게 정수 px로 맞추고, 남는 여백이 홀수면 버튼 폭·높이를 1px 줄여 맞춤(지금 세 버튼 187×28, 위아래 7)
+- 테마 `Book › 메뉴 탭`(버튼 높이 24, 간격 8), 문구 `ui.book.menu.*`. `UiBookBuilder`가 메뉴 탭에 이 페이지를 만듦
+- 확인(플레이 모드): ESC → 메뉴 탭, 메인 화면으로 → 로그만(책 그대로), 책 닫기 → 닫힘·timeScale 1
+- 문서 `Docs/UI_INTEGRATION_GUIDE.md` 새로: 기능별 연결 지점(마력·기력 `IPlayerVitals`/`SetVitals`, 시간 `IGameTime`/`SetTime`, 점수 `ScoreBook`, 의뢰 `IAcceptedRequestList`, 퀵슬롯 `Inventory`, 책 `BookState`, 화면 스택·시간 정지·입력), 바인딩 시점 주의, 새 UI 제작 틀(파일 위치·ThemedWidget·테마·문구·픽셀 규칙·층·빌더·리스트), 확인 방법. `HANDOFF_UI.md` 맨 위에서 이 문서를 가리킴
+
 ## 2026-11-23 — 책 페이지 넘김 연출(5-3) + 탭 휠 전환
 - UI `BookPageTurner`: README 규칙 그대로 9프레임 × 45ms(unscaled), 폭 = round(W × |cos(πp)|)(W = 책등 가운데 ~ 반대편 표지 안쪽), 들어 올림 round(4 × sin(πp)), 폭 비율 0.8↑ leaf_0 / 0.45↑ leaf_1 / 그 아래 leaf_2, k=4 leaf_edge, 반대편은 Scale X −1. 그림자(shadow_strip)는 종이 바깥 가장자리에 붙이고 종이 안쪽(RectMask2D)에서 자름, k=4는 양쪽
 - `BookView`: 탭을 바꾸면 한 장씩 넘김. 앞으로(아래 탭)는 k=0에 오른쪽 내용·탭 선택 그림, k=8에 왼쪽 내용을 바꾸고 뒤로는 반대. 멀리 있는 탭은 이어서 넘기고 넘기는 중 입력은 마지막 탭만 목표로 남김. 책을 열 때는 넘기지 않고 바로 보임. `BookPage.SetHalves`로 왼쪽·오른쪽 내용을 따로 켜고 끔

@@ -214,6 +214,11 @@ MonoBehaviour:
     _sectionGap: 10
     _requirementIndent: 8
     _rewardGap: 8
+    _menuButtonHeight: 28
+    _pageButtonNormal: {fileID: 21300000, guid: c3454f4b3967bc64b99de72792fb4f44, type: 3}
+    _pageButtonHover: {fileID: 21300000, guid: 42d653fe6b4a02743b05c589534c5494, type: 3}
+    _pageButtonPressed: {fileID: 21300000, guid: 1f028b5e9cbee3041a16d99dc9671186, type: 3}
+    _menuButtonGap: 8
     _checkboxOn: {fileID: 21300000, guid: 54673e13af7ffe84999ecb849572806f, type: 3}
     _checkboxOnHover: {fileID: 21300000, guid: d245453f3f0bd5f4c97ff8dde13ae73f, type: 3}
     _checkboxOff: {fileID: 21300000, guid: 1bf8e0cc64158d84e8fbdb0ed1f69092, type: 3}

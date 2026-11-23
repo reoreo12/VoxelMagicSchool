@@ -238,3 +238,11 @@ MonoBehaviour:
       _top: 0
       _right: 0
       _bottom: 0
+  - _pathPattern: book_ui/buttons/*.png
+    _left: 4
+    _top: 4
+    _right: 4
+    _bottom: 4
+    _sliceGrid: 0
+    _cellSize: {x: 0, y: 0}
+    _slices: []

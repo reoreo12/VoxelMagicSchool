@@ -55,10 +55,15 @@ namespace VoxelMagic.UI
             if (_inventory != null) _inventory.SlotChanged -= OnSlotChanged;
         }
 
-        private void OnActiveChanged(RequestDefinition _) => RefreshEntries();
+        private void OnActiveChanged(RequestDefinition _)
+        {
+            if (this == null) { OnDestroy(); return; } // 꺼진 채 씬이 내려가 OnDestroy가 불리지 않은 구독자: 여기서 구독을 푼다
+            RefreshEntries();
+        }
 
         private void OnSlotChanged(int _)
         {
+            if (this == null) { OnDestroy(); return; } // 꺼진 채 씬이 내려가 OnDestroy가 불리지 않은 구독자: 여기서 구독을 푼다
             if (IsVisible) RefreshEntries();
         }
 

@@ -50,6 +50,7 @@ namespace VoxelMagic.Tools.EditorTools.UiWorkbench
             theme.Book.SetSprites(Load("book_ui/book_page_left.png"), Load("book_ui/book_page_right.png"), Load("book_ui/book_spine.png"), tabs, checkbox);
             theme.Book.SetTurnSprites(new[] { Load("book_ui/page_turn/leaf_0.png"), Load("book_ui/page_turn/leaf_1.png"), Load("book_ui/page_turn/leaf_2.png") },
                 Load("book_ui/page_turn/leaf_edge.png"), Load("book_ui/page_turn/shadow_strip.png"));
+            theme.Book.SetPageButtonSprites(Load("book_ui/buttons/btn_page_normal.png"), Load("book_ui/buttons/btn_page_hover.png"), Load("book_ui/buttons/btn_page_pressed.png"));
             EditorUtility.SetDirty(theme);
             AssetDatabase.SaveAssets();
         }
@@ -67,6 +68,10 @@ namespace VoxelMagic.Tools.EditorTools.UiWorkbench
             Seed(UiTextKeys.BookQuestReward, "보상");
             Seed(UiTextKeys.BookQuestRewardValue, "필기 점수 +{0}");
             Seed(UiTextKeys.BookQuestLine, "“{0}”");
+            Seed(UiTextKeys.BookMenuTitle, "메뉴");
+            Seed(UiTextKeys.BookMenuMainMenu, "메인 화면으로");
+            Seed(UiTextKeys.BookMenuQuit, "게임 종료");
+            Seed(UiTextKeys.BookMenuClose, "책 닫기");
             EditorUtility.SetDirty(table);
             AssetDatabase.SaveAssets();
         }
@@ -92,7 +97,8 @@ namespace VoxelMagic.Tools.EditorTools.UiWorkbench
 
             var pages = new BookPage[Tabs.Length];
             pages[0] = BuildQuestPage(book.transform, theme);
-            for (int i = 1; i < Tabs.Length; i++) pages[i] = BuildEmptyPage(book.transform, Tabs[i].tab, theme);
+            for (int i = 1; i < Tabs.Length; i++)
+                pages[i] = Tabs[i].tab == BookTab.Menu ? BuildMenuPage(book.transform, theme) : BuildEmptyPage(book.transform, Tabs[i].tab, theme);
 
             var turner = BuildTurner(book.transform);
 
@@ -194,6 +200,38 @@ namespace VoxelMagic.Tools.EditorTools.UiWorkbench
             UiHudBuilder.Assign(page, "_reward", reward);
             page.SetTheme(theme);
             return page;
+        }
+
+        // 나가기/종료 메뉴 탭: 왼쪽 페이지에 제목·구분선·버튼 세 개(배치만, 책 닫기만 동작).
+        private static BookPage BuildMenuPage(Transform parent, UiTheme theme)
+        {
+            var go = PageRoot(parent, $"Page_{BookTab.Menu}", out var left, out var right);
+            var header = Text(left, "Header", UiTextStyle.HudTitle, theme, TextOverflowModes.Ellipsis, false);
+            var line = NewImage(left, "HeaderLine");
+            line.enabled = true;
+            var page = go.AddComponent<MenuBookPage>();
+            SetPageFields(page, BookTab.Menu, left, right);
+            UiHudBuilder.Assign(page, "_header", header);
+            UiHudBuilder.Assign(page, "_headerLine", line);
+            UiHudBuilder.Assign(page, "_mainMenu", BuildMenuButton(left, "MainMenu", theme));
+            UiHudBuilder.Assign(page, "_quit", BuildMenuButton(left, "Quit", theme));
+            UiHudBuilder.Assign(page, "_close", BuildMenuButton(left, "Close", theme));
+            page.SetTheme(theme);
+            return page;
+        }
+
+        private static BookMenuButton BuildMenuButton(Transform parent, string name, UiTheme theme)
+        {
+            var go = new GameObject(name, typeof(RectTransform));
+            go.transform.SetParent(parent, false);
+            var background = NewImage(go.transform, "Background");
+            background.raycastTarget = true; // 버튼 누르기 영역
+            var label = Text(go.transform, "Label", UiTextStyle.Body, theme, TextOverflowModes.Overflow, false);
+            label.GetComponent<TMP_Text>().alignment = TextAlignmentOptions.Center;
+            var button = go.AddComponent<BookMenuButton>();
+            UiHudBuilder.Assign(button, "_background", background);
+            UiHudBuilder.Assign(button, "_label", label);
+            return button;
         }
 
         private static QuestBookRowView BuildRow(Transform parent, UiTheme theme)

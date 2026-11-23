@@ -55,6 +55,7 @@ namespace VoxelMagic.UI
         // 개수가 바뀔 때만 글자를 다시 만든다(4-A-5).
         private void RefreshTitle()
         {
+            if (this == null) { OnDestroy(); return; } // 꺼진 채 씬이 내려가 OnDestroy가 불리지 않은 구독자: 여기서 구독을 푼다
             int count = _requests != null ? _requests.AcceptedCount : 0;
             if (count == _shownCount || Theme == null || Theme.Texts == null) return;
             _shownCount = count;
