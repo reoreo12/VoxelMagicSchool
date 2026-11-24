@@ -61,7 +61,8 @@ namespace VoxelMagic.Gameplay
         {
             var context = FindContext();
             if (context == null || context.Screens.HasAny) return;
-            if (CreatureNpc.TryDeliver(context)) return;
+            var creature = FindFirstObjectByType<CreatureNpc>(); // 씬의 크리처 화자로 대사창까지 보여 준다
+            if (CreatureNpc.TryDeliver(context, creature != null ? creature.Speaker : null)) return;
             context.Messages.ShowToast(context.Requests.CanDeliver() == DeliverResult.MissingItems
                 ? $"{GameTexts.MissingItems}: {context.Requests.DescribeMissing()}"
                 : GameTexts.NoActiveRequest);

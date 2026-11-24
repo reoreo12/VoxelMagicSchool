@@ -31,7 +31,7 @@ namespace VoxelMagic.Tests
         [Test]
         public void 대화는_게임_시계만_멈춘다()
         {
-            _stack.Open(GameScreen.CreatureDialog);
+            _stack.Open(GameScreen.Dialogue);
             Assert.IsTrue(_pause.IsClockPaused);
             Assert.IsFalse(_pause.IsFullyPaused);
         }
@@ -62,10 +62,10 @@ namespace VoxelMagic.Tests
         [Test]
         public void ESC를_받지_않는_화면은_닫히지_않는다()
         {
-            _stack.OverridePolicy(GameScreen.CreatureDialog, new ScreenPolicy(PauseLevel.GameClock, false, false, true));
-            _stack.Open(GameScreen.CreatureDialog);
+            _stack.OverridePolicy(GameScreen.Dialogue, new ScreenPolicy(PauseLevel.GameClock, false, false, true));
+            _stack.Open(GameScreen.Dialogue);
             Assert.IsTrue(_stack.Cancel());
-            Assert.IsTrue(_stack.IsOpen(GameScreen.CreatureDialog));
+            Assert.IsTrue(_stack.IsOpen(GameScreen.Dialogue));
         }
 
         [Test]

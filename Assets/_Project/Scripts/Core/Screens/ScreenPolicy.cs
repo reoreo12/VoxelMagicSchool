@@ -9,7 +9,8 @@ namespace VoxelMagic.Core
         Inventory,
         RequestBoard,
         RequestDetail,
-        CreatureDialog
+        /// <summary>초상화 대사창 (크리처 대화·수업, UI_SPEC 6장)</summary>
+        Dialogue
     }
 
     public readonly struct ScreenPolicy
@@ -34,8 +35,9 @@ namespace VoxelMagic.Core
         {
             switch (screen)
             {
-                case GameScreen.CreatureDialog:
-                    return new ScreenPolicy(PauseLevel.GameClock, closesOnCancel: true, blocksInputBehind: false, blocksGameplay: true);
+                case GameScreen.Dialogue:
+                    // 게임 시계만 멈춤(캐릭터 애니메이션은 계속, 13장·사용자 확인 2026-11-23). ESC·바깥 클릭으로 닫히지 않음(6-1).
+                    return new ScreenPolicy(PauseLevel.GameClock, closesOnCancel: false, blocksInputBehind: false, blocksGameplay: true);
                 case GameScreen.None:
                     return default;
                 default: // 책, 가방, 의뢰 게시판, 자세히 패널: 전체 정지 + 입력 막기

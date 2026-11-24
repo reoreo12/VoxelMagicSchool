@@ -1543,6 +1543,7 @@ MonoBehaviour:
   _promptAnchor: {fileID: 1272390073}
   _defaultAnchorHeight: 2
   _reactions: {fileID: 183227475}
+  _speaker: {fileID: 0}
 --- !u!65 &183227474
 BoxCollider:
   m_ObjectHideFlags: 0

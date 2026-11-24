@@ -1,5 +1,16 @@
 # 변경 기록
 
+## 2026-11-23 — 초상화 대사창 (UI_SPEC 6장)
+- 설계 대화에서 온 `Art/UI/UI_SPEC.md` 사본의 6장(대사)을 `Docs/UI_SPEC.md`에 합치고 사본은 지움(사용자 승인)
+- Core `DialogueChannel`(`context.Dialogue`: Play·Finish·Abort·HasPresenter), `DialogueLine`, `SpeakerProfile`(SO: 이름·기본 초상화·표정별 초상화). `GameScreen.CreatureDialog` → `Dialogue`로 이름 바꿈. 정책: 게임 시계만 정지(사용자 결정: 캐릭터 애니메이션 계속, 문제 생기면 전체 정지로), ESC·바깥 클릭으로 닫히지 않음
+- 대사 결과는 마지막 대사 뒤에 한 번에: `CreatureNpc.TryDeliver(context, speaker)`가 완료 대사 + 재료 설명을 먼저 재생하고, 끝나면 `Requests.Deliver`. 도중 강제 종료면 아무것도 안 바뀜. 화자·대사창이 없으면 바로 납품. F11 치트도 씬 크리처 화자로 대사창을 거침
+- UI `DialogueWindow`(Popup 층 `UI_Dialogue`): 패널(320×80) 위에 왼쪽 열(64×80)을 4px 겹쳐 380×80, 1.5배(그림이 640×360 기준이라 960×540에서 의도 크기), 화면 아래 가운데. 초상화(4,4)는 왼쪽 열 아래, 이름은 이름표(4,62,56×14) 가운데(글자 모양 기준 정수 px), 본문(14,14,292×48) 갈무리11 12px·낱말 줄바꿈·3줄 넘으면 경고, ▼(290,66) 1px 끊어 오르내림. 타이핑 `maxVisibleCharacters` 초당 30자(unscaled) → 전체 표시 → 다음. 같은 프레임 중복 입력 무시, 대사를 연 입력(E)은 진행으로 안 이어짐. 열 때 6px 올라오며 0.12초 페이드
+- 이름 맞춤(제안 채택): 갈무리11 Bold 12px → 갈무리9 10px → 갈무리7 8px, 작은 글씨는 1px 겹쳐 굵게, 그래도 넘치면 `…`. 이름표 폭 56 기준 4자 / 5자 / 7자까지
+- 입력: `GameControls` `Gameplay/Submit`(Space) 추가 → 열린 화면이 있으면 `Screens.Submit()`(E와 같음). SETUP.md 기록
+- 대사 그림: 임포트(Point·압축 없음·PPU 16·Single) 확인, `dialogue_ui` 폴더를 UiAtlas에 등록(`_preview`는 텍스처라 안 들어감). 메뉴 `VoxelMagic/UI/화면 만들기/대사창`, 화자 `Data/Speakers/Speaker_It`(세 씬 크리처에 연결)
+- 옛 `CreatureDialogView`는 아무것도 하지 않게 비움(새 대사 화면을 닫아 버리지 않도록)
+- 확인(플레이 모드): 재료를 다 모으고 납품 → 대사창 열림·의뢰 그대로·점수 그대로·게임 시계만 정지, ESC로 안 닫힘, 같은 프레임 두 번 입력 = 한 번, 마지막 대사 뒤 닫힘 + 의뢰 완료 + 필기 15. 테스트 4개 추가(EditMode 157개 통과)
+
 ## 2026-11-23 — 책 메뉴 탭을 장 표지 + 오른쪽 버튼으로, 지침 갱신
 - 사용자 결정: 책의 모든 탭은 왼쪽 = 고르는 곳 또는 장 표지, 오른쪽 = 내용. 고를 것이 없는 탭은 왼쪽에 장 표지
 - UI `BookCoverView`(장 표지): 탭 아이콘 4배(48) + 이름 굵게 + 구분선 80 + 한 줄 문구(Small, #967854), 세로 가운데. 테마 `Book › 장 표지`

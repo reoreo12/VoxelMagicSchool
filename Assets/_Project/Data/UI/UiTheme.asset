@@ -229,6 +229,33 @@ MonoBehaviour:
     _checkboxOnHover: {fileID: 21300000, guid: d245453f3f0bd5f4c97ff8dde13ae73f, type: 3}
     _checkboxOff: {fileID: 21300000, guid: 1bf8e0cc64158d84e8fbdb0ed1f69092, type: 3}
     _checkboxOffHover: {fileID: 21300000, guid: 5fa9501c353bb554495016ed6df03d98, type: 3}
+  _dialogue:
+    _scale: 1.5
+    _bottomMargin: 8
+    _overlap: 4
+    _portraitPosition: {x: 4, y: 4}
+    _namePlate:
+      x: 4
+      y: 62
+      width: 56
+      height: 14
+    _namePadding: 0
+    _nameStyles: 010000000300000004000000
+    _textArea:
+      x: 14
+      y: 14
+      width: 292
+      height: 48
+    _maxLines: 3
+    _arrowPosition: {x: 290, y: 66}
+    _charsPerSecond: 30
+    _arrowStepSeconds: 0.35
+    _openSeconds: 0.12
+    _openRise: 6
+    _panel: {fileID: 21300000, guid: d587af796e6660f408fc19f1b02eef87, type: 3}
+    _leftColumn: {fileID: 21300000, guid: 552fb6e930242144faa71a1b2336e0d2, type: 3}
+    _nextArrow: {fileID: 21300000, guid: 6652cb695a410794bac0f75bb9e501f7, type: 3}
+    _placeholderPortrait: {fileID: 21300000, guid: 302d068a784b4fe41aa433243622765c, type: 3}
   _texts: {fileID: 11400000, guid: 352cc08e03e545b4c8f802b1ffd4165f, type: 2}
   _textStyles:
   - _id: 0

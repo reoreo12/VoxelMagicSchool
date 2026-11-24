@@ -1,4 +1,4 @@
-# UI 연결·제작 지침 (2026-11-23 기준, 메뉴 탭 장 표지 반영)
+# UI 연결·제작 지침 (2026-11-23 기준, 대사창 반영)
 
 다른 사람이나 다른 대화(모델)가 UI 작업을 이어받거나, 게임 규칙 쪽에서 이미 만든 UI에 기능을 붙일 때 읽는 문서다.
 브랜치 `feature/tool-UI-editor`. 함께 읽을 것: `Docs/HANDOFF_UI.md`(진행 상황·열린 질문) → `Docs/UI_SPEC.md` 13장(결정) → 이 문서.
@@ -91,16 +91,28 @@ GameBootstrap (씬마다, Gameplay)
 | 새 탭 페이지 만들기 | `BookPage`를 상속(`Relayout()`에서 `Left`·`Right` 칸 안에 배치, `OnOpened()`는 펼쳐질 때 — 글자 크기를 재는 배치는 숨겨진 동안 정확하지 않으니 `OnOpened`에서 다시 배치), `UiBookBuilder`에 페이지 생성 추가. 왼쪽 페이지 규칙(목록 또는 `BookCoverView` 장 표지)을 따른다 |
 
 ### 2-7. 화면 스택·시간 정지·입력
-- 팝업 종류: `Core/Screens/ScreenPolicy`의 `GameScreen`(Book, Inventory, RequestBoard, RequestDetail(지금 안 씀), CreatureDialog).
-- 정책(`ScreenPolicy.DefaultFor`): 책·가방·게시판 = 전체 정지(timeScale 0) + 뒤쪽 입력 막기 + 플레이어 조작 막기. 크리처 대화 = 게임 시계만 정지.
+- 팝업 종류: `Core/Screens/ScreenPolicy`의 `GameScreen`(Book, Inventory, RequestBoard, RequestDetail(지금 안 씀), Dialogue).
+- 정책(`ScreenPolicy.DefaultFor`): 책·가방·게시판 = 전체 정지(timeScale 0) + 뒤쪽 입력 막기 + 플레이어 조작 막기. 대사(Dialogue) = 게임 시계만 정지(캐릭터 애니메이션은 계속) + **ESC·바깥 클릭으로 닫히지 않음** + 딤 없음.
 - 시간 정지는 `TimePause`가 참조 카운트로 센다. 실제 timeScale은 `Gameplay/TimeScaleDriver`.
 - 팝업 화면은 `UiScreen`을 상속하고 UI_Root의 `Popup` 층에 둔다. `UiScreenRouter`가 스택을 보고 켜고 끄며, 그 아래에 입력 막기 판(딤, 검정 알파 0.6)을 깐다. **판을 누르면 맨 위 화면이 닫힌다**(ESC와 같음).
-- ESC(`GameInputReader`): 열린 화면을 위에서부터 닫음 → 없으면 낚시 취소 → 없으면 `Screens.RequestMenu()`(책 메뉴 탭). Q: 의뢰 목록 접기/펼치기(`HudState.ToggleQuestList`).
+- ESC(`GameInputReader`): 열린 화면을 위에서부터 닫음(닫히지 않는 화면이면 아무것도 안 함) → 없으면 낚시 취소 → 없으면 `Screens.RequestMenu()`(책 메뉴 탭). Q: 의뢰 목록 접기/펼치기(`HudState.ToggleQuestList`).
+- 진행(Submit): 열린 화면이 있을 때 **Space**(`Gameplay/Submit` 액션)와 **E**(`PlayerInteractor`)가 모두 `Screens.Submit()` → `ScreenStack.Submitted`. 대사 넘기기 등에 쓴다.
 - 연출(페이지 넘김, 완료 알림 페이드, 퀵슬롯 선택 이동)은 모두 `Time.unscaledDeltaTime`.
 
-### 2-8. 그 밖의 HUD
+### 2-8. 초상화 대사창 (크리처 대화·수업)
+| 항목 | 내용 |
+|---|---|
+| 재생 창구 | `Core/Dialogue/DialogueChannel`(`context.Dialogue`): `Play(lines, onFinished)`, `IsPlaying`, `HasPresenter`(이 씬에 대사창 UI가 있는지), `Finish()`(UI가 마지막 대사 뒤에 부름), `Abort()` |
+| 대사 줄 | `DialogueLine(speaker, text, expression)`. 화자는 `Core/Data/SpeakerProfile`(SO: 이름표 이름, 기본 초상화 56×56, 표정 키별 초상화). 데이터 `Data/Speakers/`(지금 `Speaker_It` = '그것', 테스트 초상화) |
+| **결과 반영 규칙** | 아이템 소모·의뢰 완료·보상은 **`onFinished` 안에서만** 한다. 대사 도중 강제 종료되면 아무것도 바뀌지 않아 "말 걸기 전" 상태로 남는다(UI_SPEC 6-1). 예: `CreatureNpc.TryDeliver(context, speaker)`는 대사를 먼저 재생하고 끝나면 `Requests.Deliver` |
+| 대사창 UI가 없는 씬 | `HasPresenter`가 false면 대사 없이 결과를 바로 반영한다. 초상화 없는 대사는 이 창이 아니라 머리 위 말풍선(아직 없음) |
+| UI 코드 | `UI/Dialog/DialogueWindow`(UiScreen, Popup 층 `UI_Dialogue`): 패널 → 초상화 → 왼쪽 열 → 이름 → 본문 → ▼. 1.5배, 화면 아래 가운데. 타이핑 `maxVisibleCharacters`(초당 30자, unscaled), 같은 프레임 중복 입력 무시, 클릭·Space·E로 진행. 본문 낱말 단위 줄바꿈, 3줄 넘으면 콘솔 경고 |
+| 이름 맞춤 | 갈무리11 Bold 12px(4자) → 갈무리9 10px(5자) → 갈무리7 8px(7자) 순으로 이름표 폭 56에 맞추고, 작은 글씨는 1px 겹쳐 굵게. 그래도 넘치면 `…`. 테마 `Dialogue › Name Styles` |
+| 테마 | `Dialogue`(배수, 아래 여백, 겹침 4, 초상화·이름표·본문·▼ 위치, 타이핑 속도, 열기 페이드 0.12초·6px) |
+| 옛 코드 | `CreatureDialogView`는 아무것도 하지 않게 비워 둠(씬에 남아 있음, 옛 UI 정리 때 삭제). `GameMessages.CreatureSpeechRequested`는 더 쓰지 않음 |
+
+### 2-9. 그 밖의 HUD
 - `HudState`(`context.Hud`): 의뢰 목록 펼침(`IsQuestListExpanded`), 의뢰 바 보이기(`IsQuestBarVisible`), 휠 쓰는 HUD 위 마우스(`IsPointerOverScrollHud`).
-- 크리처 대사: 지금은 옛 `UI/Dialog/CreatureDialogView`(`GameMessages.CreatureSpeechRequested`). 새 대사 UI(6장)는 설계만 있고 그림 없음.
 - 아이템 획득 창·토스트: 옛 `AcquisitionPopup`·`ToastView`(`GameMessages`). 새 지침으로 아직 안 바꿈.
 - 옛 프로토타입(`InventoryBar`, `ScoreHud`, `QuestTrackerPanel`)은 세 씬에서 꺼 둠. `ControlsHintView`(왼쪽 아래 조작 안내)는 최종에 지움(사용자 결정).
 
@@ -148,7 +160,7 @@ GameBootstrap (씬마다, Gameplay)
 
 ### 3-5. 빌더(에디터 메뉴)로 만드는 방식
 - UI는 손으로 씬에 만들지 않고 **빌더 메뉴**로 프리팹을 만들어 UI_Root 안의 같은 이름을 바꿔 끼운다. 테마 값은 덮어쓰지 않고 비어 있는 것만 채운다.
-- 지금 있는 메뉴(`VoxelMagic/UI/`): `HUD 만들기/`(왼쪽 위 메뉴·의뢰 바, 퀵슬롯·상태 바, 점수, 시간대·툴팁, 의뢰 목록·완료 알림), `화면 만들기/책`, `UI 루트 프리팹 만들기`, `테마 기본값·위젯 프리셋 만들기`, `임포트 규칙 적용`, `픽셀 폰트 다시 굽기`, `외곽선 버전/`, `미리보기/`, `UI 작업대`(해상도·검사·굽기·테마), `UI 에디터 씬 열기`.
+- 지금 있는 메뉴(`VoxelMagic/UI/`): `HUD 만들기/`(왼쪽 위 메뉴·의뢰 바, 퀵슬롯·상태 바, 점수, 시간대·툴팁, 의뢰 목록·완료 알림), `화면 만들기/책`·`화면 만들기/대사창`(열린 씬의 크리처에 화자 연결까지), `UI 루트 프리팹 만들기`, `테마 기본값·위젯 프리셋 만들기`, `임포트 규칙 적용`, `픽셀 폰트 다시 굽기`, `외곽선 버전/`, `미리보기/`, `UI 작업대`(해상도·검사·굽기·테마), `UI 에디터 씬 열기`.
 - 새 HUD를 만들 때: (1) 테마 값 묶음 추가 → (2) 문구 키 추가 + 빌더에서 Seed → (3) 뷰 스크립트 → (4) 빌더(`Tools/Editor/UI/UiHud<이름>Builder.cs`)에서 프리팹 생성·층에 넣기·참조 연결 → (5) 메뉴 실행 → (6) 플레이 확인.
 
 ### 3-6. 리스트·성능
@@ -162,9 +174,9 @@ GameBootstrap (씬마다, Gameplay)
 1. 스크립트를 고치면 Unity 콘솔에 컴파일 오류가 없는지 본다.
 2. 빌더 메뉴를 다시 실행해 프리팹을 갱신한다.
 3. 플레이 모드 확인 전에 **자동 저장을 끈다**(`GameSaveSystem.AutoSaveEnabled = false`, 또는 GameBootstrap의 Auto Save 체크 해제). 안 끄면 테스트 아이템·점수가 저장 파일에 남는다.
-4. 치트(에디터·개발 빌드): F7 = 진행 중 의뢰의 모자란 재료 1개, F12 = `[Cheat] Requests` Inspector에서 고른 아이템, F10 = 의뢰 게시판, F11 = 의뢰 전달. (F1~F6은 뒷산 디버그, F8 자유 카메라, F9 이동 속도)
+4. 치트(에디터·개발 빌드): F7 = 진행 중 의뢰의 모자란 재료 1개, F12 = `[Cheat] Requests` Inspector에서 고른 아이템, F10 = 의뢰 게시판, F11 = 의뢰 전달(씬 크리처의 화자로 대사창을 거친 뒤 납품). (F1~F6은 뒷산 디버그, F8 자유 카메라, F9 이동 속도)
 5. 여러 의뢰 미리보기: 메뉴 `VoxelMagic/UI/미리보기/`(플레이 중).
-6. 캡처는 `Temp/UiCaptures`에. **Unity 창이 포커스가 없으면 게임 화면이 다시 그려지지 않아** 캡처가 이전 화면일 수 있다 → 같은 장면을 두 번 찍거나 값(위치·크기)을 뽑아 확인.
+6. 캡처는 `Temp/UiCaptures`에. **Unity 창이 포커스가 없으면 게임 화면이 다시 그려지지 않아** 캡처가 이전 화면일 수 있다 → 같은 장면을 두 번 찍거나 값(위치·크기)을 뽑아 확인. 플레이 중 `Time.frameCount`가 늘지 않으면 `Application.runInBackground = true` + `EditorApplication.QueuePlayerLoopUpdate()`로 프레임을 돌린다(이 프로젝트는 PlayerSettings에서 이미 켜져 있음).
 7. EditMode 테스트(지금 153개)가 통과하는지 본다.
 8. `UI 작업대 › 검사`로 정수 위치·불필요한 Raycast 등 배치 규칙을 확인한다.
 

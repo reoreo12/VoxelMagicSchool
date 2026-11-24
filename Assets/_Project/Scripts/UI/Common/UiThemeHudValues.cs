@@ -347,6 +347,61 @@ namespace VoxelMagic.UI
         public Sprite Icon => _icon;
     }
 
+    /// <summary>
+    /// 초상화 대사창(UI_SPEC 6-2): 고정 크기 그림(9-slice 없음). 대사 패널을 아래에, 왼쪽 열(초상화 창 + 이름표)을 위에 그려 4px 겹친다.
+    /// 위치 값은 모두 그림 왼쪽 위 기준 1배 px. 묶음 전체를 Scale배로 키워 화면 아래 가운데에 둔다.
+    /// </summary>
+    [System.Serializable]
+    public sealed class DialogueValues
+    {
+        [SerializeField, Min(0.5f), Tooltip("묶음 확대 배수(0.5 단위). 그림은 기준 640×360용이라 우리 화면(960×540)에서는 1.5배가 원래 의도한 크기")] private float _scale = 1.5f;
+        [SerializeField, Tooltip("화면 아래에서 대사창까지 (확대 뒤 화면 px)")] private int _bottomMargin = 8;
+        [SerializeField, Tooltip("왼쪽 열과 패널이 겹치는 폭")] private int _overlap = 4;
+        [SerializeField, Tooltip("왼쪽 열 안 초상화 창 위치 (56×56, 왼쪽 열 아래 층)")] private Vector2Int _portraitPosition = new Vector2Int(4, 4);
+        [SerializeField, Tooltip("왼쪽 열 안 이름표 칸 (x, y, 폭, 높이)")] private RectInt _namePlate = new RectInt(4, 62, 56, 14);
+        [SerializeField, Tooltip("이름 글자 좌우 최소 여백")] private int _namePadding = 2;
+        [SerializeField, Tooltip("이름이 길면 차례로 작은 글씨로 (갈무리11 Bold 12 → 갈무리9 10 → 갈무리7 8). 마지막에도 넘치면 … 으로 자른다")]
+        private UiTextStyle[] _nameStyles = { UiTextStyle.BodyBold, UiTextStyle.Small, UiTextStyle.Tiny };
+        [SerializeField, Tooltip("패널 안 대사 글자 칸 (x, y, 폭, 높이). 12px·줄 16·최대 3줄")] private RectInt _textArea = new RectInt(14, 14, 292, 48);
+        [SerializeField, Min(1), Tooltip("최대 줄 수. 넘치면 콘솔 경고(대사를 나눌 것)")] private int _maxLines = 3;
+        [SerializeField, Tooltip("패널 안 ▼ 위치")] private Vector2Int _arrowPosition = new Vector2Int(290, 66);
+        [SerializeField, Min(1f), Tooltip("타이핑 속도(글자/초, 시간 정지와 무관)")] private float _charsPerSecond = 30f;
+        [SerializeField, Min(0.01f), Tooltip("▼가 1px 오르내리는 간격(초)")] private float _arrowStepSeconds = 0.35f;
+        [SerializeField, Min(0f), Tooltip("열 때 페이드 시간(초)")] private float _openSeconds = 0.12f;
+        [SerializeField, Tooltip("열 때 아래에서 올라오는 거리(px, 1배 기준)")] private int _openRise = 6;
+        [SerializeField] private Sprite _panel;
+        [SerializeField] private Sprite _leftColumn;
+        [SerializeField] private Sprite _nextArrow;
+        [SerializeField, Tooltip("화자에 초상화가 없을 때 (테스트용)")] private Sprite _placeholderPortrait;
+
+        public float Scale => Mathf.Max(0.5f, Mathf.Round(_scale * 2f) / 2f);
+        public int BottomMargin => _bottomMargin;
+        public int Overlap => _overlap;
+        public Vector2Int PortraitPosition => _portraitPosition;
+        public RectInt NamePlate => _namePlate;
+        public int NamePadding => _namePadding;
+        public IReadOnlyList<UiTextStyle> NameStyles => _nameStyles;
+        public RectInt TextArea => _textArea;
+        public int MaxLines => Mathf.Max(1, _maxLines);
+        public Vector2Int ArrowPosition => _arrowPosition;
+        public float CharsPerSecond => Mathf.Max(1f, _charsPerSecond);
+        public float ArrowStepSeconds => Mathf.Max(0.01f, _arrowStepSeconds);
+        public float OpenSeconds => Mathf.Max(0f, _openSeconds);
+        public int OpenRise => _openRise;
+        public Sprite Panel => _panel;
+        public Sprite LeftColumn => _leftColumn;
+        public Sprite NextArrow => _nextArrow;
+        public Sprite PlaceholderPortrait => _placeholderPortrait;
+
+        public void SetSprites(Sprite panel, Sprite leftColumn, Sprite arrow, Sprite placeholder)
+        {
+            _panel = panel;
+            _leftColumn = leftColumn;
+            _nextArrow = arrow;
+            _placeholderPortrait = placeholder;
+        }
+    }
+
     /// <summary>공용 툴팁(종이 바탕 + 글자 한 줄). 맨 위 Overlay 층에 하나만 둔다.</summary>
     [System.Serializable]
     public sealed class TooltipValues

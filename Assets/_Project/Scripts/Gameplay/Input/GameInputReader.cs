@@ -43,6 +43,8 @@ namespace VoxelMagic.Gameplay
             _map.FindAction("Scroll", true).performed += OnScroll;
             _map.FindAction("ToggleTracker", true).performed += _ => _context?.Hud.ToggleQuestList();
             _map.FindAction("Cancel", true).performed += _ => OnCancel();
+            // Space: 열린 화면 진행(대사 넘기기 등, UI_SPEC 6-1). E는 PlayerInteractor가 같은 Submit으로 보낸다.
+            _map.FindAction("Submit", true).performed += _ => { if (_context != null && _context.Screens.HasAny) _context.Screens.Submit(); };
         }
 
         private void OnEnable()

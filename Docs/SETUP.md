@@ -50,6 +50,7 @@
 | 2026-11-04 | `SideScroll` 맵에 `ToggleCameraFollow`(C), `Interact`(E) 추가 | 복도 카메라 고정/부드럽게 전환, 오른쪽 문 포털 | 사용자 승인 |
 | 2026-11-04 | `SideScroll` 맵에 `ToggleNight`(N) 추가 | 복도 낮/밤 전환 | 사용자 승인 |
 | 2026-11-10 | `Gameplay` 맵에 `Run`(Left Shift, Button) 추가 | 텃밭·연못 달리기 (복도 Run과 같은 키) | 사용자 승인 (설계 9-3) |
+| 2026-11-23 | `Gameplay` 맵에 `Submit`(Space, Button) 추가 | 열린 화면 진행(대사 넘기기, UI_SPEC 6-1). E는 기존 Interact가 같은 Submit으로 보냄 | 사용자 승인 |
 
 ## 빌드 씬 목록 (Build Settings)
 
