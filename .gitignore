@@ -73,3 +73,7 @@ crashlytics-build.properties
 # Temporary auto-generated Android Assets
 /[Aa]ssets/[Ss]treamingAssets/aa.meta
 /[Aa]ssets/[Ss]treamingAssets/aa/*
+
+# Sprout Lands UI 팩 (비상업 전용 라이선스) - 공개 저장소에 올리지 않음
+/[Aa]ssets/_Project/Art/UI/Sprout Lands*/
+/[Aa]ssets/_Project/Art/UI/Sprout Lands*.meta
