@@ -33,11 +33,15 @@ namespace VoxelMagic.Gameplay
 
         public GameContext Context { get; private set; }
 
+        private TimeScaleDriver _timeScale;
+
         private void Awake()
         {
             GameSaveSystem.AutoSaveEnabled = _autoSave;
             var progress = GameSaveSystem.GetOrCreateProgress(_balance, _requests, _catalog, GiveStartingItems);
             Context = GameContext.Create(_balance, _farm, _fishing, _player, progress, new SystemRandom());
+            // 씬에 들어올 때의 timeScale을 평소 값으로 기억한다(보통 1).
+            _timeScale = new TimeScaleDriver(Context.Pause, Time.timeScale > 0f ? Time.timeScale : 1f);
 
             var registry = new InteractableRegistry();
             foreach (var root in _bindRoots)
@@ -57,6 +61,7 @@ namespace VoxelMagic.Gameplay
         private void OnDestroy()
         {
             GameSession.Capturing -= CaptureScene;
+            _timeScale?.Dispose();
             // 저장 없이 씬이 내려가도(에디터에서 씬 전환 등) 밭은 보관본에 남긴다.
             if (Context != null && GameSession.Progress == Context.Progress) Context.Progress.CaptureFarm(Context.FarmGrid);
         }

@@ -74,6 +74,6 @@ crashlytics-build.properties
 /[Aa]ssets/[Ss]treamingAssets/aa.meta
 /[Aa]ssets/[Ss]treamingAssets/aa/*
 
-# Sprout Lands UI 팩 (비상업 전용 라이선스) - 공개 저장소에 올리지 않음
+# Sprout Lands UI Pack (재배포 금지 라이선스, UI_SPEC.md 1장) - 원본과 수정본 모두 저장소에 올리지 않는다
 /[Aa]ssets/_Project/Art/UI/Sprout Lands*/
 /[Aa]ssets/_Project/Art/UI/Sprout Lands*.meta

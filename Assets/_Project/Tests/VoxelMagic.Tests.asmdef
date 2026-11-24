@@ -3,6 +3,7 @@
     "rootNamespace": "VoxelMagic.Tests",
     "references": [
         "VoxelMagic.Core",
+        "VoxelMagic.UI",
         "UnityEngine.TestRunner",
         "UnityEditor.TestRunner"
     ],

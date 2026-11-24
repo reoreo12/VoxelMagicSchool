@@ -41,6 +41,7 @@ namespace VoxelMagic.UI
 
         private void OnScoreChanged(ScoreKind kind, int previous, int current)
         {
+            if (this == null) { OnDestroy(); return; } // 꺼진 채 씬이 내려가 OnDestroy가 불리지 않은 구독자: 여기서 구독을 푼다
             (kind == ScoreKind.Practical ? _practical : _written).Target = current;
         }
 

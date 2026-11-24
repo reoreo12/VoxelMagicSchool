@@ -25,7 +25,7 @@ namespace VoxelMagic.Gameplay
             if (_context == null || _registry == null) return;
 
             // 창·낚시·물 주기 동작 중에는 주변 상호작용 안내를 끈다.
-            if (_context.Screen.IsModalOpen || _context.Fishing.IsBusy || _context.Farm.IsWatering)
+            if (_context.Screens.BlocksGameplay || _context.Fishing.IsBusy || _context.Farm.IsWatering)
             {
                 Current = null;
                 _context.Prompt.Clear();
@@ -41,9 +41,9 @@ namespace VoxelMagic.Gameplay
         {
             if (_context == null) return;
 
-            if (_context.Screen.IsModalOpen)
+            if (_context.Screens.HasAny)
             {
-                _context.Screen.Submit();
+                _context.Screens.Submit();
                 return;
             }
             if (_context.Fishing.IsBusy)

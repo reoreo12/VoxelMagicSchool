@@ -52,12 +52,14 @@ namespace VoxelMagic.UI
 
         private void OnSlotChanged(int index)
         {
+            if (this == null) { OnDestroy(); return; } // 꺼진 채 씬이 내려가 OnDestroy가 불리지 않은 구독자: 여기서 구독을 푼다
             _slots[index].Show(_inventory.GetSlot(index));
             if (index == _inventory.SelectedIndex) RefreshSelectedName();
         }
 
         private void OnSelectionChanged(int selected)
         {
+            if (this == null) { OnDestroy(); return; } // 꺼진 채 씬이 내려가 OnDestroy가 불리지 않은 구독자: 여기서 구독을 푼다
             for (int i = 0; i < _slots.Count; i++) _slots[i].SetSelected(i == selected);
             RefreshSelectedName();
         }

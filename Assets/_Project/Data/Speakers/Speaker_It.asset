@@ -1,0 +1,29 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e8ac3ad781b30ba4e8e2572fce1d19da, type: 3}
+  m_Name: Speaker_It
+  m_EditorClassIdentifier: 
+  _displayName: "'\uADF8\uAC83'"
+  _defaultPortrait: {fileID: -1316231579, guid: f44130ac12965c74bb42fd97a85cffd0, type: 3}
+  _expressions:
+  - Key: surprised
+    Portrait: {fileID: -985378089, guid: f44130ac12965c74bb42fd97a85cffd0, type: 3}
+  - Key: closed
+    Portrait: {fileID: -1615870940, guid: f44130ac12965c74bb42fd97a85cffd0, type: 3}
+  - Key: squint
+    Portrait: {fileID: -894736327, guid: f44130ac12965c74bb42fd97a85cffd0, type: 3}
+  - Key: happy
+    Portrait: {fileID: 1836766402, guid: f44130ac12965c74bb42fd97a85cffd0, type: 3}
+  - Key: shy
+    Portrait: {fileID: -1947813486, guid: f44130ac12965c74bb42fd97a85cffd0, type: 3}
+  - Key: dark
+    Portrait: {fileID: -1810263119, guid: f44130ac12965c74bb42fd97a85cffd0, type: 3}
