@@ -1,4 +1,4 @@
-# UI 연결·제작 지침 (2026-11-23 기준, 대사창 반영)
+# UI 연결·제작 지침 (2026-11-24 기준, 대사창 확대 반영)
 
 다른 사람이나 다른 대화(모델)가 UI 작업을 이어받거나, 게임 규칙 쪽에서 이미 만든 UI에 기능을 붙일 때 읽는 문서다.
 브랜치 `feature/tool-UI-editor`. 함께 읽을 것: `Docs/HANDOFF_UI.md`(진행 상황·열린 질문) → `Docs/UI_SPEC.md` 13장(결정) → 이 문서.
@@ -103,12 +103,12 @@ GameBootstrap (씬마다, Gameplay)
 | 항목 | 내용 |
 |---|---|
 | 재생 창구 | `Core/Dialogue/DialogueChannel`(`context.Dialogue`): `Play(lines, onFinished)`, `IsPlaying`, `HasPresenter`(이 씬에 대사창 UI가 있는지), `Finish()`(UI가 마지막 대사 뒤에 부름), `Abort()` |
-| 대사 줄 | `DialogueLine(speaker, text, expression)`. 화자는 `Core/Data/SpeakerProfile`(SO: 이름표 이름, 기본 초상화 56×56, 표정 키별 초상화). 데이터 `Data/Speakers/`(지금 `Speaker_It` = '그것', 테스트 초상화) |
+| 대사 줄 | `DialogueLine(speaker, text, expression)`. 화자는 `Core/Data/SpeakerProfile`(SO: 이름표 이름, 기본 초상화 72×72, 표정 키별 초상화). 데이터 `Data/Speakers/`(지금 `Speaker_It` = '그것', 테스트 초상화) |
 | **결과 반영 규칙** | 아이템 소모·의뢰 완료·보상은 **`onFinished` 안에서만** 한다. 대사 도중 강제 종료되면 아무것도 바뀌지 않아 "말 걸기 전" 상태로 남는다(UI_SPEC 6-1). 예: `CreatureNpc.TryDeliver(context, speaker)`는 대사를 먼저 재생하고 끝나면 `Requests.Deliver` |
 | 대사창 UI가 없는 씬 | `HasPresenter`가 false면 대사 없이 결과를 바로 반영한다. 초상화 없는 대사는 이 창이 아니라 머리 위 말풍선(아직 없음) |
-| UI 코드 | `UI/Dialog/DialogueWindow`(UiScreen, Popup 층 `UI_Dialogue`): 패널 → 초상화 → 왼쪽 열 → 이름 → 본문 → ▼. 1.5배, 화면 아래 가운데. 타이핑 `maxVisibleCharacters`(초당 30자, unscaled), 같은 프레임 중복 입력 무시, 클릭·Space·E로 진행. 본문 낱말 단위 줄바꿈, 3줄 넘으면 콘솔 경고 |
-| 이름 맞춤 | 갈무리11 Bold 12px(4자) → 갈무리9 10px(5자) → 갈무리7 8px(7자) 순으로 이름표 폭 56에 맞추고, 작은 글씨는 1px 겹쳐 굵게. 그래도 넘치면 `…`. 테마 `Dialogue › Name Styles` |
-| 테마 | `Dialogue`(배수, 아래 여백, 겹침 4, 초상화·이름표·본문·▼ 위치, 타이핑 속도, 열기 페이드 0.12초·6px) |
+| UI 코드 | `UI/Dialog/DialogueWindow`(UiScreen, Popup 층 `UI_Dialogue`): 패널(320×96) → 초상화(72×72) → 왼쪽 열(80×96) → 이름 → 본문 → ▼. 4px 겹쳐 396×96, 1.25배(495×120, 사용자 결정), 화면 아래 가운데. ▼는 글자판 오른쪽·아래 여백 8 타이핑 `maxVisibleCharacters`(초당 30자, unscaled), 같은 프레임 중복 입력 무시, 클릭·Space·E로 진행. 본문 낱말 단위 줄바꿈, 3줄 넘으면 콘솔 경고 |
+| 이름 맞춤 | 갈무리11 Bold 12px(4자) → 갈무리9 10px(5자) → 갈무리7 8px(7자) 순으로 이름표 폭 72에 맞추고(6자 / 7자 / 9자까지), 세로는 실제 글자 모양(글리프) 기준으로 크림색 줄(4,79,72×13) 가운데, 작은 글씨는 1px 겹쳐 굵게. 그래도 넘치면 `…`. 테마 `Dialogue › Name Styles` |
+| 테마 | `Dialogue`(배수, 아래 여백, 겹침 4, 초상화 위치·**크기**, 이름표·본문·▼ 위치, 그림이 없을 때 쓸 왼쪽 열·패널·▼ 크기, 타이핑 속도, 열기 페이드 0.12초·6px). 그림 크기를 바꾸면 이 값들을 함께 고치고 메뉴 `화면 만들기/대사창`을 다시 실행 |
 | 옛 코드 | `CreatureDialogView`는 아무것도 하지 않게 비워 둠(씬에 남아 있음, 옛 UI 정리 때 삭제). `GameMessages.CreatureSpeechRequested`는 더 쓰지 않음 |
 
 ### 2-9. 그 밖의 HUD

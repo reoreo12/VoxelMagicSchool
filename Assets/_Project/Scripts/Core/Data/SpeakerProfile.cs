@@ -12,11 +12,11 @@ namespace VoxelMagic.Core
         public struct Expression
         {
             [Tooltip("표정 키 (예: smile, angry). 대사 줄에서 이 키를 고른다")] public string Key;
-            [Tooltip("56×56 초상화")] public Sprite Portrait;
+            [Tooltip("72×72 초상화 (테마 Dialogue › Portrait Size)")] public Sprite Portrait;
         }
 
-        [SerializeField, Tooltip("이름표에 보일 이름 (약 5자까지 12px, 더 길면 자동으로 작은 글씨)")] private string _displayName;
-        [SerializeField, Tooltip("56×56 기본 초상화")] private Sprite _defaultPortrait;
+        [SerializeField, Tooltip("이름표에 보일 이름 (6자까지 12px 굵게, 더 길면 자동으로 작은 글씨)")] private string _displayName;
+        [SerializeField, Tooltip("72×72 기본 초상화")] private Sprite _defaultPortrait;
         [SerializeField] private List<Expression> _expressions = new List<Expression>();
 
         public string DisplayName => _displayName;

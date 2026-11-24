@@ -354,17 +354,21 @@ namespace VoxelMagic.UI
     [System.Serializable]
     public sealed class DialogueValues
     {
-        [SerializeField, Min(0.5f), Tooltip("묶음 확대 배수(0.5 단위). 그림은 기준 640×360용이라 우리 화면(960×540)에서는 1.5배가 원래 의도한 크기")] private float _scale = 1.5f;
+        [SerializeField, Min(0.5f), Tooltip("묶음 확대 배수(0.05 단위). 1·1.5·2배는 1080p에서 도트 폭이 고르고, 그 밖의 값(사용자 결정 1.25)은 도트 폭이 조금 고르지 않다")] private float _scale = 1.25f;
         [SerializeField, Tooltip("화면 아래에서 대사창까지 (확대 뒤 화면 px)")] private int _bottomMargin = 8;
         [SerializeField, Tooltip("왼쪽 열과 패널이 겹치는 폭")] private int _overlap = 4;
-        [SerializeField, Tooltip("왼쪽 열 안 초상화 창 위치 (56×56, 왼쪽 열 아래 층)")] private Vector2Int _portraitPosition = new Vector2Int(4, 4);
-        [SerializeField, Tooltip("왼쪽 열 안 이름표 칸 (x, y, 폭, 높이)")] private RectInt _namePlate = new RectInt(4, 62, 56, 14);
+        [SerializeField, Tooltip("왼쪽 열 안 초상화 창 위치 (왼쪽 열 아래 층)")] private Vector2Int _portraitPosition = new Vector2Int(4, 4);
+        [SerializeField, Tooltip("초상화 크기 = 초상화 창 크기. 다른 크기 그림은 이 크기로 늘려 그린다")] private Vector2Int _portraitSize = new Vector2Int(72, 72);
+        [SerializeField, Tooltip("왼쪽 열 그림이 없을 때 배치에 쓸 크기 (그림이 있으면 그림 크기)")] private Vector2Int _leftColumnSize = new Vector2Int(80, 96);
+        [SerializeField, Tooltip("패널 그림이 없을 때 배치에 쓸 크기 (그림이 있으면 그림 크기)")] private Vector2Int _panelSize = new Vector2Int(320, 96);
+        [SerializeField, Tooltip("▼ 그림이 없을 때 크기 (그림이 있으면 그림 크기)")] private Vector2Int _arrowSize = new Vector2Int(7, 4);
+        [SerializeField, Tooltip("왼쪽 열 안 이름표 칸 (x, y, 폭, 높이). 세로는 위 베벨·아래 그늘을 뺀 크림색 줄만(79~91), 이름은 실제 글자 모양 기준 가운데")] private RectInt _namePlate = new RectInt(4, 79, 72, 13);
         [SerializeField, Tooltip("이름 글자 좌우 최소 여백")] private int _namePadding = 2;
         [SerializeField, Tooltip("이름이 길면 차례로 작은 글씨로 (갈무리11 Bold 12 → 갈무리9 10 → 갈무리7 8). 마지막에도 넘치면 … 으로 자른다")]
         private UiTextStyle[] _nameStyles = { UiTextStyle.BodyBold, UiTextStyle.Small, UiTextStyle.Tiny };
-        [SerializeField, Tooltip("패널 안 대사 글자 칸 (x, y, 폭, 높이). 12px·줄 16·최대 3줄")] private RectInt _textArea = new RectInt(14, 14, 292, 48);
+        [SerializeField, Tooltip("패널 안 대사 글자 칸 (x, y, 폭, 높이). 12px·줄 16·최대 3줄")] private RectInt _textArea = new RectInt(14, 20, 292, 48);
         [SerializeField, Min(1), Tooltip("최대 줄 수. 넘치면 콘솔 경고(대사를 나눌 것)")] private int _maxLines = 3;
-        [SerializeField, Tooltip("패널 안 ▼ 위치")] private Vector2Int _arrowPosition = new Vector2Int(290, 66);
+        [SerializeField, Tooltip("패널 안 ▼ 위치. 글자판(크림색) 오른쪽·아래 끝에서 같은 여백 8")] private Vector2Int _arrowPosition = new Vector2Int(301, 80);
         [SerializeField, Min(1f), Tooltip("타이핑 속도(글자/초, 시간 정지와 무관)")] private float _charsPerSecond = 30f;
         [SerializeField, Min(0.01f), Tooltip("▼가 1px 오르내리는 간격(초)")] private float _arrowStepSeconds = 0.35f;
         [SerializeField, Min(0f), Tooltip("열 때 페이드 시간(초)")] private float _openSeconds = 0.12f;
@@ -374,10 +378,14 @@ namespace VoxelMagic.UI
         [SerializeField] private Sprite _nextArrow;
         [SerializeField, Tooltip("화자에 초상화가 없을 때 (테스트용)")] private Sprite _placeholderPortrait;
 
-        public float Scale => Mathf.Max(0.5f, Mathf.Round(_scale * 2f) / 2f);
+        public float Scale => Mathf.Max(0.5f, Mathf.Round(_scale * 20f) / 20f);
         public int BottomMargin => _bottomMargin;
         public int Overlap => _overlap;
         public Vector2Int PortraitPosition => _portraitPosition;
+        public Vector2Int PortraitSize => _portraitSize;
+        public Vector2Int LeftColumnSize => _leftColumnSize;
+        public Vector2Int PanelSize => _panelSize;
+        public Vector2Int ArrowSize => _arrowSize;
         public RectInt NamePlate => _namePlate;
         public int NamePadding => _namePadding;
         public IReadOnlyList<UiTextStyle> NameStyles => _nameStyles;

@@ -230,24 +230,28 @@ MonoBehaviour:
     _checkboxOff: {fileID: 21300000, guid: 1bf8e0cc64158d84e8fbdb0ed1f69092, type: 3}
     _checkboxOffHover: {fileID: 21300000, guid: 5fa9501c353bb554495016ed6df03d98, type: 3}
   _dialogue:
-    _scale: 1.5
+    _scale: 1.25
     _bottomMargin: 8
     _overlap: 4
     _portraitPosition: {x: 4, y: 4}
+    _portraitSize: {x: 72, y: 72}
+    _leftColumnSize: {x: 80, y: 96}
+    _panelSize: {x: 320, y: 96}
+    _arrowSize: {x: 7, y: 4}
     _namePlate:
       x: 4
-      y: 62
-      width: 56
-      height: 14
+      y: 79
+      width: 72
+      height: 13
     _namePadding: 0
     _nameStyles: 010000000300000004000000
     _textArea:
       x: 14
-      y: 14
+      y: 20
       width: 292
       height: 48
     _maxLines: 3
-    _arrowPosition: {x: 290, y: 66}
+    _arrowPosition: {x: 301, y: 80}
     _charsPerSecond: 30
     _arrowStepSeconds: 0.35
     _openSeconds: 0.12

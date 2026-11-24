@@ -170,8 +170,8 @@ namespace VoxelMagic.UI
             var values = _theme.Dialogue;
             var root = (RectTransform)transform;
             PixelLayout.Stretch(root);
-            var column = Size(values.LeftColumn, new Vector2Int(64, 80));
-            var panel = Size(values.Panel, new Vector2Int(320, 80));
+            var column = Size(values.LeftColumn, values.LeftColumnSize);
+            var panel = Size(values.Panel, values.PanelSize);
             int panelX = column.x - values.Overlap;
             int width = panelX + panel.x, height = Mathf.Max(column.y, panel.y);
             float scale = values.Scale;
@@ -183,11 +183,11 @@ namespace VoxelMagic.UI
 
             // 그리는 순서(자식 순서): 패널 → 초상화 → 왼쪽 열 → 이름 → 대사 → ▼.
             SetImage(_panel, values.Panel, panelX, 0, panel, raycast: true);
-            SetImage(_portrait, _portrait.sprite, values.PortraitPosition.x, values.PortraitPosition.y, new Vector2Int(56, 56), raycast: false);
+            SetImage(_portrait, _portrait.sprite, values.PortraitPosition.x, values.PortraitPosition.y, values.PortraitSize, raycast: false);
             SetImage(_leftColumn, values.LeftColumn, 0, 0, column, raycast: true);
             var area = values.TextArea;
             PixelLayout.PlaceTopLeft((RectTransform)_text.transform, panelX + area.x, area.y, area.width, area.height);
-            var arrow = Size(values.NextArrow, new Vector2Int(7, 4));
+            var arrow = Size(values.NextArrow, values.ArrowSize);
             _nextArrow.sprite = values.NextArrow;
             _nextArrow.raycastTarget = false;
             _nextArrow.rectTransform.sizeDelta = arrow;
@@ -196,9 +196,9 @@ namespace VoxelMagic.UI
         private void PlaceArrow(int bob)
         {
             var values = _theme.Dialogue;
-            var column = Size(values.LeftColumn, new Vector2Int(64, 80));
+            var column = Size(values.LeftColumn, values.LeftColumnSize);
             int panelX = column.x - values.Overlap;
-            var arrow = Size(values.NextArrow, new Vector2Int(7, 4));
+            var arrow = Size(values.NextArrow, values.ArrowSize);
             PixelLayout.PlaceTopLeft(_nextArrow.rectTransform, panelX + values.ArrowPosition.x, values.ArrowPosition.y + bob, arrow.x, arrow.y);
         }
 
@@ -235,12 +235,13 @@ namespace VoxelMagic.UI
             label.alignment = TextAlignmentOptions.Center;
             label.ForceMeshUpdate();
             var bounds = label.textBounds;
-            if (bounds.size.x > 0f)
+            if (bounds.size.x > 0f && TryInkRows(label, out float inkTop, out float inkBottom))
             {
-                int w = Mathf.RoundToInt(bounds.size.x) + (pixelBold ? 1 : 0), h = Mathf.RoundToInt(bounds.size.y);
+                // 세로는 textBounds(줄 높이 포함)가 아니라 실제 글자 모양 위·아래로 가운데 맞춤.
+                int w = Mathf.RoundToInt(bounds.size.x) + (pixelBold ? 1 : 0), h = Mathf.RoundToInt(inkTop - inkBottom);
                 int left = plate.x + (plate.width - w) / 2, top = plate.y + (plate.height - h) / 2;
                 rect.anchoredPosition = new Vector2(rect.anchoredPosition.x + (left - (plate.x + values.NamePadding + bounds.min.x)),
-                    rect.anchoredPosition.y - (top - (plate.y - bounds.max.y)));
+                    rect.anchoredPosition.y - (top - (plate.y - inkTop)));
             }
             if (pixelBold)
             {
@@ -250,6 +251,24 @@ namespace VoxelMagic.UI
                 copy.anchoredPosition = rect.anchoredPosition + new Vector2(1f, 0f);
                 _nameBold.GetComponent<TMP_Text>().alignment = TextAlignmentOptions.Center;
             }
+        }
+
+        // 보이는 글자들의 글리프 모양 맨 위·맨 아래 (글자 칸 기준 y, 위가 +).
+        private static bool TryInkRows(TMP_Text label, out float top, out float bottom)
+        {
+            top = float.MinValue;
+            bottom = float.MaxValue;
+            var info = label.textInfo;
+            for (int i = 0; i < info.characterCount; i++)
+            {
+                var ch = info.characterInfo[i];
+                if (!ch.isVisible || ch.textElement == null || ch.textElement.glyph == null) continue;
+                var metrics = ch.textElement.glyph.metrics;
+                float glyphTop = ch.baseLine + metrics.horizontalBearingY * ch.scale;
+                top = Mathf.Max(top, glyphTop);
+                bottom = Mathf.Min(bottom, glyphTop - metrics.height * ch.scale);
+            }
+            return top > bottom;
         }
 
         private static void SetImage(Image image, Sprite sprite, int x, int y, Vector2Int size, bool raycast)
