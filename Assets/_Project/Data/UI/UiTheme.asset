@@ -1,0 +1,362 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4cf9afd6babb8df42b8f6286ef1e154f, type: 3}
+  m_Name: UiTheme
+  m_EditorClassIdentifier: 
+  _canvas:
+    _referenceHeight: 480
+    _referencePixelsPerUnit: 16
+    _minScale: 1
+  _layers:
+    _hudStatic: 0
+    _hudDynamic: 10
+    _hudAnimated: 20
+    _popup: 100
+    _overlay: 200
+  _modal:
+    _blockerColor: {r: 0, g: 0, b: 0, a: 0.6}
+  _fonts:
+    _regular: {fileID: 11400000, guid: 9fa631a826f3f41498165906aae102ed, type: 2}
+    _bold: {fileID: 11400000, guid: 58250c39abc89aa4e81cc7157b9ae992, type: 2}
+  _topLeft:
+    _margin: 8
+    _iconScale: 2
+    _iconGap: 4
+    _barGap: 4
+    _barWidth: 144
+    _barPaddingY: 3
+    _barButtonInset: 5
+    _barTitleGap: 4
+  _quickSlots:
+    _slotCount: 5
+    _slotSize: {x: 32, y: 36}
+    _slotGap: 2
+    _innerMargin: 2
+    _borderSide: 4
+    _borderBottom: 6
+    _bottomMargin: 8
+    _iconSize: 24
+    _selectionOutset: 2
+    _selectionMoveSeconds: 0.08
+    _selectionTopLeft: {fileID: 2095984601, guid: 85acf4bfda616c04fbbbea6d820019a9, type: 3}
+    _selectionTopRight: {fileID: 635226595, guid: 85acf4bfda616c04fbbbea6d820019a9, type: 3}
+    _selectionBottomLeft: {fileID: 1107980624, guid: 85acf4bfda616c04fbbbea6d820019a9, type: 3}
+    _selectionBottomRight: {fileID: 1248349939, guid: 85acf4bfda616c04fbbbea6d820019a9, type: 3}
+  _statusBars:
+    _margin: 8
+    _scale: 1.5
+    _iconScale: 1.125
+    _barHeight: 80
+    _barGap: 4
+    _iconGap: 2
+    _fillInset: 5
+    _manaFill: {fileID: 21300000, guid: 8eb8728c6ef7ed845a3686edc94ce81b, type: 3}
+    _staminaFill: {fileID: 21300000, guid: b4c8c5395d87c02489ff9087ea6fd1ff, type: 3}
+    _manaCap: {fileID: 21300000, guid: 22ab4b2a77672fe46a89ba8f70902a68, type: 3}
+    _staminaCap: {fileID: 21300000, guid: 6571776816fe7a144afeb5742ec09752, type: 3}
+    _manaIcon: {fileID: 21300000, guid: 926fbb60e88f53e4a85b21b35dbdde87, type: 3}
+    _staminaIcon: {fileID: 21300000, guid: 45b6d1c5a0ba5ea4887ca0444f801b78, type: 3}
+  _scores:
+    _topMargin: 8
+    _groupGap: 24
+    _labelGap: 4
+    _writtenOffsets:
+      _group: {x: -20, y: 0}
+      _label: {x: -17, y: 10}
+      _number: {x: 0, y: 0}
+    _practicalOffsets:
+      _group: {x: 20, y: 0}
+      _label: {x: -17, y: 10}
+      _number: {x: 0, y: 0}
+    _numberScale: 2
+    _digitPitch: 9
+    _maxDigits: 4
+    _outlinePx: 1
+    _digits:
+    - {fileID: 21300000, guid: 6896711c31c6e394287281722b937c7e, type: 3}
+    - {fileID: 21300000, guid: 5feb0fcea66e73b48b8c7f22e9fcc020, type: 3}
+    - {fileID: 21300000, guid: 8f8a04cb6457e6849910f4a99e781fb4, type: 3}
+    - {fileID: 21300000, guid: b4cb82121cb28d44ba2f0dd2df576213, type: 3}
+    - {fileID: 21300000, guid: b57f35db2154b144b893a25ff3855f29, type: 3}
+    - {fileID: 21300000, guid: 7b96ebd9919aca24d9759f12f08c37dc, type: 3}
+    - {fileID: 21300000, guid: a350f1782cc9ff941a04a5299dffdfeb, type: 3}
+    - {fileID: 21300000, guid: 59063cb1e9dd08d4bba45ae80390a26e, type: 3}
+    - {fileID: 21300000, guid: 56774a715d79a5849a52614c7cf57252, type: 3}
+    - {fileID: 21300000, guid: 60f2ecaa84e8022408e69720ebdc789a, type: 3}
+    _writtenUnderlines:
+    - {fileID: 21300000, guid: a71c605186d016449ab1530870a2d4d8, type: 3}
+    - {fileID: 21300000, guid: 0727ab90e47ed8e4e89c4f38fd5e8c94, type: 3}
+    - {fileID: 21300000, guid: 9699703082c70d24a9bd55d6d98273de, type: 3}
+    - {fileID: 21300000, guid: 0dad6e1cfe8bd9e4fb6afa65299b4a06, type: 3}
+    _practicalUnderlines:
+    - {fileID: 21300000, guid: 6dc880bb4468eb0488b0dc2cb43008f2, type: 3}
+    - {fileID: 21300000, guid: 70a98bb66e7108b45bc7366c88e418e7, type: 3}
+    - {fileID: 21300000, guid: 2fc7e635c1a9f86479804070dcb462bf, type: 3}
+    - {fileID: 21300000, guid: baaa5a0e38da1c6429a23bfdb04a28e4, type: 3}
+  _time:
+    _margin: 8
+    _scale: 1.5
+    _backing:
+      x: 8
+      y: 8
+      width: 41
+      height: 18
+    _backingColor: {r: 0.76862746, g: 0.6039216, b: 0.42352942, a: 1}
+    _iconPosition: {x: 8, y: 8}
+    _roulettePosition: {x: 35, y: 8}
+    _arrowPivot: {x: 35.08, y: 18.1}
+    _arrowPivotInSprite: {x: 0, y: 4}
+    _datePosition: {x: 3, y: 36}
+    _dateSize: {x: 48, y: 16}
+    _pausedPosition: {x: 0, y: 56}
+    _dateStyle: 5
+    _afterSchoolStartHour: 16
+    _nightStartHour: 19
+    _nightEndHour: 24
+    _startAngle: 75
+    _boundaryAngle: 0
+    _endAngle: -75
+    _previewDay: 1
+    _playDays: 8
+    _previewHour: 16
+    _tooltipOffset: {x: -8, y: 12}
+    _frame: {fileID: 952465741, guid: 455ad42b9a35d634b91e1fece7fc4f7d, type: 3}
+    _roulette: {fileID: -754629294, guid: 614c8de0451911a46ab3ff85fedbdb54, type: 3}
+    _arrow: {fileID: 2124064162, guid: 614c8de0451911a46ab3ff85fedbdb54, type: 3}
+    _afterSchoolIcon: {fileID: 1392401110, guid: 60e5e2e9af0bfd34cb3f3de36510f709, type: 3}
+    _nightIcon: {fileID: -245857414, guid: 60e5e2e9af0bfd34cb3f3de36510f709, type: 3}
+  _tooltip:
+    _padding: {x: 5, y: 3}
+    _screenMargin: 4
+    _textStyle: 0
+  _questList:
+    _barGap: 0
+    _paddingX: 9
+    _paddingY: 10
+    _itemGap: 4
+    _requirementIndent: 8
+    _maxVisibleItems: 4
+    _scrollbarWidth: 8
+    _scrollbarGap: 2
+    _wheelStep: 16
+    _titleStyle: 3
+    _titlePixelBold: 1
+    _requirementStyle: 3
+    _completedColor: {r: 0.2901961, g: 0.5647059, b: 0.78431374, a: 1}
+  _questToast:
+    _margin: 8
+    _padding: {x: 7, y: 5}
+    _closeGap: 4
+    _showSeconds: 3
+    _fadeSeconds: 0.4
+    _textStyle: 0
+  _book:
+    _pageSize: {x: 220, y: 300}
+    _contentInset: 16
+    _firstTabY: 12
+    _tabStep: 34
+    _tabTuck: 4
+    _tabSize: {x: 37, y: 32}
+    _tabSelectedSize: {x: 41, y: 32}
+    _tabIconScale: 2
+    _tabOutline: 1
+    _lineColor: {r: 0.7490196, g: 0.627451, b: 0.4392157, a: 1}
+    _pageLeft: {fileID: 21300000, guid: 84e131e454bbcb84eaf7bf6d41c6aac4, type: 3}
+    _pageRight: {fileID: 21300000, guid: e2e7b8351e2b6c2449492d150259090c, type: 3}
+    _spine: {fileID: 21300000, guid: 42754a6d8e0a63246bb2d961218bb4d2, type: 3}
+    _tabs:
+    - _id: 0
+      _normal: {fileID: 21300000, guid: 1bd237d10c632d84ca25571cf615448f, type: 3}
+      _selected: {fileID: 21300000, guid: f584662445f5f06428cf7f843eafe048, type: 3}
+      _icon: {fileID: 21300000, guid: 2c38c33a6a414ad47b6d7397c12c18f5, type: 3}
+    - _id: 1
+      _normal: {fileID: 21300000, guid: 7922a63eddf81a042a12fdd0a7476b46, type: 3}
+      _selected: {fileID: 21300000, guid: 7821fb9876fdf344ca3cdb9ced76ff0c, type: 3}
+      _icon: {fileID: 21300000, guid: 4616561a5aa2b1645b6fc109b198ffdd, type: 3}
+    - _id: 2
+      _normal: {fileID: 21300000, guid: 5bb72606d485d704bb5314c7c5c00f06, type: 3}
+      _selected: {fileID: 21300000, guid: 822eae905b4c48d4cbce1fbdfb67458f, type: 3}
+      _icon: {fileID: 21300000, guid: 1f0cd6c367db4d94b845872dbdd6c901, type: 3}
+    - _id: 3
+      _normal: {fileID: 21300000, guid: 10ec10db09bffdd4c9c91a1ae5c9debc, type: 3}
+      _selected: {fileID: 21300000, guid: e3000d4025f72064fa9514d268220f8c, type: 3}
+      _icon: {fileID: 21300000, guid: 37933cba7de7d304285f68bc370716ea, type: 3}
+    - _id: 4
+      _normal: {fileID: 21300000, guid: e2d7bab3d1e7f6b429958787ef0b1f06, type: 3}
+      _selected: {fileID: 21300000, guid: 95b3675391c7308449a764b4ff939b4f, type: 3}
+      _icon: {fileID: 21300000, guid: da25fecd1ba793a47b2c485989ca6d6a, type: 3}
+    _turnFrameSeconds: 0.045
+    _turnFrames: 9
+    _paperInset: 4
+    _turnLift: 4
+    _leafFlatRatio: 0.8
+    _leafCurveRatio: 0.45
+    _leaves:
+    - {fileID: 21300000, guid: 4547bcf3564101248b2c7f214af98dc1, type: 3}
+    - {fileID: 21300000, guid: 5d00ce453c302ee4d8705c46b9501f0b, type: 3}
+    - {fileID: 21300000, guid: c178721b812ef4f46a2d1267b2a52e8f, type: 3}
+    _leafEdge: {fileID: 21300000, guid: 3877da92347511a46a531f42ce85deee, type: 3}
+    _turnShadow: {fileID: 21300000, guid: 6b202cb6e463c3548b30f3a674ce78a8, type: 3}
+    _rowHeight: 22
+    _rowTextInset: 5
+    _headerGap: 4
+    _checkboxGap: 4
+    _titleGap: 6
+    _sectionGap: 10
+    _requirementIndent: 8
+    _rewardGap: 8
+    _coverIconScale: 4
+    _coverIconGap: 12
+    _coverLineGap: 6
+    _coverLineWidth: 80
+    _coverCaptionStyle: 3
+    _coverCaptionColor: {r: 0.5882353, g: 0.47058824, b: 0.32941177, a: 1}
+    _menuButtonHeight: 28
+    _pageButtonNormal: {fileID: 21300000, guid: c3454f4b3967bc64b99de72792fb4f44, type: 3}
+    _pageButtonHover: {fileID: 21300000, guid: 42d653fe6b4a02743b05c589534c5494, type: 3}
+    _pageButtonPressed: {fileID: 21300000, guid: 1f028b5e9cbee3041a16d99dc9671186, type: 3}
+    _menuButtonGap: 8
+    _checkboxOn: {fileID: 21300000, guid: 54673e13af7ffe84999ecb849572806f, type: 3}
+    _checkboxOnHover: {fileID: 21300000, guid: d245453f3f0bd5f4c97ff8dde13ae73f, type: 3}
+    _checkboxOff: {fileID: 21300000, guid: 1bf8e0cc64158d84e8fbdb0ed1f69092, type: 3}
+    _checkboxOffHover: {fileID: 21300000, guid: 5fa9501c353bb554495016ed6df03d98, type: 3}
+  _dialogue:
+    _scale: 1.25
+    _bottomMargin: 8
+    _overlap: 4
+    _portraitPosition: {x: 4, y: 4}
+    _portraitSize: {x: 72, y: 72}
+    _portraitBackingColor: {r: 0.9137255, g: 0.8392157, b: 0.6784314, a: 1}
+    _leftColumnSize: {x: 80, y: 96}
+    _panelSize: {x: 320, y: 96}
+    _arrowSize: {x: 7, y: 4}
+    _namePlate:
+      x: 4
+      y: 79
+      width: 72
+      height: 13
+    _namePadding: 0
+    _nameStyles: 010000000300000004000000
+    _textArea:
+      x: 14
+      y: 20
+      width: 292
+      height: 48
+    _maxLines: 3
+    _arrowPosition: {x: 301, y: 80}
+    _charsPerSecond: 30
+    _arrowStepSeconds: 0.35
+    _openSeconds: 0.12
+    _openRise: 6
+    _panel: {fileID: 21300000, guid: d587af796e6660f408fc19f1b02eef87, type: 3}
+    _leftColumn: {fileID: 21300000, guid: 552fb6e930242144faa71a1b2336e0d2, type: 3}
+    _nextArrow: {fileID: 21300000, guid: 6652cb695a410794bac0f75bb9e501f7, type: 3}
+    _placeholderPortrait: {fileID: 21300000, guid: 302d068a784b4fe41aa433243622765c, type: 3}
+  _texts: {fileID: 11400000, guid: 352cc08e03e545b4c8f802b1ffd4165f, type: 2}
+  _textStyles:
+  - _id: 0
+    _bold: 0
+    _fontOverride: {fileID: 0}
+    _sizeMultiplier: 1
+    _color: {r: 0.36078432, g: 0.25490198, b: 0.15686275, a: 1}
+    _extraWordSpacingPx: 0
+  - _id: 1
+    _bold: 1
+    _fontOverride: {fileID: 0}
+    _sizeMultiplier: 1
+    _color: {r: 0.36078432, g: 0.25490198, b: 0.15686275, a: 1}
+    _extraWordSpacingPx: 0
+  - _id: 2
+    _bold: 1
+    _fontOverride: {fileID: 0}
+    _sizeMultiplier: 1
+    _color: {r: 0.36078432, g: 0.25490198, b: 0.15686275, a: 1}
+    _extraWordSpacingPx: 0
+  - _id: 3
+    _bold: 0
+    _fontOverride: {fileID: 11400000, guid: 86c53de135500264886434858a2e1777, type: 2}
+    _sizeMultiplier: 1
+    _color: {r: 0.36078432, g: 0.25490198, b: 0.15686275, a: 1}
+    _extraWordSpacingPx: 0
+  - _id: 4
+    _bold: 0
+    _fontOverride: {fileID: 11400000, guid: e3db84c7608d41e4c90cde92a90f4b58, type: 2}
+    _sizeMultiplier: 1
+    _color: {r: 0.36078432, g: 0.25490198, b: 0.15686275, a: 1}
+    _extraWordSpacingPx: 0
+  - _id: 5
+    _bold: 1
+    _fontOverride: {fileID: 0}
+    _sizeMultiplier: 1
+    _color: {r: 0.36078432, g: 0.25490198, b: 0.15686275, a: 1}
+    _extraWordSpacingPx: 2
+  - _id: 6
+    _bold: 1
+    _fontOverride: {fileID: 0}
+    _sizeMultiplier: 1
+    _color: {r: 0.95686275, g: 0.9098039, b: 0.8, a: 1}
+    _extraWordSpacingPx: 0
+  _buttons:
+  - _id: 0
+    _normal: {fileID: 21300000, guid: c87daf77a58f6ff459e3b45ce80236cc, type: 3}
+    _hover: {fileID: 21300000, guid: 8cc22e469cabcdd4cb97bd01528bdddf, type: 3}
+    _pressed: {fileID: 21300000, guid: 386cade7d7640584cb7e12c26083eed5, type: 3}
+  - _id: 1
+    _normal: {fileID: 21300000, guid: 59a3f8971a850cd48a23466b5e3c6b8a, type: 3}
+    _hover: {fileID: 21300000, guid: e0e812d6dac225742ab2d3f093b03843, type: 3}
+    _pressed: {fileID: 21300000, guid: b3f7d5ad40949284ab4d276b777e98a0, type: 3}
+  - _id: 2
+    _normal: {fileID: 21300000, guid: f121cc33184b3f3429e317a5625235f9, type: 3}
+    _hover: {fileID: 21300000, guid: b51949cb7a4752e40a645a02c34bc99e, type: 3}
+    _pressed: {fileID: 21300000, guid: c848b6606f1dbd140bfad069f5bd1306, type: 3}
+  - _id: 3
+    _normal: {fileID: 21300000, guid: 03d7bd173157ecb4d92002f30d51d9cc, type: 3}
+    _hover: {fileID: 21300000, guid: 11c64704a98346640814f3515e5ee132, type: 3}
+    _pressed: {fileID: 21300000, guid: 0af9b2e2f45e5d1439622a5dad925cf9, type: 3}
+  - _id: 4
+    _normal: {fileID: 21300000, guid: fa7a91404a83f6a4c90043bdb3c92376, type: 3}
+    _hover: {fileID: 21300000, guid: a407380713c854a4ebee1b67bacc099d, type: 3}
+    _pressed: {fileID: 21300000, guid: 20e60ae3ef6fd404e95f0c09801618c8, type: 3}
+  _panels:
+  - _id: 0
+    _sprite: {fileID: 21300000, guid: 5c1af70882c7dd04eabb6073c0faa3d2, type: 3}
+    _imageType: 2
+  - _id: 1
+    _sprite: {fileID: 21300000, guid: 2bcc06577a8e9b840a7a53fad3a0eae6, type: 3}
+    _imageType: 2
+  - _id: 2
+    _sprite: {fileID: 21300000, guid: 0bee9e6cbf0f0994d9eb5633a2ce5635, type: 3}
+    _imageType: 2
+  - _id: 3
+    _sprite: {fileID: 21300000, guid: 6b0596a1eb5f7044983cf44ee482b089, type: 3}
+    _imageType: 2
+  - _id: 4
+    _sprite: {fileID: 21300000, guid: 408558d1ffc3301409390fe8d197b9f3, type: 3}
+    _imageType: 1
+  - _id: 5
+    _sprite: {fileID: 21300000, guid: 5c28281b2bc100b49a1e8d87efa28cef, type: 3}
+    _imageType: 1
+  - _id: 6
+    _sprite: {fileID: 1922709061, guid: 85acf4bfda616c04fbbbea6d820019a9, type: 3}
+    _imageType: 1
+  - _id: 7
+    _sprite: {fileID: 2008636851, guid: 85acf4bfda616c04fbbbea6d820019a9, type: 3}
+    _imageType: 1
+  - _id: 8
+    _sprite: {fileID: -1514007330, guid: 85acf4bfda616c04fbbbea6d820019a9, type: 3}
+    _imageType: 1
+  - _id: 9
+    _sprite: {fileID: 21300000, guid: d71581965160b4c4fa9eb8aa49425fdb, type: 3}
+    _imageType: 1
+  - _id: 10
+    _sprite: {fileID: 21300000, guid: 5c1af70882c7dd04eabb6073c0faa3d2, type: 3}
+    _imageType: 2

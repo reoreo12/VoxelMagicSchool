@@ -1,5 +1,5 @@
-// 크리처 대사 창. 받은 대사를 한 줄씩 보여 주고, E(ScreenState.Submit)나 클릭으로 넘기며, 마지막 줄 뒤에 창을 닫는다.
-using System.Collections.Generic;
+// 옛 프로토타입 크리처 대사 창. 새 대사창(DialogueWindow, UI_SPEC 6장)으로 바뀌어 더는 아무것도 하지 않는다(숨김만).
+// 씬에 남은 컴포넌트가 새 대사 화면을 건드리지 않도록 비워 두었다. 옛 프로토타입 UI를 정리할 때 씬과 함께 지운다.
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -14,59 +14,6 @@ namespace VoxelMagic.UI
         [SerializeField] private TMP_Text _hint;
         [SerializeField] private Button _nextButton;
 
-        private readonly List<string> _lines = new List<string>();
-        private GameMessages _messages;
-        private ScreenState _screen;
-        private int _index;
-
-        public void Bind(GameContext context)
-        {
-            _messages = context.Messages;
-            _screen = context.Screen;
-            _speaker.text = GameTexts.CreatureName;
-            _messages.CreatureSpeechRequested += OnSpeech;
-            _screen.WindowChanged += OnWindowChanged;
-            _screen.Submitted += Advance;
-            _nextButton.onClick.AddListener(Advance);
-            SetVisible(false);
-        }
-
-        private void OnDestroy()
-        {
-            if (_screen == null) return;
-            _messages.CreatureSpeechRequested -= OnSpeech;
-            _screen.WindowChanged -= OnWindowChanged;
-            _screen.Submitted -= Advance;
-        }
-
-        private void OnSpeech(IReadOnlyList<string> lines)
-        {
-            _lines.Clear();
-            _lines.AddRange(lines);
-            _index = 0;
-        }
-
-        private void OnWindowChanged(GameWindow window)
-        {
-            bool open = window == GameWindow.CreatureDialog;
-            SetVisible(open);
-            if (!open) return;
-            if (_lines.Count == 0) _screen.Close(GameWindow.CreatureDialog);
-            else ShowCurrent();
-        }
-
-        private void Advance()
-        {
-            if (!IsVisible) return;
-            _index++;
-            if (_index >= _lines.Count) _screen.Close(GameWindow.CreatureDialog);
-            else ShowCurrent();
-        }
-
-        private void ShowCurrent()
-        {
-            _line.text = _lines[_index];
-            _hint.text = _index < _lines.Count - 1 ? GameTexts.DialogNext : GameTexts.DialogClose;
-        }
+        public void Bind(GameContext context) => SetVisible(false);
     }
 }

@@ -1,4 +1,4 @@
-// 새 Input System 액션을 읽는 유일한 곳. 이동·E·카메라 줌(스크롤)은 이벤트로 내보내고, 나머지 키는 Core 명령으로 바꾼다.
+// 새 Input System 액션을 읽는 유일한 곳. 이동·E·카메라 줌(스크롤, HUD 위가 아닐 때)은 이벤트로 내보내고, 나머지 키는 Core 명령으로 바꾼다.
 using System;
 using UnityEngine;
 using UnityEngine.InputSystem;
@@ -41,8 +41,10 @@ namespace VoxelMagic.Gameplay
             }
             _map.FindAction("Interact", true).performed += _ => InteractPressed?.Invoke();
             _map.FindAction("Scroll", true).performed += OnScroll;
-            _map.FindAction("ToggleTracker", true).performed += _ => _context?.Screen.ToggleTracker();
+            _map.FindAction("ToggleTracker", true).performed += _ => _context?.Hud.ToggleQuestList();
             _map.FindAction("Cancel", true).performed += _ => OnCancel();
+            // Space: 열린 화면 진행(대사 넘기기 등, UI_SPEC 6-1). E는 PlayerInteractor가 같은 Submit으로 보낸다.
+            _map.FindAction("Submit", true).performed += _ => { if (_context != null && _context.Screens.HasAny) _context.Screens.Submit(); };
         }
 
         private void OnEnable()
@@ -70,14 +72,17 @@ namespace VoxelMagic.Gameplay
             float value = ctx.ReadValue<float>();
             if (Mathf.Approximately(value, 0f) || _context == null) return;
             if (_context.Fishing.State == FishingState.Minigame) _context.Fishing.Scroll(Mathf.Sign(value));
-            else if (!_context.Screen.IsModalOpen) ZoomRequested?.Invoke(Mathf.Sign(value));
+            // 마우스가 퀵슬롯 같은 HUD 위에 있으면 휠은 그 HUD가 쓴다(칸 바꾸기). 게임 화면 위일 때만 카메라 줌.
+            else if (!_context.Screens.HasAny && !_context.Hud.IsPointerOverScrollHud) ZoomRequested?.Invoke(Mathf.Sign(value));
         }
 
         private void OnCancel()
         {
             if (_context == null) return;
-            if (_context.Screen.IsModalOpen) _context.Screen.CloseCurrent();
-            else _context.Fishing.Cancel();
+            // ESC는 열린 화면을 맨 위부터 닫고, 없으면 낚시를 취소하고, 그것도 아니면 책(메뉴 탭)을 연다 (UI_SPEC 5-2).
+            if (_context.Screens.Cancel()) return;
+            if (_context.Fishing.IsBusy) _context.Fishing.Cancel();
+            else _context.Screens.RequestMenu();
         }
     }
 }
