@@ -71,6 +71,15 @@ namespace VoxelMagic.Tools.EditorTools.UiWorkbench
             yield return UiImportRule.Named("Sprout Lands - UI Pack - Basic packemojis-free/weather/Weather_Icons_smal_freel.png",
                 new UiSliceRect("time_icon_night", 7, 39, 18, 17),
                 new UiSliceRect("time_icon_after_school", 7, 71, 18, 17));
+            // 크리처 초상화(UI_SPEC 6-2): 336 원본을 72×72로 줄여 구운 표정 시트, 4×2칸(마지막 칸 비어 있음).
+            yield return UiImportRule.Named("Portrait/Creature/Creature_Portrait_Atlas_72.png",
+                new UiSliceRect("it_normal", 0, 0, 72, 72),
+                new UiSliceRect("it_surprised", 72, 0, 72, 72),
+                new UiSliceRect("it_closed", 144, 0, 72, 72),
+                new UiSliceRect("it_squint", 216, 0, 72, 72),
+                new UiSliceRect("it_happy", 0, 72, 72, 72),
+                new UiSliceRect("it_shy", 72, 72, 72, 72),
+                new UiSliceRect("it_dark", 144, 72, 72, 72));
         }
 
         public static string ApplyAll()

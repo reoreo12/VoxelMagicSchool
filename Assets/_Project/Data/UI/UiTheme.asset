@@ -235,6 +235,7 @@ MonoBehaviour:
     _overlap: 4
     _portraitPosition: {x: 4, y: 4}
     _portraitSize: {x: 72, y: 72}
+    _portraitBackingColor: {r: 0.9137255, g: 0.8392157, b: 0.6784314, a: 1}
     _leftColumnSize: {x: 80, y: 96}
     _panelSize: {x: 320, y: 96}
     _arrowSize: {x: 7, y: 4}

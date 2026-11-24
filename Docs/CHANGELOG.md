@@ -1,5 +1,17 @@
 # 변경 기록
 
+## 2026-11-24 — 초상화 가운데 정렬, 표정 넘기기 치트 키
+- `Creature_Portrait_Atlas_72.png`: 원본 칸 안에서 크리처가 오른쪽으로 치우쳐 있어(왼쪽 여백 3, 오른쪽 1) 표정 6칸을 1px 왼쪽으로 옮겨 좌우 2/2로 맞춤. 세로는 위 4·아래 3(높이 65라 더 맞출 수 없음). 어둠 칸은 꽉 찬 그림이라 그대로
+- 치트 키(에디터·개발 빌드): 대사창이 떠 있을 때 `]` = 다음 표정, `[` = 이전 표정. 화자의 기본 → 표정 목록 순서로 돌고, 다음 대사로 넘어가면 그 줄의 표정으로 돌아간다. 콘솔에 지금 표정 키 표시. `Gameplay/Debug/DialogueCheatKeys`(스스로 생김, "[Cheat] Dialogue") → Core `DialogueChannel.RequestPreviewExpression(step)` → UI `DialogueWindow`(의존 방향 유지). `SpeakerProfile`에 `ExpressionCount`·`ExpressionKey(i)` 추가
+- 확인(플레이 모드, 자동 저장 끔): 키 입력으로 7개 순환·되돌리기, 다음 줄에서 그 줄 표정(happy)으로 복귀, 초상화 좌우 여백 같음
+
+## 2026-11-24 — 크리처 초상화 적용 ('그것' 표정 7종)
+- 사용자가 넣은 `Art/UI/Portrait/Creature/Creature_Portrait_Atlas_336.png`(1344×672)·`_64.png`(256×128), 둘 다 4×2칸에 표정 7개. 64 버전은 336을 면적 평균으로 줄인 것과 픽셀까지 같음 → 같은 방식으로 336을 **72×72로 줄여 `Creature_Portrait_Atlas_72.png`(288×144)** 를 만듦(초상화 창 72에 늘림 없이 1:1). 반투명 가장자리는 알파 128 기준으로 불투명/투명
+- 임포트 규칙에 이름 붙인 자르기 추가: `it_normal`·`it_surprised`·`it_closed`·`it_squint`·`it_happy`·`it_shy`·`it_dark`. 규칙 적용으로 원본 336·64 시트도 Point·PPU 16·압축 없음이 됨(쓰지는 않음)
+- 화자 `Speaker_It`: 기본 초상화 `it_normal`, 표정 키 `surprised`·`closed`·`squint`·`happy`·`shy`·`dark`(대사 줄의 expression에 이 키를 넣으면 바뀜, 지금 대사는 표정 키를 안 씀)
+- 초상화가 배경이 투명해 게임 화면이 비치므로 초상화 아래에 단색 배경 `PortraitBacking` 추가. 테마 `Dialogue › Portrait Backing Color`(임시 #E9D6AD, 크림보다 조금 진함). 빌더가 새 화자를 만들 때 기본 초상화로 `it_normal`을 씀
+- 확인(플레이 모드, 자동 저장 끔): 표정 키 7개 모두 해당 그림으로 바뀜, 캡처 확인
+
 ## 2026-11-24 — 대사창 배율 1.25, ▼ 여백 맞춤
 - 사용자 결정: 1.5배는 너무 커서 **1.25배**로 줄임(글씨도 함께 작아짐). 테마 `Dialogue › Scale`은 0.05 단위로 받게 바꿈. 1080p에서 도트 하나가 2.5px라 폭이 조금 고르지 않음(1·1.5·2배만 고름)
 - 화면(960×540)에서 495×120, x 232~727, 아래 8~128

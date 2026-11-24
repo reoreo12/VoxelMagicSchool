@@ -1,5 +1,6 @@
 // 초상화 대사창 프리팹(UI_SPEC 6장)을 만들어 UI_Root의 Popup 층에 넣는다. 대사 그림을 UiAtlas에 등록하고, 테마에 그림을 채우고,
 // 크리처용 임시 화자 데이터(이름 '그것', 테스트 초상화)를 만들어 열린 씬의 CreatureNpc에 비어 있으면 연결한다.
+using System.Linq;
 using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEditor.U2D;
@@ -20,6 +21,7 @@ namespace VoxelMagic.Tools.EditorTools.UiWorkbench
         private const string SpeakerFolder = "Assets/_Project/Data/Speakers";
         private const string CreatureSpeakerPath = SpeakerFolder + "/Speaker_It.asset";
         private const string WindowName = "UI_Dialogue";
+        private const string CreaturePortraitPath = "Assets/_Project/Art/UI/Portrait/Creature/Creature_Portrait_Atlas_72.png";
 
         [MenuItem("VoxelMagic/UI/화면 만들기/대사창")]
         public static void Build()
@@ -56,8 +58,9 @@ namespace VoxelMagic.Tools.EditorTools.UiWorkbench
             var frame = new GameObject("Frame", typeof(RectTransform));
             frame.transform.SetParent(root.transform, false);
 
-            // 그리는 순서: 패널 → 초상화 → 왼쪽 열(초상화 창 테두리 + 이름표) → 이름 → 대사 → ▼
+            // 그리는 순서: 패널 → 초상화 배경 → 초상화 → 왼쪽 열(초상화 창 테두리 + 이름표) → 이름 → 대사 → ▼
             var panel = NewImage(frame.transform, "Panel");
+            var backing = NewImage(frame.transform, "PortraitBacking");
             var portrait = NewImage(frame.transform, "Portrait");
             var column = NewImage(frame.transform, "LeftColumn");
             var name = Text(frame.transform, "Name", UiTextStyle.BodyBold, theme, TextAlignmentOptions.Center, false);
@@ -72,6 +75,7 @@ namespace VoxelMagic.Tools.EditorTools.UiWorkbench
             so.FindProperty("_theme").objectReferenceValue = theme;
             so.FindProperty("_frame").objectReferenceValue = frame.transform;
             so.FindProperty("_panel").objectReferenceValue = panel;
+            so.FindProperty("_portraitBacking").objectReferenceValue = backing;
             so.FindProperty("_portrait").objectReferenceValue = portrait;
             so.FindProperty("_leftColumn").objectReferenceValue = column;
             so.FindProperty("_name").objectReferenceValue = name;
@@ -106,7 +110,8 @@ namespace VoxelMagic.Tools.EditorTools.UiWorkbench
             speaker = ScriptableObject.CreateInstance<SpeakerProfile>();
             var so = new SerializedObject(speaker);
             so.FindProperty("_displayName").stringValue = GameTexts.CreatureName;
-            so.FindProperty("_defaultPortrait").objectReferenceValue = Load("portrait_placeholder_56.png");
+            var normal = AssetDatabase.LoadAllAssetsAtPath(CreaturePortraitPath).OfType<Sprite>().FirstOrDefault(s => s.name == "it_normal");
+            so.FindProperty("_defaultPortrait").objectReferenceValue = normal != null ? normal : Load("portrait_placeholder_56.png");
             so.ApplyModifiedPropertiesWithoutUndo();
             AssetDatabase.CreateAsset(speaker, CreatureSpeakerPath);
             AssetDatabase.SaveAssets();

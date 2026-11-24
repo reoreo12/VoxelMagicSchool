@@ -13,5 +13,17 @@ MonoBehaviour:
   m_Name: Speaker_It
   m_EditorClassIdentifier: 
   _displayName: "'\uADF8\uAC83'"
-  _defaultPortrait: {fileID: 21300000, guid: 302d068a784b4fe41aa433243622765c, type: 3}
-  _expressions: []
+  _defaultPortrait: {fileID: -1316231579, guid: f44130ac12965c74bb42fd97a85cffd0, type: 3}
+  _expressions:
+  - Key: surprised
+    Portrait: {fileID: -985378089, guid: f44130ac12965c74bb42fd97a85cffd0, type: 3}
+  - Key: closed
+    Portrait: {fileID: -1615870940, guid: f44130ac12965c74bb42fd97a85cffd0, type: 3}
+  - Key: squint
+    Portrait: {fileID: -894736327, guid: f44130ac12965c74bb42fd97a85cffd0, type: 3}
+  - Key: happy
+    Portrait: {fileID: 1836766402, guid: f44130ac12965c74bb42fd97a85cffd0, type: 3}
+  - Key: shy
+    Portrait: {fileID: -1947813486, guid: f44130ac12965c74bb42fd97a85cffd0, type: 3}
+  - Key: dark
+    Portrait: {fileID: -1810263119, guid: f44130ac12965c74bb42fd97a85cffd0, type: 3}

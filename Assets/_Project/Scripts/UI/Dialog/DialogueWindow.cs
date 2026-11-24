@@ -15,6 +15,7 @@ namespace VoxelMagic.UI
         [SerializeField] private UiTheme _theme;
         [SerializeField, Tooltip("대사창 묶음(그림 기준 1배 좌표, 배수만큼 키움)")] private RectTransform _frame;
         [SerializeField] private Image _panel;
+        [SerializeField, Tooltip("초상화 뒤 단색 배경 (테마 Portrait Backing Color)")] private Image _portraitBacking;
         [SerializeField] private Image _portrait;
         [SerializeField] private Image _leftColumn;
         [SerializeField] private ThemedText _name;
@@ -35,6 +36,7 @@ namespace VoxelMagic.UI
         private float _openTime;
         private float _arrowTime;
         private Vector2Int _framePosition;
+        private int _previewExpression; // 개발용 표정 넘기기: 0 = 기본, 1~ = 화자의 표정 목록 순서
 
         public void Bind(GameContext context)
         {
@@ -42,12 +44,17 @@ namespace VoxelMagic.UI
             _screens = context.Screens;
             _channel.RegisterPresenter();
             _channel.Started += OnStarted;
+            _channel.PreviewExpressionRequested += OnPreviewExpression;
             _screens.Submitted += OnSubmit;
         }
 
         private void OnDestroy()
         {
-            if (_channel != null) _channel.Started -= OnStarted;
+            if (_channel != null)
+            {
+                _channel.Started -= OnStarted;
+                _channel.PreviewExpressionRequested -= OnPreviewExpression;
+            }
             if (_screens != null) _screens.Submitted -= OnSubmit;
         }
 
@@ -77,6 +84,30 @@ namespace VoxelMagic.UI
         public void OnPointerClick(PointerEventData eventData)
         {
             if (eventData.button == PointerEventData.InputButton.Left) Advance();
+        }
+
+        // 개발용(치트 키): 지금 화자의 기본 → 표정 목록 순서로 초상화만 바꿔 본다. 다음 대사로 넘어가면 그 줄의 표정으로 돌아간다.
+        private void OnPreviewExpression(int step)
+        {
+            if (this == null) { OnDestroy(); return; }
+            if (!IsShown || _lines == null || _index >= _lines.Count) return;
+            var speaker = _lines[_index].Speaker;
+            if (speaker == null) return;
+            int count = speaker.ExpressionCount + 1;
+            _previewExpression = ((_previewExpression + step) % count + count) % count;
+            string key = _previewExpression == 0 ? null : speaker.ExpressionKey(_previewExpression - 1);
+            var portrait = speaker.Portrait(key);
+            _portrait.sprite = portrait != null ? portrait : _theme.Dialogue.PlaceholderPortrait;
+            _portrait.enabled = _portrait.sprite != null;
+            Debug.Log($"[치트] 초상화 표정: {(key ?? "기본")} ({_previewExpression + 1}/{count})");
+        }
+
+        private static int ExpressionIndex(SpeakerProfile speaker, string expression)
+        {
+            if (speaker == null || string.IsNullOrEmpty(expression)) return 0;
+            for (int i = 0; i < speaker.ExpressionCount; i++)
+                if (speaker.ExpressionKey(i) == expression) return i + 1;
+            return 0;
         }
 
         // 타이핑 중이면 전체 표시, 전체 표시면 다음 대사, 마지막이면 닫고 결과 반영.
@@ -109,6 +140,7 @@ namespace VoxelMagic.UI
             var portrait = line.Speaker != null ? line.Speaker.Portrait(line.Expression) : null;
             _portrait.sprite = portrait != null ? portrait : values.PlaceholderPortrait;
             _portrait.enabled = _portrait.sprite != null;
+            _previewExpression = ExpressionIndex(line.Speaker, line.Expression);
             FitName(line.Speaker != null ? line.Speaker.DisplayName : string.Empty, values);
 
             var label = _text.GetComponent<TMP_Text>();
@@ -181,8 +213,15 @@ namespace VoxelMagic.UI
             PixelLayout.PlaceBottomLeft(_frame, _framePosition.x, _framePosition.y, width, height);
             _frame.localScale = new Vector3(scale, scale, 1f);
 
-            // 그리는 순서(자식 순서): 패널 → 초상화 → 왼쪽 열 → 이름 → 대사 → ▼.
+            // 그리는 순서(자식 순서): 패널 → 초상화 배경 → 초상화 → 왼쪽 열 → 이름 → 대사 → ▼.
             SetImage(_panel, values.Panel, panelX, 0, panel, raycast: true);
+            if (_portraitBacking != null)
+            {
+                _portraitBacking.sprite = null;
+                _portraitBacking.color = values.PortraitBackingColor;
+                _portraitBacking.raycastTarget = false;
+                PixelLayout.PlaceTopLeft(_portraitBacking.rectTransform, values.PortraitPosition.x, values.PortraitPosition.y, values.PortraitSize.x, values.PortraitSize.y);
+            }
             SetImage(_portrait, _portrait.sprite, values.PortraitPosition.x, values.PortraitPosition.y, values.PortraitSize, raycast: false);
             SetImage(_leftColumn, values.LeftColumn, 0, 0, column, raycast: true);
             var area = values.TextArea;

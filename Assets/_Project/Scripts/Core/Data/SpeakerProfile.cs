@@ -20,6 +20,8 @@ namespace VoxelMagic.Core
         [SerializeField] private List<Expression> _expressions = new List<Expression>();
 
         public string DisplayName => _displayName;
+        public int ExpressionCount => _expressions.Count;
+        public string ExpressionKey(int index) => _expressions[index].Key;
 
         /// <summary>표정 키에 맞는 초상화. 비었거나 없는 키면 기본 초상화.</summary>
         public Sprite Portrait(string expression)

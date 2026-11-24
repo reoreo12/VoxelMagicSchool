@@ -246,3 +246,74 @@ MonoBehaviour:
     _sliceGrid: 0
     _cellSize: {x: 0, y: 0}
     _slices: []
+  - _pathPattern: Portrait/Creature/Creature_Portrait_Atlas_72.png
+    _left: 0
+    _top: 0
+    _right: 0
+    _bottom: 0
+    _sliceGrid: 0
+    _cellSize: {x: 0, y: 0}
+    _slices:
+    - _name: it_normal
+      _x: 0
+      _yFromTop: 0
+      _width: 72
+      _height: 72
+      _left: 0
+      _top: 0
+      _right: 0
+      _bottom: 0
+    - _name: it_surprised
+      _x: 72
+      _yFromTop: 0
+      _width: 72
+      _height: 72
+      _left: 0
+      _top: 0
+      _right: 0
+      _bottom: 0
+    - _name: it_closed
+      _x: 144
+      _yFromTop: 0
+      _width: 72
+      _height: 72
+      _left: 0
+      _top: 0
+      _right: 0
+      _bottom: 0
+    - _name: it_squint
+      _x: 216
+      _yFromTop: 0
+      _width: 72
+      _height: 72
+      _left: 0
+      _top: 0
+      _right: 0
+      _bottom: 0
+    - _name: it_happy
+      _x: 0
+      _yFromTop: 72
+      _width: 72
+      _height: 72
+      _left: 0
+      _top: 0
+      _right: 0
+      _bottom: 0
+    - _name: it_shy
+      _x: 72
+      _yFromTop: 72
+      _width: 72
+      _height: 72
+      _left: 0
+      _top: 0
+      _right: 0
+      _bottom: 0
+    - _name: it_dark
+      _x: 144
+      _yFromTop: 72
+      _width: 72
+      _height: 72
+      _left: 0
+      _top: 0
+      _right: 0
+      _bottom: 0

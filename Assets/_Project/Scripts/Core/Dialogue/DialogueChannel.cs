@@ -32,7 +32,16 @@ namespace VoxelMagic.Core
         /// <summary>새 대사가 시작될 때 (UI 대사창이 받아 화면을 연다).</summary>
         public event Action Started;
 
+        /// <summary>개발용: 대사창에 떠 있는 초상화를 화자의 다음(+1)·이전(−1) 표정으로 바꿔 보라는 요청 (치트 키 → UI).</summary>
+        public event Action<int> PreviewExpressionRequested;
+
         public void RegisterPresenter() => HasPresenter = true;
+
+        /// <summary>개발용 치트 키가 부른다. 재생 중일 때만 대사창에 알린다.</summary>
+        public void RequestPreviewExpression(int step)
+        {
+            if (IsPlaying) PreviewExpressionRequested?.Invoke(step);
+        }
 
         /// <summary>대사를 시작한다. 이미 재생 중이거나 줄이 없으면 false(이때 onFinished는 부르지 않는다).</summary>
         public bool Play(IReadOnlyList<DialogueLine> lines, Action onFinished)

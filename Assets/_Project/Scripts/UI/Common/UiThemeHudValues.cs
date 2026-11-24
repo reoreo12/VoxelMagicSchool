@@ -359,6 +359,7 @@ namespace VoxelMagic.UI
         [SerializeField, Tooltip("왼쪽 열과 패널이 겹치는 폭")] private int _overlap = 4;
         [SerializeField, Tooltip("왼쪽 열 안 초상화 창 위치 (왼쪽 열 아래 층)")] private Vector2Int _portraitPosition = new Vector2Int(4, 4);
         [SerializeField, Tooltip("초상화 크기 = 초상화 창 크기. 다른 크기 그림은 이 크기로 늘려 그린다")] private Vector2Int _portraitSize = new Vector2Int(72, 72);
+        [SerializeField, Tooltip("초상화 뒤 배경색 (배경이 투명한 초상화 뒤로 게임 화면이 비치지 않게)")] private Color _portraitBackingColor = new Color32(233, 214, 173, 255);
         [SerializeField, Tooltip("왼쪽 열 그림이 없을 때 배치에 쓸 크기 (그림이 있으면 그림 크기)")] private Vector2Int _leftColumnSize = new Vector2Int(80, 96);
         [SerializeField, Tooltip("패널 그림이 없을 때 배치에 쓸 크기 (그림이 있으면 그림 크기)")] private Vector2Int _panelSize = new Vector2Int(320, 96);
         [SerializeField, Tooltip("▼ 그림이 없을 때 크기 (그림이 있으면 그림 크기)")] private Vector2Int _arrowSize = new Vector2Int(7, 4);
@@ -383,6 +384,7 @@ namespace VoxelMagic.UI
         public int Overlap => _overlap;
         public Vector2Int PortraitPosition => _portraitPosition;
         public Vector2Int PortraitSize => _portraitSize;
+        public Color PortraitBackingColor => _portraitBackingColor;
         public Vector2Int LeftColumnSize => _leftColumnSize;
         public Vector2Int PanelSize => _panelSize;
         public Vector2Int ArrowSize => _arrowSize;

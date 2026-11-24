@@ -103,7 +103,8 @@ GameBootstrap (씬마다, Gameplay)
 | 항목 | 내용 |
 |---|---|
 | 재생 창구 | `Core/Dialogue/DialogueChannel`(`context.Dialogue`): `Play(lines, onFinished)`, `IsPlaying`, `HasPresenter`(이 씬에 대사창 UI가 있는지), `Finish()`(UI가 마지막 대사 뒤에 부름), `Abort()` |
-| 대사 줄 | `DialogueLine(speaker, text, expression)`. 화자는 `Core/Data/SpeakerProfile`(SO: 이름표 이름, 기본 초상화 72×72, 표정 키별 초상화). 데이터 `Data/Speakers/`(지금 `Speaker_It` = '그것', 테스트 초상화) |
+| 대사 줄 | `DialogueLine(speaker, text, expression)`. 화자는 `Core/Data/SpeakerProfile`(SO: 이름표 이름, 기본 초상화 72×72, 표정 키별 초상화). 데이터 `Data/Speakers/`(지금 `Speaker_It` = '그것': 기본 `it_normal`, 표정 키 `surprised`·`closed`·`squint`·`happy`·`shy`·`dark`) |
+| 초상화 그림 | `Art/UI/Portrait/Creature/Creature_Portrait_Atlas_72.png`(72×72 칸, 크리처를 칸 가운데로 맞춤, 임포트 규칙으로 이름 붙여 자름). 새 크리처는 원본을 72×72로 줄여 같은 폴더에 두고 `UiImportRuleApplier.DefaultRules`에 자르기 규칙 추가 → `임포트 규칙 적용` → 화자 SO에 연결. 배경이 투명하면 초상화 뒤 단색(테마 `Portrait Backing Color`)이 보인다 |
 | **결과 반영 규칙** | 아이템 소모·의뢰 완료·보상은 **`onFinished` 안에서만** 한다. 대사 도중 강제 종료되면 아무것도 바뀌지 않아 "말 걸기 전" 상태로 남는다(UI_SPEC 6-1). 예: `CreatureNpc.TryDeliver(context, speaker)`는 대사를 먼저 재생하고 끝나면 `Requests.Deliver` |
 | 대사창 UI가 없는 씬 | `HasPresenter`가 false면 대사 없이 결과를 바로 반영한다. 초상화 없는 대사는 이 창이 아니라 머리 위 말풍선(아직 없음) |
 | UI 코드 | `UI/Dialog/DialogueWindow`(UiScreen, Popup 층 `UI_Dialogue`): 패널(320×96) → 초상화(72×72) → 왼쪽 열(80×96) → 이름 → 본문 → ▼. 4px 겹쳐 396×96, 1.25배(495×120, 사용자 결정), 화면 아래 가운데. ▼는 글자판 오른쪽·아래 여백 8 타이핑 `maxVisibleCharacters`(초당 30자, unscaled), 같은 프레임 중복 입력 무시, 클릭·Space·E로 진행. 본문 낱말 단위 줄바꿈, 3줄 넘으면 콘솔 경고 |
@@ -174,7 +175,7 @@ GameBootstrap (씬마다, Gameplay)
 1. 스크립트를 고치면 Unity 콘솔에 컴파일 오류가 없는지 본다.
 2. 빌더 메뉴를 다시 실행해 프리팹을 갱신한다.
 3. 플레이 모드 확인 전에 **자동 저장을 끈다**(`GameSaveSystem.AutoSaveEnabled = false`, 또는 GameBootstrap의 Auto Save 체크 해제). 안 끄면 테스트 아이템·점수가 저장 파일에 남는다.
-4. 치트(에디터·개발 빌드): F7 = 진행 중 의뢰의 모자란 재료 1개, F12 = `[Cheat] Requests` Inspector에서 고른 아이템, F10 = 의뢰 게시판, F11 = 의뢰 전달(씬 크리처의 화자로 대사창을 거친 뒤 납품). (F1~F6은 뒷산 디버그, F8 자유 카메라, F9 이동 속도)
+4. 치트(에디터·개발 빌드): F7 = 진행 중 의뢰의 모자란 재료 1개, F12 = `[Cheat] Requests` Inspector에서 고른 아이템, F10 = 의뢰 게시판, F11 = 의뢰 전달(씬 크리처의 화자로 대사창을 거친 뒤 납품), 대사창이 떠 있을 때 `]`/`[` = 초상화 다음/이전 표정(그 줄에서만). (F1~F6은 뒷산 디버그, F8 자유 카메라, F9 이동 속도)
 5. 여러 의뢰 미리보기: 메뉴 `VoxelMagic/UI/미리보기/`(플레이 중).
 6. 캡처는 `Temp/UiCaptures`에. **Unity 창이 포커스가 없으면 게임 화면이 다시 그려지지 않아** 캡처가 이전 화면일 수 있다 → 같은 장면을 두 번 찍거나 값(위치·크기)을 뽑아 확인. 플레이 중 `Time.frameCount`가 늘지 않으면 `Application.runInBackground = true` + `EditorApplication.QueuePlayerLoopUpdate()`로 프레임을 돌린다(이 프로젝트는 PlayerSettings에서 이미 켜져 있음).
 7. EditMode 테스트(지금 153개)가 통과하는지 본다.
