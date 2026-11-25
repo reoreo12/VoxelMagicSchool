@@ -1,0 +1,56 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 61ff641225af5274eb6f0d7b66dc667d, type: 3}
+  m_Name: PixelFontSet
+  m_EditorClassIdentifier: 
+  _outputFolder: Assets/_Project/Fonts/Pixel
+  _charsetPath: Assets/_Project/Fonts/Pretendard/KoreanCharset.txt
+  _textSourceFolders:
+  - Assets/_Project/Scripts/Core
+  - Assets/_Project/Scripts/UI
+  - Assets/_Project/Data
+  _padding: 1
+  _staticAtlasSize: 1024
+  _fallbackAtlasSize: 256
+  _fonts:
+  - _source: {fileID: 12800000, guid: 69c1e63e71bb3494dae5d16b3addacec, type: 3}
+    _assetName: Galmuri11
+    _samplingSize: 12
+    _renderMode: 4122
+  - _source: {fileID: 12800000, guid: bfab4b5fffc19e645bbd22652d3fcd12, type: 3}
+    _assetName: Galmuri11 Bold
+    _samplingSize: 12
+    _renderMode: 4122
+  - _source: {fileID: 12800000, guid: 970d02eeaf0babf44a1daedf0680b1f9, type: 3}
+    _assetName: Stardust3
+    _samplingSize: 13
+    _renderMode: 4122
+  - _source: {fileID: 12800000, guid: c86d7f5dc261fc8488fa367ca833f6e5, type: 3}
+    _assetName: Stardust3 Bold
+    _samplingSize: 13
+    _renderMode: 4122
+  - _source: {fileID: 12800000, guid: b51e6a89298818e4594de5717ebbf249, type: 3}
+    _assetName: Galmuri9
+    _samplingSize: 10
+    _renderMode: 4122
+  - _source: {fileID: 12800000, guid: 0309cc149d254ad4dbe1ac3da538071f, type: 3}
+    _assetName: Galmuri7
+    _samplingSize: 8
+    _renderMode: 4122
+  - _source: {fileID: 12800000, guid: 97958b7c640f47c4d9addf47bf70d7cd, type: 3}
+    _assetName: Silver
+    _samplingSize: 19
+    _renderMode: 4122
+  - _source: {fileID: 12800000, guid: 06ca2b1f1cf357144864e038fbc41422, type: 3}
+    _assetName: NeoDunggeunmo
+    _samplingSize: 16
+    _renderMode: 4122

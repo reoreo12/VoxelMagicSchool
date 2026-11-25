@@ -13,8 +13,7 @@ MonoBehaviour:
   m_Name: Request_HungryIt
   m_EditorClassIdentifier: 
   _title: "\uBC30\uACE0\uD508 '\uADF8\uAC83'\uC758 \uBD80\uD0C1"
-  _creatureLine: "\uBC30\uACE0\uD30C\u2026 \uD558\uC597\uACE0 \uC544\uC0AD\uD55C
-    \uAC70. \uC544\uB2C8, \uB108 \uB9D0\uACE0."
+  _creatureLine: "\uBC30\uACE0\uD30C\u2026 \uC544\uC0AD\uD55C \uAC8C \uD544\uC694\uD574."
   _requirements:
   - _item: {fileID: 11400000, guid: 0f8a00c4c4e02f941afff640b76201b0, type: 2}
     _amount: 3

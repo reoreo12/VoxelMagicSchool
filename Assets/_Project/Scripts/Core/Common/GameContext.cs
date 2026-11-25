@@ -20,12 +20,25 @@ namespace VoxelMagic.Core
         public RequestTracker Requests { get; private set; }
         public FishingSession Fishing { get; private set; }
         public PromptChannel Prompt { get; private set; }
-        public ScreenState Screen { get; private set; }
+        public TimePause Pause { get; private set; }
+        public ScreenStack Screens { get; private set; }
+        public HudState Hud { get; private set; }
+        /// <summary>책(메뉴) 화면의 탭·먼저 보여 줄 의뢰.</summary>
+        public BookState Book { get; private set; }
+        /// <summary>초상화가 있는 대사(크리처 대화·수업) 재생 창구.</summary>
+        public DialogueChannel Dialogue { get; private set; }
+        /// <summary>마력·기력(UI 상태 바가 읽음). 규칙 쪽 모델이 생기면 SetVitals로 연결한다. 없으면 null.</summary>
+        public IPlayerVitals Vitals { get; private set; }
+        /// <summary>날짜·시각(UI 시간대 HUD가 읽음). 게임 시계가 생기면 SetTime으로 연결한다. 없으면 null.</summary>
+        public IGameTime Time { get; private set; }
         public GameMessages Messages { get; private set; }
 
         public PlayerProgress Progress { get; private set; }
 
         /// <summary>플레이어 데이터(인벤토리·점수·도감·의뢰)는 씬을 넘어 유지되는 progress의 것을 쓰고, 나머지는 씬마다 새로 만든다.</summary>
+        public void SetVitals(IPlayerVitals vitals) => Vitals = vitals;
+        public void SetTime(IGameTime time) => Time = time;
+
         public static GameContext Create(GameBalanceConfig balance, FarmConfig farm, FishingConfig fishing,
             PlayerConfig player, PlayerProgress progress, IRandom random)
         {
@@ -40,13 +53,17 @@ namespace VoxelMagic.Core
                 Progress = progress,
                 Messages = new GameMessages(),
                 Prompt = new PromptChannel(),
-                Screen = new ScreenState(),
                 Journal = progress.Journal,
                 Inventory = progress.Inventory,
                 Score = progress.Score,
                 Requests = progress.Requests,
                 FarmGrid = new FarmGrid(farm.GridSize, new InstantGrowthRule())
             };
+            context.Pause = new TimePause();
+            context.Screens = new ScreenStack(context.Pause);
+            context.Hud = new HudState();
+            context.Book = new BookState();
+            context.Dialogue = new DialogueChannel();
             context.Farm = new FarmService(context.FarmGrid, context.Inventory, random, context.Messages);
             context.Fishing = new FishingSession(fishing, context.Inventory, random, context.Messages,
                 balance.AcquiredInfoSeconds);

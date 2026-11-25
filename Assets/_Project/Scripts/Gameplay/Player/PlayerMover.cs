@@ -43,7 +43,7 @@ namespace VoxelMagic.Gameplay
             var config = _context.PlayerConfig;
 
             // 창이 열려 있거나 물 주기 동작 중에는 멈춘다.
-            Vector2 input = _context.Screen.IsModalOpen || _context.Farm.IsWatering ? Vector2.zero : _input.Move;
+            Vector2 input = _context.Screens.BlocksGameplay || _context.Farm.IsWatering ? Vector2.zero : _input.Move;
             bool moving = input.sqrMagnitude > 0.01f;
             if (moving)
             {

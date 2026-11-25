@@ -1,5 +1,208 @@
 # 변경 기록
 
+## 2026-11-24 — 초상화 가운데 정렬, 표정 넘기기 치트 키
+- `Creature_Portrait_Atlas_72.png`: 원본 칸 안에서 크리처가 오른쪽으로 치우쳐 있어(왼쪽 여백 3, 오른쪽 1) 표정 6칸을 1px 왼쪽으로 옮겨 좌우 2/2로 맞춤. 세로는 위 4·아래 3(높이 65라 더 맞출 수 없음). 어둠 칸은 꽉 찬 그림이라 그대로
+- 치트 키(에디터·개발 빌드): 대사창이 떠 있을 때 `]` = 다음 표정, `[` = 이전 표정. 화자의 기본 → 표정 목록 순서로 돌고, 다음 대사로 넘어가면 그 줄의 표정으로 돌아간다. 콘솔에 지금 표정 키 표시. `Gameplay/Debug/DialogueCheatKeys`(스스로 생김, "[Cheat] Dialogue") → Core `DialogueChannel.RequestPreviewExpression(step)` → UI `DialogueWindow`(의존 방향 유지). `SpeakerProfile`에 `ExpressionCount`·`ExpressionKey(i)` 추가
+- 확인(플레이 모드, 자동 저장 끔): 키 입력으로 7개 순환·되돌리기, 다음 줄에서 그 줄 표정(happy)으로 복귀, 초상화 좌우 여백 같음
+
+## 2026-11-24 — 크리처 초상화 적용 ('그것' 표정 7종)
+- 사용자가 넣은 `Art/UI/Portrait/Creature/Creature_Portrait_Atlas_336.png`(1344×672)·`_64.png`(256×128), 둘 다 4×2칸에 표정 7개. 64 버전은 336을 면적 평균으로 줄인 것과 픽셀까지 같음 → 같은 방식으로 336을 **72×72로 줄여 `Creature_Portrait_Atlas_72.png`(288×144)** 를 만듦(초상화 창 72에 늘림 없이 1:1). 반투명 가장자리는 알파 128 기준으로 불투명/투명
+- 임포트 규칙에 이름 붙인 자르기 추가: `it_normal`·`it_surprised`·`it_closed`·`it_squint`·`it_happy`·`it_shy`·`it_dark`. 규칙 적용으로 원본 336·64 시트도 Point·PPU 16·압축 없음이 됨(쓰지는 않음)
+- 화자 `Speaker_It`: 기본 초상화 `it_normal`, 표정 키 `surprised`·`closed`·`squint`·`happy`·`shy`·`dark`(대사 줄의 expression에 이 키를 넣으면 바뀜, 지금 대사는 표정 키를 안 씀)
+- 초상화가 배경이 투명해 게임 화면이 비치므로 초상화 아래에 단색 배경 `PortraitBacking` 추가. 테마 `Dialogue › Portrait Backing Color`(임시 #E9D6AD, 크림보다 조금 진함). 빌더가 새 화자를 만들 때 기본 초상화로 `it_normal`을 씀
+- 확인(플레이 모드, 자동 저장 끔): 표정 키 7개 모두 해당 그림으로 바뀜, 캡처 확인
+
+## 2026-11-24 — 대사창 배율 1.25, ▼ 여백 맞춤
+- 사용자 결정: 1.5배는 너무 커서 **1.25배**로 줄임(글씨도 함께 작아짐). 테마 `Dialogue › Scale`은 0.05 단위로 받게 바꿈. 1080p에서 도트 하나가 2.5px라 폭이 조금 고르지 않음(1·1.5·2배만 고름)
+- 화면(960×540)에서 495×120, x 232~727, 아래 8~128
+- ▼ 위치 (290,82) → **(301,80)**: 글자판(크림색) 오른쪽 끝·아래 끝에서 같은 여백 8(전에는 오른쪽 19, 아래 6)
+- 확인(플레이 모드): 실제 납품 대사로 열어 위치·여백 확인
+- 이름 세로 가운데: 전에는 줄 높이(textBounds) 기준이라 12px 굵게에서 위 여백 0·아래 2로 위에 붙어 보였음. 실제 글자 모양(글리프 위·아래) 기준으로 바꾸고, 이름표 칸을 위 베벨·아래 그늘을 뺀 크림색 줄 (4,79) 72×13으로 고침 → 12px 위아래 1, 10px 2, 8px 3으로 같음
+
+## 2026-11-24 — 대사창 초상화·이름표 확대 (A안)
+- (아래 배율 1.5·▼ (290,82)는 같은 날 1.25·(301,80)으로 바뀜)
+- 그림: `dialogue_left_column.png` 64×80 → **80×96**(초상화 창 (4,4) 72×72, 이름표 (4,78) 72×14), `dialogue_panel.png` 320×80 → **320×96**(글자판 안쪽 (5,5)~(315,91)). 균일한 안쪽 줄을 복제해 늘려서 테두리·베벨 모양은 같음. 파일 이름·GUID 유지. `_preview` 합성 그림 갱신
+- 높이는 패널도 96으로 맞춤(사용자 결정, A안). 겹침 4 그대로, 전체 396×96 → 1.5배 594×144(960×540에서 x 183~777, 아래 8~152). 퀵슬롯은 덮고 마력·기력 바(x 약 896~)와는 떨어짐
+- 테마 `Dialogue`: `Portrait Size`(72×72) 추가, 그림이 없을 때 쓸 `Left Column Size`(80×96)·`Panel Size`(320×96)·`Arrow Size`(7×4) 추가, 이름표 (4,78,72×14), 본문 (14,20,292×48), ▼ (290,82). `DialogueWindow`의 숫자(56×56, 64×80, 320×80, 7×4)를 테마 값으로 바꿈
+- 테스트용 초상화는 새로 만들지 않고 `portrait_placeholder_56.png`를 72×72로 늘려 씀(사용자 결정, 정수 배가 아니라 도트 폭이 조금 고르지 않음). `SpeakerProfile` 설명 문구 72×72
+- 이름 맞춤(이름표 폭 72, 여백 0): 12px 굵게 6자, 10px 7자, 8px 9자까지. 6자는 이름표를 꽉 채움
+- 확인(플레이 모드, 자동 저장 끔): 실제 납품 대사로 열림, 이름 4~10자 글씨 변화 확인, EditMode 157개 통과
+
+## 2026-11-23 — 초상화 대사창 (UI_SPEC 6장)
+- 설계 대화에서 온 `Art/UI/UI_SPEC.md` 사본의 6장(대사)을 `Docs/UI_SPEC.md`에 합치고 사본은 지움(사용자 승인)
+- Core `DialogueChannel`(`context.Dialogue`: Play·Finish·Abort·HasPresenter), `DialogueLine`, `SpeakerProfile`(SO: 이름·기본 초상화·표정별 초상화). `GameScreen.CreatureDialog` → `Dialogue`로 이름 바꿈. 정책: 게임 시계만 정지(사용자 결정: 캐릭터 애니메이션 계속, 문제 생기면 전체 정지로), ESC·바깥 클릭으로 닫히지 않음
+- 대사 결과는 마지막 대사 뒤에 한 번에: `CreatureNpc.TryDeliver(context, speaker)`가 완료 대사 + 재료 설명을 먼저 재생하고, 끝나면 `Requests.Deliver`. 도중 강제 종료면 아무것도 안 바뀜. 화자·대사창이 없으면 바로 납품. F11 치트도 씬 크리처 화자로 대사창을 거침
+- UI `DialogueWindow`(Popup 층 `UI_Dialogue`): 패널(320×80) 위에 왼쪽 열(64×80)을 4px 겹쳐 380×80, 1.5배(그림이 640×360 기준이라 960×540에서 의도 크기), 화면 아래 가운데. 초상화(4,4)는 왼쪽 열 아래, 이름은 이름표(4,62,56×14) 가운데(글자 모양 기준 정수 px), 본문(14,14,292×48) 갈무리11 12px·낱말 줄바꿈·3줄 넘으면 경고, ▼(290,66) 1px 끊어 오르내림. 타이핑 `maxVisibleCharacters` 초당 30자(unscaled) → 전체 표시 → 다음. 같은 프레임 중복 입력 무시, 대사를 연 입력(E)은 진행으로 안 이어짐. 열 때 6px 올라오며 0.12초 페이드
+- 이름 맞춤(제안 채택): 갈무리11 Bold 12px → 갈무리9 10px → 갈무리7 8px, 작은 글씨는 1px 겹쳐 굵게, 그래도 넘치면 `…`. 이름표 폭 56 기준 4자 / 5자 / 7자까지
+- 입력: `GameControls` `Gameplay/Submit`(Space) 추가 → 열린 화면이 있으면 `Screens.Submit()`(E와 같음). SETUP.md 기록
+- 대사 그림: 임포트(Point·압축 없음·PPU 16·Single) 확인, `dialogue_ui` 폴더를 UiAtlas에 등록(`_preview`는 텍스처라 안 들어감). 메뉴 `VoxelMagic/UI/화면 만들기/대사창`, 화자 `Data/Speakers/Speaker_It`(세 씬 크리처에 연결)
+- 옛 `CreatureDialogView`는 아무것도 하지 않게 비움(새 대사 화면을 닫아 버리지 않도록)
+- 확인(플레이 모드): 재료를 다 모으고 납품 → 대사창 열림·의뢰 그대로·점수 그대로·게임 시계만 정지, ESC로 안 닫힘, 같은 프레임 두 번 입력 = 한 번, 마지막 대사 뒤 닫힘 + 의뢰 완료 + 필기 15. 테스트 4개 추가(EditMode 157개 통과)
+
+## 2026-11-23 — 책 메뉴 탭을 장 표지 + 오른쪽 버튼으로, 지침 갱신
+- 사용자 결정: 책의 모든 탭은 왼쪽 = 고르는 곳 또는 장 표지, 오른쪽 = 내용. 고를 것이 없는 탭은 왼쪽에 장 표지
+- UI `BookCoverView`(장 표지): 탭 아이콘 4배(48) + 이름 굵게 + 구분선 80 + 한 줄 문구(Small, #967854), 세로 가운데. 테마 `Book › 장 표지`
+- `MenuBookPage`: 왼쪽 장 표지(`메뉴` / `잠시 책을 덮고 쉬어 가요.`), 오른쪽 `나가기` 제목·구분선·`메인 화면으로`·`게임 종료`, 맨 아래 `책 닫기`. 문구 `ui.book.menu.caption`·`header`(임시)
+- 확인(플레이 모드): ESC → 메뉴 탭, 버튼은 오른쪽 페이지, 표지 아이콘 48×48이 왼쪽 내용 칸 가로 가운데. Unity 창 포커스가 없어 캡처는 못 함
+- `UI_INTEGRATION_GUIDE.md`: 페이지 규칙·장 표지·메뉴 탭 배치, 꺼진 채 내려간 뷰의 구독 해제(`if (this == null) { OnDestroy(); return; }`, 사용자 커밋 22c9c88에서 들어온 규칙), 새 탭 페이지는 `OnOpened`에서 다시 배치
+
+## 2026-11-23 — 씬 이동 뒤 E 줍기 오류(MissingReferenceException) 수정
+- 원인: `GameBootstrap`은 꺼진 UI에도 `Bind`를 부르고, Unity는 한 번도 켜진 적 없는 오브젝트에 `OnDestroy`를 부르지 않는다. Creature_Cave의 꺼진 `InventoryBar`가 씬을 넘어 유지되는 `Inventory` 구독을 풀지 못하고 남아, 뒷산에서 줍기 → `SlotChanged`에서 파괴된 Image에 접근해 예외 → `GatheringService.TryPick`이 중간에 멈춤(가방에는 들어가고 서식지에는 남음)
+- 수정: 씬을 넘어 유지되는 Core(`Inventory`·`RequestTracker`·`ScoreBook`) 이벤트를 받는 처리기 맨 앞에 `if (this == null) { OnDestroy(); return; }` — 파괴된 구독자는 첫 이벤트 때 스스로 구독을 푼다. 대상: `InventoryBar`, `QuickSlotBarView`, `ScoreHud`, `ScoreHudView`, `QuestBarView`, `QuestListView`, `QuestBookPage`, `QuestToastView`, `QuestTrackerPanel`, `RequestBoardWindow`, `InventoryEquipmentLink`
+- 확인(플레이 모드): Creature_Cave에서 시작 → 뒷산으로 이동 → 줍기 성공(가방 0→1, 슬롯 비움), 콘솔 에러 없음, `Inventory.SlotChanged` 구독자에 파괴된 객체 없음. EditMode 테스트 153개 통과
+- 새 UI가 씬을 넘는 Core 이벤트를 구독하면 같은 확인을 넣을 것
+
+## 2026-11-23 — 책 메뉴 탭(배치만) + UI 연결·제작 지침
+- UI `MenuBookPage`: 왼쪽 페이지에 `메뉴` 제목·구분선, `메인 화면으로`·`게임 종료` 버튼, 맨 아래 `책 닫기`(사용자 요청). 책 닫기만 동작(화면 스택에서 책 닫기 → 시간 다시 흐름). 메인 화면·게임 종료는 기능이 없어 로그만, 기능이 생기면 `MainMenuRequested`·`QuitRequested`에 연결
+- UI `BookMenuButton`: 가운데 글자, 마우스를 올리면 굵게
+- 사용자 피드백 반영: 찢김 없는 책 페이지 버튼 그림을 새로 그림(`Art/UI/book_ui/buttons/btn_page_{normal,hover,pressed}.png`, 12×12, 9-slice 4, 넘김 종이 외곽선색 #6B4B2A·모서리 1px 둥글게, 위 밝은 줄·아래 그늘 줄, 누름은 반대). 버튼 높이 24 → 28. 글자는 실제 글자 모양(textBounds) 기준으로 왼쪽=오른쪽, 위=아래 여백이 같게 정수 px로 맞추고, 남는 여백이 홀수면 버튼 폭·높이를 1px 줄여 맞춤(지금 세 버튼 187×28, 위아래 7)
+- 테마 `Book › 메뉴 탭`(버튼 높이 24, 간격 8), 문구 `ui.book.menu.*`. `UiBookBuilder`가 메뉴 탭에 이 페이지를 만듦
+- 확인(플레이 모드): ESC → 메뉴 탭, 메인 화면으로 → 로그만(책 그대로), 책 닫기 → 닫힘·timeScale 1
+- 문서 `Docs/UI_INTEGRATION_GUIDE.md` 새로: 기능별 연결 지점(마력·기력 `IPlayerVitals`/`SetVitals`, 시간 `IGameTime`/`SetTime`, 점수 `ScoreBook`, 의뢰 `IAcceptedRequestList`, 퀵슬롯 `Inventory`, 책 `BookState`, 화면 스택·시간 정지·입력), 바인딩 시점 주의, 새 UI 제작 틀(파일 위치·ThemedWidget·테마·문구·픽셀 규칙·층·빌더·리스트), 확인 방법. `HANDOFF_UI.md` 맨 위에서 이 문서를 가리킴
+
+## 2026-11-23 — 책 페이지 넘김 연출(5-3) + 탭 휠 전환
+- UI `BookPageTurner`: README 규칙 그대로 9프레임 × 45ms(unscaled), 폭 = round(W × |cos(πp)|)(W = 책등 가운데 ~ 반대편 표지 안쪽), 들어 올림 round(4 × sin(πp)), 폭 비율 0.8↑ leaf_0 / 0.45↑ leaf_1 / 그 아래 leaf_2, k=4 leaf_edge, 반대편은 Scale X −1. 그림자(shadow_strip)는 종이 바깥 가장자리에 붙이고 종이 안쪽(RectMask2D)에서 자름, k=4는 양쪽
+- `BookView`: 탭을 바꾸면 한 장씩 넘김. 앞으로(아래 탭)는 k=0에 오른쪽 내용·탭 선택 그림, k=8에 왼쪽 내용을 바꾸고 뒤로는 반대. 멀리 있는 탭은 이어서 넘기고 넘기는 중 입력은 마지막 탭만 목표로 남김. 책을 열 때는 넘기지 않고 바로 보임. `BookPage.SetHalves`로 왼쪽·오른쪽 내용을 따로 켜고 끔
+- 탭 위 휠(사용자 요청): 위 = 이전 탭, 아래 = 다음 탭, 양 끝에서 멈춤, 마지막 탭으로 기억(`BookTabView.Scrolled`)
+- 테마 `Book › 페이지 넘김`(프레임 시간·수, 표지 두께 4, 들어 올림 4, leaf 비율 경계, leaf·단면·그림자 스프라이트)
+- 확인(플레이 모드): 프레임별 종이·그림자 위치를 뽑아 실제 스프라이트로 그려 README 프리뷰와 같은 모양인지 확인, 휠 아래 1칸·끝에서 멈춤·위 1칸, 의뢰 → 설정까지 이어 넘긴 뒤 설정 페이지만 남음. Unity 창이 포커스가 없을 때는 게임 화면이 다시 그려지지 않아 움직임은 캡처로 못 봄 → 사용자 확인 필요
+
+## 2026-11-20 — (b) 책 화면 틀 + 의뢰 목록 탭 (자세히 패널 대신)
+- 사용자 결정: 자세히 패널(10-5) 대신 책의 맨 앞 탭 "의뢰 목록"에서 목록과 자세한 내용을 본다. 탭 순서 의뢰 목록 → 마법 스펠 → 마법진 → 환경 설정 → 나가기/종료 메뉴. 책은 프리뷰 비율로 크게(페이지 220×300 × 2 + 책등 8 = 448×300, 임시)
+- Core `BookState`(지금 탭·직접 고른 마지막 탭·먼저 보여 줄 의뢰)와 `GameContext.Book`. 책 아이콘 = 마지막으로 직접 고른 탭(처음 의뢰 목록), ESC(열린 화면 없음) = 메뉴 탭(마지막 탭으로 기억 안 함, 5-2 제안), HUD 의뢰 항목 = 의뢰 탭 + 그 의뢰
+- Core `HudState.IsQuestBarVisible`: 의뢰 바 X가 바·목록을 끄고, 책 의뢰 탭의 `화면에 의뢰 목록 표시` 체크 상자로 다시 켬(저장은 환경 설정 저장을 만들 때)
+- Core `IAcceptedRequestList.ExpectedReward`: 처음 납품하는 재료 보너스까지 포함한 필기 점수 예상값(규칙은 `ScoreCalculator`)
+- UI `BookScreen`·`BookView`(책 그림·사이드 탭 5개, 탭 아이콘 가운데 정렬)·`BookPage`(빈 페이지)·`QuestBookPage`(왼쪽: `수락한 의뢰(n)`, 구분선, 의뢰 버튼 목록 — 고른 칸 진한 종이 + 굵게, 완료 파란 글자, 넘치면 휠·스크롤바, 맨 아래 체크 상자 / 오른쪽: 제목·대사·필요한 재료·`보상 필기 점수 +n`)·`QuestBookRowView`·`ThemedCheckbox`
+- `UiTextWrap.ByWords`: 한글 대사를 낱말 단위로 줄바꿈(TMP 기본은 글자마다 끊어 "상식/이야"가 됨, 프로젝트 TMP 설정은 건드리지 않음)
+- 팝업 바깥(입력 막기 판)을 누르면 ESC처럼 맨 위 화면을 닫음(`UiRaycastBlocker.Clicked`)
+- 테마 `Book`(페이지 크기·여백·탭 위치·탭 색·아이콘·체크 상자·의뢰 탭 간격), 문구 `ui.book.quest.*`. 메뉴 `VoxelMagic/UI/화면 만들기/책`(UI_Root의 Popup 층)
+- 확인(Creature_Cave 1080p, 자동 저장 끔): 의뢰 항목 → 의뢰 탭 + 그 의뢰(timeScale 0), ESC → 메뉴 탭, 바깥 클릭 → 닫힘, 책 아이콘 → 처음 의뢰 탭·직접 고른 탭 기억, 체크 상자 ↔ 의뢰 바 숨김. EditMode 153개 통과
+- 사용자 피드백 반영: 사이드 탭을 9-slice로 키움(평상시 37×32, 선택 41×32, 외곽선 1px 그대로, 간격 34), 탭 아이콘 2배(24)로 표지 밖 안쪽 칸 가운데에. `화면에 의뢰 목록 표시` 글씨를 체크 상자 크기에 맞춰 `Small`(갈무리9 10px)로
+- 딤 켬: 팝업 뒤 입력 막기 판 색 = 검정 알파 0.6(테마 `Modal › Blocker Color`). 리니어 색 공간이라 0.45로는 약하게 보여 0.6으로(화면 밝기 약 65%)
+- 남은 것: 탭 전환 페이지 넘김 연출(5-3), 다른 탭 내용, 체크 상자 상태 저장
+
+## 2026-11-20 — 날짜 판 D-n, 완료 알림 X 수정
+- 버그: 완료 알림의 X가 눌리지 않았음. 알림이 있는 `HudAnimated` 층에 GraphicRaycaster가 없었음(연출 전용 층으로 만들었기 때문) → UI_Root의 `HudAnimated`에 추가, `UiRootPrefabBuilder`도 같게. 플레이 중 X 위치 레이캐스트가 `Close`에 맞고 다음 알림으로 넘어가는 것 확인
+- 사용자 결정: 8일 플레이, 날짜 판은 `D-{n}`(문구 `ui.time.day`). n = 플레이 날 수 − 며칠째 + 1 → 1일째 D-8 … 마지막 날 D-1. 날 수는 테마 `Time › Play Days`(8), 게임 시계가 생기면 규칙 쪽 값으로 옮길 것
+
+## 2026-11-20 — 외곽선 v2 비교 (책·가방 버튼, 점수 숫자·밑줄)
+- 사용자 외곽선 그림: `menu_icons/buttons/btn_{book,bag}_{normal,hover,pressed}_v2.png`(20×20), `score_ui/v2/digits/score_digit_N_v2.png`(13×14), `score_ui/underline/score_underline_N_v2.png`·`score_ui/v2/underline/score_underline_N_v2.png`(가로세로 +2)
+- 메뉴 `VoxelMagic/UI/외곽선 버전/외곽선 v2 쓰기`·`원본 쓰기`: 테마의 버튼·숫자·밑줄 스프라이트와 `Scores › Outline Px`(0/1)만 바꿈
+- `ScoreNumberView`: 숫자를 왼쪽 자리부터 채우고 그리는 순서도 왼쪽 → 오른쪽(이웃 외곽선 겹침). 피치 9 그대로. 밑줄은 `숫자 칸 높이 − 2 × 외곽선`에 둬서 원래 밑줄 자리와 같게. 테마가 바뀌면 숫자를 다시 그림
+- 사용자 결정: 외곽선 v2 채택
+- 외곽선 버튼은 20px × 2배 = 40이라 아이콘 줄이 8px 커지고, 그 아래 의뢰 바·목록도 8px 내려감
+
+## 2026-11-20 — (f) 의뢰 드롭다운 목록·완료 알림 (브랜치 `feature/tool-UI-editor`, `UI_SPEC.md` 10-2~10-4·10-6·13장)
+- Core `IAcceptedRequestList` 확장: `Accepted`(항목 = 의뢰·제목·수락 순서·요구 아이템별 진행·진행률·완료), `RequestBecameComplete`(조건을 다 채워 납품 가능해진 순간). `RequestTracker`가 진행이 바뀔 때마다 항목을 다시 만들고 `AcceptedListChanged`를 냄. 저장에서 불러온 의뢰가 이미 납품 가능하면 알림을 다시 내지 않음. 보상까지 받은(납품한) 의뢰는 목록에서 빠짐
+- UI `QuestListView`(HudDynamic `HUD_QuestList`): 의뢰 바 바로 아래, 폭 = 바 폭, 높이 = 항목에 맞춤(위아래 여백 같음). 정렬은 완료 → 진행률 높은 순 → 먼저 수락한 순(사용자 결정). 제목 + 아이템마다 한 줄 `무 0/3`(사용자 결정). 완료 항목 글자 `#4A90C8`. 제목+1줄 항목 4개 높이를 넘으면 RectMask2D로 자르고 휠·스크롤바(끌기 가능)로 스크롤, 항목은 보이는 만큼만 풀에서 재사용(가상 스크롤). 목록 위 휠은 카메라 줌 대신 스크롤. 항목이 없으면 패널을 숨김. 항목 클릭은 `ItemClicked`(자세히 패널 연결 자리)
+- UI `QuestToastView`(HudAnimated `HUD_QuestToast`): 화면 왼쪽 아래 `의뢰 완료: 제목`, 3초 + 페이드 0.4초(unscaled), 여러 건은 차례로, X로 지금 알림 닫기(사용자 요청). 의뢰 바를 꺼도 뜸
+- `ThemedText.SetColorOverride`(완료 글자색), 테마 `Quest List`·`Quest Toast`, 문구 `ui.quest.toast`·`ui.quest.requirement`, 메뉴 `VoxelMagic/UI/HUD 만들기/의뢰 목록·완료 알림`, 미리보기 메뉴 `VoxelMagic/UI/미리보기/`(가짜 의뢰 6건, 알림 2건 — 지금 규칙은 한 번에 하나만 수락해서)
+- 세 게임 씬의 옛 프로토타입 `QuestTracker`(오른쪽 위)를 끔
+- 사용자 피드백 반영: 목록 글자를 갈무리9 10px(`Small`)로 줄임. 갈무리9에는 굵은체가 없어 의뢰 제목은 1px 오른쪽에 한 번 더 그려 굵게(`Quest List › Title Pixel Bold`). 제목 앞 항목 기호 `· {0}`(문구 `ui.quest.itemTitle`), 재료 줄 들여쓰기 8. 여백 왼쪽·오른쪽 6 → 9, 위·아래 5 → 10(10-2: 위아래는 항상 같게)
+- 치트(`RequestCheatKeys`, 에디터·개발 빌드): F7 = 진행 중 의뢰의 모자란 재료 1개 넣기, F12 = `[Cheat] Requests` Inspector의 `Item To Add`를 `Amount To Add`만큼 넣기(F1~F6·F8~F11은 다른 디버그 키가 씀). 인벤토리에 실제로 들어가므로 자동 저장이 켜져 있으면 저장 파일에 남음
+- 확인(Creature_Cave 1080p, 자동 저장 끔): 의뢰 수락 → `무 0/3`, 무 3개 → 파란 글자 + 왼쪽 아래 알림, 가짜 6건 정렬·스크롤·스크롤바. EditMode 153개 통과. 왼쪽 아래 옛 조작 안내(`ControlsHintView`)와 알림이 겹침
+
+## 2026-11-20 — 시간대 UI 배치 (브랜치 `feature/tool-UI-editor`, `UI_SPEC.md` 8장·13장)
+- Core `IGameTime`(날짜·정시·시간대 `TimeOfDay` Day=방과후/Night=밤, `TimeChanged`)과 `GameContext.Time`·`SetTime`. 게임 시계는 아직 없음 → 연결 전에는 테마의 미리보기 값(1일째, 16시)을 보임
+- 임포트 규칙: 수정본 날씨 시트에서 `time_frame`(6,7 65×54, 틀 + 날짜 패널 한 조각)·`time_roulette`(17,71 13×17)·`time_arrow`(4,85 10×8, 가로), 원본 작은 날씨 아이콘에서 `time_icon_after_school`(노을, 7,71)·`time_icon_night`(달, 7,39) 18×17
+- UI `TimeHudView`(오른쪽 위, 가장자리 8, 2배): 그리는 순서 틀 → 룰렛 → 시간대 그림(틀보다 앞, 사용자 결정으로 왼쪽 1·아래 1 보정한 9,8) → 화살표 → 글자. 화살표는 정시마다 정수 각도로 회전(스텝, 13장): 방과후 16~19시 = 75°→0°, 밤 19~24시 = 0°→−75°(구간별로 나눠 색 경계에서 바뀜, 임시값). 날짜 패널 `{0}일째`(임시). 개발 빌드에서 게임 시계가 멈추면 "멈춰 있음"(8-2). 글자는 묶음 배수를 되돌려 다른 HUD 글자와 같은 크기
+- 공용 툴팁 `UiTooltipView`(Overlay 층 `UI_Tooltip`, 종이 바탕 `Tooltip` 스킨 = 의뢰 바 종이 임시): 마우스 옆 정수 px, 화면 밖이면 반대쪽. 시간대 HUD에 올리면 `방과후 16:00`(분 없음)
+- 테마 `Time`(위치·각도·구간 시각·미리보기·툴팁 거리·스프라이트), `Tooltip`(여백·글자 스타일). 문구 `ui.time.afterSchool`·`night`·`tooltip`·`day`·`paused`
+- 프리팹 `HUD_Time`(HudDynamic 층), 메뉴 `VoxelMagic/UI/HUD 만들기/시간대·툴팁`. `UiHudBuilder.Replace`가 넣은 인스턴스를 돌려줌(툴팁 연결용)
+- 사용자 피드백 반영: 틀을 사용자 v2 시트(`Sprout Lands (수정본)/weather/Weather_UI_Free_v2.png`, 날짜 판 가운데·잎 없음, 원본 폴더에 있던 것을 수정본 폴더로 옮김)의 `time_frame`(7,7 56×54)으로 교체. v2 시트의 룰렛은 원본 색이라 룰렛·화살표는 계속 Noon 수정본에서 자름. 조각 위치는 v2 기준(그림 8,8 / 룰렛 35,8 / 날짜 3,36)
+- 화살표 회전 중심을 룰렛 반원 중심(34, 16.5)으로(0.5px 아래). `ArrowPivot`은 0.5 단위 값
+- 날짜 글자를 수락한 의뢰 제목과 같은 `HudTitle`(굵게)로, 테마 `Time › Date Style`
+- 시간대 묶음 배수 2 → 1.2(사용자 요청 0.6배, 아래에서 1.5로 다시 바꿈)
+- 퀵슬롯 0.8배: 칸 40×44 → 32×36, 아이콘 32 → 24(16px 도트 1.5배라 선명)
+- 시간대 배수 1.2 → 1.5(사용자 요청 '1.2와 2의 중간', 0.5 단위로 맞춤). 1.2에서는 조각마다 화면 px 반올림이 달라 룰렛·그림 옆에 틈이 비쳤음 → 1.5(1080p에서 도트 하나 = 3px)로 게임 화면 틈 없음. `Scale`은 0.5 단위로 반올림
+- 틀 뒤 받침(`Time › Backing` 8,8 41×18, 틀 안쪽 테두리 색)을 깔아 씬 화면처럼 정수 px가 아닌 곳에서도 틀 구멍 뒤 틈이 비치지 않게 함
+- 날짜 글자: 1.5배에서는 굵은 12px가 날짜 판 안쪽(밝은 테두리 안)에 들어감 — 크기는 그대로
+- 확인(Creature_Cave 1080p, 자동 저장 끔): 16시 방과후·21시 밤 아이콘·화살표 −30°, 툴팁 `밤 21:00`, 시계 정지 시 "멈춰 있음". 런타임 회전한 화살표는 도트 격자가 어긋나 보임 → 사용자 판단 대기. 임박 효과(23시~)는 아직 없음
+
+## 2026-11-20 — (e) 점수 HUD (브랜치 `feature/tool-UI-editor`, `UI_SPEC.md` 9장·13장)
+- UI `ScoreNumberView`: v2 숫자를 피치 9로 이어 붙이고(폭 9n+2), 자릿수별 밑줄(1~2자리 → 2번, 3 → 3번, 4 → 4번)을 가로 가운데 내림으로 바로 아래에. 숫자 4개·밑줄 1개를 미리 만들어 켜고 끔, 값이 같으면 갱신 안 함, 문자열 없이 자릿수 계산
+- UI `ScoreHudView`: 화면 위 가운데에 "필기 예상 점수" + 숫자(v1 밑줄), 여백, "실기 예상 점수" + 숫자(v2 밑줄). `ScoreBook.ScoreChanged`로만 갱신, 숫자 폭이 바뀌면 다시 가운데 정렬(왼쪽 끝 기준 정수 px)
+- 테마 `Scores`(위 여백 8, 묶음 사이 24, 글자–숫자 4, 숫자 배수 2, 피치 9, 최대 4자리, 숫자·밑줄 스프라이트) — 임시값. 새 글자 스타일 `HudLabel`(갈무리11 Bold, 임시 밝은 종이색 `#F4E8CC` — 게임 화면 위에 바로 놓여서). 문구 `ui.score.written`·`ui.score.practical`
+- 프리팹 `HUD_Score`(HudDynamic 층), 메뉴 `VoxelMagic/UI/HUD 만들기/점수`. 세 게임 씬의 기존 프로토타입 `ScoreHud`(실기·필기 채움 바)를 끔
+- 기력 아이콘: 사용자가 옮긴 `bar_ui/icons/icon_stamina.png`를 쓰도록 테마·빌더·아틀라스 갱신(옛 `bar_ui/icon/`에 같은 파일이 남아 있음)
+- 테마 `Scores › Written Offsets` · `Practical Offsets` 추가(각각 `Group`·`Label`·`Number`, x +오른쪽 / y +아래, px): 필기·실기 묶음 전체, 이름 글자만, 숫자만 따로 손으로 옮긴다. 자동 배치(가운데 정렬·간격) 위에 더해지고 줄 가운데 계산에는 들어가지 않는다
+- `CLAUDE.md` 작업 표에 UI 작업 줄 추가(`Docs/HANDOFF_UI.md` → `Docs/UI_SPEC.md`), 사용자 승인
+- 확인(Creature_Cave 1080p): 필기 85·실기 9, 필기 100·실기 100(3자리 밑줄). 지금 점수 규칙(`ScoreBook`)은 100 상한이라 4자리는 게임에서 볼 수 없음. 규칙 검사 0개, EditMode 153개 통과
+
+## 2026-11-20 — (d) 퀵슬롯 바 + 마력·기력 상태 바 (브랜치 `feature/tool-UI-editor`, `UI_SPEC.md` 7-1·7-2)
+- 임포트 규칙에 이름 붙인 조각 자르기(`UiSliceRect`, 그림 왼쪽 위 기준 좌표) 추가. 기존 규칙 에셋에는 새 기본 규칙만 덧붙임. Sprout 인벤토리 시트에서 7조각: `inv_bar_dark`(329,121 30×32)·`inv_slot_light`(233,121)·`inv_slot_mid`(281,121) 경계 4/5/4/7, 선택 프레임 중간 색 모서리 `inv_select_tl/tr/bl/br`(273·308, 0·36, 11×12). 아틀라스에는 아직 넣지 않음(Sprout은 git 제외라 아틀라스 항목이 팀원 쪽에서 비게 됨 — 결정 필요)
+- Core: `ItemDefinition`에 `Icon`(Sprite) 추가, `IPlayerVitals`(마력·기력 0~1 + 바뀜 알림) 추가, `GameContext.Vitals`/`SetVitals`(아직 규칙 모델이 없어 null → 바는 가득 찬 상태로 보임)
+- UI: `QuickSlotBarView`(화면 아래 가운데, 칸 5개 미리 생성, 인벤토리 이벤트로만 갱신, 칸 클릭 = 선택 요청), `QuickSlotView`(아이콘 16×16 가운데, 아이콘 없는 아이템은 단색 칸 + 첫 글자, 개수 2개 이상이면 작은 글씨), `SelectionFrameView`(모서리 4조각, 0.08초 보간 이동·정수 px 반올림·unscaled time, 자체 캔버스), `StatusBarView`·`StatusBarsView`(오른쪽 아래, 마력 → 기력, 정수 px 채움 + 윗면 하이라이트, 아이콘 위 2px)
+- 가운데 배치는 0.5px 어긋남을 피하려고 왼쪽 끝 기준 정수 px로 계산(`PixelLayout.PlaceBottomCenter`), 창 폭이 바뀌면 다시 계산
+- 테마 `QuickSlots`(칸 30×32, 간격 2, 안쪽 여백 2, 아래 여백 8, 선택 프레임 바깥 2·이동 0.08초)·`StatusBars`(여백 8, 바 높이 80, 바 사이 10, 아이콘 간격 2) — 모두 임시값. 패널 모양 `QuickSlotBar`·`QuickSlot`·`QuickSlotAlt`·`StatusBarFrame`
+- 프리팹 `HUD_QuickSlot`(HudStatic 층)·`HUD_QuickSlotCell`·`HUD_StatusBars`(HudDynamic 층), 메뉴 `VoxelMagic/UI/HUD 만들기/퀵슬롯·상태 바`. 지팡이 아이템에 임시 아이콘 `item_staff.png`(7-3 방식 1)
+- 세 게임 씬의 기존 프로토타입 `InventoryBar`(아래 가운데 줄)를 끔(삭제하지 않음). 기존 "선택한 아이템 이름" 글자는 문서에 없어 새 바에 넣지 않음
+- 검사기: 부모가 클릭을 받는 그래픽(퀵슬롯 칸 배경)은 Raycast 경고에서 뺌
+- 사용자 피드백 반영: 칸 30×32 → **40×44**, 아이콘 16 → **32**(16px 도트 정수 2배), 바 220×58 (테마 값만 바꿈)
+- 마우스 휠: 퀵슬롯 바 위에서 돌리면 칸 변경(아래로 = 다음 칸, 끝에서 처음으로 돎), 게임 화면 위에서는 기존처럼 카메라 줌. `HudState.IsPointerOverScrollHud`(바가 마우스 들어옴/나감으로 알림)를 `GameInputReader`가 보고 줌을 쉰다. 낚시 미니게임 중 휠은 그대로 낚시 바가 먼저. 바 배경도 Raycast를 켜서 칸 사이에서도 휠이 먹음
+- 사용자 피드백 반영: 마력·기력 바를 아이콘과 함께 **정수 2배**로 키움 — 테마 `Status Bars › Scale`(2, 묶음 전체에 정수 배 Scale, 오른쪽 아래 기준이라 여백 유지)와 바 높이 80 → **48**(2배 후 화면에서 96). 검사기는 이제 같은 정수 배 Scale을 허용(소수·가로세로 다른 Scale만 경고)
+- 사용자 피드백 재반영: 바는 원래 비율(16×80) 그대로 **2배**(화면 가상 32×160)로 바 높이 80 복귀. 아이콘은 바와 따로 `Status Bars › Icon Scale`(0.5 단위, 기본 **1.5** → 24px 아이콘이 36). 1080p·4K(캔버스 짝수 배)에서는 선명하고, 1440p(3배)·720p(1배)에서는 도트 폭이 조금 고르지 않을 수 있음
+- 사용자 피드백 3차: 순서 **기력(왼쪽) → 마력(오른쪽)**. 바 묶음 배수 2 → **1.5**(16×80 → 화면 가상 24×120, `Scale`은 0.5 단위로 바뀜). 여백은 이제 **바 프레임 기준**(아이콘은 프레임 밖으로 삐져나와도 됨): 화면 오른쪽·아래 끝 ↔ 프레임 **16**, 기력 ↔ 마력 프레임 사이 9(확대 후 13.5) < 16. 아이콘 1.5배(36) 유지. 검사기는 가로세로 같은 0.5 단위 배수를 허용
+- 사용자 피드백 4차: 가장자리 여백을 다시 **8**(바 프레임 기준), 기력 ↔ 마력 프레임 사이 **4**(확대 후 6) < 8. 아이콘은 바보다 아주 조금 넓게: `Icon Scale` **1.125**(24 → 27, 바 24보다 양옆 1.5씩 튀어나옴). 아이콘 배수는 이제 자유 값(정수·0.5 단위가 아니면 도트 폭이 조금 고르지 않음)
+- 퀵슬롯 칸 프리팹이 빈 칸 상태(아이콘·단색 칸·글자 꺼짐)로 시작하도록 수정 — UI 에디터 씬에서 흰 사각형이 보이던 문제
+- 확인(Creature_Cave 1920×1080 = 2배): 바 170×46 가운데, 지팡이 아이콘, 3번 선택 시 프레임 이동, 상태 바 가득 참. 규칙 검사 0개, EditMode 153개 통과
+
+## 2026-11-20 — UI 배율 2배 + 왼쪽 위 HUD 피드백
+- 테마 기준 높이 360 → **480** (사용자 결정): 1080p 2배(가상 960×540), 1440p 3배, 4K 4배, 720p·768p 1배. UI_SPEC 13장 갱신
+- 책·가방 아이콘 정수 배 확대: 테마 `TopLeft › Icon Scale`(기본 2 → 32×32). `ThemedButton`에 크기 배수(`SetSizeScale`)를 두어 버튼이 다시 그려져도 크기가 유지됨
+- 의뢰 바: `Bar Size` 대신 `Bar Width`(144) + `Bar Padding Y`(3). 바 높이 = 제목 글자 줄 높이(16) + 여백 × 2 = 22. 제목은 바 세로 가운데 줄 높이 칸에 둠
+- 글자 스타일에 `띄어쓰기 더(px)` 추가, 새 스타일 `HudTitle`(갈무리11 Bold, 띄어쓰기 +2px) → 바 제목에 적용("의뢰"와 "(0)" 사이가 붙어 보이던 문제). 스타일에 `LineHeightFrom` 추가
+- 확인: Creature_Cave 1920×1080(2배) 캡처, UI_Root 규칙 검사 0개
+- 바 제목 문구를 `수락한 의뢰({0})`로 ("의뢰"와 개수 사이 띄어쓰기 없음, 사용자 결정). 크기 값은 지금 상태로 확정(아이콘 2배, 바 22, 여백 3)
+
+## 2026-11-20 — Silver · 네오둥근모 Pro 비교
+- 사용자가 넣은 `Silver.ttf`, `NeoDunggeunmoPro-Regular.ttf` 설계 크기 측정: Silver 19px(한글 높이 11, 줄 높이 21), 네오둥근모 Pro 16px(한글 높이 13, 줄 높이 16). 둘 다 Bold 없음. `Fonts/Pixel/Silver`·`NeoDunggeunmo` 고정 + 예비 에셋. 네오둥근모에 없는 기호 19개(※ ℃ Ⅰ~Ⅴ 화살표 ★☆♡♥♪ 등)
+- 의뢰 바 6개(갈무리11 Bold·갈무리11·갈무리9·갈무리7·Silver·네오둥근모)를 1080p에서 나란히 캡처(플레이 중 임시, 저장 안 함)
+- 버그 수정: 테마를 인스펙터에서 바꿀 때 "SendMessage cannot be called during OnValidate" 경고 → 위젯이 편집 모드에서는 한 박자 뒤(delayCall)에 적용. 폰트 재굽기 때 "Main Object Name does not match filename" 경고 → 같은 파일 이름으로 `_Baking` 임시 폴더에 저장 후 복사
+
+## 2026-11-20 — 작은 갈무리 폰트 시험 + 값 바로 고쳐 보기 (브랜치 `feature/tool-UI-editor`)
+- 갈무리9·갈무리7(Regular만 있음, Bold 없음)을 받아 `Art/Font/`에 넣음(SETUP.md). 설계 크기 측정: 갈무리9 10px(줄 높이 13), 갈무리7 8px(줄 높이 11). `Fonts/Pixel/Galmuri9`·`Galmuri7` 고정 에셋 + 예비 에셋
+- 글자 스타일에 `폰트 지정`(비우면 테마 기본) 추가. 글자 크기는 이제 쓰는 폰트 에셋의 설계 크기 × 배수(테마의 공용 설계 크기 값은 없앰). 새 스타일 `Small`(갈무리9 10px)·`Tiny`(갈무리7 8px)
+- 문구 표(`Texts_ko`)를 고치면 테마 변경으로 넘겨 화면 글자가 바로 바뀜
+- 버그 수정: 폰트를 다시 구우면 에셋 이름이 "… (Baking)"으로 남던 문제(`FontAssetFileWriter`)
+- 의뢰 바 제목에 Small·Tiny를 넣어 1080p 캡처 비교. 프리팹은 아직 Bold(갈무리11 Bold 12px) 그대로, 사용자 선택 대기
+
+## 2026-11-20 — (a) 왼쪽 위 책·가방 버튼 + 의뢰 드롭다운 바 (브랜치 `feature/tool-UI-editor`, `UI_SPEC.md` 5-4·10-1)
+- Core `IAcceptedRequestList`(수락한 의뢰 수 + 바뀜 알림, UI 연결 창구). `RequestTracker`가 구현(지금 규칙은 한 번에 하나라 0 또는 1)
+- UI `TopLeftMenuView`(책 → 책 화면, 가방 → 확장 인벤토리를 화면 스택에 연다. 아직 없는 화면은 열지 않고 로그만), `QuestBarView`(화살표로 목록 펼침/접힘 즉시 전환, 펼침 = 위 화살표·접힘 = 아래 화살표, "수락한 의뢰 (n)"은 개수가 바뀔 때만 다시 씀, X는 아이콘만), `PixelLayout`(정수 px 배치), `UiTextKeys`, `UiScreenRouter.HasScreen`
+- 테마 `TopLeft` 값(임시): 모서리 여백 8, 아이콘 간격 4, 아이콘 줄과 바 사이 4, 바 144×22, 바 버튼 안쪽 5, 버튼–제목 4. 문구 표에 `ui.quest.bar.title` = "수락한 의뢰 ({0})"
+- 프리팹 `Prefabs/UI/HUD/HUD_TopLeftMenu`(HudStatic 층), `HUD_QuestBar`(HudDynamic 층) — 위젯 프리셋을 조합, UI_Root에 넣음. 메뉴 `VoxelMagic/UI/HUD 만들기/왼쪽 위 메뉴·의뢰 바`
+- 게임 씬 `FarmPond`·`BackMountain`·`Creature_Cave`에 UI_Root 배치, `_Bootstrap`(GameBootstrap) 연결 목록에 추가. 기존 프로토타입 UI(오른쪽 위 의뢰 토글, 점수, 인벤토리 줄)는 그대로 두고 해당 단계에서 교체. 화살표와 Q가 같은 펼침 상태를 쓴다
+- 사용자 피드백 반영: 의뢰 바 높이 22 → **16**(테마 값, 갈무리11 줄 높이 16과 같음), 바 제목을 **갈무리11 Bold**로 (`ThemedText.SetStyle`). 글자 크기는 갈무리11의 최소 정수 배(12px)라 더 줄이려면 더 작은 폰트가 필요
+- 확인(Creature_Cave, 1920×1080 = 3배): 책·가방(16px) 줄 아래 의뢰 바, 화살표 전환, 의뢰 수락 시 (0) → (1), 책 버튼은 책 화면이 없어 열리지 않고 시간도 그대로. UI_Root 규칙 검사 0개, EditMode 153개 통과
+
+## 2026-11-20 — UI 에디터 씬 · 픽셀 폰트 · 위젯 프리셋 (브랜치 `feature/tool-UI-editor`, `UI_SPEC.md` 1-1·3장)
+- 폰트 설계 크기 측정: 갈무리11은 12px에서 글자 테두리가 격자에 완전히 맞음(부드러운 렌더 중간 알파 0%). 스타더스트 3.0은 정수 격자에 맞는 크기가 없고, 13px에서 획이 고르게 1px로 나옴(14px은 윗줄이 잘림). Regular·Bold 같은 결과
+- 픽셀 폰트 TMP 에셋 `Fonts/Pixel/`: `Galmuri11`·`Galmuri11 Bold`(12px)·`Stardust3`·`Stardust3 Bold`(13px). RASTER_HINTED, Point 필터, 고정(Static) 아틀라스 1024 한 장(KS X 1001 2,350자 + 기호 + ASCII + Core·UI·Data에 쓰인 글자, 약 2,560자). 각각 예비 Dynamic 에셋(`… Fallback`, 256, 빌드 때 글자 비움)을 fallback으로 연결. 폰트에 없는 글자: `−`(스타더스트 둘, 갈무리 Bold), `↔`(갈무리 Bold)
+- 설정 `Data/UI/PixelFontSet.asset`, 메뉴 `VoxelMagic/UI/픽셀 폰트 다시 굽기`(`Editor/Fonts/PixelFontAssetBuilder`). 글자 모으기·GUID 유지 저장을 `FontCharsetCollector`·`FontAssetFileWriter`로 빼고 Pretendard 빌더(`KoreanFontAssetBuilder`)도 같이 쓰게 정리(동작 같음, ASCII는 항상 포함)
+- 위젯: `ThemedWidget`(기반) + `ThemedText`(글자 스타일·문구 키, Raycast 끔) · `ThemedButton`(3상태 Sprite Swap, 스프라이트 크기 그대로) · `ThemedPanel`(Sliced/Tiled). 테마에 글자 스타일·버튼 모양(책·가방·화살표 위/아래·닫기)·패널 모양(의뢰 종이 4종·스크롤 트랙/핸들)·문구 표 연결 추가(`UiThemeSkins`). 임시 글자색 `#5C4128`, 임시 폰트 갈무리11
+- 위젯 프리셋 `Prefabs/UI/Widgets/`: `W_Text`, `W_Button`, `W_PaperPanel`, `W_Scrollbar`(트랙 8 + 핸들 6) — 메뉴 `VoxelMagic/UI/테마 기본값·위젯 프리셋 만들기`
+- UI 작업대 창(메뉴 `VoxelMagic/UI/UI 작업대`, `Data/Tools/UI/UiWorkbenchConfig.asset`): ① 해상도 — 16:9·16:10·21:9·4:3 10개 버튼으로 Game View 해상도 전환(리플렉션, 실패하면 경고만), 배율·가상 크기 표시 ② 검사 · 굽기 — 선택한 UI의 규칙 위반 목록(정수 위치·크기, 홀수 + 가운데 기준점, 불필요한 Raycast, LayoutGroup·ContentSizeFitter·Mask, Point 아닌 스프라이트, 설계 크기의 정수 배가 아닌 글자, Scale) → 클릭하면 그 오브젝트 선택, `Prefabs/UI/`로 프리팹 굽기 ③ 테마 · 도구 — 임포트 규칙·폰트 굽기·프리셋·씬 열기 버튼 + 테마 인스펙터
+- `UiRaycastBlocker`(일부러 클릭을 받는 판 표시, 검사 예외) → UI_Root의 InputBlocker에 붙임
+- UI 에디터 씬 `Scenes/Tools/UIEditor.unity`(빌드 목록에 넣지 않음, 메뉴 `VoxelMagic/UI/UI 에디터 씬 열기`): 카메라·EventSystem(Input System)·UI_Root + 폰트 비교판 `FontCompareBoard`(Tools 어셈블리). 크림 종이(Tiled)·갈색·어두운 배경 × 폰트 4종, 인스펙터에서 문장 3개 중 선택·크기 배수 1~3·배경 하나만 보기
+- 확인: 1920×1080(3배)에서 스크린샷 — 도트가 정수 배로 선명, 종이 Tiled 찢김 반복 정상. UI_Root 전체 규칙 검사 위반 0개. EditMode 153개 통과
+
+## 2026-11-19 — UI 공통 기반 (브랜치 `feature/tool-UI-editor`, `UI_SPEC.md` 4-A·13장)
+- Core `Screens/`: `ScreenStack`(팝업 화면 스택, ESC는 맨 위부터 닫고 비어 있으면 `MenuRequested`, `Submitted`), `ScreenPolicy`(화면별 시간 정지 단계·ESC 닫힘·뒤쪽 입력 막기·조작 막기, 기본값은 13장 결정), `TimePause`(전체 정지 / 게임 시계만 정지 참조 카운트), `HudState`(의뢰 목록 펼침/접힘)
+- Core `Common/TextTable`(키 → 문장 ScriptableObject, `ITextSource`). 없는 키는 `#키`로 보임
+- 기존 `ScreenState` 삭제 → `GameContext.Screens`·`Pause`·`Hud`. 사용처 교체: `GameInputReader`(ESC: 화면 닫기 → 낚시 취소 → 메뉴 요청, Q: 의뢰 목록 토글), `PlayerMover`·`PlayerInteractor`(`BlocksGameplay`), `CreatureNpc`·`RequestBoard`·`RequestCheatKeys`, UI `CreatureDialogView`·`RequestBoardWindow`·`QuestTrackerPanel`. 동작은 그대로이고, 의뢰 게시판이 열리면 이제 전체 정지(timeScale 0), 크리처 대화는 게임 시계만 정지
+- Gameplay `TimeScaleDriver`: `TimePause` 전체 정지를 `Time.timeScale`에 반영, `GameBootstrap`이 만들고 씬이 내려갈 때 원래 값으로 되돌림
+- UI `Common/`: `UiTheme`(캔버스 기준 높이 360·PPU 16·최소 배율, 층별 정렬 순서, 입력 막기 판 색(지금 투명 = 딤 없음), 폰트), `PixelCanvasScaler`(정수 배율, Pixel Perfect, 에디터에서도 동작), `UiLayerCanvas`(층 캔버스 정렬 순서를 테마에서), `UiScreen`·`IUiScreen`(팝업 기반, 숨기면 비활성), `UiScreenRouter`(스택 → 화면 보이기/숨기기, 입력 막기 판 위치)
+- 에디터 `Tools/Editor/UI/UiRootPrefabBuilder`(메뉴 `VoxelMagic/UI/UI 루트 프리팹 만들기`): `Prefabs/UI/UI_Root.prefab`(HudStatic 0 / HudDynamic 10 / HudAnimated 20 / Popup 100 / Overlay 200), `Data/UI/UiTheme.asset`, `Data/UI/Texts_ko.asset`. UI_Root는 아직 어느 씬에도 넣지 않음(첫 화면 제작 때 배치)
+- 테스트 `ScreenStackTests` 17개(스택·시간 정지·ESC·메뉴 요청·정수 배율·문구 표). EditMode 전체 통과
+
+## 2026-11-19 — UI 준비 단계 (브랜치 `feature/tool-UI-editor`, `UI_SPEC.md`)
+- Sprout Lands를 `.gitignore`에 추가. 사용자가 색을 수정한 `Weather_UI_Free_Noon_ver.png`는 원본과 분리해 `Art/UI/Sprout Lands (수정본)/weather/`로 이동(GUID 유지)
+- 패키지 `com.unity.2d.sprite` 1.0.0 설치, Sprite Packer Mode를 Sprite Atlas V2로 (SETUP.md)
+- UI 임포트 규칙: `Tools/Editor/UI/UiImportRules`(규칙 데이터) + `UiImportRuleApplier`(메뉴 `VoxelMagic/UI/임포트 규칙 적용`). 규칙 에셋 `Data/Tools/UI/UiImportRules.asset`. `Art/UI` PNG 96장에 적용, 9-slice 경계(책·탭·leaf·바 프레임·종이 패널·스크롤바), `score_ui/v2/score_digits_sheet` 11×12 칸 10장으로 자름. Sprout Lands 시트 자르기는 퀵슬롯·시간대 UI 단계에서
+- Sprite Atlas `Art/UI/UiAtlas.spriteatlasv2`: 지금 쓰는 스프라이트 71개 (회전 끔, Tight Packing 끔, 패딩 4, Point, 압축 없음). 미리보기·ver1 숫자·초기 탭 아이콘·별 v3·아이콘 받침·가로 지팡이 원본은 넣지 않음
+- 종이 패널 Tiled 확인: Unity Tiled가 Border(가장자리)도 길이 방향으로 반복한다. 76·140·144·300 폭과 22~200 높이에서 직접 이어 붙인 예상 이미지와 픽셀 단위로 일치 (Canvas Reference PPU 16, Pixel Perfect). 조각 분리 스크립트는 필요 없음
+
 ## 2026-11-17 — 크리처 굴 정식 씬 + 뒷산·복도 포탈 (브랜치 `Creature-cave-map`)
 - 새 씬 `Scenes/Creature_Cave.unity`: 타일 맵 에디터의 `Map_Creature_Cave`(구운 바닥·소품·횃불·조명 스위치·바닥 빛)를 옮겨 옴 + BackMountain의 `_Bootstrap`·`Player`·`Main Camera`·`Directional Light`·`SceneTransition`·`UI`(공통 UI만: 뒷산 전용 `DebugKeyHint`·`CenterBanner` 제외)
   - 콜라이더(씬 인스턴스에만, 메시 크기): `Low_Table`·`Candle_Stand`·`Bookshelf_Filled`·`Book_Stack`·`Cardboard_Box`. `Cat_Bed`는 사용자가 직접
