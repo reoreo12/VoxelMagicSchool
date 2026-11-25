@@ -14,11 +14,14 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _id: gather_Mugwort
   _displayName: "\uC465"
-  _description: "\uD5A5\uC774 \uC9C4\uD55C \uC57D\uCD08 \uC78E."
+  _description: "\uD5A5\uC774 \uC9C4\uD55C \uC57D\uCD08."
   _iconColor: {r: 0.5, g: 0.6, b: 0.45, a: 1}
+  _icon: {fileID: 0}
   _maxStack: 99
   _creatureNote: "\uC465\uC740 \uB9C8\uB825\uC744 \uAC00\uB77C\uC549\uD600\u2026
     \uADF8\uB798\uC11C \uC57D\uC5D0 \uAF2D \uB123\uC5B4."
+  _rarity: 1
+  _source: 3
   _habitat: 3
   _appearsAfterSchool: 1
   _appearsAtNight: 0

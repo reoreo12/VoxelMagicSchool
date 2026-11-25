@@ -13,6 +13,7 @@ MonoBehaviour:
   m_Name: FishingConfig
   m_EditorClassIdentifier: 
   _castSeconds: 0.6
+  _castReleaseTimeoutSeconds: 6
   _biteWaitSeconds:
     _min: 2
     _max: 6
@@ -23,10 +24,14 @@ MonoBehaviour:
   _gaugeStart: 0.3
   _gaugeFillPerSecond: 0.35
   _gaugeDrainPerSecond: 0.25
+  _rarity:
+    _common: 60
+    _uncommon: 30
+    _rare: 10
   _pondFish:
   - _fish: {fileID: 11400000, guid: 22a9aaf902f918b46996f13b7ed2ff1b, type: 2}
     _weight: 60
   - _fish: {fileID: 11400000, guid: 2c3a7d50508108c4e954dc1963770b38, type: 2}
     _weight: 30
-  - _fish: {fileID: 11400000, guid: 08e658153ed4e0a468db626085f61e3a, type: 2}
+  - _fish: {fileID: 11400000, guid: 21ab2dbd710a5ec46bfc60bcd9939171, type: 2}
     _weight: 10

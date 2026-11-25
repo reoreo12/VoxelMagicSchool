@@ -1,5 +1,5 @@
 // 밭 칸 모양을 작물 상태에 맞춰 바꾼다: 물 준 작물이 차지한 칸은 젖은 흙(Wet), 나머지는 마른 흙(Dry).
-// 칸 오브젝트의 메시·머티리얼만 바꾸고 로직은 모른다 (FarmGrid 이벤트를 듣기만 함).
+// 칸 오브젝트의 메시·머티리얼만 바꾸고 로직은 모른다 (FarmGrid 이벤트를 듣기만 함). 격자는 씬을 넘어 유지되므로 연결 때 지금 상태를 먼저 그린다.
 using UnityEngine;
 using VoxelMagic.Core;
 
@@ -35,6 +35,7 @@ namespace VoxelMagic.Gameplay
             _grid.PlotAdded += Refresh;
             _grid.PlotChanged += Refresh;
             _grid.PlotRemoved += OnPlotRemoved;
+            foreach (var plot in _grid.Plots) SetArea(plot, plot.IsWatered);
         }
 
         private void OnDestroy()
@@ -64,9 +65,17 @@ namespace VoxelMagic.Gameplay
             }
         }
 
-        private void Refresh(FarmPlot plot) => SetArea(plot, plot.IsWatered);
+        private void Refresh(FarmPlot plot)
+        {
+            if (this == null) { OnDestroy(); return; } // 꺼진 채 씬이 내려간 구독자 정리
+            SetArea(plot, plot.IsWatered);
+        }
 
-        private void OnPlotRemoved(FarmPlot plot) => SetArea(plot, false);
+        private void OnPlotRemoved(FarmPlot plot)
+        {
+            if (this == null) { OnDestroy(); return; }
+            SetArea(plot, false);
+        }
 
         private void SetArea(FarmPlot plot, bool wet)
         {

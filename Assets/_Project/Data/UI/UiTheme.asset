@@ -113,7 +113,7 @@ MonoBehaviour:
     _backingColor: {r: 0.76862746, g: 0.6039216, b: 0.42352942, a: 1}
     _iconPosition: {x: 8, y: 8}
     _roulettePosition: {x: 35, y: 8}
-    _arrowPivot: {x: 35.08, y: 18.1}
+    _arrowPivot: {x: 33, y: 16.5}
     _arrowPivotInSprite: {x: 0, y: 4}
     _datePosition: {x: 3, y: 36}
     _dateSize: {x: 48, y: 16}
@@ -125,6 +125,8 @@ MonoBehaviour:
     _startAngle: 75
     _boundaryAngle: 0
     _endAngle: -75
+    _warningArrowColor: {r: 1, g: 0.3764706, b: 0.2509804, a: 1}
+    _warningBlinkSeconds: 0.5
     _previewDay: 1
     _playDays: 8
     _previewHour: 16
@@ -132,6 +134,8 @@ MonoBehaviour:
     _frame: {fileID: 952465741, guid: 455ad42b9a35d634b91e1fece7fc4f7d, type: 3}
     _roulette: {fileID: -754629294, guid: 614c8de0451911a46ab3ff85fedbdb54, type: 3}
     _arrow: {fileID: 2124064162, guid: 614c8de0451911a46ab3ff85fedbdb54, type: 3}
+    _arrowFrames: []
+    _arrowFrameStep: 3
     _afterSchoolIcon: {fileID: 1392401110, guid: 60e5e2e9af0bfd34cb3f3de36510f709, type: 3}
     _nightIcon: {fileID: -245857414, guid: 60e5e2e9af0bfd34cb3f3de36510f709, type: 3}
   _tooltip:

@@ -1,0 +1,29 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 633fc3acc8de4d34399e6d92ce70239f, type: 3}
+  m_Name: Produce_MonsterSweetPotato
+  m_EditorClassIdentifier: 
+  _id: monster_sweet_potato
+  _displayName: "\uAD34\uBB3C \uACE0\uAD6C\uB9C8"
+  _description: "\uC0AC\uB78C \uBA38\uB9AC\uB9CC \uD55C \uACE0\uAD6C\uB9C8. \uAC00\uB054
+    \uAFC8\uD2C0\uAC70\uB9B0\uB2E4."
+  _iconColor: {r: 0.6, g: 0.25, b: 0.45, a: 1}
+  _icon: {fileID: 0}
+  _maxStack: 99
+  _creatureNote: "\uAD34\uBB3C \uACE0\uAD6C\uB9C8\uB294 \uB545\uC18D \uB9C8\uB825\uC744
+    \uB2E4 \uBA39\uACE0 \uC790\uB77C\u2026 \uAD6C\uC6B0\uBA74 \uBD88 \uC8FC\uBB38
+    \uC5F0\uC2B5\uC774 \uB3FC."
+  _rarity: 2
+  _source: 1
+  _sizeRangeCm:
+    _min: 20
+    _max: 45

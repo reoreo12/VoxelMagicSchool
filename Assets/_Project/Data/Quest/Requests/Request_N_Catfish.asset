@@ -1,0 +1,29 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6e2e2f20d9b88964fa16d99bbf67be48, type: 3}
+  m_Name: Request_N_Catfish
+  m_EditorClassIdentifier: 
+  _title: "\uBA54\uAE30 \uCC1C"
+  _creatureLine: "\uBA54\uAE30 \uD55C \uB9C8\uB9AC\uB791 \uADF8\uB298\uBC84\uC12F.
+    \uCC1C\uC744 \uD560 \uAC70\uC57C."
+  _habitatHint: "\uBA54\uAE30\uB294 \uC5F0\uBABB\uC5D0\uC11C, \uBC84\uC12F\uC740
+    \uD070 \uB098\uBB34 \uADF8\uB298\uC5D0"
+  _difficulty: 1
+  _requirements:
+  - _item: {fileID: 11400000, guid: 2c3a7d50508108c4e954dc1963770b38, type: 2}
+    _amount: 1
+  - _item: {fileID: 11400000, guid: f399077c6983dd14fa438a8a21576ca7, type: 2}
+    _amount: 1
+  _givenItems: []
+  _baseReward: 6
+  _completionLine: "\uBA54\uAE30 \uC218\uC5FC\uC774 \uAC04\uC9C0\uB7EC\uC6CC\u2026
+    \uB9DB\uC740 \uC88B\uC544."

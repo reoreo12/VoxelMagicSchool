@@ -1,4 +1,4 @@
-// 낚시 설정(대기·입질 시간, 스크롤 감도, 게이지 속도, 연못 물고기 출현 표).
+// 낚시 설정(대기·입질 시간, 스크롤 감도, 게이지 속도, 낚을 때마다의 희귀도 확률, 연못 물고기 출현 표).
 using System;
 using System.Collections.Generic;
 using UnityEngine;
@@ -38,6 +38,9 @@ namespace VoxelMagic.Core
         [SerializeField, Range(0.01f, 0.99f)] private float _gaugeStart = 0.3f;
         [SerializeField, Min(0.01f)] private float _gaugeFillPerSecond = 0.35f;
         [SerializeField, Min(0.01f)] private float _gaugeDrainPerSecond = 0.25f;
+        [Tooltip("낚을 때마다 희귀도 확률 (흔함·보통·희귀). 고른 희귀도의 물고기 중에서 아래 가중치로 고른다")]
+        [SerializeField] private RarityTable _rarity = RarityTable.Default;
+        [Tooltip("연못 물고기와 같은 희귀도 안에서의 가중치")]
         [SerializeField] private List<FishWeight> _pondFish = new List<FishWeight>();
 
         public float CastSeconds => _castSeconds;
@@ -51,20 +54,26 @@ namespace VoxelMagic.Core
         public float GaugeFillPerSecond => _gaugeFillPerSecond;
         public float GaugeDrainPerSecond => _gaugeDrainPerSecond;
         public IReadOnlyList<FishWeight> PondFish => _pondFish;
+        public RarityTable Rarity => _rarity;
 
-        /// <summary>출현 표의 가중치로 물고기 하나를 고른다. 표가 비어 있으면 null.</summary>
-        public FishDefinition PickFish(IRandom random)
+        /// <summary>희귀도 확률로 희귀도를 고르고(forced가 있으면 그것), 그 희귀도의 연못 물고기 중 가중치로 하나 고른다. 표가 비어 있으면 null.</summary>
+        public FishDefinition PickFish(IRandom random, ItemRarity? forced = null)
         {
+            var rarity = forced ?? _rarity.Roll(random);
+            var fishes = new List<FishDefinition>();
+            foreach (var entry in _pondFish)
+                if (entry.Fish != null && entry.Weight > 0f && !fishes.Contains(entry.Fish)) fishes.Add(entry.Fish);
+            var candidates = RarityTable.CandidatesOf(fishes, rarity);
+            if (candidates.Count == 0) return null;
+
             float total = 0f;
             foreach (var entry in _pondFish)
-                if (entry.Fish != null) total += entry.Weight;
-            if (total <= 0f) return null;
-
+                if (candidates.Contains(entry.Fish)) total += entry.Weight;
             float roll = random.Range(0f, total);
             FishDefinition last = null;
             foreach (var entry in _pondFish)
             {
-                if (entry.Fish == null || entry.Weight <= 0f) continue;
+                if (!candidates.Contains(entry.Fish) || entry.Weight <= 0f) continue;
                 last = entry.Fish;
                 if (roll < entry.Weight) return entry.Fish;
                 roll -= entry.Weight;

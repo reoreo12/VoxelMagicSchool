@@ -1,4 +1,5 @@
-// 뒷산 전용 부트스트랩. GameBootstrap이 만든 GameContext를 받아 시간대·채집·포획 서비스를 만들고, 아래의 IMountainContextBinder에 연결한다.
+// 뒷산 전용 부트스트랩. GameBootstrap이 만든 GameContext를 받아 시간대(게임 시계를 따라감)·채집(오늘의 채집 자리에 씬 슬롯을 이음)·포획 서비스를 만들고,
+// 아래의 IMountainContextBinder에 연결한다.
 using System.Collections.Generic;
 using UnityEngine;
 using VoxelMagic.Core;
@@ -9,13 +10,8 @@ namespace VoxelMagic.Gameplay
     public sealed class MountainBootstrap : MonoBehaviour
     {
         [SerializeField] private GameBootstrap _game;
-        [Tooltip("시작 시간대 (가정: 방과후)")]
+        [Tooltip("게임 시계가 없을 때의 시간대 (시험용)")]
         [SerializeField] private TimeOfDay _startTime = TimeOfDay.Day;
-
-        [Header("채집")]
-        [SerializeField] private GatheringConfig _gathering;
-        [Tooltip("뒷산에 나올 수 있는 채집 재료 전부")]
-        [SerializeField] private List<GatherMaterialDefinition> _materials = new List<GatherMaterialDefinition>();
 
         [Header("포획")]
         [SerializeField] private CaptureConfig _capture;
@@ -38,10 +34,16 @@ namespace VoxelMagic.Gameplay
 
             foreach (var binder in Find<IMountainContextBinder>())
                 binder.Bind(Context);
-            gathering.Respawn();
+            if (game.Clock != null) game.Clock.PeriodChanged += OnPeriodChanged;
         }
 
-        private void OnDestroy() => Context?.Gathering.Dispose();
+        private void OnDestroy()
+        {
+            Context?.Gathering.Dispose();
+            if (Context?.Game.Clock != null) Context.Game.Clock.PeriodChanged -= OnPeriodChanged;
+        }
+
+        private void OnPeriodChanged(TimeOfDay period) => Context.Time.Set(period);
 
         private GatheringService BuildGathering(GameContext game, out TimeOfDayState time)
         {
@@ -55,9 +57,13 @@ namespace VoxelMagic.Gameplay
                 kinds.Add(habitats[i].Kind);
                 slotCounts.Add(habitats[i].SlotCount);
             }
-            time = new TimeOfDayState(_startTime);
-            return new GatheringService(new GatherSpawner(kinds, slotCounts), _materials, _gathering, time,
-                game.Inventory, game.Messages, game.Requests, game.Random);
+            time = new TimeOfDayState(game.Clock != null ? game.Clock.Period : _startTime);
+            var day = game.GatherDay ?? new GatherDayState(1); // 진행 상태에 세계가 없으면(시험용) 빈 자리
+            var service = new GatheringService(day, kinds, slotCounts, game.Inventory, game.Messages, game.Random);
+            foreach (var pair in service.SceneSpotCounts)
+                if (pair.Value < day.SpotsPerKind)
+                    Debug.LogWarning($"[{name}] {pair.Key} 서식지 슬롯이 {pair.Value}개라 채집 자리 {day.SpotsPerKind}곳 중 일부가 씬에 없습니다 (VoxelMagic/뒷산/채집 밸런스 → 슬롯 수 적용).", this);
+            return service;
         }
 
         private CaptureService BuildCapture(GameContext game, MountainMessages messages)

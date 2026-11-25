@@ -1,5 +1,5 @@
 // 씬 시작 시 Core 객체를 한 번 조립하고, 월드·플레이어·UI의 IGameContextBinder에 연결한다.
-// 플레이어 데이터는 GameSession에서 받고(처음이면 저장 파일에서 불러오거나 새로 만듦), 밭은 연결이 끝난 뒤 보관본대로 다시 심는다.
+// 플레이어 데이터는 GameSession에서 받고(처음이면 저장 파일에서 불러오거나 새로 만듦), 진행 상태의 세계(시계·밭·채집·게시판)를 한 번 만들고, 게임 시계를 구동기에 붙인다.
 using System.Collections.Generic;
 using UnityEngine;
 using VoxelMagic.Core;
@@ -14,6 +14,16 @@ namespace VoxelMagic.Gameplay
         [SerializeField] private FarmConfig _farm;
         [SerializeField] private FishingConfig _fishing;
         [SerializeField] private PlayerConfig _player;
+        [Tooltip("하루 구간·경고·하루 시작 시각")]
+        [SerializeField] private TimeConfig _time;
+        [Tooltip("8일 일정표 (날 종류)")]
+        [SerializeField] private CalendarConfig _calendar;
+        [Tooltip("채집 자리 수·희귀도·재료 목록 (하루 시작 때 뽑기)")]
+        [SerializeField] private GatheringConfig _gathering;
+        [Tooltip("의뢰 규칙 (게시판·수락·점수)")]
+        [SerializeField] private QuestConfig _quest;
+        [Tooltip("게시판에 올라올 수 있는 의뢰 전부")]
+        [SerializeField] private RequestPool _requestPool;
 
         [Header("데이터")]
         [SerializeField] private List<RequestDefinition> _requests = new List<RequestDefinition>();
@@ -39,9 +49,22 @@ namespace VoxelMagic.Gameplay
         {
             GameSaveSystem.AutoSaveEnabled = _autoSave;
             var progress = GameSaveSystem.GetOrCreateProgress(_balance, _requests, _catalog, GiveStartingItems);
+            if (_time != null && _calendar != null)
+                progress.EnsureWorld(new WorldSetup
+                {
+                    Time = _time, Calendar = _calendar, Farm = _farm, Gathering = _gathering,
+                    Quest = _quest, RequestPool = _requestPool, Random = new SystemRandom()
+                });
             Context = GameContext.Create(_balance, _farm, _fishing, _player, progress, new SystemRandom());
             // 씬에 들어올 때의 timeScale을 평소 값으로 기억한다(보통 1).
             _timeScale = new TimeScaleDriver(Context.Pause, Time.timeScale > 0f ? Time.timeScale : 1f);
+            if (Context.Clock != null)
+            {
+                var driver = GetComponent<GameClockDriver>();
+                if (driver == null) driver = gameObject.AddComponent<GameClockDriver>();
+                driver.Initialize(Context.Clock, Context.Pause);
+            }
+            else Debug.LogWarning("[GameBootstrap] Time·Calendar 설정이 비어 있어 게임 시계가 없습니다.");
 
             var registry = new InteractableRegistry();
             foreach (var root in _bindRoots)
@@ -53,22 +76,11 @@ namespace VoxelMagic.Gameplay
                     registry.Add(interactable);
             }
             _playerInteractor.Initialize(registry);
-
-            progress.RestoreFarm(Context.FarmGrid);
-            GameSession.Capturing += CaptureScene;
         }
 
         private void OnDestroy()
         {
-            GameSession.Capturing -= CaptureScene;
             _timeScale?.Dispose();
-            // 저장 없이 씬이 내려가도(에디터에서 씬 전환 등) 밭은 보관본에 남긴다.
-            if (Context != null && GameSession.Progress == Context.Progress) Context.Progress.CaptureFarm(Context.FarmGrid);
-        }
-
-        private void CaptureScene(PlayerProgress progress)
-        {
-            if (Context != null && progress == Context.Progress) progress.CaptureFarm(Context.FarmGrid);
         }
 
         private void GiveStartingItems(PlayerProgress progress)

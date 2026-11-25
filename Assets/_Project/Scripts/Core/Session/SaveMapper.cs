@@ -25,11 +25,13 @@ namespace VoxelMagic.Core
             foreach (var request in progress.Requests.CompletedRequests)
                 data.CompletedRequestIds.Add(DefinitionCatalog.IdOf(request));
             data.ActiveRequestId = DefinitionCatalog.IdOf(progress.Requests.Active);
+            if (progress.Farm != null) progress.CaptureFarm(progress.Farm);
             foreach (var plot in progress.FarmPlots)
             {
                 if (plot.Seed == null) continue;
                 data.FarmPlots.Add(new FarmPlotRecord
-                    { SeedId = plot.Seed.Id, OriginX = plot.Origin.x, OriginY = plot.Origin.y, Watered = plot.Watered });
+                    { SeedId = plot.Seed.Id, OriginX = plot.Origin.x, OriginY = plot.Origin.y, Watered = plot.Watered,
+                      WateredAt = plot.WateredAt, Grown = plot.Grown });
             }
             return data;
         }
@@ -70,7 +72,7 @@ namespace VoxelMagic.Core
             {
                 if (record == null) continue;
                 if (catalog.TryGetItem(record.SeedId, out var item) && item is SeedDefinition seed)
-                    plots.Add(new FarmPlotState(seed, new Vector2Int(record.OriginX, record.OriginY), record.Watered));
+                    plots.Add(new FarmPlotState(seed, new Vector2Int(record.OriginX, record.OriginY), record.Watered, record.WateredAt, record.Grown));
                 else unknown.Add(record.SeedId);
             }
             progress.SetFarmPlots(plots);

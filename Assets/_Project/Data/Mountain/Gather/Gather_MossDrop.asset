@@ -17,8 +17,11 @@ MonoBehaviour:
   _description: "\uC774\uC2AC\uC744 \uBA38\uAE08\uC740 \uB465\uADFC \uC774\uB07C
     \uB369\uC774."
   _iconColor: {r: 0.35, g: 0.55, b: 0.3, a: 1}
+  _icon: {fileID: 0}
   _maxStack: 99
   _creatureNote: 
+  _rarity: 0
+  _source: 3
   _habitat: 0
   _appearsAfterSchool: 1
   _appearsAtNight: 0

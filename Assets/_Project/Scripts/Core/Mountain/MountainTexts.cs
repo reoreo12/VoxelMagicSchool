@@ -11,8 +11,8 @@ namespace VoxelMagic.Core
 
         public const string DebugHeader = "[디버그 키]";
         public const string DebugTimeFormat = "시간대: {0}";
-        public const string DebugRespawn = "새 하루 (재료 다시 배치)";
-        public const string DebugToggleTime = "시간대 전환";
+        public const string DebugRespawn = "채집 자리 다시 뽑기";
+        public const string DebugToggleTime = "방과후↔밤 (시각 이동)";
         public const string DebugSwapRequest = "의뢰 교체";
         public const string DebugDiscardKey = "우클릭";
         public const string DebugDiscard = "인벤토리 칸 버리기";

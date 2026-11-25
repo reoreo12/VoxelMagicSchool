@@ -14,10 +14,14 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _id: gather_Dandelion
   _displayName: "\uBBFC\uB4E4\uB808"
-  _description: "\uD3C9\uC9C0\uC5D0 \uD754\uD55C \uB178\uB780 \uAF43."
+  _description: "\uD754\uD55C \uB178\uB780 \uAF43."
   _iconColor: {r: 1, g: 0.8, b: 0.1, a: 1}
+  _icon: {fileID: 0}
   _maxStack: 99
-  _creatureNote: 
+  _creatureNote: "\uBBFC\uB4E4\uB808\uB294 \uC5B4\uB514\uC11C\uB098 \uD53C\uC5B4\u2026
+    \uD754\uD574\uB3C4 \uBC14\uB78C \uC8FC\uBB38\uC5D4 \uAF2D \uD544\uC694\uD574."
+  _rarity: 0
+  _source: 3
   _habitat: 3
   _appearsAfterSchool: 1
   _appearsAtNight: 0

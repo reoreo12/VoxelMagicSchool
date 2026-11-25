@@ -1,5 +1,5 @@
-// 뒷산 채집 밸런스 도구: 서식지 종류별 슬롯 수·재료 개수(최소~최대)·확률을 GatheringConfig에서 조절하는 창과,
-// 슬롯 수를 기본 도형 프리팹·씬에 놓인 서식지(기능 붙이기로 만든 것 포함)에 맞추는 기능. 개수·확률은 데이터라 바로 적용된다.
+// 뒷산 채집 밸런스 도구: 채집 자리 수·켜지는 자리 수·희귀도 확률과 서식지 종류별 슬롯 수를 GatheringConfig에서 조절하는 창과,
+// 슬롯 수를 기본 도형 프리팹·씬에 놓인 서식지(기능 붙이기로 만든 것 포함)에 맞추는 기능. 자리 수·확률은 다음 하루 시작(또는 다시 뽑기)부터 쓰인다.
 using System.Collections.Generic;
 using System.Linq;
 using UnityEditor;
@@ -27,7 +27,7 @@ namespace VoxelMagic.EditorTools
 
         public static GatheringConfig LoadConfig() => AssetDatabase.LoadAssetAtPath<GatheringConfig>(ConfigPath);
 
-        /// <summary>목록에 없는 서식지 종류를 기본값(슬롯 2·0~1개·확률 0.5, 가정)으로 채운다.</summary>
+        /// <summary>목록에 없는 서식지 종류를 기본값(슬롯 3)으로 채운다.</summary>
         public static bool EnsureDefaults(GatheringConfig config)
         {
             var list = config.Habitats.Where(h => h != null).ToList();
@@ -35,7 +35,7 @@ namespace VoxelMagic.EditorTools
             foreach (GatherHabitatKind kind in System.Enum.GetValues(typeof(GatherHabitatKind)))
             {
                 if (list.Any(h => h.Kind == kind)) continue;
-                list.Add(new HabitatBalance(kind, 2, 0, 1, 0.5f, DefaultLayouts[kind]));
+                list.Add(new HabitatBalance(kind, 3, DefaultLayouts[kind]));
                 changed = true;
             }
             if (!changed) return false;
@@ -189,15 +189,19 @@ namespace VoxelMagic.EditorTools
                 return;
             }
             if (System.Enum.GetValues(typeof(GatherHabitatKind)).Length > _config.Habitats.Count(h => h != null)
-                && GUILayout.Button("빠진 서식지 종류를 기본값으로 채우기 (슬롯 2 · 0~1개 · 확률 0.5)"))
+                && GUILayout.Button("빠진 서식지 종류를 기본값으로 채우기 (슬롯 3)"))
                 GatheringBalanceTool.EnsureDefaults(_config);
 
-            EditorGUILayout.HelpBox("개수·확률은 다시 배치할 때 바로 쓰입니다 (플레이 중이면 F1 새 하루).\n" +
-                                    "슬롯 수를 바꾸면 아래 '슬롯 수 적용'을 눌러야 프리팹·씬·기능 붙이기 도구에 반영됩니다.\n" +
-                                    "의뢰에 필요한 재료는 이와 별개로 맵 전체에 최소 1개 보장됩니다.", MessageType.Info);
+            EditorGUILayout.HelpBox("하루 시작 때 서식지 종류마다 '자리 수' 중 '켜지는 자리 수'만큼 켜고, 자리마다 희귀도 확률로 재료를 고릅니다.\n" +
+                                    "자리 번호는 그 종류 서식지들의 슬롯을 차례로 센 순서입니다. 종류마다 씬 슬롯 합계가 자리 수 이상이어야 합니다.\n" +
+                                    "슬롯 수를 바꾸면 아래 '슬롯 수 적용'을 눌러야 프리팹·씬에 반영됩니다. 플레이 중이면 F1(또는 치트 패널)로 다시 뽑기.", MessageType.Info);
 
             _scroll = EditorGUILayout.BeginScrollView(_scroll);
             var so = new SerializedObject(_config);
+            EditorGUILayout.PropertyField(so.FindProperty("_spotsPerKind"), new GUIContent("자리 수 (종류마다)"));
+            EditorGUILayout.PropertyField(so.FindProperty("_activeSpotsPerKind"), new GUIContent("켜지는 자리 수"));
+            EditorGUILayout.PropertyField(so.FindProperty("_rarity"), new GUIContent("희귀도 확률"), true);
+            EditorGUILayout.PropertyField(so.FindProperty("_materials"), new GUIContent("재료 전부"), true);
             var list = so.FindProperty("_habitats");
             var counts = SceneSlotCounts();
             for (int i = 0; i < list.arraySize; i++)
@@ -208,20 +212,18 @@ namespace VoxelMagic.EditorTools
                 EditorGUILayout.LabelField(KindNames[(int)kind], EditorStyles.boldLabel);
                 EditorGUI.indentLevel++;
                 EditorGUILayout.PropertyField(entry.FindPropertyRelative("_slotCount"), new GUIContent("슬롯 수"));
-                EditorGUILayout.PropertyField(entry.FindPropertyRelative("_minItems"), new GUIContent("최소 개수"));
-                EditorGUILayout.PropertyField(entry.FindPropertyRelative("_maxItems"), new GUIContent("최대 개수"));
-                EditorGUILayout.PropertyField(entry.FindPropertyRelative("_extraChance"), new GUIContent("추가분 확률"));
                 if (_showLayout) EditorGUILayout.PropertyField(entry.FindPropertyRelative("_slotLayout"), new GUIContent("슬롯 배치 모양"), true);
 
                 var balance = _config.For(kind);
                 int slots = balance.SlotCount;
-                float empty = balance.MinItems > 0 ? 0f : Mathf.Pow(1f - balance.ExtraChance, Mathf.Min(balance.MaxItems, slots) - balance.MinItems);
-                float average = Mathf.Min(balance.ExpectedItems, slots);
-                EditorGUILayout.LabelField($"→ 서식지 하나에 평균 {average:0.##}개, 비어 있을 확률 {empty * 100f:0}%");
+                var mats = _config.Materials.Where(m => m != null && m.Habitat == kind).ToList();
+                EditorGUILayout.LabelField($"→ 재료 {mats.Count}종: {string.Join(" · ", mats.Select(m => m.DisplayName + "(" + ItemTypeNames.Of(m.Rarity) + ")"))}");
                 if (counts.TryGetValue(kind, out var placed))
                 {
                     string mismatch = placed.Any(c => c != slots) ? "  ⚠ 슬롯 수 적용 필요" : "";
-                    EditorGUILayout.LabelField($"   씬에 {placed.Count}개 (지금 슬롯 {string.Join("·", placed.Distinct())}칸){mismatch}");
+                    int total = placed.Sum();
+                    string shortage = total < _config.SpotsPerKind ? $"  ⚠ 자리 {_config.SpotsPerKind}곳보다 적음" : "";
+                    EditorGUILayout.LabelField($"   씬에 서식지 {placed.Count}개, 슬롯 합계 {total} (서식지마다 {string.Join("·", placed.Distinct())}칸){mismatch}{shortage}");
                 }
                 EditorGUI.indentLevel--;
             }

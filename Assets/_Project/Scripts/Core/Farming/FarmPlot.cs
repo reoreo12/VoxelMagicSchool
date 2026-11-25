@@ -1,4 +1,4 @@
-// 텃밭에 심어진 작물 하나의 상태(씨앗, 차지한 칸, 성장 단계).
+// 텃밭에 심어진 작물 하나의 상태(씨앗, 차지한 칸, 물 준 게임 시각, 성장 단계).
 using UnityEngine;
 
 namespace VoxelMagic.Core
@@ -27,13 +27,19 @@ namespace VoxelMagic.Core
         public Vector2Int Size { get; }
         public GrowthStage Stage { get; private set; }
         public bool IsWatered { get; private set; }
+        /// <summary>물을 준 게임 시각 (1일 0시부터의 누적 분, GameClock.AbsoluteMinute).</summary>
+        public float WateredAt { get; private set; }
         public bool IsGrown => Stage == GrowthStage.Grown;
 
         public bool Contains(Vector2Int cell)
             => cell.x >= Origin.x && cell.x < Origin.x + Size.x
                && cell.y >= Origin.y && cell.y < Origin.y + Size.y;
 
-        internal void MarkWatered() => IsWatered = true;
+        internal void MarkWatered(float at)
+        {
+            IsWatered = true;
+            WateredAt = at;
+        }
         internal void SetStage(GrowthStage stage) => Stage = stage;
     }
 }

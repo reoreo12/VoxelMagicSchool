@@ -54,6 +54,13 @@ namespace VoxelMagic.Core
             _resultHoldSeconds = resultHoldSeconds;
         }
 
+        /// <summary>물고기 속도 배율 (주문 "느려져라" 자리). null이면 1.</summary>
+        public IFishSpeedModifier SpeedModifier { get; set; }
+        /// <summary>다음 입질 한 번만 이 희귀도로 (치트). 쓰면 비워진다.</summary>
+        public ItemRarity? ForcedNextRarity { get; set; }
+        /// <summary>설정되어 있으면 입질마다 이 물고기 (튜토리얼 결과 보장).</summary>
+        public FishDefinition ForcedFish { get; set; }
+
         public FishingState State { get; private set; }
         public bool IsBusy => State != FishingState.Idle;
         public FishDefinition CurrentFish { get; private set; }
@@ -90,7 +97,8 @@ namespace VoxelMagic.Core
         {
             if (State == FishingState.Biting)
             {
-                Minigame = new FishingMinigame(_config, CurrentFish, _random);
+                Minigame = new FishingMinigame(_config, CurrentFish, _random,
+                    SpeedModifier != null ? SpeedModifier.SpeedMultiplier(CurrentFish) : 1f);
                 Enter(FishingState.Minigame, 0f);
             }
             else if(State == FishingState.Casting || State == FishingState.Waiting)
@@ -158,7 +166,8 @@ namespace VoxelMagic.Core
 
         private void EnterBiting()
         {
-            CurrentFish = _config.PickFish(_random);
+            CurrentFish = ForcedFish != null ? ForcedFish : _config.PickFish(_random, ForcedNextRarity);
+            ForcedNextRarity = null;
             if (CurrentFish == null)
             {
                 Cancel();

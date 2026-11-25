@@ -17,9 +17,13 @@ MonoBehaviour:
   _description: "\uD638\uBC15\uC774(\uAC00) \uB418\uB294 \uC528\uC557. 2\xD72\uCE78\uC744
     \uCC28\uC9C0\uD55C\uB2E4."
   _iconColor: {r: 0.75, g: 0.6, b: 0.4, a: 1}
+  _icon: {fileID: 0}
   _maxStack: 20
   _creatureNote: 
+  _rarity: 0
+  _source: 0
   _produce: {fileID: 11400000, guid: cd25bb3a4b5b07547960f24c17240f73, type: 2}
   _footprint: {x: 2, y: 2}
+  _growDays: 2
   _sproutPrefab: {fileID: 8908149154171474695, guid: 9ea3c10ad46b7074ba312cf1258abc4d, type: 3}
   _grownPrefab: {fileID: 1385485634989354750, guid: 217bbd56257952e4a9de24f851581810, type: 3}

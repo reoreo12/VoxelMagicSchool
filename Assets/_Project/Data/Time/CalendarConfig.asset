@@ -1,0 +1,57 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a6bc22f3464f63f46b05366888fc8447, type: 3}
+  m_Name: CalendarConfig
+  m_EditorClassIdentifier: 
+  _days:
+  - _label: "\uD06C\uB9AC\uCC98\uC640 \uB9CC\uB0A8, \uD29C\uD1A0\uB9AC\uC5BC"
+    _kind: 0
+    _heldTime:
+      _hour: 20
+      _minute: 0
+  - _label: "\uC790\uC720 \uD50C\uB808\uC774"
+    _kind: 2
+    _heldTime:
+      _hour: 16
+      _minute: 0
+  - _label: "\uC9C0\uAC01 \uB808\uC774\uC2A4"
+    _kind: 1
+    _heldTime:
+      _hour: 16
+      _minute: 0
+  - _label: "\uB9C8\uBC95 \uB300\uACB0"
+    _kind: 1
+    _heldTime:
+      _hour: 16
+      _minute: 0
+  - _label: "\uC11D\uACE0\uC0C1 \uBCF4\uC2A4\uC804"
+    _kind: 1
+    _heldTime:
+      _hour: 16
+      _minute: 0
+  - _label: "\uB9C8\uC9C0\uB9C9 \uC758\uB8B0 \uC804\uB2EC"
+    _kind: 2
+    _heldTime:
+      _hour: 16
+      _minute: 0
+  - _label: "\uBD88\uAF43 \uCD95\uC81C (\uC77C\uACFC \uC5C6\uC74C)"
+    _kind: 0
+    _heldTime:
+      _hour: 20
+      _minute: 0
+  - _label: "\uAE09\uC218 \uC2DC\uD5D8 \u2192 \uC5D4\uB529"
+    _kind: 0
+    _heldTime:
+      _hour: 16
+      _minute: 0
+  _examDay: 8
+  _newGameStartDay: 2

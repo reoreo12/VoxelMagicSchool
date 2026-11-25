@@ -1,0 +1,29 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 633fc3acc8de4d34399e6d92ce70239f, type: 3}
+  m_Name: Produce_StraightRice
+  m_EditorClassIdentifier: 
+  _id: straight_rice
+  _displayName: "\uAF3F\uAF3F\uD55C \uBCBC"
+  _description: "\uACE0\uAC1C\uB97C \uC219\uC774\uC9C0 \uC54A\uACE0 \uAF3F\uAF3F\uC774
+    \uC120 \uBCBC \uC774\uC0AD."
+  _iconColor: {r: 0.95, g: 0.85, b: 0.45, a: 1}
+  _icon: {fileID: 0}
+  _maxStack: 99
+  _creatureNote: "\uAF3F\uAF3F\uD55C \uBCBC\uB294 \uBC14\uB78C \uB9C8\uBC95\uC5D0\uB3C4
+    \uC548 \uC4F0\uB7EC\uC838\u2026 \uC790\uC138\uAC00 \uBC14\uB974\uBA74 \uC8FC\uBB38\uB3C4
+    \uACE7\uAC8C \uB098\uAC00."
+  _rarity: 1
+  _source: 1
+  _sizeRangeCm:
+    _min: 40
+    _max: 70

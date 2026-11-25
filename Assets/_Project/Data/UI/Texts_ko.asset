@@ -57,3 +57,5 @@ MonoBehaviour:
     _text: "\uC7A0\uC2DC \uCC45\uC744 \uB36E\uACE0 \uC26C\uC5B4 \uAC00\uC694."
   - _key: ui.book.menu.header
     _text: "\uB098\uAC00\uAE30"
+  - _key: ui.time.examDay
+    _text: D-Day

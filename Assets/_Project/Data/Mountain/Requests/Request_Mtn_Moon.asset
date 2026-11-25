@@ -15,6 +15,8 @@ MonoBehaviour:
   _title: "\uBC24\uC758 \uBC84\uC12F"
   _creatureLine: "\uBC24\uC5D0\uB9CC \uBE5B\uB098\uB294 \uBC84\uC12F\u2026 \uBCF4\uACE0
     \uC2F6\uC5B4\u2026"
+  _habitatHint: 
+  _difficulty: 2
   _requirements:
   - _item: {fileID: 11400000, guid: f671480368ed82f4d9e3d1dc217eb429, type: 2}
     _amount: 1
