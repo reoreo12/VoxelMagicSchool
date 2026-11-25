@@ -1,5 +1,5 @@
 // 퀵슬롯 한 칸(UI_SPEC 7-1): 밝은 칸 배경 + 아이템 아이콘(16×16, 정수 px 가운데). 아이콘이 없는 아이템은 단색 칸 + 첫 글자로 보인다(아이콘 제작 전 임시).
-// 클릭하면 이 칸 선택을 요청한다. 개수는 2개 이상일 때만 작은 글씨로 오른쪽 아래에 보인다(표시 방식은 [미정], 임시).
+// 클릭하면 이 칸 선택을, 우클릭하면(연결돼 있을 때, 치트) 이 칸 버리기를 요청한다. 개수는 2개 이상일 때만 작은 글씨로 오른쪽 아래에 보인다(표시 방식은 [미정], 임시).
 using System;
 using UnityEngine;
 using UnityEngine.EventSystems;
@@ -18,20 +18,23 @@ namespace VoxelMagic.UI
 
         private int _index;
         private Action<int> _onClick;
+        private Action<int> _onRightClick;
         private ItemStack _shown;
         private bool _hasShown;
 
         public RectTransform Rect => (RectTransform)transform;
 
-        public void Setup(int index, Action<int> onClick)
+        public void Setup(int index, Action<int> onClick, Action<int> onRightClick = null)
         {
             _index = index;
             _onClick = onClick;
+            _onRightClick = onRightClick;
         }
 
         public void OnPointerClick(PointerEventData eventData)
         {
             if (eventData.button == PointerEventData.InputButton.Left) _onClick?.Invoke(_index);
+            else if (eventData.button == PointerEventData.InputButton.Right) _onRightClick?.Invoke(_index);
         }
 
         /// <summary>내용이 바뀐 칸만 다시 그린다(4-A-5).</summary>

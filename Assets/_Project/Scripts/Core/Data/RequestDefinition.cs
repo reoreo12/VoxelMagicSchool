@@ -14,8 +14,8 @@ namespace VoxelMagic.Core
         [Tooltip("게시판 뽑기 난이도 (튜토리얼은 1일 고정 의뢰)")]
         [SerializeField] private RequestDifficulty _difficulty = RequestDifficulty.Easy;
         [SerializeField] private List<ItemAmount> _requirements = new List<ItemAmount>();
+        [Tooltip("수락할 때 주는 씨앗 (작물 재료 개수만큼)")]
         [SerializeField] private List<ItemAmount> _givenItems = new List<ItemAmount>();
-        [SerializeField, Min(0)] private int _baseReward = 10;
         [SerializeField, TextArea] private string _completionLine;
 
         public string Title => _title;
@@ -46,7 +46,6 @@ namespace VoxelMagic.Core
         }
         public IReadOnlyList<ItemAmount> Requirements => _requirements;
         public IReadOnlyList<ItemAmount> GivenItems => _givenItems;
-        public int BaseReward => _baseReward;
         public string CompletionLine => _completionLine;
 
         public const int MaxRequiredCount = 3;

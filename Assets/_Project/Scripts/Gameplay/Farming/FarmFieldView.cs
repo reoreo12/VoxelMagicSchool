@@ -45,6 +45,7 @@ namespace VoxelMagic.Gameplay
             var go = new GameObject($"Crop_{plot.Seed.Id}_{plot.Id}");
             go.transform.SetParent(_cropRoot, false);
             go.transform.position = _field.AreaCenter(plot.Origin, plot.Size);
+            go.transform.rotation = Quaternion.Euler(0f, FarmPlacement.Yaw(plot.Facing), 0f); // 심은 방향으로 모양을 돌림
             var view = go.AddComponent<CropView>();
             view.Show(plot, _growSeconds, animate);
             _views.Add(plot, view);

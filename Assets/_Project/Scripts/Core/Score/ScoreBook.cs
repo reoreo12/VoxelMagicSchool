@@ -1,4 +1,4 @@
-// 시험 예상 점수(실기, 필기). 최대값을 넘지 않게 더하고, 바뀌면 이벤트로 알린다.
+// 시험 예상 점수(실기, 필기). 상한 없이 쌓고(QUEST_TIMER 2-7, 통과 기준은 시스템만 앎), 바뀌면 이벤트로 알린다.
 using System;
 
 namespace VoxelMagic.Core
@@ -17,13 +17,6 @@ namespace VoxelMagic.Core
         /// <summary>(종류, 이전 값, 새 값)</summary>
         public event Action<ScoreKind, int, int> ScoreChanged;
 
-        public ScoreBook(int maxScore)
-        {
-            if (maxScore < 1) throw new ArgumentOutOfRangeException(nameof(maxScore));
-            MaxScore = maxScore;
-        }
-
-        public int MaxScore { get; }
         public int Practical => _practical;
         public int Written => _written;
 
@@ -33,8 +26,8 @@ namespace VoxelMagic.Core
         public int AddWritten(int amount) => Add(ScoreKind.Written, ref _written, amount);
         public int AddPractical(int amount) => Add(ScoreKind.Practical, ref _practical, amount);
 
-        /// <summary>저장 파일에서 불러온 값으로 맞춘다 (최대값을 넘지 않게).</summary>
-        internal void Restore(int practical, int written)
+        /// <summary>저장 파일에서 불러온 값으로 맞춘다 (치트 점수 설정도).</summary>
+        public void Restore(int practical, int written)
         {
             Set(ScoreKind.Practical, ref _practical, practical);
             Set(ScoreKind.Written, ref _written, written);
@@ -42,7 +35,7 @@ namespace VoxelMagic.Core
 
         private void Set(ScoreKind kind, ref int value, int next)
         {
-            next = Math.Max(0, Math.Min(MaxScore, next));
+            next = Math.Max(0, next);
             if (next == value) return;
             int before = value;
             value = next;
@@ -53,7 +46,7 @@ namespace VoxelMagic.Core
         {
             if (amount <= 0) return 0;
             int before = value;
-            value = Math.Min(MaxScore, value + amount);
+            value += amount;
             if (value != before) ScoreChanged?.Invoke(kind, before, value);
             return value - before;
         }

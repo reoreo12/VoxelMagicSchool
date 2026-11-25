@@ -1,5 +1,37 @@
 # 변경 기록
 
+## 2026-11-25 — 밭: 앞 칸·방향 돌려 심기·물 주기 미리보기, 치트: 맵 이동
+- **앞 칸 기준**: 심기·물 주기·뽑기 대상은 플레이어가 선 칸의 바로 앞 칸(바라보는 네 방향). `FarmConfig.Target Forward Offset` 삭제(에셋 값은 남음, 읽지 않음)
+- **방향 돌려 심기**(사용자 결정, 자동): 바라보는 방향으로 모양을 돌림(옆이면 1×2 → 2×1, 정사각형도 모델이 그 방향), 앞 칸에서 바라보는 쪽으로 펼치고 옆으로 넓으면 선 칸의 절반 쪽으로 붙임. Core `FarmFacing`·`FarmPlacement`, `FarmPlot.Facing`, `FarmGrid.TryPlant/TryRestore(…, facing, …)`, `FarmService.Resolve(cell, item, facing, lateralPositive)`, `FarmFieldView`가 모델을 돌림. 저장 `FarmPlotRecord.Facing`(예전 기록은 0 = 안 돌림, 버전 그대로)
+- **물 주기 미리보기**: `PlacementPreview`가 물 주기 때도 작물 칸 전체를 보여 줌. 이미 물 준 작물은 막힘(빨강, "이미 물을 줬어요", `GameTexts.AlreadyWatered`) — 예전엔 초록 안내인데 눌러도 아무 일 없었음
+- **맵 이동 치트**: 치트 패널 "이동" 탭(`Debug/MapCheats`) — 크리처 굴(들어온 포탈), 뒷산(복도에서 나온 자리), 뒷산 굴 입구 앞(`FromCave`), 텃밭(복도에서 나온 자리), 복도 가운데. 문과 같은 페이드·자동 저장. 복도 씬에 치트용 도착 지점 `Spawn_CheatCenter`(x 17.92, 두 문 가운데) 추가하고 `CorridorBootstrap` 연결 목록에 넣음
+- 테스트: `FarmFacingTests` 8개 → EditMode 198개 통과. 플레이(텃밭): 오른쪽을 보고 벼 → 앞 칸부터 가로 2칸 미리보기·심김(모델 90도), 지팡이 → 초록 2칸 → 물 준 뒤 빨강·"이미 물을 줬어요". 이동 치트: 텃밭 → 복도 가운데 → 뒷산 굴 입구 앞 → 크리처 굴 도착 확인. 콘솔 에러 없음
+
+## 2026-11-25 — 치트: 퀵슬롯 우클릭 버리기 다시 연결
+- 원인: UI 개편으로 퀵슬롯이 `InventoryBar` → `QuickSlotBarView`로 바뀌면서 우클릭 버리기가 연결되지 않았음(옛 바의 씬 체크도 꺼져 있었음)
+- `QuickSlotView`에 우클릭 콜백, `QuickSlotBarView`가 에디터·개발 빌드에서만 "칸 통째로 버리기"(개수 상관없음, 토스트) 연결. 옛 `InventoryBar`도 씬 체크(`_debugRightClickDiscard`) 대신 같은 규칙
+- 안내: 왼쪽 아래 조작법(`ControlsHintView`) 맨 아래에 "우클릭  인벤토리 칸 통째로 버리기 (치트)"(개발 빌드만, `GameTexts.CheatDiscardHint`). 뒷산 디버그 목록의 우클릭 항목·`MountainTexts.DebugDiscard*`는 중복이라 삭제
+- 확인(Creature_Cave 플레이): 검은 무 씨앗 3개 칸 우클릭 → 칸 비움, 안내 줄이 조작법과 겹치지 않음. 콘솔 에러 없음. `UI_INTEGRATION_GUIDE.md` 2-5 갱신
+
+## 2026-11-25 — 규칙 결정: 포기 시 씨앗 회수, 파내기
+- 사용자 결정(코드 변경 없음, 기록만): 포기하면 그 의뢰가 준 씨앗을 **가방에 있는 것만 준 개수까지** 회수하고 이미 심은 씨앗·작물은 그대로. 덜 자란 작물 파내기를 넣게 되면 씨앗을 가방에 돌려줌. 설계 7-6·7-8·10장·12장, 지침 2-4, `PROJECT_CONTEXT.md`에 기록. 회수는 아직 구현 안 함(지금은 포기해도 씨앗 그대로)
+
+## 2026-11-25 — 균형 결정: 어려움 의뢰 2일부터
+- 사용자 결정: 의뢰 튜토리얼은 1일에 끝나므로 2일 게시판부터 어려움을 섞어 3개(쉬움·보통·어려움)로. `QuestConfig.Hard From Day` 3 → 2(에셋·코드 기본값), 지침 2-2 표·완료 기준 3, 설계 6장 표, `PROJECT_CONTEXT.md` 갱신. 게시판 테스트를 2일 3개로
+
+## 2026-11-25 — 의뢰·타이머 3단계: 의뢰 개편 + 세이브 v2
+- 브랜치 `feature/quest-timer`(main까지 fast-forward 후 작업). 설계 7-7·7-8·7-8-1에 승인한 제안 기록(하나면 고르기 생략, 포기한 의뢰는 전달한 의뢰처럼 게시 제외, 수락하면 게시판에서 빠짐, 옛 의뢰 치트 키 삭제)
+- Core `Quest/`: **`RequestLog`**(옛 `RequestTracker` 대체, `IAcceptedRequestList` 구현) — 최대 3개(`QuestConfig.Max Accepted`), 수락 시 씨앗 지급·게시판에서 빼기, 거절 이유(칸 꽉 참·씨앗 자리·밤에만·닫힌 날·게시판에 없음), `Abandon(id)`, 골라서 `Deliver(id)`(그 순간 다시 확인), 완료 가능은 인벤토리로 매번 계산, 7일부터 전달 불가. `AcceptedRequest`, `DeliverySession`(고르기 → 대사 → 전달 → 다시 고르기, `QuestConfig.Skip Choice When Single`), `SeedRefillRule`(요구 작물 − 가진 작물 − 심은 것 − 가진 씨앗), `WrittenScoreRule`(희귀도 2/4/8 합). `RequestTypes`: `RequestState`, 새 `AcceptResult`·`DeliverResult`·`QuestAccess`
+- 점수: `ScoreBook` 상한 삭제, `ScoreCalculator`·`GameBalanceConfig.MaxScore`·`NewItemKindBonus`·`RequestDefinition._baseReward` 삭제. 옛 `ScoreHud`는 막대 기준값 필드(임시)
+- `ConfirmChannel`(Core) + UI `ConfirmDialog`(임시, `GameScreen.Confirm`), `DeliveryChoiceWindow`(임시, `GameScreen.DeliveryChoice` = 게임 시계만 멈춤). 두 창은 `TempUiBuilder`로 코드에서 모양을 만들고 네 씬 HUDCanvas에 컴포넌트만 둠. `DialogueChannel.Play`에 중단 콜백
+- `CreatureNpc`: 전달 대화 진행(낮 "밤에 와", 7일부터 "이제 늦었어", 부족한 재료 안내). `RequestBoardWindow`: 오늘 게시판, 받은 수 n/3·이유 안내, `씨앗 다시 받기`. 책 의뢰 탭 오른쪽 아래 임시 `포기` → 확인 창
+- **세이브 v2**: 받은·전달한·포기한 의뢰, 날짜·시각·다음 날 보정, 게시판·반복 기록, 오늘 채집 자리. 불러오면 세계가 생길 때 새 게임 대신 이어 감(`PlayerProgress.SetWorld`, `DayFlow.ResumeDay`). v1 파일은 경고 후 새 게임
+- 치트 패널 "의뢰" 탭(최소): 게시판 창 열기, 어디서나 전달, 받은 의뢰 재료 넣기, 모두 비우기, 디버그 표시에 받은 의뢰 상태
+- 삭제: `RequestTracker`, `QuestTrackerPanel`(씬의 빈 스크립트 자리 정리), `RequestCheatKeys`(F7·F10·F11·F12), 뒷산 F2 의뢰 교체, `GameBootstrap._requests`
+- 테스트: `RequestAndScoreTests` 새로(4번째 거절, 겹치는 재료 전달, 포기, 씨앗 다시 받기, 밤·마감, 전달 대화), `SaveSystemTests` v2 → EditMode 190개 통과
+- 확인(Creature_Cave 플레이, 자동 저장 끔): 2일 16:00 수락 거절(밤에만) → 20:00 3개 수락·4번째 거절·씨앗 지급 → 포기 확인 창 "예"로 칸 비움 → 재료 겹치는 두 의뢰 + 하나 더 완료 가능 → 고르기 창 3개 → "검은 무 두 뿌리" 전달 뒤 "그늘버섯 수프"가 진행 중(검은 무 0/1)으로 빠짐 → 남은 하나는 고르기 없이 바로 대사 → 필기 8점. 콘솔 에러 없음
+- 남은 것: 에셋 파일의 지운 필드 값(읽지 않음), 게시판 창 안내 글자색 밝게 고침(플레이 뒤 수정, 컴파일·테스트 통과)
+
 ## 2026-11-25 — 균형 결정: 작물 성장 3·5시간
 - 사용자 결정: 흔함 2시간이면 밤 20:00에 받은 의뢰를 그날 밤 바로 끝낼 수 있어 계획하는 맛이 약함 → **흔함 3시간 · 보통 5시간**, 희귀(괴물 고구마)는 다음 날 아침 그대로. 검은 무·꼿꼿한 벼 씨앗 값과 설명, 씨앗 기본값(3시간) 변경
 - 문서 정리(새 대화 인수인계): `DESIGN_QUEST_TIMER.md` 6·7·10장을 구현에 맞추고 12장 "제작 현황과 다음 대화 인수인계" 추가, `CLAUDE.md` 작업표에 의뢰·타이머 행 추가(사용자 승인, 현재 작업 표시 이동), `PROJECT_CONTEXT.md`·Notion 세계관 페이지(타이머·작물·재료 표·의뢰·인터뷰 기록) 갱신

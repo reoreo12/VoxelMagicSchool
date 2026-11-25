@@ -125,7 +125,6 @@ namespace VoxelMagic.EditorTools
                 so.FindProperty("_creatureLine").stringValue = line;
                 SetAmounts(so.FindProperty("_requirements"), needs, needAmounts);
                 SetAmounts(so.FindProperty("_givenItems"), given, givenAmounts);
-                so.FindProperty("_baseReward").intValue = reward;
                 so.FindProperty("_completionLine").stringValue = completion;
             });
             return asset;

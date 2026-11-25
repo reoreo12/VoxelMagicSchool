@@ -26,7 +26,6 @@ namespace VoxelMagic.Gameplay
         [SerializeField] private RequestPool _requestPool;
 
         [Header("데이터")]
-        [SerializeField] private List<RequestDefinition> _requests = new List<RequestDefinition>();
         [Tooltip("새 게임(저장 파일 없음)일 때만 지급")]
         [SerializeField] private List<ItemAmount> _startingItems = new List<ItemAmount>();
 
@@ -48,7 +47,7 @@ namespace VoxelMagic.Gameplay
         private void Awake()
         {
             GameSaveSystem.AutoSaveEnabled = _autoSave;
-            var progress = GameSaveSystem.GetOrCreateProgress(_balance, _requests, _catalog, GiveStartingItems);
+            var progress = GameSaveSystem.GetOrCreateProgress(_balance, _catalog, GiveStartingItems);
             if (_time != null && _calendar != null)
                 progress.EnsureWorld(new WorldSetup
                 {

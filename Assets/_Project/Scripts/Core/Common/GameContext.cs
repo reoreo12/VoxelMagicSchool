@@ -17,7 +17,11 @@ namespace VoxelMagic.Core
         public FarmService Farm { get; private set; }
         public ScoreBook Score { get; private set; }
         public MaterialJournal Journal { get; private set; }
-        public RequestTracker Requests { get; private set; }
+        public RequestLog Requests { get; private set; }
+        /// <summary>크리처 전달 대화 한 번의 단계 (크리처·고르기 창이 따라감).</summary>
+        public DeliverySession Delivery { get; private set; }
+        /// <summary>예/아니요 확인 창 요청 창구.</summary>
+        public ConfirmChannel Confirm { get; private set; }
         public FishingSession Fishing { get; private set; }
         public PromptChannel Prompt { get; private set; }
         public TimePause Pause { get; private set; }
@@ -74,6 +78,8 @@ namespace VoxelMagic.Core
             context.Hud = new HudState();
             context.Book = new BookState();
             context.Dialogue = new DialogueChannel();
+            context.Delivery = new DeliverySession(context.Requests);
+            context.Confirm = new ConfirmChannel();
             context.Farm = new FarmService(context.FarmGrid, context.Inventory, random, context.Messages);
             context.Fishing = new FishingSession(fishing, context.Inventory, random, context.Messages,
                 balance.AcquiredInfoSeconds);

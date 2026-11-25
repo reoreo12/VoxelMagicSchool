@@ -1,4 +1,4 @@
-# UI 연결·제작 지침 (2026-11-24 기준, 대사창 확대 반영)
+# UI 연결·제작 지침 (2026-11-25 기준, 의뢰 개편 반영)
 
 다른 사람이나 다른 대화(모델)가 UI 작업을 이어받거나, 게임 규칙 쪽에서 이미 만든 UI에 기능을 붙일 때 읽는 문서다.
 브랜치 `feature/tool-UI-editor`. 함께 읽을 것: `Docs/HANDOFF_UI.md`(진행 상황·열린 질문) → `Docs/UI_SPEC.md` 13장(결정) → 이 문서.
@@ -59,19 +59,21 @@ GameBootstrap (씬마다, Gameplay)
 ### 2-4. 수락한 의뢰 (왼쪽 위 바·목록, 완료 알림, 책의 의뢰 목록 탭)
 | 항목 | 내용 |
 |---|---|
-| UI가 읽는 창구 | `Core/Requests/IAcceptedRequestList`: `AcceptedCount`, `Accepted`(항목 목록), `event AcceptedListChanged`(수락·납품·포기·진행 변화), `event RequestBecameComplete(entry)`(조건을 다 채운 순간 → 완료 알림), `ExpectedReward(entry)`(지금 납품하면 받을 필기 점수, 처음 납품 재료 보너스 포함) |
-| 항목(`AcceptedRequestEntry`) | `Request`(RequestDefinition), `Title`, `AcceptedOrder`(먼저 수락할수록 작음), `Requirements`(아이템·현재·필요), `Progress`(0~1), `IsComplete`(납품 가능) |
-| 지금 | 구현은 `RequestTracker` 하나, **규칙상 한 번에 하나만 수락**. UI는 개수 제한 없이 만들어 둠(정렬·가상 스크롤) |
-| 여러 의뢰 동시 수락을 넣을 때 | `RequestTracker`가 여러 건을 들고 `Accepted`에 모두 넣고, 건마다 `AcceptedOrder`를 증가시키고, 진행이 바뀔 때 `AcceptedListChanged`, 건마다 납품 가능해지는 순간 `RequestBecameComplete`. UI는 그대로 |
+| UI가 읽는 창구 | `Core/Requests/IAcceptedRequestList`: `AcceptedCount`, `Accepted`(항목 목록), `event AcceptedListChanged`(수락·납품·포기·진행 변화), `event RequestBecameComplete(entry)`(조건을 다 채운 순간 → 완료 알림), `ExpectedReward(entry)`(지금 납품하면 받을 필기 점수 = 필요 재료 희귀도 점수 합, 보너스 없음) |
+| 항목(`AcceptedRequestEntry`) | `Request`(RequestDefinition), `Title`, `AcceptedOrder`(먼저 수락할수록 작음, = `Id` 포기 호출용), `Requirements`(아이템·현재·필요), `Progress`(0~1), `IsComplete`(납품 가능) |
+| 지금 (2026-11-25) | 구현은 `Core/Quest/RequestLog`(`context.Requests`). **최대 3개**(`QuestConfig`), 수락하면 씨앗 지급·게시판에서 빠짐. 규칙 메서드: `CanAccept/Accept(r)`, `Abandon(id)`, `CanDeliver/Deliver(id)`, `ReadyRequests()`, `RefillableSeeds()/GiveRefillSeeds()`, `BoardAccess()/DeliveryAccess()`(밤에만·닫힌 날), `RewardOf(r)` |
+| 포기 | `RequestLog.Abandon(id)`는 UI와 무관. 확인 창은 부르는 쪽이 `context.Confirm.Ask(문구, 예 콜백)`(Core `ConfirmChannel` → UI `ConfirmDialog`, `GameScreen.Confirm`). 지금은 책 의뢰 탭 오른쪽 아래 임시 `포기` 글자 버튼 |
+| 전달 | `context.Delivery`(`DeliverySession`): `Begin()` → `Choosing`(둘 이상) / `Talking` → `Choose(id)` → `CompleteTalk()` / `Cancel()`. 크리처(`CreatureNpc`)가 단계에 따라 고르기 창(`GameScreen.DeliveryChoice`, 임시 `DeliveryChoiceWindow`, 게임 시계만 멈춤)과 대사창을 띄움 |
 | 정렬(UI가 함) | 완료 → 진행률 높은 순 → 먼저 수락한 순. 보상까지 받은 의뢰는 목록에서 빠진다 |
 | UI 코드 | `UI/Requests/QuestBarView`(바, X = 숨기기), `QuestListView`(드롭다운, 항목 클릭 = 책 의뢰 탭), `QuestToastView`(완료 알림), `UI/Book/QuestBookPage`(책 의뢰 탭) |
-| 의뢰 게시판 | 아직 옛 프로토타입 `RequestBoardWindow`. 새 디자인 [미정] |
+| 의뢰 게시판 | 임시 `RequestBoardWindow`: 오늘 게시판(`context.Board.Offers`), 못 받는 이유, 받은 수 n/3, `씨앗 다시 받기`. 새 디자인 [미정] |
 
 ### 2-5. 퀵슬롯 (화면 아래 가운데)
 | 항목 | 내용 |
 |---|---|
 | UI가 읽는 창구 | `Core/Inventory/Inventory`: `SlotCount`, `GetSlot(i)`, `SelectedIndex`, `Select(i)`, `event SlotChanged(i)`, `event SelectionChanged(i)`. 아이콘은 `ItemDefinition.Icon`(16×16 도트, 없으면 글자 대체) |
 | 입력 | 1~5 키·클릭·퀵슬롯 위 휠 = 칸 선택. 게임 화면 위 휠 = 카메라 줌(`HudState.IsPointerOverScrollHud`로 구분, `GameInputReader`) |
+| 치트 (에디터·개발 빌드만, 2026-11-25) | 칸 **우클릭** = 개수와 상관없이 그 칸 통째로 버리기(`Inventory.DiscardSlot` + 토스트). `QuickSlotView.Setup(index, onClick, onRightClick)`, 정식 빌드에서는 우클릭을 연결하지 않음. 안내는 `ControlsHintView` 맨 아래 한 줄(`GameTexts.CheatDiscardHint`, 개발 빌드만). 정식 버리기 UI는 [미정] |
 | UI 코드 | `UI/HUD/QuickSlotBarView.cs`, `QuickSlotView.cs`. 테마 `Quick Slots` |
 | 남은 일 | 확장 인벤토리(가방, 7-4): 패널·칸 그림 없음, [미정] 많음 |
 
@@ -90,7 +92,7 @@ GameBootstrap (씬마다, Gameplay)
 | 새 탭 페이지 만들기 | `BookPage`를 상속(`Relayout()`에서 `Left`·`Right` 칸 안에 배치, `OnOpened()`는 펼쳐질 때 — 글자 크기를 재는 배치는 숨겨진 동안 정확하지 않으니 `OnOpened`에서 다시 배치), `UiBookBuilder`에 페이지 생성 추가. 왼쪽 페이지 규칙(목록 또는 `BookCoverView` 장 표지)을 따른다 |
 
 ### 2-7. 화면 스택·시간 정지·입력
-- 팝업 종류: `Core/Screens/ScreenPolicy`의 `GameScreen`(Book, Inventory, RequestBoard, RequestDetail(지금 안 씀), Dialogue).
+- 팝업 종류: `Core/Screens/ScreenPolicy`의 `GameScreen`(Book, Inventory, RequestBoard, RequestDetail(지금 안 씀), Dialogue, DeliveryChoice(시계만 멈춤), Confirm). 임시 창(고르기·확인)은 `UI/Common/TempUiBuilder`로 코드에서 모양을 만든다(씬에는 컴포넌트만, HUDCanvas 아래).
 - 정책(`ScreenPolicy.DefaultFor`): 책·가방·게시판 = 전체 정지(timeScale 0) + 뒤쪽 입력 막기 + 플레이어 조작 막기. 대사(Dialogue) = 게임 시계만 정지(캐릭터 애니메이션은 계속) + **ESC·바깥 클릭으로 닫히지 않음** + 딤 없음.
 - 시간 정지는 `TimePause`가 **원인별로** 등록·해제한다(2026-11-24, 화면은 `화면:<GameScreen>` 원인, 같은 원인은 하나로 셈, `Causes`로 목록). 실제 timeScale은 `Gameplay/TimeScaleDriver`(개발용 월드 배속 `DebugWorldSpeed` 포함).
 - 팝업 화면은 `UiScreen`을 상속하고 UI_Root의 `Popup` 층에 둔다. `UiScreenRouter`가 스택을 보고 켜고 끄며, 그 아래에 입력 막기 판(딤, 검정 알파 0.6)을 깐다. **판을 누르면 맨 위 화면이 닫힌다**(ESC와 같음).
@@ -114,7 +116,7 @@ GameBootstrap (씬마다, Gameplay)
 ### 2-9. 그 밖의 HUD
 - `HudState`(`context.Hud`): 의뢰 목록 펼침(`IsQuestListExpanded`), 의뢰 바 보이기(`IsQuestBarVisible`), 휠 쓰는 HUD 위 마우스(`IsPointerOverScrollHud`).
 - 아이템 획득 창·토스트: 옛 `AcquisitionPopup`·`ToastView`(`GameMessages`). 새 지침으로 아직 안 바꿈.
-- 옛 프로토타입(`InventoryBar`, `ScoreHud`, `QuestTrackerPanel`)은 세 씬에서 꺼 둠. `ControlsHintView`(왼쪽 아래 조작 안내)는 최종에 지움(사용자 결정).
+- 옛 프로토타입(`InventoryBar`, `ScoreHud`, `QuestTrackerPanel`)은 세 씬에서 꺼 둠. `ControlsHintView`(왼쪽 아래 조작 안내)는 최종에 지움(사용자 결정). 지금은 개발 빌드에서 치트 안내 한 줄(우클릭 버리기)을 덧붙임.
 
 ---
 

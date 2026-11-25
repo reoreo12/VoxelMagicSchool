@@ -1,4 +1,4 @@
-// 플레이어 데이터 유지·저장 단위 테스트: 저장 → JSON → 불러오기 결과가 같음, 모르는 ID 건너뛰기, 밭 보관·복원, 세션 보관소.
+// 플레이어 데이터 유지·저장 단위 테스트: 저장 → JSON → 불러오기 결과가 같음(받은·전달한·포기한 의뢰 포함), 모르는 ID 건너뛰기, 밭 보관·복원, 세션 보관소.
 using System.Collections.Generic;
 using NUnit.Framework;
 using UnityEngine;
@@ -19,13 +19,13 @@ namespace VoxelMagic.Tests
         [SetUp]
         public void SetUp()
         {
-            _balance = TestAssets.Create<GameBalanceConfig>(("_inventorySlotCount", 5), ("_maxScore", 100), ("_newItemKindBonus", 5));
+            _balance = TestAssets.Create<GameBalanceConfig>(("_inventorySlotCount", 5));
             _radish = TestAssets.Produce("radish");
             _radishSeed = TestAssets.Seed("radish_seed", _radish, 1, 1);
             _wand = TestAssets.Wand();
-            _first = TestAssets.Request("첫 의뢰", 10, new[] { new ItemAmount(_radish, 1) }, new ItemAmount[0]);
+            _first = TestAssets.Request("첫 의뢰", new[] { new ItemAmount(_radish, 1) }, new ItemAmount[0]);
             _first.name = "Request_First";
-            _second = TestAssets.Request("둘째 의뢰", 10, new[] { new ItemAmount(_radish, 2) }, new ItemAmount[0]);
+            _second = TestAssets.Request("둘째 의뢰", new[] { new ItemAmount(_radish, 2) }, new ItemAmount[0]);
             _second.name = "Request_Second";
             _catalog = TestAssets.Create<DefinitionCatalog>();
             _catalog.SetEntries(new ItemDefinition[] { _radish, _radishSeed, _wand }, new[] { _first, _second });
@@ -39,7 +39,7 @@ namespace VoxelMagic.Tests
             TestAssets.DestroyAll();
         }
 
-        private PlayerProgress NewProgress() => PlayerProgress.CreateNew(_balance, new[] { _first, _second });
+        private PlayerProgress NewProgress() => PlayerProgress.CreateNew(_balance);
 
         [Test]
         public void SaveThenLoadThroughJson_RestoresEverything()
@@ -49,8 +49,10 @@ namespace VoxelMagic.Tests
             source.Inventory.TryAdd(_radish, 3);
             source.Inventory.Select(1);
             source.Requests.Accept(_first);
-            source.Requests.Deliver(out _);
+            source.Requests.Deliver(source.Requests.Active[0].Id, out _);
             source.Requests.Accept(_second);
+            source.Requests.Accept(_given = MakeGiven());
+            source.Requests.Abandon(source.Requests.Active[1].Id);
             source.Score.AddPractical(7);
             var grid = new FarmGrid(6, new InstantGrowthRule());
             grid.TryPlant(_radishSeed, new Vector2Int(1, 2), out var watered);
@@ -72,14 +74,64 @@ namespace VoxelMagic.Tests
             Assert.AreEqual(source.Score.Written, loaded.Score.Written);
             Assert.AreEqual(7, loaded.Score.Practical);
             Assert.IsTrue(loaded.Journal.HasDelivered(_radish));
-            Assert.AreEqual(RequestStatus.Completed, loaded.Requests.GetStatus(_first));
-            Assert.AreSame(_second, loaded.Requests.Active);
+            Assert.AreEqual(RequestState.Delivered, loaded.Requests.GetState(_first));
+            Assert.AreEqual(1, loaded.Requests.AcceptedCount);
+            Assert.AreSame(_second, loaded.Requests.Active[0].Request);
+            Assert.AreEqual(RequestState.Abandoned, loaded.Requests.GetState(_given));
+            Assert.Greater(loaded.Requests.NextId, loaded.Requests.Active[0].Id, "새로 받는 의뢰 번호가 겹치지 않음");
 
             var restored = new FarmGrid(6, new InstantGrowthRule());
             loaded.RestoreFarm(restored);
             Assert.AreEqual(2, restored.Plots.Count);
             Assert.IsTrue(restored.GetPlotAt(new Vector2Int(1, 2)).IsWatered);
             Assert.IsFalse(restored.GetPlotAt(new Vector2Int(3, 3)).IsWatered);
+        }
+
+        private RequestDefinition _given;
+
+        private RequestDefinition MakeGiven()
+        {
+            var given = TestAssets.Request("지급 의뢰", new[] { new ItemAmount(_radish, 1) }, new[] { new ItemAmount(_radishSeed, 2) });
+            given.name = "Request_Given";
+            _catalog.SetEntries(new ItemDefinition[] { _radish, _radishSeed, _wand }, new[] { _first, _second, given });
+            return given;
+        }
+
+        private WorldSetup NewWorldSetup()
+        {
+            var pool = TestAssets.Create<RequestPool>();
+            pool.Set(new List<RequestDefinition> { _first, _second });
+            return new WorldSetup
+            {
+                Time = TestAssets.Create<TimeConfig>(), Calendar = TestAssets.Create<CalendarConfig>(),
+                Farm = TestAssets.Create<FarmConfig>(), Gathering = TestAssets.Create<GatheringConfig>(),
+                Quest = TestAssets.Create<QuestConfig>(), RequestPool = pool, Random = new SystemRandom(3)
+            };
+        }
+
+        [Test]
+        public void 세계_저장_v2는_날짜_시각_게시판_보정을_이어_간다()
+        {
+            var source = NewProgress();
+            source.EnsureWorld(NewWorldSetup());
+            source.Days.StartDay(3);
+            source.Clock.JumpTo(21 * 60);
+            source.Days.RequestNextDayShift("경비원", 60);
+            var offers = new List<RequestDefinition>(source.Board.Offers);
+            Assert.IsNotEmpty(offers);
+
+            var data = SaveMapper.ToData(source);
+            Assert.AreEqual(2, data.Version);
+            var loaded = NewProgress();
+            var unknown = SaveMapper.Apply(JsonUtility.FromJson<SaveData>(JsonUtility.ToJson(data)), loaded, _catalog);
+            loaded.EnsureWorld(NewWorldSetup());
+
+            Assert.IsEmpty(unknown);
+            Assert.AreEqual(3, loaded.Clock.Day);
+            Assert.AreEqual(21 * 60, loaded.Clock.Minute, 0.01f);
+            CollectionAssert.AreEqual(offers, loaded.Board.Offers);
+            Assert.AreEqual(1, loaded.Board.TimesOffered(offers[0]));
+            Assert.AreEqual(60, loaded.Days.NextDayShift.Requests["경비원"]);
         }
 
         [Test]
@@ -118,27 +170,26 @@ namespace VoxelMagic.Tests
         [Test]
         public void Load_ActiveRequest_DoesNotGiveItemsAgain()
         {
-            var given = TestAssets.Request("지급 의뢰", 5, new[] { new ItemAmount(_radish, 1) }, new[] { new ItemAmount(_radishSeed, 2) });
-            given.name = "Request_Given";
-            _catalog.SetEntries(new ItemDefinition[] { _radish, _radishSeed, _wand }, new[] { _first, _second, given });
-            var data = new SaveData { ActiveRequestId = "Request_Given" };
-            var progress = PlayerProgress.CreateNew(_balance, new[] { given });
+            var given = MakeGiven();
+            var data = new SaveData();
+            data.AcceptedRequestIds.Add("Request_Given");
+            var progress = NewProgress();
 
             SaveMapper.Apply(data, progress, _catalog);
 
-            Assert.AreSame(given, progress.Requests.Active);
+            Assert.AreSame(given, progress.Requests.Active[0].Request);
             Assert.AreEqual(0, progress.Inventory.Count(_radishSeed));
         }
 
         [Test]
-        public void Score_RestoreClampsToMax()
+        public void Score_RestoreHasNoCap()
         {
             var data = new SaveData { PracticalScore = 500, WrittenScore = -3 };
             var progress = NewProgress();
 
             SaveMapper.Apply(data, progress, _catalog);
 
-            Assert.AreEqual(100, progress.Score.Practical);
+            Assert.AreEqual(500, progress.Score.Practical, "점수 상한 없음");
             Assert.AreEqual(0, progress.Score.Written);
         }
 

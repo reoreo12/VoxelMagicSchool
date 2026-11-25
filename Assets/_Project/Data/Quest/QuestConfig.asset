@@ -15,7 +15,7 @@ MonoBehaviour:
   _maxAccepted: 3
   _easyFromDay: 1
   _normalFromDay: 1
-  _hardFromDay: 3
+  _hardFromDay: 2
   _tutorialDay: 1
   _tutorialRequest: {fileID: 11400000, guid: c9756bc89d699a143a66554a793b5ed2, type: 2}
   _lastDeliveryDay: 6

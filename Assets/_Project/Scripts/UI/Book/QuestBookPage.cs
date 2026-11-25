@@ -1,5 +1,5 @@
 // 책의 의뢰 목록 탭(사용자 결정 2026-11-20, UI_SPEC 10-5를 대신함): 왼쪽 페이지는 수락한 의뢰 버튼 목록 + "화면에 의뢰 목록 표시" 토글,
-// 오른쪽 페이지는 고른 의뢰의 제목·크리처 대사·필요한 재료·보상 한 줄. 정렬과 완료 색은 HUD 드롭다운과 같다. 목록이 넘치면 휠·스크롤바.
+// 오른쪽 페이지는 고른 의뢰의 제목·크리처 대사·필요한 재료·보상 한 줄 + 임시 "포기" 버튼(확인 창 뒤 RequestLog.Abandon). 정렬과 완료 색은 HUD 드롭다운과 같다.
 using System.Collections.Generic;
 using System.Text;
 using TMPro;
@@ -28,11 +28,16 @@ namespace VoxelMagic.UI
         [SerializeField] private ThemedText _needs;
         [SerializeField] private ThemedText _rewardLabel;
         [SerializeField] private ThemedText _reward;
+        [Tooltip("비우면 보상 글자를 복제해 오른쪽 아래에 만든다 (임시)")]
+        [SerializeField] private ThemedText _abandon;
 
         private static readonly StringBuilder Lines = new StringBuilder();
         private readonly List<AcceptedRequestEntry> _sorted = new List<AcceptedRequestEntry>();
         private readonly List<QuestBookRowView> _pool = new List<QuestBookRowView>();
         private IAcceptedRequestList _requests;
+        private RequestLog _log;
+        private ConfirmChannel _confirm;
+        private GameMessages _messages;
         private BookState _book;
         private HudState _hud;
         private AcceptedRequestEntry _selected;
@@ -44,6 +49,9 @@ namespace VoxelMagic.UI
         public void Bind(GameContext context)
         {
             _requests = context.Requests;
+            _log = context.Requests;
+            _confirm = context.Confirm;
+            _messages = context.Messages;
             _book = context.Book;
             _hud = context.Hud;
             _requests.AcceptedListChanged += Rebuild;
@@ -219,7 +227,8 @@ namespace VoxelMagic.UI
         {
             var values = theme.Book;
             bool has = _selected != null;
-            foreach (var t in new[] { _title, _line, _needsLabel, _needs, _rewardLabel, _reward })
+            EnsureAbandon();
+            foreach (var t in new[] { _title, _line, _needsLabel, _needs, _rewardLabel, _reward, _abandon })
                 if (t != null && t.gameObject.activeSelf != has) t.gameObject.SetActive(has);
             if (!has) return;
 
@@ -276,6 +285,40 @@ namespace VoxelMagic.UI
             _reward.SetText(texts != null ? string.Format(texts.Get(UiTextKeys.BookQuestRewardValue), reward) : reward.ToString());
             int rewardX = labelWidth + values.RewardGap;
             PixelLayout.PlaceTopLeft((RectTransform)_reward.transform, rewardX, y, width - rewardX, body);
+
+            if (_abandon != null)
+            {
+                _abandon.SetStyle(UiTextStyle.BodyBold);
+                _abandon.SetText($"<u>{GameTexts.AbandonButton}</u>");
+                var label = _abandon.GetComponent<TMP_Text>();
+                label.raycastTarget = true; // 글자 자체가 버튼
+                int abandonWidth = Mathf.CeilToInt(label.GetPreferredValues(GameTexts.AbandonButton).x) + 4;
+                PixelLayout.PlaceTopLeft((RectTransform)_abandon.transform, width - abandonWidth, RightSize.y - bold, abandonWidth, bold);
+            }
+        }
+
+        // 포기 버튼(임시): 보상 글자를 복제해 버튼을 붙인다. 정식 디자인은 책 의뢰 상세 페이지 작업에서.
+        private void EnsureAbandon()
+        {
+            if (_abandon == null && _rewardLabel != null)
+            {
+                _abandon = Instantiate(_rewardLabel, _rewardLabel.transform.parent);
+                _abandon.name = "AbandonButton";
+            }
+            if (_abandon == null || _abandon.GetComponent<Button>() != null) return;
+            var button = _abandon.gameObject.AddComponent<Button>();
+            button.targetGraphic = _abandon.GetComponent<TMP_Text>();
+            button.onClick.AddListener(OnAbandonClicked);
+        }
+
+        private void OnAbandonClicked()
+        {
+            var entry = _selected;
+            if (entry == null || _log == null || _confirm == null) return;
+            _confirm.Ask(string.Format(GameTexts.AbandonConfirmFormat, entry.Title), () =>
+            {
+                if (_log.Abandon(entry.Id)) _messages?.ShowToast(string.Format(GameTexts.AbandonedFormat, entry.Title));
+            });
         }
 
         private static void SetLine(Image image, Color color, int x, int y, int width)

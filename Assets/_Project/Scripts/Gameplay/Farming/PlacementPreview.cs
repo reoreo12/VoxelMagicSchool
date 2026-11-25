@@ -1,4 +1,5 @@
-// 씨앗을 들고 텃밭을 볼 때 심을 자리를 칸 크기만큼 보여 준다. 심을 수 있으면 초록, 아니면 빨강.
+// 텃밭을 볼 때 대상 칸을 칸 크기만큼 보여 준다: 씨앗을 들면 심을 자리(돌린 모양), 물 주기면 그 작물이 차지한 칸 전체.
+// 할 수 있으면 초록, 아니면 빨강(이미 심어짐·밖·지팡이 없음·이미 물 줌).
 using UnityEngine;
 using VoxelMagic.Core;
 
@@ -22,7 +23,8 @@ namespace VoxelMagic.Gameplay
         private void LateUpdate()
         {
             var action = _field.CurrentAction;
-            bool show = _field.Config != null && _field.IsTargetedThisFrame && action.Type == FarmActionType.Plant;
+            bool show = _field.Config != null && _field.IsTargetedThisFrame
+                        && (action.Type == FarmActionType.Plant || action.Type == FarmActionType.Water);
             _quad.enabled = show;
             if (!show) return;
 

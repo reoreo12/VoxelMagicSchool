@@ -52,6 +52,8 @@ namespace VoxelMagic.DebugTools
             Panel.ToggleOverlay = () => Overlay.Visible = !Overlay.Visible;
             Panel.IsOverlayVisible = () => Overlay.Visible;
             DayStartCheats.Register(Panel, Overlay);
+            RequestCheats.Register(Panel, Overlay);
+            MapCheats.Register(Panel);
             SceneManager.sceneLoaded += OnSceneLoaded;
         }
 

@@ -1,6 +1,5 @@
-// 크리처. 다가가면 의뢰 조건을 확인해 안내하고, E로 전달하면 대사창(완료 대사 + 재료 설명)을 먼저 보여 준 뒤 마지막 대사가 끝나면 납품·점수를 한 번에 반영한다.
-// 대사 도중 강제 종료되면 아무것도 바뀌지 않아 "말 걸기 전" 상태로 남는다(UI_SPEC 6-1).
-// 반응(CreatureReactions)이 연결돼 있으면 전달할 수 없을 때 "말 걸기"로 바뀌고, E를 누르면 무작위 반응 동작을 한다.
+// 크리처. E로 말을 걸면 전달 대화(DeliverySession)를 연다: 완료 가능 의뢰를 고르고(둘 이상일 때 고르기 창) → 전달 대사 → 마지막 대사 뒤 전달 → 남았으면 다시 고르기.
+// 대사 도중 끊기거나 고르기 창을 닫으면 아무것도 바뀌지 않는다(UI_SPEC 6-1). 낮·전달 마감 뒤·전달할 것이 없을 때는 안내(반응이 연결돼 있으면 반응 동작).
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -21,40 +20,91 @@ namespace VoxelMagic.Gameplay
         public override InteractionPrompt GetPrompt(in InteractionContext context)
         {
             var requests = Context.Requests;
-            var result = requests.CanDeliver();
-            if (result == DeliverResult.Success) return InteractionPrompt.Available(GameTexts.Deliver, PromptAnchor);
+            string blocked = BlockedReason(requests);
+            if (blocked == null) return InteractionPrompt.Available(GameTexts.Deliver, PromptAnchor);
             if (_reactions != null) return InteractionPrompt.Available(GameTexts.Talk, PromptAnchor);
-            return result == DeliverResult.MissingItems
-                ? InteractionPrompt.Blocked(GameTexts.Deliver, $"{GameTexts.MissingItems}: {requests.DescribeMissing()}", PromptAnchor)
-                : InteractionPrompt.Blocked(GameTexts.Deliver, GameTexts.NoActiveRequest, PromptAnchor);
+            return InteractionPrompt.Blocked(GameTexts.Deliver, blocked, PromptAnchor);
         }
 
         public override void Interact(in InteractionContext context)
         {
-            if (Context.Requests.CanDeliver() != DeliverResult.Success)
+            if (StartDelivery(Context, _speaker)) return;
+            if (_reactions != null) _reactions.PlayRandom();
+            else Context.Messages.ShowToast(BlockedReason(Context.Requests) ?? GameTexts.NoActiveRequest);
+        }
+
+        /// <summary>지금 전달할 수 없는 이유 (전달할 수 있으면 null).</summary>
+        public static string BlockedReason(RequestLog requests)
+        {
+            switch (requests.DeliveryAccess())
             {
-                if (_reactions != null) _reactions.PlayRandom();
-                return;
+                case QuestAccess.Closed: return GameTexts.CreatureTooLate;
+                case QuestAccess.NotNight: return GameTexts.CreatureNotNight;
             }
-            TryDeliver(Context, _speaker);
+            if (requests.AcceptedCount == 0) return GameTexts.NoActiveRequest;
+            if (requests.ReadyRequests().Count == 0) return $"{GameTexts.MissingItems}: {requests.DescribeMissingFirst()}";
+            return null;
         }
 
         /// <summary>
-        /// 의뢰 전달 (크리처 E, 의뢰 치트 키가 같이 씀). 화자와 대사창이 있으면 대사를 먼저 보여 주고 마지막 대사 뒤에 납품한다.
-        /// 지금 전달할 수 없으면 false.
+        /// 전달 대화를 시작한다 (크리처 E, 치트가 같이 씀). 화자와 대사창이 있으면 대사를 먼저 보여 주고 마지막 대사 뒤에 납품한다.
+        /// 전달할 의뢰가 없거나 이미 대화 중이면 false.
         /// </summary>
-        public static bool TryDeliver(GameContext context, SpeakerProfile speaker = null)
+        public static bool StartDelivery(GameContext context, SpeakerProfile speaker = null)
         {
-            var requests = context.Requests;
-            if (requests.CanDeliver() != DeliverResult.Success || context.Dialogue.IsPlaying) return false;
-            var lines = BuildLines(requests.Active, speaker);
-            // 대사 결과(아이템 소모·의뢰 완료·점수)는 마지막 대사 뒤 한 번에. 도중에는 아무것도 바꾸지 않는다.
-            if (speaker != null && context.Dialogue.HasPresenter && context.Dialogue.Play(lines, () => Deliver(context))) return true;
-            Deliver(context);
-            return true;
+            if (context.Delivery.IsActive || context.Dialogue.IsPlaying) return false;
+            new DeliveryConversation(context, speaker).Start();
+            return context.Delivery.IsActive || context.Delivery.DeliveredCount > 0;
         }
 
-        private static void Deliver(GameContext context) => context.Requests.Deliver(out _);
+        // 대화 한 번 동안만 단계 알림을 듣는 진행자. 대화가 끝나면 구독을 푼다.
+        private sealed class DeliveryConversation
+        {
+            private readonly GameContext _context;
+            private readonly SpeakerProfile _speaker;
+
+            public DeliveryConversation(GameContext context, SpeakerProfile speaker)
+            {
+                _context = context;
+                _speaker = speaker;
+            }
+
+            public void Start()
+            {
+                _context.Delivery.StepChanged += OnStep;
+                if (!_context.Delivery.Begin()) _context.Delivery.StepChanged -= OnStep;
+            }
+
+            private void OnStep()
+            {
+                var session = _context.Delivery;
+                switch (session.Step)
+                {
+                    case DeliveryStep.Choosing:
+                        // 고르기 창은 화면 스택을 보고 뜬다(UI). 이미 열려 있으면 창이 목록만 새로 고친다.
+                        if (_context.Screens.Top != GameScreen.DeliveryChoice) _context.Screens.Open(GameScreen.DeliveryChoice);
+                        break;
+                    case DeliveryStep.Talking:
+                        if (_context.Screens.IsOpen(GameScreen.DeliveryChoice)) _context.Screens.Close(GameScreen.DeliveryChoice);
+                        PlayTalk(session.Current.Request);
+                        break;
+                    case DeliveryStep.Idle:
+                        session.StepChanged -= OnStep;
+                        if (_context.Screens.IsOpen(GameScreen.DeliveryChoice)) _context.Screens.Close(GameScreen.DeliveryChoice);
+                        break;
+                }
+            }
+
+            private void PlayTalk(RequestDefinition request)
+            {
+                var lines = BuildLines(request, _speaker);
+                // 대사 결과(아이템 소모·의뢰 완료·점수)는 마지막 대사 뒤 한 번에. 도중에 끊기면 아무것도 바꾸지 않는다.
+                if (_speaker != null && lines.Count > 0 && _context.Dialogue.HasPresenter
+                    && _context.Dialogue.Play(lines, () => _context.Delivery.CompleteTalk(), () => _context.Delivery.Cancel()))
+                    return;
+                _context.Delivery.CompleteTalk();
+            }
+        }
 
         private static List<DialogueLine> BuildLines(RequestDefinition request, SpeakerProfile speaker)
         {
