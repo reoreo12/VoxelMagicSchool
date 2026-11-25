@@ -1,4 +1,4 @@
-// 미니게임 속 물고기의 위아래 움직임. 데이터의 속도·변덕·급이동 확률로 목표 지점을 바꿔 가며 움직인다.
+// 미니게임 속 물고기의 위아래 움직임. 데이터의 속도·변덕·급이동 확률로 목표 지점을 바꿔 가며 움직인다. 속도 배율(주문 "느려져라" 자리)을 곱한다.
 using UnityEngine;
 
 namespace VoxelMagic.Core
@@ -10,11 +10,13 @@ namespace VoxelMagic.Core
         private float _target;
         private float _retargetTimer;
         private bool _darting;
+        private readonly float _speedMultiplier;
 
-        public FishMotion(FishDefinition fish, IRandom random, float startPosition)
+        public FishMotion(FishDefinition fish, IRandom random, float startPosition, float speedMultiplier = 1f)
         {
             _fish = fish;
             _random = random;
+            _speedMultiplier = Mathf.Max(0f, speedMultiplier);
             Position = _target = Mathf.Clamp01(startPosition);
             _retargetTimer = fish.RetargetIntervalSeconds.Roll(random);
         }
@@ -32,7 +34,7 @@ namespace VoxelMagic.Core
                 _retargetTimer = _fish.RetargetIntervalSeconds.Roll(_random);
             }
 
-            float speed = _fish.MoveSpeed * (_darting ? _fish.DartSpeedMultiplier : 1f);
+            float speed = _fish.MoveSpeed * _speedMultiplier * (_darting ? _fish.DartSpeedMultiplier : 1f);
             Position = Mathf.MoveTowards(Position, _target, speed * deltaTime);
             if (Mathf.Approximately(Position, _target)) _darting = false;
         }

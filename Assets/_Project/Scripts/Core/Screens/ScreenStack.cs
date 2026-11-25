@@ -55,7 +55,7 @@ namespace VoxelMagic.Core
         {
             if (screen == GameScreen.None || IsOpen(screen)) return false;
             _stack.Add(screen);
-            _pause.Acquire(PolicyOf(screen).Pause);
+            _pause.Acquire(PolicyOf(screen).Pause, PauseCauses.ForScreen(screen));
             Opened?.Invoke(screen);
             Changed?.Invoke();
             return true;
@@ -67,7 +67,7 @@ namespace VoxelMagic.Core
             int index = _stack.LastIndexOf(screen);
             if (index < 0) return false;
             _stack.RemoveAt(index);
-            _pause.Release(PolicyOf(screen).Pause);
+            _pause.Release(PauseCauses.ForScreen(screen));
             Closed?.Invoke(screen);
             Changed?.Invoke();
             return true;

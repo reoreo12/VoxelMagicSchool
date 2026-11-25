@@ -17,8 +17,11 @@ MonoBehaviour:
   _description: "\uADC0\uAC00 \uAE34 \uB4B7\uC0B0 \uD1A0\uB07C. \uAC81\uC774 \uB9CE\uC544
     \uD480\uC232\uC5D0 \uC228\uB294\uB2E4."
   _iconColor: {r: 0.85, g: 0.82, b: 0.75, a: 1}
+  _icon: {fileID: 0}
   _maxStack: 99
   _creatureNote: 
+  _rarity: 0
+  _source: 4
   _requiredAccuracy: 0.5
   _sizeRangeCm:
     _min: 30

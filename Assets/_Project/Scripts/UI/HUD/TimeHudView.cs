@@ -1,5 +1,5 @@
-// 화면 오른쪽 위 시간대 HUD(UI_SPEC 8장, 13장): 나무 틀 왼쪽 칸에 시간대 그림, 오른쪽 칸에 룰렛과 1시간마다 정해진 각도로 움직이는 화살표, 아래 패널에 날짜.
-// 시각은 Core의 IGameTime을 이벤트로만 읽고, 시계가 연결되기 전에는 테마의 미리보기 값을 보인다. 마우스를 올리면 "방과후 16:00" 툴팁.
+// 화면 오른쪽 위 시간대 HUD(UI_SPEC 8장, 13장): 나무 틀 왼쪽 칸에 시간대 그림, 오른쪽 칸에 룰렛과 시간에 따라 부드럽게 도는 화살표, 아래 패널에 날짜.
+// 시각·날짜(D-n)·임박 경고는 Core의 IGameTime을 이벤트로만 읽고, 경고 중에는 화살표 색을 바꾸고 깜빡인다. 시계가 연결되기 전에는 테마의 미리보기 값을 보인다.
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
@@ -25,22 +25,85 @@ namespace VoxelMagic.UI
         private int _shownDay = -1;
         private int _shownHour = -1;
         private bool _shownNight;
+        private bool _warning;
+        private float _blinkTimer;
+        private bool _blinkOn;
+        private float _shownAngle = float.NaN;
 
         public void Bind(GameContext context)
         {
             _time = context.Time;
             _pause = context.Pause;
-            if (_time != null) _time.TimeChanged += Refresh;
+            if (_time != null)
+            {
+                _time.TimeChanged += Refresh;
+                _time.WarningChanged += RefreshWarning;
+                _time.HeldChanged += RefreshPaused;
+            }
             if (_pause != null) _pause.Changed += RefreshPaused;
             _shownDay = -1;
             Refresh();
             RefreshPaused();
+            RefreshWarning();
         }
 
         private void OnDestroy()
         {
-            if (_time != null) _time.TimeChanged -= Refresh;
+            if (_time != null)
+            {
+                _time.TimeChanged -= Refresh;
+                _time.WarningChanged -= RefreshWarning;
+                _time.HeldChanged -= RefreshPaused;
+            }
             if (_pause != null) _pause.Changed -= RefreshPaused;
+        }
+
+        private void Update()
+        {
+            UpdateArrowAngle();
+            UpdateBlink();
+        }
+
+        // 화살표는 게임 시계의 분(소수)으로 매 프레임 각도를 구해 부드럽게 돈다. 시계가 멈추면 화살표도 멈춘다.
+        private void UpdateArrowAngle()
+        {
+            if (_time == null || _arrow == null || Theme == null) return;
+            float angle = ArrowAngle(Theme.Time, _time.Minute / 60f);
+            if (Mathf.Abs(angle - _shownAngle) < 0.01f) return;
+            ShowArrowAngle(angle);
+        }
+
+        private void ShowArrowAngle(float angle)
+        {
+            _shownAngle = angle;
+            _arrow.rectTransform.localRotation = Quaternion.Euler(0f, 0f, angle);
+        }
+
+        // 경고 중 깜빡임 (시간이 멈춰도 UI 연출이라 unscaled time).
+        private void UpdateBlink()
+        {
+            if (!_warning || _arrow == null || Theme == null) return;
+            float interval = Theme.Time.WarningBlinkSeconds;
+            if (interval <= 0f) return;
+            _blinkTimer += Time.unscaledDeltaTime;
+            if (_blinkTimer < interval) return;
+            _blinkTimer = 0f;
+            _blinkOn = !_blinkOn;
+            ApplyArrowColor();
+        }
+
+        private void RefreshWarning()
+        {
+            _warning = _time != null && _time.Warning != TimeWarning.None;
+            _blinkTimer = 0f;
+            _blinkOn = _warning;
+            ApplyArrowColor();
+        }
+
+        private void ApplyArrowColor()
+        {
+            if (_arrow == null || Theme == null) return;
+            _arrow.color = _warning && _blinkOn ? Theme.Time.WarningArrowColor : Color.white;
         }
 
         private int Day => _time != null ? _time.Day : Theme.Time.PreviewDay;
@@ -89,8 +152,10 @@ namespace VoxelMagic.UI
             PlaceText(_paused, values.PausedPosition, new Vector2Int(frameSize.x, values.DateSize.y), values.Scale);
 
             _shownDay = -1; // 위치·스프라이트가 바뀌었으니 다시 그린다
+            _shownAngle = float.NaN;
             Refresh();
             RefreshPaused();
+            ApplyArrowColor();
         }
 
         private void Refresh()
@@ -105,16 +170,36 @@ namespace VoxelMagic.UI
 
             var values = Theme.Time;
             SetSprite(_icon, values.Icon(night), values.IconPosition);
-            _arrow.rectTransform.localRotation = Quaternion.Euler(0f, 0f, values.ArrowAngle(hour));
-            if (_date != null && Theme.Texts != null) _date.SetText(string.Format(Theme.Texts.Get(UiTextKeys.TimeDay), Theme.Time.DaysLeft(day)));
+            ShowArrowAngle(ArrowAngle(values, _time != null ? _time.Minute / 60f : hour));
+            if (_date != null && Theme.Texts != null) _date.SetText(DateText(day));
             if (_hovering) ShowTooltip(_pointer); // 시각이 바뀌면 떠 있는 툴팁 글자도 바꾼다
         }
 
-        // 개발 빌드에서만 "멈춰 있음"(8-2). 정식 빌드에서는 숨긴다(기본 가정).
+        // 시계가 연결되면 TimeConfig 구간 시각(방과후 시작·밤 시작·하루 끝)으로, 아니면 테마 미리보기 시각으로 각도를 구한다.
+        private float ArrowAngle(TimeValues values, float hour)
+        {
+            if (_time == null) return values.ArrowAngle(Mathf.FloorToInt(hour)); // 미리보기: 정시 각도
+            int start = _time.PeriodStartHour(TimeOfDay.Day);
+            int night = _time.PeriodStartHour(TimeOfDay.Night);
+            if (start < 0 || night < 0) return values.ArrowAngle(Mathf.FloorToInt(hour));
+            return values.ArrowAngle(hour, start, night, _time.DayEndHour);
+        }
+
+        // 시험까지 남은 날: 시계가 있으면 Core 값(1일째 D-7 … 시험 날 D-Day), 없으면 테마 미리보기.
+        private string DateText(int day)
+        {
+            var texts = Theme.Texts;
+            int left = _time != null ? _time.DaysUntilExam : Theme.Time.DaysLeft(day);
+            if (left <= 0 && texts.TryGet(UiTextKeys.TimeExamDay, out var examDay)) return examDay;
+            return string.Format(texts.Get(UiTextKeys.TimeDay), left);
+        }
+
+        // 개발 빌드에서만 "멈춰 있음"(8-2). 화면 멈춤이나 시계 잡기(스토리·맵 이동 등) 중 하나라도 있으면. 정식 빌드에서는 숨긴다.
         private void RefreshPaused()
         {
             if (_paused == null) return;
-            bool show = Debug.isDebugBuild && Application.isPlaying && _pause != null && _pause.IsClockPaused;
+            bool paused = (_pause != null && _pause.IsClockPaused) || (_time != null && _time.IsHeld);
+            bool show = Debug.isDebugBuild && Application.isPlaying && paused;
             if (_paused.gameObject.activeSelf != show) _paused.gameObject.SetActive(show);
         }
 

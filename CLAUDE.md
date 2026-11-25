@@ -7,8 +7,9 @@
   | 프로토타입 1: 의뢰 · 농사 · 낚시 루프 | `GAMEPLAY_PROTOTYPE_SPEC.md` | `Docs/DESIGN.md` |
   | 프로토타입 2: 2D 횡스크롤 복도 + 캐릭터 | `CORRIDOR_SIDESCROLL_SPEC.md` | `Docs/DESIGN_CORRIDOR.md` |
   | 캐릭터 공용 시스템: 소켓·장착물 · 애니메이션 · 스탯 | `Docs/HANDOFF_CHARACTER_SYSTEMS.md` | `Docs/DESIGN_CHARACTER.md` |
-  | 뒷산 맵: 채집 · 포획 프로토타입 (현재, 브랜치 `Back-mountain-map`) | `Docs/BACKMOUNTAIN_PROTOTYPE_GUIDE.md` (맨 아래 "추가 항목") | `Docs/HANDOFF_BACKMOUNTAIN.md` · `Docs/DESIGN_MOUNTAIN_FLOOR.md` |
-  | UI: HUD · 책 · 의뢰 UI · UI 에디터 씬 (현재, 브랜치 `feature/tool-UI-editor`) | `Docs/HANDOFF_UI.md` (진행 상황 · 다음 단계 · 열린 질문, 먼저 읽기) | `Docs/UI_SPEC.md` (13장 결정이 우선) |
+  | 뒷산 맵: 채집 · 포획 프로토타입 (브랜치 `Back-mountain-map`, 채집 규칙은 의뢰·타이머 작업에서 바뀜) | `Docs/BACKMOUNTAIN_PROTOTYPE_GUIDE.md` (맨 아래 "추가 항목") | `Docs/HANDOFF_BACKMOUNTAIN.md` · `Docs/DESIGN_MOUNTAIN_FLOOR.md` |
+  | UI: HUD · 책 · 의뢰 UI · UI 에디터 씬 (브랜치 `feature/tool-UI-editor`) | `Docs/HANDOFF_UI.md` (진행 상황 · 다음 단계 · 열린 질문, 먼저 읽기) | `Docs/UI_SPEC.md` (13장 결정이 우선) · `Docs/UI_INTEGRATION_GUIDE.md` (기능 연결) |
+  | 의뢰 시스템 개편 · 게임 타이머 · 치트 (현재, 브랜치 `feature/quest-timer`, 1·2단계 완료 → 3단계 의뢰 개편부터) | `Docs/QUEST_TIMER_SPEC.md` | `Docs/DESIGN_QUEST_TIMER.md` (**12장 "제작 현황과 다음 대화 인수인계"를 먼저 읽기**, 결정은 맨 위 상태 줄과 10장) |
 
 - **설계 먼저**: 코드를 만들기 전에 해당 설계 문서로 설계를 정리해 설명하고, 사용자가 "제작 시작"이라고 승인한 뒤에만 스크립트·씬·에셋을 만든다.
 - 모든 스크립트 맨 위에 주석으로 스크립트의 용도와 의도를 적는다. 최대 3줄, 짧게 쓸 수 있으면 1줄로 충분하다.

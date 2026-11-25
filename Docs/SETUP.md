@@ -96,6 +96,7 @@
 | VoxelMagic.Editor | `Assets/_Project/Scripts/Editor` (에디터 전용) | Core, Unity.TextMeshPro |
 | VoxelMagic.Tests | `Assets/_Project/Tests` (EditMode 테스트) | Core, **UI**(2026-11-19 추가: 정수 배율 계산 테스트), Test Runner, NUnit |
 | VoxelMagic.Tools (2026-11-03, 11-06 `VoxelMagic.Sandbox`에서 이름 변경) | `Assets/_Project/Scripts/Tools` (애니메이션 랩, 자동 참조 끔) | Core, **Gameplay**(2026-11-06 추가: 농장과 같은 소켓·장착 부품을 랩에서 그대로 사용), Unity.InputSystem, Unity.TextMeshPro, UnityEngine.UI |
+| VoxelMagic.DebugTools (2026-11-24, 의뢰·타이머 작업) | `Assets/_Project/Scripts/Debug` (치트·디버그 표시, 자동 참조 끔. 모든 파일을 `#if UNITY_EDITOR \|\| DEVELOPMENT_BUILD`로 감싸 정식 빌드에서는 빈 어셈블리. 어느 어셈블리도 참조하지 않음) | Core, Gameplay, Unity.InputSystem |
 | VoxelMagic.Tools.Editor (2026-11-03, 11-06 `VoxelMagic.Sandbox.Editor`에서 이름 변경) | `Assets/_Project/Scripts/Tools/Editor` (에디터 전용) | Tools, Core, Gameplay, Editor, TMP, UI, InputSystem, **Unity.2D.Sprite.Editor**(2026-11-19 추가: UI 시트 자르기) |
 
 ## 저장 파일 (2026-11-10)
@@ -105,6 +106,13 @@
 - 불러오기: 게임 시작 후 텃밭 씬 부트스트랩이 처음 진행 상태를 만들 때 파일이 있으면 불러옴, 없으면 시작 아이템 지급
 - ID 표: `Data/Save/DefinitionCatalog` — 새 아이템·의뢰를 만들면 메뉴 `VoxelMagic/저장/정의 목록 채우기`를 다시 실행 (안 하면 그 아이템은 저장은 되지만 불러올 때 건너뜀)
 - 메뉴: `VoxelMagic/저장/` 정의 목록 채우기(+ 지금 씬 부트스트랩 연결) · 저장 폴더 열기 · 저장 지우기(슬롯 0)
+
+## 게임 타이머 설정 (2026-11-24)
+- 설정 에셋: `Data/Time/TimeConfig`(하루 구간·경고·하루 시작 시각·경비원 지연·보정 범위), `Data/Time/CalendarConfig`(8일 날 종류, 시험 날, 새 게임 시작 날)
+- `FarmPond`·`BackMountain`·`Creature_Cave`·`Prototype_FarmFishing` 씬의 `GameBootstrap`에 `Time`·`Calendar` 연결. 비어 있으면 시계 없이 경고 로그
+- 2026-11-24 2단계: `GameBootstrap`에 `Gathering`(`Data/Config/GatheringConfig`)·`Quest`(`Data/Quest/QuestConfig`)·`Request Pool`(`Data/Quest/RequestPool`) 연결(네 씬). 뒷산 서식지 슬롯 3칸(채집 밸런스 창 '슬롯 수 적용', 서식지 프리팹 4종도 바뀜)
+- **임시**: `CalendarConfig.New Game Start Day = 2`(튜토리얼이 아직 없어 1일은 시계가 멈춘 스토리 날이라서). 튜토리얼 단계에서 1로 되돌린다
+- 시계는 진행 상태(`PlayerProgress`)에 있어 씬을 옮겨도 이어진다. 저장 파일에는 아직 안 들어감(게임을 다시 켜면 새 게임 시작 날부터) — 의뢰 단계에서 세이브 v2로 추가 예정
 
 ## 연결 메모
 - 한글 폰트: `Fonts/Pretendard SDF.asset`은 고정(Static) 아틀라스라 플레이해도 파일이 바뀌지 않는다. 문자 목록에 없는 글자를 쓰려면 `VoxelMagic/한글 폰트 다시 굽기`를 실행한다.

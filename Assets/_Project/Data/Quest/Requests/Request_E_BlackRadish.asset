@@ -1,0 +1,29 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6e2e2f20d9b88964fa16d99bbf67be48, type: 3}
+  m_Name: Request_E_BlackRadish
+  m_EditorClassIdentifier: 
+  _title: "\uAC80\uC740 \uBB34 \uB450 \uBFCC\uB9AC"
+  _creatureLine: "\uAC80\uC740 \uBB34 \uB450 \uBFCC\uB9AC\uB9CC. \uB9C8\uB825\uC774
+    \uBE60\uC9C4 \uB0A0\uC5D4 \uC774\uAC8C \uCD5C\uACE0\uC57C."
+  _habitatHint: "\uD143\uBC2D\uC5D0 \uC2EC\uACE0 \uBB3C\uC744 \uC8FC\uBA74 \uAE08\uBC29
+    \uC790\uB77C"
+  _difficulty: 0
+  _requirements:
+  - _item: {fileID: 11400000, guid: 723b2ecf6711cab4fb05145c50acbb42, type: 2}
+    _amount: 2
+  _givenItems:
+  - _item: {fileID: 11400000, guid: a65f704237085b34fb7ac9c7c6fbdb1d, type: 2}
+    _amount: 2
+  _baseReward: 4
+  _completionLine: "\uC544\uC0AD\u2026 \uC18D\uAE4C\uC9C0 \uAE4C\uB9E4. \uC88B\uC740
+    \uBB34\uC57C."

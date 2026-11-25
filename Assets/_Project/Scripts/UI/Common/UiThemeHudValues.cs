@@ -437,20 +437,24 @@ namespace VoxelMagic.UI
         [SerializeField, Tooltip("받침 색 (틀 안쪽 테두리 색)")] private Color _backingColor = new Color32(196, 154, 108, 255);
         [SerializeField, Tooltip("왼쪽 칸 시간대 그림 (틀보다 앞에 그린다)")] private Vector2Int _iconPosition = new Vector2Int(8, 8);
         [SerializeField, Tooltip("오른쪽 칸 룰렛")] private Vector2Int _roulettePosition = new Vector2Int(35, 8);
-        [SerializeField, Tooltip("화살표 회전 중심 = 룰렛 반원의 중심 (0.5 단위 가능)")] private Vector2 _arrowPivot = new Vector2(34f, 16.5f);
+        [SerializeField, Tooltip("화살표 회전 중심. 세로 = 룰렛 반원 중심, 가로 = 반원 중심(35)보다 2px 왼쪽(화살표가 룰렛 그림을 덜 가리게, 사용자 결정). 0.5 단위 가능")] private Vector2 _arrowPivot = new Vector2(33f, 16.5f);
         [SerializeField, Tooltip("화살표 그림 안의 회전 중심 (그림 왼쪽 위 기준)")] private Vector2Int _arrowPivotInSprite = new Vector2Int(0, 4);
         [SerializeField, Tooltip("날짜 글자 칸 위치 (아래 패널 안)")] private Vector2Int _datePosition = new Vector2Int(3, 36);
         [SerializeField, Tooltip("날짜 글자 칸 크기")] private Vector2Int _dateSize = new Vector2Int(48, 16);
         [SerializeField, Tooltip("개발용 '멈춰 있음' 글자 위치 (8-2)")] private Vector2Int _pausedPosition = new Vector2Int(0, 56);
         [SerializeField, Tooltip("날짜 글자 스타일 (수락한 의뢰 제목처럼 굵게)")] private UiTextStyle _dateStyle = UiTextStyle.HudTitle;
 
-        [Header("시각 → 화살표 각도 (임시값, 8-1 [미정])")]
+        [Header("시각 → 화살표 각도 (시계 연결 전 미리보기용 시각, 연결되면 TimeConfig 구간 시각을 쓴다)")]
         [SerializeField, Range(0, 24), Tooltip("방과후 시작 시각")] private int _afterSchoolStartHour = 16;
-        [SerializeField, Range(0, 24), Tooltip("밤 시작 시각 (방과후 끝)")] private int _nightStartHour = 19;
+        [SerializeField, Range(0, 24), Tooltip("밤 시작 시각 (방과후 끝)")] private int _nightStartHour = 20;
         [SerializeField, Range(0, 24), Tooltip("밤 끝 시각")] private int _nightEndHour = 24;
         [SerializeField, Tooltip("방과후 시작 때 화살표 각도 (0 = 오른쪽, +는 위로)")] private int _startAngle = 75;
         [SerializeField, Tooltip("방과후→밤 경계 각도 (룰렛 색 경계)")] private int _boundaryAngle = 0;
         [SerializeField, Tooltip("밤 끝 때 화살표 각도")] private int _endAngle = -75;
+
+        [Header("임박 경고 (19:40 밤 임박, 23:40 하루 끝 임박 — 시각은 TimeConfig)")]
+        [SerializeField, Tooltip("경고 중 화살표 색")] private Color _warningArrowColor = new Color32(255, 96, 64, 255);
+        [SerializeField, Min(0f), Tooltip("경고 중 깜빡임 간격(초). 0이면 색만 바꾼다")] private float _warningBlinkSeconds = 0.5f;
 
         [Header("시계 연결 전 미리보기")]
         [SerializeField, Min(1)] private int _previewDay = 1;
@@ -483,6 +487,8 @@ namespace VoxelMagic.UI
         /// <summary>며칠째 → 남은 날 n (D-n). 마지막 날이 1.</summary>
         public int DaysLeft(int day) => Mathf.Max(0, Mathf.Max(1, _playDays) - day + 1);
         public int PreviewHour => _previewHour;
+        public Color WarningArrowColor => _warningArrowColor;
+        public float WarningBlinkSeconds => _warningBlinkSeconds;
         public int NightStartHour => _nightStartHour;
         public Vector2Int TooltipOffset => _tooltipOffset;
         public Sprite Frame => _frame;
@@ -491,11 +497,28 @@ namespace VoxelMagic.UI
         public Sprite Icon(bool night) => night ? _nightIcon : _afterSchoolIcon;
 
         /// <summary>정시 → 화살표 각도(정수 도). 방과후는 시작~경계, 밤은 경계~끝 각도에 나눠 놓아 구간 길이가 달라도 색 경계에서 바뀐다(스텝, 13장).</summary>
-        public int ArrowAngle(int hour)
+        public int ArrowAngle(int hour) => ArrowAngle(hour, _afterSchoolStartHour, _nightStartHour, _nightEndHour);
+
+        /// <summary>게임 시계의 구간 시각(방과후 시작·밤 시작·하루 끝)으로 각도를 구한다. 시계가 연결되면 이쪽을 쓴다.</summary>
+        public int ArrowAngle(int hour, int afterSchoolStartHour, int nightStartHour, int nightEndHour)
         {
-            if (hour < _nightStartHour)
-                return Lerp(_startAngle, _boundaryAngle, _afterSchoolStartHour, _nightStartHour, hour);
-            return Lerp(_boundaryAngle, _endAngle, _nightStartHour, _nightEndHour, hour);
+            if (hour < nightStartHour)
+                return Lerp(_startAngle, _boundaryAngle, afterSchoolStartHour, nightStartHour, hour);
+            return Lerp(_boundaryAngle, _endAngle, nightStartHour, nightEndHour, hour);
+        }
+
+        /// <summary>소수 시각(예: 18.5 = 18:30) → 화살표 각도(소수 도). 시간에 따라 부드럽게 돌릴 때 쓴다(2026-11-24 사용자 결정).</summary>
+        public float ArrowAngle(float hour, int afterSchoolStartHour, int nightStartHour, int nightEndHour)
+        {
+            if (hour < nightStartHour)
+                return LerpF(_startAngle, _boundaryAngle, afterSchoolStartHour, nightStartHour, hour);
+            return LerpF(_boundaryAngle, _endAngle, nightStartHour, nightEndHour, hour);
+        }
+
+        private static float LerpF(int from, int to, int startHour, int endHour, float hour)
+        {
+            if (endHour <= startHour) return from;
+            return Mathf.Lerp(from, to, Mathf.Clamp01((hour - startHour) / (endHour - startHour)));
         }
 
         private static int Lerp(int from, int to, int startHour, int endHour, int hour)

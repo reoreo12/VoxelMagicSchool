@@ -1,0 +1,31 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6e2e2f20d9b88964fa16d99bbf67be48, type: 3}
+  m_Name: Request_E_MushroomSoup
+  m_EditorClassIdentifier: 
+  _title: "\uADF8\uB298\uBC84\uC12F \uC218\uD504"
+  _creatureLine: "\uADF8\uB298\uBC84\uC12F\uC774\uB791 \uAC80\uC740 \uBB34\uB85C
+    \uC218\uD504\uB97C \uB053\uC77C \uAC70\uC57C."
+  _habitatHint: "\uADF8\uB298\uBC84\uC12F\uC740 \uD070 \uB098\uBB34 \uADF8\uB298\uC5D0,
+    \uAC80\uC740 \uBB34\uB294 \uD143\uBC2D\uC5D0\uC11C"
+  _difficulty: 0
+  _requirements:
+  - _item: {fileID: 11400000, guid: f399077c6983dd14fa438a8a21576ca7, type: 2}
+    _amount: 1
+  - _item: {fileID: 11400000, guid: 723b2ecf6711cab4fb05145c50acbb42, type: 2}
+    _amount: 1
+  _givenItems:
+  - _item: {fileID: 11400000, guid: a65f704237085b34fb7ac9c7c6fbdb1d, type: 2}
+    _amount: 1
+  _baseReward: 4
+  _completionLine: "\uD6C4\uB8E8\uB8E9\u2026 \uC218\uD504\uC5D0\uC11C \uC2DC\uD5D8
+    \uBB38\uC81C \uB9DB\uC774 \uB098."

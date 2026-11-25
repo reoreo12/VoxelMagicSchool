@@ -17,6 +17,8 @@ namespace VoxelMagic.UI
         public const string TimeTooltip = "ui.time.tooltip";
         /// <summary>"D-{0}" — 날짜 패널, {0} 남은 날 (8-1, 사용자 결정: 8일 플레이)</summary>
         public const string TimeDay = "ui.time.day";
+        /// <summary>시험 날 (D-0) 날짜 판 문구.</summary>
+        public const string TimeExamDay = "ui.time.examDay";
         /// <summary>"멈춰 있음" — 개발 빌드에서만 (8-2)</summary>
         public const string TimePaused = "ui.time.paused";
         /// <summary>"의뢰 완료: {0}" — {0} 의뢰 제목 (10-6 완료 알림, 임시)</summary>

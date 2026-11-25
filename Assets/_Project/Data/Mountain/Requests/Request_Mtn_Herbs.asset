@@ -15,6 +15,8 @@ MonoBehaviour:
   _title: "\uC57D\uCD08 \uB450 \uAC00\uC9C0"
   _creatureLine: "\uC465\uC774\uB791 \uB3CC\uC774\uB07C\u2026 \uD558\uB098\uC529
     \uC11E\uC73C\uBA74 \uC57D\uC774 \uB3FC\u2026"
+  _habitatHint: 
+  _difficulty: 1
   _requirements:
   - _item: {fileID: 11400000, guid: 3b887b5f92518984294697151943f6f0, type: 2}
     _amount: 1

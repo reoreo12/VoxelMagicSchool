@@ -1,4 +1,5 @@
-// 뒷산 채집 배치 규칙 테스트: 자기 서식지·시간대만, 서식지 종류별 개수(0개 가능), 다시 배치하면 슬롯 이동, 의뢰 재료 보장, 줍기와 누적.
+// 채집 규칙 테스트(QUEST_TIMER 3-2, 완료 기준 7): 서식지 종류마다 자리 8곳 중 4곳만 켜짐, 자기 서식지 재료만, 희귀도 비율 60/30/10,
+// 보장 재료, 씬 슬롯 → 자리 번호 잇기, 줍기와 하루 유지. 그리고 인벤토리 칸 비우기.
 using System.Collections.Generic;
 using NUnit.Framework;
 using VoxelMagic.Core;
@@ -9,133 +10,157 @@ namespace VoxelMagic.Tests
     {
         [TearDown] public void TearDown() => TestAssets.DestroyAll();
 
-        private static GatherMaterialDefinition Mat(string id, GatherHabitatKind kind, bool afterSchool, bool night)
+        private static GatherMaterialDefinition Mat(string id, GatherHabitatKind kind, ItemRarity rarity)
             => TestAssets.Create<GatherMaterialDefinition>(("_id", id), ("_displayName", id), ("_habitat", kind),
-                ("_appearsAfterSchool", afterSchool), ("_appearsAtNight", night), ("_sizeRangeCm", new FloatRange(3f, 5f)));
+                ("_rarity", rarity), ("_source", ItemSource.Gathering), ("_sizeRangeCm", new FloatRange(3f, 5f)));
 
-        /// <summary>모든 서식지 종류에 같은 밸런스 (최소~최대, 추가분 확률).</summary>
-        private static GatheringConfig Balance(int min, int max, float chance = 1f)
+        private static GatheringConfig Config(int spots, int active, RarityTable rarity, params GatherMaterialDefinition[] materials)
         {
             var config = TestAssets.Create<GatheringConfig>();
-            var list = new List<HabitatBalance>();
-            foreach (GatherHabitatKind kind in System.Enum.GetValues(typeof(GatherHabitatKind)))
-                list.Add(new HabitatBalance(kind, 2, min, max, chance, null));
-            config.SetHabitats(list);
+            config.Set(spots, active, rarity, materials);
             return config;
         }
 
-        private static GatherSpawner Spawner(params (GatherHabitatKind kind, int slots)[] habitats)
+        [Test]
+        public void 종류마다_켜지는_자리_수만큼만_자기_서식지_재료가_놓인다()
         {
-            var kinds = new List<GatherHabitatKind>();
-            var counts = new List<int>();
-            foreach (var (kind, slots) in habitats) { kinds.Add(kind); counts.Add(slots); }
-            return new GatherSpawner(kinds, counts);
+            var shade = Mat("shade", GatherHabitatKind.TreeShade, ItemRarity.Common);
+            var berry = Mat("berry", GatherHabitatKind.Bush, ItemRarity.Common);
+            var config = Config(8, 4, RarityTable.Default, shade, berry);
+
+            var random = new SystemRandom(1);
+            for (int run = 0; run < 50; run++)
+            {
+                var spots = GatherDayRoller.Roll(config, random);
+                Assert.AreEqual(4, Count(spots[GatherHabitatKind.TreeShade], shade));
+                Assert.AreEqual(4, Count(spots[GatherHabitatKind.Bush], berry));
+                Assert.AreEqual(0, Count(spots[GatherHabitatKind.Bush], shade));
+                Assert.AreEqual(0, Count(spots[GatherHabitatKind.RockCrevice], null) - 8, "재료가 없는 서식지는 비어 있다");
+            }
         }
 
         [Test]
-        public void Respawn_PlacesOnlyOwnHabitatAndCurrentTime()
+        public void 켜지는_자리는_매번_바뀐다()
         {
-            var shade = Mat("shade", GatherHabitatKind.TreeShade, true, false);
-            var moon = Mat("moon", GatherHabitatKind.TreeShade, false, true);
-            var berry = Mat("berry", GatherHabitatKind.Bush, true, false);
-            var spawner = Spawner((GatherHabitatKind.TreeShade, 4), (GatherHabitatKind.Bush, 3));
-
-            spawner.Respawn(new[] { shade, moon, berry }, TimeOfDay.Day, null, Balance(4, 4), new FixedRandom(0f));
-
-            for (int s = 0; s < 4; s++) Assert.AreEqual(shade, spawner.Get(0, s));
-            for (int s = 0; s < 3; s++) Assert.AreEqual(berry, spawner.Get(1, s));
-            Assert.AreEqual(0, spawner.CountOf(moon));
+            var shade = Mat("shade", GatherHabitatKind.TreeShade, ItemRarity.Common);
+            var config = Config(8, 4, RarityTable.Default, shade);
+            var random = new SystemRandom(7);
+            var seen = new HashSet<int>();
+            for (int run = 0; run < 30; run++)
+            {
+                var slots = GatherDayRoller.Roll(config, random)[GatherHabitatKind.TreeShade];
+                for (int i = 0; i < slots.Length; i++) if (slots[i] != null) seen.Add(i);
+            }
+            Assert.AreEqual(8, seen.Count, "여러 날 동안 8자리가 모두 한 번은 켜진다");
         }
 
         [Test]
-        public void Respawn_AtNight_HasNoAfterSchoolOnly()
+        public void 희귀도_비율은_설정_값을_따른다()
         {
-            var shade = Mat("shade", GatherHabitatKind.TreeShade, true, false);
-            var moon = Mat("moon", GatherHabitatKind.TreeShade, false, true);
-            var spawner = Spawner((GatherHabitatKind.TreeShade, 4));
+            var common = Mat("c", GatherHabitatKind.Clearing, ItemRarity.Common);
+            var uncommon = Mat("u", GatherHabitatKind.Clearing, ItemRarity.Uncommon);
+            var rare = Mat("r", GatherHabitatKind.Clearing, ItemRarity.Rare);
+            var config = Config(8, 4, RarityTable.Default, common, uncommon, rare);
+            var random = new SystemRandom(42);
 
-            spawner.Respawn(new[] { shade, moon }, TimeOfDay.Night, null, Balance(4, 4), new FixedRandom(0f));
-
-            Assert.AreEqual(0, spawner.CountOf(shade));
-            Assert.AreEqual(4, spawner.CountOf(moon));
+            int c = 0, u = 0, r = 0, total = 0;
+            for (int run = 0; run < 5000; run++)
+            {
+                foreach (var placed in GatherDayRoller.Roll(config, random)[GatherHabitatKind.Clearing])
+                {
+                    if (placed == null) continue;
+                    total++;
+                    if (placed == common) c++;
+                    else if (placed == uncommon) u++;
+                    else if (placed == rare) r++;
+                }
+            }
+            Assert.AreEqual(0.60f, c / (float)total, 0.02f);
+            Assert.AreEqual(0.30f, u / (float)total, 0.02f);
+            Assert.AreEqual(0.10f, r / (float)total, 0.015f);
         }
 
         [Test]
-        public void Respawn_MovesToPreviouslyEmptySlots()
+        public void 그_희귀도_재료가_없으면_낮은_희귀도로_대신한다()
         {
-            var shade = Mat("shade", GatherHabitatKind.TreeShade, true, false);
-            var spawner = Spawner((GatherHabitatKind.TreeShade, 4));
-            var random = new FixedRandom(0f);
-
-            spawner.Respawn(new[] { shade }, TimeOfDay.Day, null, Balance(2, 2), random);
-            var first = new List<int>();
-            for (int s = 0; s < 4; s++) if (spawner.Get(0, s) != null) first.Add(s);
-            spawner.Respawn(new[] { shade }, TimeOfDay.Day, null, Balance(2, 2), random);
-
-            Assert.AreEqual(2, first.Count);
-            foreach (int s in first) Assert.IsNull(spawner.Get(0, s), $"슬롯 {s}에 그대로 남음");
+            var common = Mat("c", GatherHabitatKind.Bush, ItemRarity.Common);
+            var config = Config(8, 4, new RarityTable(0f, 0f, 1f), common); // 늘 희귀를 뽑지만 희귀 재료가 없음
+            var slots = GatherDayRoller.Roll(config, new SystemRandom(3))[GatherHabitatKind.Bush];
+            Assert.AreEqual(4, Count(slots, common));
         }
 
         [Test]
-        public void Respawn_GuaranteesRequiredMaterial()
+        public void 보장_재료는_반드시_놓인다()
         {
-            var common = Mat("common", GatherHabitatKind.Bush, true, false);
-            var needed = Mat("needed", GatherHabitatKind.Bush, true, false);
-            var spawner = Spawner((GatherHabitatKind.Bush, 3));
-
-            // FixedRandom(0)은 항상 첫 후보(common)를 고른다 → 보장 규칙이 없으면 needed는 0개.
-            spawner.Respawn(new[] { common, needed }, TimeOfDay.Day, new ItemDefinition[] { needed }, Balance(1, 1), new FixedRandom(0f));
-
-            Assert.GreaterOrEqual(spawner.CountOf(needed), 1);
+            var common = Mat("c", GatherHabitatKind.Bush, ItemRarity.Common);
+            var tutorial = Mat("t", GatherHabitatKind.Bush, ItemRarity.Rare);
+            var config = Config(8, 4, new RarityTable(1f, 0f, 0f), common, tutorial);
+            for (int seed = 0; seed < 20; seed++)
+            {
+                var slots = GatherDayRoller.Roll(config, new SystemRandom(seed), new[] { tutorial })[GatherHabitatKind.Bush];
+                Assert.AreEqual(1, Count(slots, tutorial));
+                Assert.AreEqual(4, 8 - Count(slots, null), "켜진 자리 수는 그대로");
+            }
         }
 
         [Test]
-        public void AcceptingRequest_PlacesMissingMaterialWithoutRespawn()
+        public void 씬_슬롯은_같은_종류_서식지에_번갈아_자리_번호가_된다_넘치는_슬롯은_비어_있다()
         {
-            var common = Mat("common", GatherHabitatKind.Bush, true, false);
-            var needed = Mat("needed", GatherHabitatKind.Bush, true, false);
-            var config = Balance(1, 1);
+            var shade = Mat("shade", GatherHabitatKind.TreeShade, ItemRarity.Common);
+            var day = new GatherDayState(8);
+            var spots = new Dictionary<GatherHabitatKind, GatherMaterialDefinition[]>
+            {
+                { GatherHabitatKind.TreeShade, new GatherMaterialDefinition[8] }
+            };
+            spots[GatherHabitatKind.TreeShade][1] = shade;
+            spots[GatherHabitatKind.TreeShade][7] = shade;
+            day.Set(2, spots);
+
+            // 서식지: 그늘0(3칸) · 덤불(3칸) · 그늘1(3칸) · 그늘2(3칸)
+            // 그늘 자리: 0번 슬롯 → 0,1,2 / 1번 슬롯 → 3,4,5 / 2번 슬롯 → 6,7,8(8은 없음)
+            var kinds = new[] { GatherHabitatKind.TreeShade, GatherHabitatKind.Bush, GatherHabitatKind.TreeShade, GatherHabitatKind.TreeShade };
+            var service = new GatheringService(day, kinds, new[] { 3, 3, 3, 3 }, new Inventory(5), new GameMessages(), new FixedRandom(0f));
+
+            Assert.AreEqual(shade, service.Get(2, 0), "그늘1의 0번 슬롯 = 자리 1");
+            Assert.AreEqual(shade, service.Get(2, 2), "그늘1의 2번 슬롯 = 자리 7");
+            Assert.AreEqual(-1, service.SpotOf(3, 2), "그늘2의 2번 슬롯 = 자리 8, 설정(8곳) 밖이라 쓰지 않는다");
+            Assert.AreEqual(0, service.SpotOf(1, 0), "덤불은 따로 센다");
+            Assert.AreEqual(9, service.SceneSpotCounts[GatherHabitatKind.TreeShade]);
+        }
+
+        [Test]
+        public void 주우면_가방에_들어가고_그날은_다시_생기지_않는다()
+        {
+            var berry = Mat("berry", GatherHabitatKind.Bush, ItemRarity.Common);
+            var day = new GatherDayState(8);
+            var spots = new Dictionary<GatherHabitatKind, GatherMaterialDefinition[]> { { GatherHabitatKind.Bush, new GatherMaterialDefinition[8] } };
+            spots[GatherHabitatKind.Bush][0] = berry;
+            spots[GatherHabitatKind.Bush][1] = berry;
+            day.Set(2, spots);
             var inventory = new Inventory(5);
-            var tracker = new RequestTracker(new RequestDefinition[0], inventory, new ScoreBook(100), new MaterialJournal(), 0);
-            var service = new GatheringService(Spawner((GatherHabitatKind.Bush, 3)), new[] { common, needed }, config,
-                new TimeOfDayState(TimeOfDay.Day), inventory, new GameMessages(), tracker, new FixedRandom(0f));
-            service.Respawn();
-            Assert.AreEqual(0, service.CountOf(needed));
+            var service = new GatheringService(day, new[] { GatherHabitatKind.Bush }, new[] { 3 }, inventory, new GameMessages(), new FixedRandom(0f));
 
-            tracker.Accept(TestAssets.Request("r", 10, new[] { new ItemAmount(needed, 1) }, new ItemAmount[0]));
+            Assert.IsTrue(service.TryPick(0, 0));
+            Assert.IsTrue(service.TryPick(0, 1));
+            Assert.IsFalse(service.TryPick(0, 0));
+            Assert.AreEqual(2, inventory.Count(berry));
+            Assert.AreEqual(0, day.CountOf(berry));
 
-            Assert.AreEqual(1, service.CountOf(needed));
-            Assert.AreEqual(1, service.CountOf(common), "다른 재료는 그대로");
+            // 다른 씬에서 다시 연결해도(서비스 새로) 주운 자리는 그대로 비어 있다
+            var again = new GatheringService(day, new[] { GatherHabitatKind.Bush }, new[] { 3 }, inventory, new GameMessages(), new FixedRandom(0f));
+            Assert.IsNull(again.Get(0, 0));
         }
 
         [Test]
-        public void Balance_ZeroToOne_CanBeEmpty_AndNeverExceedsMax()
+        public void 하루_시작_단계가_그날_자리를_뽑는다()
         {
-            var shade = Mat("shade", GatherHabitatKind.TreeShade, true, false);
-            var spawner = Spawner((GatherHabitatKind.TreeShade, 2));
-
-            spawner.Respawn(new[] { shade }, TimeOfDay.Day, null, Balance(0, 1, 0f), new FixedRandom(0f));
-            Assert.AreEqual(0, spawner.CountOf(shade), "확률 0 → 0개 (예전처럼 최소 1개를 강제하지 않음)");
-
-            spawner.Respawn(new[] { shade }, TimeOfDay.Day, null, Balance(0, 1, 1f), new FixedRandom(0f));
-            Assert.AreEqual(1, spawner.CountOf(shade), "최대 1 → 슬롯이 2칸이어도 1개");
-
-            spawner.Respawn(new[] { shade }, TimeOfDay.Day, null, Balance(0, 5, 1f), new FixedRandom(0f));
-            Assert.AreEqual(2, spawner.CountOf(shade), "최대가 슬롯 수보다 크면 슬롯 수까지");
-        }
-
-        [Test]
-        public void Abandon_ClearsActiveRequest()
-        {
-            var inventory = new Inventory(5);
-            var tracker = new RequestTracker(new RequestDefinition[0], inventory, new ScoreBook(100), new MaterialJournal(), 0);
-            var request = TestAssets.Request("r", 10, new[] { new ItemAmount(TestAssets.Wand(), 1) }, new ItemAmount[0]);
-            tracker.Accept(request);
-
-            tracker.Abandon();
-
-            Assert.IsFalse(tracker.HasActive);
-            Assert.AreEqual(RequestStatus.Available, tracker.GetStatus(request));
+            var shade = Mat("shade", GatherHabitatKind.TreeShade, ItemRarity.Common);
+            var config = Config(8, 4, RarityTable.Default, shade);
+            var day = new GatherDayState(8);
+            var step = new GatherRespawnStep(day, config, new SystemRandom(5));
+            step.Run(3, DayKind.Free, DayStartReason.NextDay);
+            Assert.AreEqual(3, day.Day);
+            Assert.AreEqual(4, day.CountOf(shade));
         }
 
         [Test]
@@ -155,27 +180,11 @@ namespace VoxelMagic.Tests
             Assert.AreEqual(2, inventory.Count(b));
         }
 
-        [Test]
-        public void Pick_AddsToInventoryAndStacks()
+        private static int Count(GatherMaterialDefinition[] slots, GatherMaterialDefinition material)
         {
-            var berry = Mat("berry", GatherHabitatKind.Bush, true, false);
-            var config = Balance(3, 3);
-            var inventory = new Inventory(5);
-            var messages = new GameMessages();
-            int acquired = 0;
-            messages.ItemAcquired += _ => acquired++;
-            var service = new GatheringService(Spawner((GatherHabitatKind.Bush, 3)), new[] { berry }, config,
-                new TimeOfDayState(TimeOfDay.Day), inventory, messages, null, new FixedRandom(0f));
-
-            service.Respawn();
-            Assert.IsTrue(service.TryPick(0, 0));
-            Assert.IsTrue(service.TryPick(0, 1));
-
-            Assert.AreEqual(2, inventory.Count(berry));
-            Assert.AreEqual(2, inventory.GetSlot(0).Count, "같은 종류는 한 칸에 누적");
-            Assert.IsNull(service.Get(0, 0));
-            Assert.IsFalse(service.TryPick(0, 0), "빈 슬롯은 못 줍는다");
-            Assert.AreEqual(2, acquired);
+            int n = 0;
+            foreach (var s in slots) if (s == material) n++;
+            return n;
         }
     }
 }

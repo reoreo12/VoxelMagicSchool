@@ -17,9 +17,12 @@ MonoBehaviour:
   _description: "\uB108\uBB34 \uBE68\uB77C\uC11C \uC544\uBB34\uB3C4 \uBABB \uC7A1\uB294\uB2E4\uB294
     \uBD95\uC5B4."
   _iconColor: {r: 1, g: 0.95, b: 0.3, a: 1}
+  _icon: {fileID: 0}
   _maxStack: 99
   _creatureNote: "\uBC88\uAC1C \uBD95\uC5B4\uB97C \uC7A1\uC558\uB2E4\uACE0? \u2026\uAC70\uC9D3\uB9D0\uC774\uC9C0?
     \uB098\uB3C4 \uBABB \uC7A1\uC558\uB294\uB370."
+  _rarity: 2
+  _source: 2
   _sizeRangeCm:
     _min: 8
     _max: 15

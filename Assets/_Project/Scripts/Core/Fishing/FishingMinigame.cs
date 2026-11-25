@@ -16,7 +16,7 @@ namespace VoxelMagic.Core
         private readonly float _fillPerSecond;
         private readonly float _drainPerSecond;
 
-        public FishingMinigame(FishingConfig config, FishDefinition fish, IRandom random)
+        public FishingMinigame(FishingConfig config, FishDefinition fish, IRandom random, float speedMultiplier = 1f)
         {
             Fish = fish;
             BarSize = config.CatchBarSize;
@@ -24,7 +24,7 @@ namespace VoxelMagic.Core
             Gauge = config.GaugeStart;
             _fillPerSecond = config.GaugeFillPerSecond;
             _drainPerSecond = config.GaugeDrainPerSecond;
-            _motion = new FishMotion(fish, random, 0.5f);
+            _motion = new FishMotion(fish, random, 0.5f, speedMultiplier);
         }
 
         public FishDefinition Fish { get; }
