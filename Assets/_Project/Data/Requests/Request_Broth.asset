@@ -15,6 +15,8 @@ MonoBehaviour:
   _title: "\uAD6D\uBB3C \uC7AC\uB8CC\uAC00 \uD544\uC694\uD574"
   _creatureLine: "\uAD6D\uBB3C\uC5D4 \uB300\uD30C\uB791 \uBD95\uC5B4\uC9C0. \uC774\uAC74
     \uC0C1\uC2DD\uC774\uC57C. \uB9C8\uBC95 \uC0C1\uC2DD."
+  _habitatHint: 
+  _difficulty: 0
   _requirements:
   - _item: {fileID: 11400000, guid: e29e8f1d6d581ae47a60f46c7a85e088, type: 2}
     _amount: 2

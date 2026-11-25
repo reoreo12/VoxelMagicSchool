@@ -3008,6 +3008,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _input: {fileID: 327068516}
+  _moveConfig: {fileID: 0}
+  _animationView: {fileID: 0}
 --- !u!114 &327068516
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -11860,13 +11862,36 @@ MonoBehaviour:
   _farm: {fileID: 11400000, guid: 6fdc77d6482ebe44997505865bc9b455, type: 2}
   _fishing: {fileID: 11400000, guid: f426198d90a46d84d9c2fca36b895ce3, type: 2}
   _player: {fileID: 11400000, guid: 548ef1ec2583813479a4d051039bcfbb, type: 2}
+  _time: {fileID: 11400000, guid: 8da8c02ea758c9c439dfe9da38a416e7, type: 2}
+  _calendar: {fileID: 11400000, guid: 1943771cc655c1f4fbeae47ee5dee387, type: 2}
+  _gathering: {fileID: 11400000, guid: 318d4d927df7d3e4999c86ec428dcee7, type: 2}
+  _quest: {fileID: 11400000, guid: 25a6fc305fe1fc3449a7ae96b626b42b, type: 2}
+  _requestPool: {fileID: 11400000, guid: c53baf6473d045d4ea83cdca38ef8eb6, type: 2}
   _requests:
-  - {fileID: 11400000, guid: bceb1dd046c3f41458dfa12e1afce6ab, type: 2}
-  - {fileID: 11400000, guid: 82ee13fc935847743ae8975e0672438c, type: 2}
-  - {fileID: 11400000, guid: 9a60bb7b282f12f48a033e0138a8ee1f, type: 2}
+  - {fileID: 11400000, guid: c9756bc89d699a143a66554a793b5ed2, type: 2}
+  - {fileID: 11400000, guid: c7022e28ebc4be940a35b23c6643c2a0, type: 2}
+  - {fileID: 11400000, guid: f573ee25620825b48b09b64ea21fcd97, type: 2}
+  - {fileID: 11400000, guid: bed1c9f89f40dd74fa65c7b36968e321, type: 2}
+  - {fileID: 11400000, guid: a5f8edabf83fcfd4b882d0ac9010147f, type: 2}
+  - {fileID: 11400000, guid: c636f54525ae6534a94f197102dd805d, type: 2}
+  - {fileID: 11400000, guid: f5964fcd0ca647c46b1b4c30ed9454b6, type: 2}
+  - {fileID: 11400000, guid: d37d7bdfac0d7e642b438e779ec521e2, type: 2}
+  - {fileID: 11400000, guid: 42fde7c61fdb77d438a1d19fdfa4ccf3, type: 2}
+  - {fileID: 11400000, guid: cce957219514a254983a076ac151d6ef, type: 2}
+  - {fileID: 11400000, guid: 36eb4cf231788694ebff28cb1ee3ae7e, type: 2}
+  - {fileID: 11400000, guid: 094bac62645b8b048aef42b5dd1aee9f, type: 2}
+  - {fileID: 11400000, guid: 3e3230042a8e5c246856b9c1c96431e3, type: 2}
+  - {fileID: 11400000, guid: ea7ec12437231ee4e8688c23edb4a2b2, type: 2}
+  - {fileID: 11400000, guid: f64bd8a08b68a1f44839c5e091cfea5f, type: 2}
+  - {fileID: 11400000, guid: 1b764e0a95b2aff4e98c6dbf011bff05, type: 2}
+  - {fileID: 11400000, guid: 9a0ca1698052c3c459722a92cf48e200, type: 2}
+  - {fileID: 11400000, guid: e8de92c5d863bfe4986368c404673142, type: 2}
+  - {fileID: 11400000, guid: c576b773f255a884586b326816143d41, type: 2}
   _startingItems:
   - _item: {fileID: 11400000, guid: be3750a702fdc8f4c86ddf79204318e4, type: 2}
     _amount: 1
+  _catalog: {fileID: 0}
+  _autoSave: 1
   _bindRoots:
   - {fileID: 1031674469}
   - {fileID: 327068512}
@@ -12654,6 +12679,7 @@ MonoBehaviour:
   _slotRoot: {fileID: 1671485714}
   _slotPrefab: {fileID: 3478817151892881494, guid: 9c2a8c0d2b616354393600a7629ba94a, type: 3}
   _selectedName: {fileID: 792536422}
+  _debugRightClickDiscard: 0
 --- !u!1001 &1619846816
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -13675,6 +13701,7 @@ MonoBehaviour:
   _listRoot: {fileID: 939859558}
   _entryPrefab: {fileID: 7058891801501796666, guid: 75f4106a4e7e10946abea74df4af43a6, type: 3}
   _closeButton: {fileID: 109250711}
+  _boardRequests: []
 --- !u!225 &1758125157
 CanvasGroup:
   m_ObjectHideFlags: 0
@@ -15047,6 +15074,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _text: {fileID: 1942710910}
+  _sceneText: 
 --- !u!114 &1942710909
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -16240,6 +16268,8 @@ MonoBehaviour:
   _area: {fileID: 2042792686}
   _promptAnchor: {fileID: 0}
   _defaultAnchorHeight: 2
+  _reactions: {fileID: 0}
+  _speaker: {fileID: 0}
 --- !u!65 &2042792686
 BoxCollider:
   m_ObjectHideFlags: 0

@@ -1,4 +1,4 @@
-// 뒷산 테스트용 디버그 키 (새 하루 = 재료 다시 배치, 의뢰 교체, 시간대 전환, 입질 즉시, 마법진 성공/실패 강제). 키는 Inspector에서 바꾸고, 화면 구석 안내 목록에 등록한다.
+// 뒷산 테스트용 디버그 키 (채집 자리 다시 뽑기, 의뢰 교체, 방과후↔밤 시각 이동, 입질 즉시, 마법진 성공/실패 강제). 키는 Inspector에서 바꾸고, 화면 구석 안내 목록에 등록한다.
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
@@ -65,8 +65,20 @@ namespace VoxelMagic.Gameplay
             }
         }
 
-        private void OnNewDay(InputAction.CallbackContext _) => _context?.Gathering.Respawn();
-        private void OnToggleTime(InputAction.CallbackContext _) => _context?.Time.Toggle();
+        // 오늘 채집 자리를 다시 뽑는다 (하루는 넘기지 않음).
+        private void OnNewDay(InputAction.CallbackContext _)
+        {
+            var progress = _context?.Game.Progress;
+            if (progress?.GatherStep != null && progress.Clock != null) progress.GatherStep.Reroll(progress.Clock.Day);
+        }
+
+        // 시간대는 게임 시계를 따른다: 방과후면 20:00(밤)으로, 밤이면 16:00(방과후)으로 시각을 옮긴다.
+        private void OnToggleTime(InputAction.CallbackContext _)
+        {
+            var clock = _context?.Game.Clock;
+            if (clock == null) { _context?.Time.Toggle(); return; }
+            clock.JumpTo(clock.Period == TimeOfDay.Night ? clock.Config.DayStartMinute : clock.Config.PeriodStartHour(TimeOfDay.Night) * 60);
+        }
         private void OnSwapRequest(InputAction.CallbackContext _) => SwapRequest();
         private void OnForceBite(InputAction.CallbackContext _) => _context?.Capture.SpawnBites();
         private void OnForceSuccess(InputAction.CallbackContext _) => Force(ForcedCaptureResult.Success);

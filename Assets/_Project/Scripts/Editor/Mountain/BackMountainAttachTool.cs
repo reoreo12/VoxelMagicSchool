@@ -125,7 +125,7 @@ namespace VoxelMagic.EditorTools
         private static List<Vector3> TemplateSlots(GatherHabitatKind kind, Transform root, Bounds bounds)
         {
             var config = GatheringBalanceTool.LoadConfig();
-            var balance = config != null ? config.For(kind) : new HabitatBalance(kind, 2, 0, 1, 0.5f, null);
+            var balance = config != null ? config.For(kind) : new HabitatBalance(kind, 3, null);
             var local = new List<Vector3>();
             for (int i = 0; i < balance.SlotCount; i++) local.Add(GatheringBalanceTool.LayoutPoint(balance, i));
 

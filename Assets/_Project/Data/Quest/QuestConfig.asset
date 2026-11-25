@@ -1,0 +1,28 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: dd89e7fc2c7f9b24fb00446f1955770a, type: 3}
+  m_Name: QuestConfig
+  m_EditorClassIdentifier: 
+  _maxAccepted: 3
+  _easyFromDay: 1
+  _normalFromDay: 1
+  _hardFromDay: 3
+  _tutorialDay: 1
+  _tutorialRequest: {fileID: 11400000, guid: c9756bc89d699a143a66554a793b5ed2, type: 2}
+  _lastDeliveryDay: 6
+  _boardClosedFromDay: 7
+  _repeatCooldownDays: 2
+  _nextDayCropLeadDays: 1
+  _onlyAtNight: 1
+  _commonScore: 2
+  _uncommonScore: 4
+  _rareScore: 8

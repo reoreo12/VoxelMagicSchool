@@ -37,7 +37,7 @@ _Bootstrap (GameBootstrap) · Player · Main Camera(QuarterViewCamera) · UI · 
 | 층 | 파일 | 역할 |
 |---|---|---|
 | Core | `MountainContext` | 뒷산 전용 서비스 묶음 + `IMountainContextBinder`·`DebugCommandList`. **`GameContext`는 건드리지 않음** |
-| Core | `GatherMaterialDefinition`·`GatheringConfig`·`GatherSpawner`·`GatheringService` | 채집: 자기 서식지·시간대만, 새 하루에 직전 빈 슬롯 우선, 의뢰 재료 최소 1개 보장(수락 때도) |
+| Core | `GatherMaterialDefinition`·`GatheringConfig`·`GatherDayRoller`·`GatherDayState`·`GatheringService` | 채집 (2026-11-24 의뢰·타이머 작업으로 바뀜, `DESIGN_QUEST_TIMER.md`·CHANGELOG 참고): 하루 시작에 서식지 종류마다 자리 8곳 중 4곳 켜고 희귀도 60/30/10, 하루 동안 유지, 의뢰 재료 보장 없음 |
 | Core | `AnimalDefinition`·`CaptureConfig`·`CaptureService`·`IMagicCircleDrawer`·`MountainMessages` | 포획: 구역 안 5초마다 입질 1~2개(3초), 근처 길에서 맨 앞 풀숲 신호, 포획 성공/실패·강제 |
 | Core | `MountainTexts` | 뒷산 문구 |
 | Gameplay | `MountainBootstrap`(실행 순서 −900) | `GameBootstrap.Context`를 받아 위 서비스 조립, `_bindRoots`([Prototype], UI) 아래 바인더 연결 |

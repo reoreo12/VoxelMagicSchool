@@ -15,6 +15,8 @@ MonoBehaviour:
   _title: "'\uADF8\uAC83'\uC758 \uBC84\uC12F \uC2EC\uBD80\uB984"
   _creatureLine: "\uBC84\uC12F\u2026 \uADF8\uB298\uC5D0\uC11C \uB098\uB294 \uAC70\u2026
     \uD558\uB098\uB9CC\u2026"
+  _habitatHint: 
+  _difficulty: 1
   _requirements:
   - _item: {fileID: 11400000, guid: f399077c6983dd14fa438a8a21576ca7, type: 2}
     _amount: 1

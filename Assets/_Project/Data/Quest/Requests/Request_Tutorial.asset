@@ -1,0 +1,34 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6e2e2f20d9b88964fa16d99bbf67be48, type: 3}
+  m_Name: Request_Tutorial
+  m_EditorClassIdentifier: 
+  _title: "\uCCAB \uBC88\uC9F8 \uC2EC\uBD80\uB984"
+  _creatureLine: "\uBE5B\uC744 \uBC30\uC6E0\uC73C\uB2C8 \uC774\uC81C \uC7AC\uB8CC
+    \uACF5\uBD80\uC57C. \uD143\uBC2D\uC774\uB791 \uC5F0\uBABB\uC774\uB791 \uB4B7\uC0B0\uC5D0\uC11C
+    \uD55C \uAC00\uC9C0\uC529 \uAC00\uC838\uC640."
+  _habitatHint: "\uD143\uBC2D\uC5D0 \uC2EC\uACE0, \uC5F0\uBABB\uC5D0\uC11C \uB09A\uACE0,
+    \uB4B7\uC0B0 \uCD08\uC785 \uD3C9\uC9C0\uC5D0\uC11C \uC8FC\uC6CC \uC640"
+  _difficulty: 3
+  _requirements:
+  - _item: {fileID: 11400000, guid: 723b2ecf6711cab4fb05145c50acbb42, type: 2}
+    _amount: 1
+  - _item: {fileID: 11400000, guid: 22a9aaf902f918b46996f13b7ed2ff1b, type: 2}
+    _amount: 1
+  - _item: {fileID: 11400000, guid: ba50b8e8f541aa74897cbe737d121c41, type: 2}
+    _amount: 1
+  _givenItems:
+  - _item: {fileID: 11400000, guid: a65f704237085b34fb7ac9c7c6fbdb1d, type: 2}
+    _amount: 1
+  _baseReward: 6
+  _completionLine: "\uC798\uD588\uC5B4\u2026 \uC774\uB807\uAC8C \uD558\uB098\uC529
+    \uBAA8\uC73C\uBA74 \uD544\uAE30 \uC2DC\uD5D8\uB3C4 \uBB34\uC12D\uC9C0 \uC54A\uC544."

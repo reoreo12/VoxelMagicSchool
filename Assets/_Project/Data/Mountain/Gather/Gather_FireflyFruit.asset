@@ -17,10 +17,15 @@ MonoBehaviour:
   _description: "\uBC24\uC774 \uB418\uBA74 \uB178\uB797\uAC8C \uBE5B\uB098\uB294
     \uC5F4\uB9E4."
   _iconColor: {r: 1, g: 0.9, b: 0.3, a: 1}
+  _icon: {fileID: 0}
   _maxStack: 99
-  _creatureNote: 
+  _creatureNote: "\uBC18\uB527\uBD88\uC5F4\uB9E4\uB294 \uBC24\uC5D0 \uB4F1\uBD88
+    \uB300\uC2E0\uC774\uC57C\u2026 \uC5B4\uB450\uC6B4 \uAD74\uC5D0\uC120 \uC774\uAC8C
+    \uCD5C\uACE0\uC9C0."
+  _rarity: 2
+  _source: 3
   _habitat: 1
-  _appearsAfterSchool: 0
+  _appearsAfterSchool: 1
   _appearsAtNight: 1
   _habitatHint: "\uB364\uBD88 \uC0AC\uC774\uC5D0 \uC5F4\uB9B0\uB2E4"
   _sizeRangeCm:

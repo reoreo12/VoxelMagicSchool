@@ -17,8 +17,12 @@ MonoBehaviour:
   _description: "\uBD80\uC11C\uC9C4 \uBC14\uC704\uC5D0\uC11C \uB098\uC628 \uBC18\uC9DD\uC774\uB294
     \uAC00\uB8E8 \uB369\uC774."
   _iconColor: {r: 0.8, g: 0.8, b: 0.85, a: 1}
+  _icon: {fileID: 0}
   _maxStack: 99
-  _creatureNote: 
+  _creatureNote: "\uBC18\uC9DD\uB3CC\uAC00\uB8E8\uB294 \uBE5B \uC8FC\uBB38\uC758
+    \uC7AC\uB8CC\uC57C\u2026 \uBFCC\uB9AC\uBA74 \uC7A0\uAE50 \uBC18\uC9DD\uC5EC."
+  _rarity: 1
+  _source: 3
   _habitat: 2
   _appearsAfterSchool: 1
   _appearsAtNight: 0

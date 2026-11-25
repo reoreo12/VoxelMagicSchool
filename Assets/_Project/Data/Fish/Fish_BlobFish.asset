@@ -1,0 +1,34 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 10fa6b091a066ca41bb411019a0c4894, type: 3}
+  m_Name: Fish_BlobFish
+  m_EditorClassIdentifier: 
+  _id: blobfish
+  _displayName: "\uCD08\uB871\uCD08\uB871 \uBE14\uB86D\uD53C\uC26C"
+  _description: "\uB208\uC774 \uCD08\uB871\uCD08\uB871\uD55C \uB9D0\uB791\uD55C \uBE14\uB86D\uD53C\uC26C.
+    \uC5F0\uBABB\uC5D0 \uC65C \uC0AC\uB294\uC9C0\uB294 \uC544\uBB34\uB3C4 \uBAA8\uB978\uB2E4."
+  _iconColor: {r: 1, g: 0.65, b: 0.75, a: 1}
+  _icon: {fileID: 0}
+  _maxStack: 99
+  _creatureNote: "\uBE14\uB86D\uD53C\uC26C \uB208\uC744 \uBD10\u2026 \uCD08\uB871\uCD08\uB871\uD558\uC9C0?
+    \uC2DC\uD5D8 \uB0A0 \uB124 \uB208\uB3C4 \uC774\uB798\uC57C \uD574."
+  _rarity: 2
+  _source: 2
+  _sizeRangeCm:
+    _min: 8
+    _max: 15
+  _moveSpeed: 1.3
+  _retargetIntervalSeconds:
+    _min: 0.25
+    _max: 0.7
+  _dartChance: 0.3
+  _dartSpeedMultiplier: 3

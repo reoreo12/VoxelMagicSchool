@@ -16,9 +16,12 @@ MonoBehaviour:
   _displayName: "\uBB34"
   _description: "\uD558\uC597\uACE0 \uC544\uC0AD\uD55C \uBB34."
   _iconColor: {r: 1, g: 1, b: 1, a: 1}
+  _icon: {fileID: 0}
   _maxStack: 99
   _creatureNote: "\uBB34\uB294 \uB9C8\uB825\uC744 \uD761\uC218\uD574\u2026 \uADF8\uB798\uC11C
     \uB124 \uBD88 \uC8FC\uBB38\uC5D0\uC11C \uBB34\uAC00 \uB098\uC628 \uAC70\uC57C."
+  _rarity: 0
+  _source: 1
   _sizeRangeCm:
     _min: 15
     _max: 30

@@ -1,4 +1,5 @@
-// 뒷산 채집 규칙: 재료 다시 배치(시작·새 하루·시간대 전환), 줍기(가방에 넣고 획득 정보 띄우기). 바뀌면 Changed로 알린다.
+// 뒷산 채집 규칙: 씬의 서식지 슬롯을 오늘의 채집 자리(GatherDayState)에 이어 주고, 줍기(가방에 넣고 획득 정보 띄우기)를 한다.
+// 자리 번호 = 같은 종류 서식지들에 번갈아 매긴 순번(각 서식지 0번 슬롯부터). 재료 배치는 하루 시작 때 진행 상태 쪽에서 정해지고 여기서는 바꾸지 않는다.
 using System;
 using System.Collections.Generic;
 
@@ -6,83 +7,95 @@ namespace VoxelMagic.Core
 {
     public sealed class GatheringService
     {
-        private readonly GatherSpawner _spawner;
-        private readonly IReadOnlyList<GatherMaterialDefinition> _pool;
-        private readonly GatheringConfig _config;
-        private readonly TimeOfDayState _time;
+        private readonly GatherDayState _day;
         private readonly Inventory _inventory;
         private readonly GameMessages _messages;
-        private readonly RequestTracker _requests;
         private readonly IRandom _random;
+        private readonly GatherHabitatKind[] _kinds;
+        private readonly int[][] _spots; // [서식지][슬롯] → 자리 번호
+        private readonly int[] _slotCounts;
 
-        public GatheringService(GatherSpawner spawner, IReadOnlyList<GatherMaterialDefinition> pool, GatheringConfig config,
-            TimeOfDayState time, Inventory inventory, GameMessages messages, RequestTracker requests, IRandom random)
+        /// <param name="kinds">씬 서식지마다 종류 (서식지 번호 순)</param>
+        /// <param name="slotCounts">씬 서식지마다 슬롯 수</param>
+        public GatheringService(GatherDayState day, IReadOnlyList<GatherHabitatKind> kinds, IReadOnlyList<int> slotCounts,
+            Inventory inventory, GameMessages messages, IRandom random)
         {
-            _spawner = spawner;
-            _pool = pool;
-            _config = config;
-            _time = time;
+            _day = day ?? throw new ArgumentNullException(nameof(day));
             _inventory = inventory;
             _messages = messages;
-            _requests = requests;
             _random = random;
-            _time.Changed += Respawn;
-            if (_requests != null) _requests.ActiveChanged += OnRequestChanged;
-        }
+            _kinds = new GatherHabitatKind[kinds.Count];
+            _slotCounts = new int[kinds.Count];
+            _spots = new int[kinds.Count][];
+            var totals = new Dictionary<GatherHabitatKind, int>();
+            for (int h = 0; h < kinds.Count; h++)
+            {
+                _kinds[h] = kinds[h];
+                _slotCounts[h] = slotCounts[h];
+                _spots[h] = new int[slotCounts[h]];
+            }
 
-        /// <summary>씬이 내려갈 때 부른다 (의뢰 추적은 씬을 넘어 유지되므로 구독을 푼다).</summary>
-        public void Dispose()
-        {
-            _time.Changed -= Respawn;
-            if (_requests != null) _requests.ActiveChanged -= OnRequestChanged;
-        }
-
-        // 새 의뢰를 받으면 필요한 재료가 지금 맵에 최소 1개 있도록 채운다 (다른 재료는 그대로).
-        private void OnRequestChanged(RequestDefinition active)
-        {
-            if (active == null) return;
-            _spawner.EnsureRequired(RequiredItems(), _time.Time, _random);
-            Changed?.Invoke();
+            // 자리 번호는 같은 종류 서식지들에 번갈아 매긴다(각 서식지 0번 슬롯 → 1번 슬롯 …). 서식지가 많아도 자리가 고루 퍼진다.
+            int maxSlots = 0;
+            foreach (int count in slotCounts) maxSlots = Math.Max(maxSlots, count);
+            for (int s = 0; s < maxSlots; s++)
+                for (int h = 0; h < kinds.Count; h++)
+                {
+                    if (s >= _slotCounts[h]) continue;
+                    totals.TryGetValue(_kinds[h], out int next);
+                    _spots[h][s] = next;
+                    totals[_kinds[h]] = next + 1;
+                }
+            SceneSpotCounts = totals;
+            _day.Changed += OnDayChanged;
         }
 
         public event Action Changed;
 
-        public GatherMaterialDefinition Get(int habitat, int slot) => _spawner.Get(habitat, slot);
-        public int CountOf(GatherMaterialDefinition material) => _spawner.CountOf(material);
+        /// <summary>씬에서 센 서식지 종류별 슬롯 합계 (설정의 자리 수보다 적으면 일부 자리는 씬에 없다).</summary>
+        public IReadOnlyDictionary<GatherHabitatKind, int> SceneSpotCounts { get; }
+        public GatherDayState Day => _day;
+
+        /// <summary>씬이 내려갈 때 부른다 (하루 상태는 씬을 넘어 유지되므로 구독을 푼다).</summary>
+        public void Dispose() => _day.Changed -= OnDayChanged;
+
+        private void OnDayChanged() => Changed?.Invoke();
+
+        public GatherHabitatKind KindOf(int habitat) => _kinds[habitat];
+        /// <summary>서식지 슬롯의 자리 번호. 설정의 자리 수를 넘으면 -1 (쓰지 않는 슬롯).</summary>
+        public int SpotOf(int habitat, int slot)
+        {
+            if (habitat < 0 || habitat >= _kinds.Length || slot < 0 || slot >= _slotCounts[habitat]) return -1;
+            int spot = _spots[habitat][slot];
+            return spot < _day.SpotsPerKind ? spot : -1;
+        }
+
+        public GatherMaterialDefinition Get(int habitat, int slot)
+        {
+            int spot = SpotOf(habitat, slot);
+            return spot < 0 ? null : _day.Get(_kinds[habitat], spot);
+        }
+
+        public int CountOf(GatherMaterialDefinition material) => _day.CountOf(material);
 
         public bool CanStore(int habitat, int slot)
         {
-            var material = _spawner.Get(habitat, slot);
+            var material = Get(habitat, slot);
             return material != null && _inventory.CanAdd(material, 1);
-        }
-
-        /// <summary>새 하루 시작·시간대 전환 때 부른다. 지금은 디버그 키로도 부른다.</summary>
-        public void Respawn()
-        {
-            _spawner.Respawn(_pool, _time.Time, RequiredItems(), _config, _random);
-            Changed?.Invoke();
         }
 
         public bool TryPick(int habitat, int slot)
         {
-            var material = _spawner.Get(habitat, slot);
+            var material = Get(habitat, slot);
             if (material == null) return false;
             if (!_inventory.TryAdd(material, 1))
             {
                 _messages.ShowToast(GameTexts.InventoryFull);
                 return false;
             }
-            _spawner.Take(habitat, slot);
+            _day.Take(_kinds[habitat], SpotOf(habitat, slot));
             _messages.ShowAcquired(new AcquiredInfo(material, material.SizeRangeCm.Roll(_random)));
-            Changed?.Invoke();
             return true;
-        }
-
-        private IEnumerable<ItemDefinition> RequiredItems()
-        {
-            if (_requests == null || !_requests.HasActive) yield break;
-            foreach (var need in _requests.Active.Requirements)
-                yield return need.Item;
         }
     }
 }

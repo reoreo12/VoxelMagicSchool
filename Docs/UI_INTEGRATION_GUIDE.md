@@ -13,7 +13,7 @@
 ```
 GameBootstrap (씬마다, Gameplay)
   └ GameContext.Create(...)          ← Core 서비스 묶음
-  └ (여기서 SetVitals / SetTime)     ← 규칙 쪽 모델을 넣는 자리. 아래 바인딩보다 먼저!
+  └ (여기서 SetVitals)               ← 규칙 쪽 모델을 넣는 자리. 아래 바인딩보다 먼저! (시계는 Create가 진행 상태에서 넣음)
   └ _bindRoots 아래 모든 IGameContextBinder.Bind(context)   ← UI_Root도 여기에 들어 있음
 ```
 
@@ -41,14 +41,13 @@ GameBootstrap (씬마다, Gameplay)
 ### 2-2. 시간대 UI (화면 오른쪽 위)
 | 항목 | 내용 |
 |---|---|
-| 지금 | 게임 시계 없음 → 테마 미리보기 값(1일째 = `D-8`, 16시 방과후)으로 보임 |
-| UI가 읽는 창구 | `Core/Common/IGameTime`: `int Day`(1부터), `int Hour`(0~24 정시, 분 없음), `TimeOfDay Period`(Day = 방과후, Night = 밤), `event Action TimeChanged`. 그리고 `context.Pause`(`TimePause.IsClockPaused`, `Changed`) |
-| 연결 방법 | 게임 시계 클래스가 `IGameTime`을 구현하고 바인딩 전에 `Context.SetTime(시계)`. **시간 흐름은 `context.Pause.IsClockPaused`가 true인 동안 멈춰야 한다**(책·가방·게시판 = 전체 정지, 크리처 대화·수업 = 시계만 정지). 정시가 바뀔 때만 `TimeChanged`를 낸다 |
-| UI 표시 규칙 | 화살표는 정시마다 한 칸(스텝). 방과후 구간은 위쪽 각도, 밤 구간은 아래쪽 각도에 나눠 둠. 툴팁 `방과후 16:00`. 날짜 판 `D-n`(n = 플레이 날 수 − 며칠째 + 1). 개발 빌드에서 시계가 멈추면 "멈춰 있음" |
-| 규칙 쪽으로 옮길 임시값 | 테마 `Time`의 `Play Days`(8), `After School Start Hour`(16)·`Night Start Hour`(19)·`Night End Hour`(24) — 게임 규칙이 정해지면 Core 설정(SO)으로 옮기고 UI는 그 값을 읽게 바꾼다 |
-| 기존 코드 참고 | 복도·뒷산에 `Core/SideScroll/TimeOfDayState`(Day/Night 토글)가 이미 있다. 게임 시계를 만들 때 이것과 합칠지 정할 것 |
-| UI 코드 | `UI/HUD/TimeHudView.cs`. 테마 `Time` |
-| 남은 [미정] | 임박 효과(밤 끝 23:00~, 방과후→밤 전환 시작 시각, 효과 종류), 현실 시간 대비 속도, 화살표 회전 모양(지금은 런타임 회전 → 도트가 어긋나면 각도별 그림으로) |
+| 지금 (2026-11-24) | **게임 시계 연결됨.** `PlayerProgress.Clock`(`Core/Time/GameClock`)이 `IGameTime`을 구현하고 `GameContext.Create`가 `Time`에 넣는다(바인딩 전). 시계가 없는 씬(복도)에서는 테마 미리보기 값 |
+| UI가 읽는 창구 | `Core/Common/IGameTime`: `Day`, `Hour`(0~24 정시), `Minute`(하루 0시부터의 분, 화살표 보간용·글자로 표시 안 함), `Period`(Day = 방과후, Night = 밤), `DaysUntilExam`(1일째 7 … 시험 날 0), `Warning`(None / NightSoon / DayEndSoon), `IsHeld`(스토리·맵 이동·치트 등 화면 밖 이유로 시계가 잡힘), `PeriodStartHour(period)`·`DayEndHour`(룰렛 각도용 구간 시각), 이벤트 `TimeChanged`·`WarningChanged`·`HeldChanged`. 화면 멈춤은 `context.Pause` |
+| 시간 규칙 | 구간·속도·경고 시각은 `Data/Time/TimeConfig`(방과후 16~20시 210초, 밤 20~24시 150초, 경고 19:40·23:40부터 20분, 2026-11-24 사용자 결정), 날 종류는 `CalendarConfig`. 시계는 `GameClockDriver`가 `unscaledDeltaTime`으로 돌리고, `context.Pause`(화면)나 `Clock.Holds`(스토리 등)에 원인이 하나라도 있으면 멈춘다 |
+| UI 표시 규칙 | 화살표는 `IGameTime.Minute`(소수)로 매 프레임 각도를 구해 따라간다(2026-11-24 사용자 결정, 시계가 멈추면 같이 멈춤, 시계 없는 미리보기는 정시 각도).부드럽게 돈다(원본 한 장 회전. 각도별로 구운 그림도 시험했으나 원본이 작은 둥근 판 모양이라 더 뭉개져 되돌림). 각도 구간은 시계의 구간 시각(방과후 시작·밤 시작·하루 끝)을 쓴다. 툴팁 `방과후 16:00`. 날짜 판 `D-n`, 시험 날은 문구 키 `ui.time.examDay`(`D-Day`). 경고 중에는 화살표가 테마 `Time › Warning Arrow Color`로 바뀌고 `Warning Blink Seconds` 간격으로 깜빡인다(unscaled time, 0이면 색만). 개발 빌드에서 시계가 멈추면(화면 멈춤 또는 `IsHeld`) "멈춰 있음" |
+| 테마에 남은 값 | `Play Days`·`After School Start Hour`·`Night Start Hour`(20)·`Night End Hour`·`Preview *`는 **시계가 없을 때 미리보기용**으로만 쓴다 |
+| UI 코드 | `UI/HUD/TimeHudView.cs`. 테마 `Time` (화살표 회전 중심 `Arrow Pivot` (33, 16.5) = 세로는 룰렛 반원 중심, 가로는 반원 중심(35)보다 2px 왼쪽(룰렛 그림을 덜 가리게, 2026-11-24 사용자 결정), 그림 안 중심 `Arrow Pivot In Sprite` (0,4) = 꼬리 가운데) |
+| 남은 [미정] | 화살표 그림(비스듬할 때 도트가 바뀜 → 실루엣이 얇은 바늘 모양으로 다시 그리는 안), 경고 효과 최종 아트 |
 
 ### 2-3. 점수 (화면 위 가운데)
 | 항목 | 내용 |
@@ -93,7 +92,7 @@ GameBootstrap (씬마다, Gameplay)
 ### 2-7. 화면 스택·시간 정지·입력
 - 팝업 종류: `Core/Screens/ScreenPolicy`의 `GameScreen`(Book, Inventory, RequestBoard, RequestDetail(지금 안 씀), Dialogue).
 - 정책(`ScreenPolicy.DefaultFor`): 책·가방·게시판 = 전체 정지(timeScale 0) + 뒤쪽 입력 막기 + 플레이어 조작 막기. 대사(Dialogue) = 게임 시계만 정지(캐릭터 애니메이션은 계속) + **ESC·바깥 클릭으로 닫히지 않음** + 딤 없음.
-- 시간 정지는 `TimePause`가 참조 카운트로 센다. 실제 timeScale은 `Gameplay/TimeScaleDriver`.
+- 시간 정지는 `TimePause`가 **원인별로** 등록·해제한다(2026-11-24, 화면은 `화면:<GameScreen>` 원인, 같은 원인은 하나로 셈, `Causes`로 목록). 실제 timeScale은 `Gameplay/TimeScaleDriver`(개발용 월드 배속 `DebugWorldSpeed` 포함).
 - 팝업 화면은 `UiScreen`을 상속하고 UI_Root의 `Popup` 층에 둔다. `UiScreenRouter`가 스택을 보고 켜고 끄며, 그 아래에 입력 막기 판(딤, 검정 알파 0.6)을 깐다. **판을 누르면 맨 위 화면이 닫힌다**(ESC와 같음).
 - ESC(`GameInputReader`): 열린 화면을 위에서부터 닫음(닫히지 않는 화면이면 아무것도 안 함) → 없으면 낚시 취소 → 없으면 `Screens.RequestMenu()`(책 메뉴 탭). Q: 의뢰 목록 접기/펼치기(`HudState.ToggleQuestList`).
 - 진행(Submit): 열린 화면이 있을 때 **Space**(`Gameplay/Submit` 액션)와 **E**(`PlayerInteractor`)가 모두 `Screens.Submit()` → `ScreenStack.Submitted`. 대사 넘기기 등에 쓴다.

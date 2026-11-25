@@ -89,14 +89,38 @@ namespace VoxelMagic.Tests
         }
 
         [Test]
-        public void 시간_정지_변화가_있을_때만_알린다()
+        public void 멈춤_원인이_바뀔_때마다_알리고_원인을_보여_준다()
         {
             int changes = 0;
             _pause.Changed += () => changes++;
             _stack.Open(GameScreen.Book);
             _stack.Open(GameScreen.Inventory);
+            Assert.AreEqual(2, _pause.Causes.Count);
+            Assert.IsTrue(_pause.Has(PauseCauses.ForScreen(GameScreen.Book)));
             _stack.CloseAll();
-            Assert.AreEqual(2, changes);
+            Assert.AreEqual(4, changes);
+            Assert.AreEqual(0, _pause.Causes.Count);
+        }
+
+        [Test]
+        public void 같은_원인을_두_번_등록해도_한_번_해제로_풀린다()
+        {
+            _pause.Acquire(PauseLevel.GameClock, PauseCauses.Story);
+            _pause.Acquire(PauseLevel.GameClock, PauseCauses.Story);
+            _pause.Release(PauseCauses.Story);
+            Assert.IsFalse(_pause.IsClockPaused);
+        }
+
+        [Test]
+        public void 원인이_겹치면_모두_풀려야_흐른다()
+        {
+            _stack.Open(GameScreen.Book);
+            _pause.Acquire(PauseLevel.GameClock, PauseCauses.Cheat);
+            _stack.Close(GameScreen.Book);
+            Assert.IsTrue(_pause.IsClockPaused);
+            Assert.IsFalse(_pause.IsFullyPaused);
+            _pause.Release(PauseCauses.Cheat);
+            Assert.IsFalse(_pause.IsClockPaused);
         }
 
         [Test]

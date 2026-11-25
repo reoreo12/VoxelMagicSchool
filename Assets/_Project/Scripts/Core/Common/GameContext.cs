@@ -29,8 +29,16 @@ namespace VoxelMagic.Core
         public DialogueChannel Dialogue { get; private set; }
         /// <summary>마력·기력(UI 상태 바가 읽음). 규칙 쪽 모델이 생기면 SetVitals로 연결한다. 없으면 null.</summary>
         public IPlayerVitals Vitals { get; private set; }
-        /// <summary>날짜·시각(UI 시간대 HUD가 읽음). 게임 시계가 생기면 SetTime으로 연결한다. 없으면 null.</summary>
+        /// <summary>날짜·시각(UI 시간대 HUD가 읽음). 진행 상태에 게임 시계가 있으면 그것, 없으면 null.</summary>
         public IGameTime Time { get; private set; }
+        /// <summary>게임 시계 (씬을 넘어 유지, PlayerProgress 소속). 없으면 null.</summary>
+        public GameClock Clock => Progress?.Clock;
+        /// <summary>하루 시작·끝 진행자 (PlayerProgress 소속). 없으면 null.</summary>
+        public DayFlow Days => Progress?.Days;
+        /// <summary>오늘의 채집 자리 (PlayerProgress 소속). 없으면 null.</summary>
+        public GatherDayState GatherDay => Progress?.Gathering;
+        /// <summary>오늘의 게시판 (PlayerProgress 소속). 없으면 null.</summary>
+        public RequestBoardState Board => Progress?.Board;
         public GameMessages Messages { get; private set; }
 
         public PlayerProgress Progress { get; private set; }
@@ -51,13 +59,15 @@ namespace VoxelMagic.Core
                 PlayerConfig = player,
                 Random = random,
                 Progress = progress,
+                Time = progress.Clock,
                 Messages = new GameMessages(),
                 Prompt = new PromptChannel(),
                 Journal = progress.Journal,
                 Inventory = progress.Inventory,
                 Score = progress.Score,
                 Requests = progress.Requests,
-                FarmGrid = new FarmGrid(farm.GridSize, new InstantGrowthRule())
+                // 밭 격자는 진행 상태 소속(씬을 넘어 하나). 진행 상태에 세계가 아직 없으면(시험용) 이 씬에서만 쓰는 격자.
+                FarmGrid = progress.Farm ?? new FarmGrid(farm.GridSize, new TimedGrowthRule())
             };
             context.Pause = new TimePause();
             context.Screens = new ScreenStack(context.Pause);

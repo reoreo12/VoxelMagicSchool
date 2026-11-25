@@ -36,6 +36,8 @@ namespace VoxelMagic.Core
         public int OriginX;
         public int OriginY;
         public bool Watered;
+        public float WateredAt;
+        public bool Grown;
     }
 
     /// <summary>저장 파일 읽기·쓰기 (슬롯 번호별). 실제 위치·형식은 구현이 정한다.</summary>
