@@ -1,4 +1,4 @@
-// 하루 시작 처리 테스트(QUEST_TIMER 1-4·2-2·3-3, 완료 기준 3·7): 게시판 교체(난이도별, 어려움은 3일부터, 1일 튜토리얼, 7일 닫힘, 반복 방지),
+// 하루 시작 처리 테스트(QUEST_TIMER 1-4·2-2·3-3, 완료 기준 3·7): 게시판 교체(난이도별, 어려움은 2일부터, 1일 튜토리얼, 7일 닫힘, 반복 방지),
 // 낚시 희귀도 비율과 고정, 하루 시작 단계 순서(작물 → 채집 → 게시판).
 using System.Collections.Generic;
 using NUnit.Framework;
@@ -43,14 +43,14 @@ namespace VoxelMagic.Tests
         }
 
         [Test]
-        public void 게시판은_1일_튜토리얼_2일_쉬움보통_3일부터_어려움_7일_닫힘()
+        public void 게시판은_1일_튜토리얼_2일부터_쉬움보통어려움_7일_닫힘()
         {
             var board = new RequestBoardState();
             var random = new SystemRandom(1);
             board.Refresh(1, _quest, _pool, null, null, random);
             CollectionAssert.AreEqual(new[] { _tutorial }, board.Offers);
             board.Refresh(2, _quest, _pool, null, null, random);
-            CollectionAssert.AreEqual(new[] { RequestDifficulty.Easy, RequestDifficulty.Normal }, Difficulties(board));
+            CollectionAssert.AreEqual(new[] { RequestDifficulty.Easy, RequestDifficulty.Normal, RequestDifficulty.Hard }, Difficulties(board));
             board.Refresh(3, _quest, _pool, null, null, random);
             CollectionAssert.AreEqual(new[] { RequestDifficulty.Easy, RequestDifficulty.Normal, RequestDifficulty.Hard }, Difficulties(board));
             board.Refresh(7, _quest, _pool, null, null, random);
@@ -145,7 +145,7 @@ namespace VoxelMagic.Tests
             var farm = TestAssets.Create<FarmConfig>();
             var gathering = TestAssets.Create<GatheringConfig>();
             var balance = TestAssets.Create<GameBalanceConfig>();
-            var progress = PlayerProgress.CreateNew(balance, new RequestDefinition[0]);
+            var progress = PlayerProgress.CreateNew(balance);
             var pool = TestAssets.Create<RequestPool>();
             pool.Set(_pool);
             progress.EnsureWorld(new WorldSetup
@@ -166,7 +166,7 @@ namespace VoxelMagic.Tests
             Assert.IsTrue(plot.IsGrown, "2일 시작에 작물이 자람");
             Assert.AreEqual(2, progress.Gathering.Day);
             Assert.AreEqual(2, progress.Board.Day);
-            Assert.AreEqual(2, progress.Board.Offers.Count);
+            Assert.AreEqual(3, progress.Board.Offers.Count, "2일부터 쉬움·보통·어려움");
         }
     }
 }

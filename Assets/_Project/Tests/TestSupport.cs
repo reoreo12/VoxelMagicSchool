@@ -52,8 +52,9 @@ namespace VoxelMagic.Tests
             => Create<FishDefinition>(("_id", name), ("_displayName", name),
                 ("_sizeRangeCm", new FloatRange(10f, 20f)), ("_dartChance", 0f));
 
-        public static RequestDefinition Request(string title, int baseReward, ItemAmount[] needs, ItemAmount[] given)
-            => Create<RequestDefinition>(("_title", title), ("_baseReward", baseReward),
+        public static RequestDefinition Request(string title, ItemAmount[] needs, ItemAmount[] given,
+            RequestDifficulty difficulty = RequestDifficulty.Easy)
+            => Create<RequestDefinition>(("_title", title), ("_difficulty", difficulty),
                 ("_requirements", new List<ItemAmount>(needs)), ("_givenItems", new List<ItemAmount>(given)));
 
         private static void SetField(object target, string fieldName, object value)

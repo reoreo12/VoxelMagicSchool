@@ -26,10 +26,13 @@ namespace VoxelMagic.Core
         public Vector2Int Size { get; }
         public SeedDefinition Seed { get; }
         public FarmPlot Plot { get; }
+        /// <summary>심기: 심을 방향 (모양을 이 방향으로 돌림).</summary>
+        public FarmFacing Facing { get; }
 
         public FarmAction(FarmActionType type, bool canExecute, string label, string blockedReason,
-            Vector2Int origin, Vector2Int size, SeedDefinition seed, FarmPlot plot)
+            Vector2Int origin, Vector2Int size, SeedDefinition seed, FarmPlot plot, FarmFacing facing = FarmFacing.Up)
         {
+            Facing = facing;
             Type = type;
             CanExecute = canExecute;
             Label = label;
@@ -84,7 +87,18 @@ namespace VoxelMagic.Core
             WateringFinished?.Invoke();
         }
 
+        /// <summary>그 칸을 대상으로 한 행동 (심기는 그 칸을 시작 칸으로, 돌리지 않음).</summary>
         public FarmAction Resolve(Vector2Int cell, ItemDefinition selected)
+            => Resolve(cell, selected, FarmFacing.Up, true, anchorAtCell: true);
+
+        /// <summary>
+        /// 플레이어 앞 칸(cell)을 대상으로 한 행동. 심기는 바라보는 방향(facing)으로 모양을 돌리고, 앞 칸에서 그 방향으로 펼친다
+        /// (옆으로 넓으면 lateralPositive 쪽으로). 물 주기·뽑기는 앞 칸에 있는 작물 전체가 대상.
+        /// </summary>
+        public FarmAction Resolve(Vector2Int cell, ItemDefinition selected, FarmFacing facing, bool lateralPositive)
+            => Resolve(cell, selected, facing, lateralPositive, anchorAtCell: false);
+
+        private FarmAction Resolve(Vector2Int cell, ItemDefinition selected, FarmFacing facing, bool lateralPositive, bool anchorAtCell)
         {
             var plot = Grid.GetPlotAt(cell);
 
@@ -97,7 +111,9 @@ namespace VoxelMagic.Core
 
             if (selected is SeedDefinition seed)
             {
-                var result = Grid.CanPlace(cell, seed.Footprint);
+                var size = FarmPlacement.RotatedSize(seed.Footprint, facing);
+                var origin = anchorAtCell ? cell : FarmPlacement.Origin(cell, size, facing, lateralPositive);
+                var result = Grid.CanPlace(origin, size);
                 string reason = result switch
                 {
                     PlacementResult.OutOfBounds => GameTexts.NotEnoughCells,
@@ -105,14 +121,15 @@ namespace VoxelMagic.Core
                     _ => null
                 };
                 return new FarmAction(FarmActionType.Plant, result == PlacementResult.Ok, GameTexts.Plant,
-                    reason, cell, seed.Footprint, seed, null);
+                    reason, origin, size, seed, null, facing);
             }
 
             if (plot != null)
             {
                 bool hasWand = ToolDefinition.IsWand(selected);
-                return new FarmAction(FarmActionType.Water, hasWand, GameTexts.Water,
-                    hasWand ? null : GameTexts.NeedWandToWater, plot.Origin, plot.Size, plot.Seed, plot);
+                string reason = !hasWand ? GameTexts.NeedWandToWater : plot.IsWatered ? GameTexts.AlreadyWatered : null;
+                return new FarmAction(FarmActionType.Water, reason == null, GameTexts.Water,
+                    reason, plot.Origin, plot.Size, plot.Seed, plot);
             }
 
             return FarmAction.None;
@@ -125,9 +142,9 @@ namespace VoxelMagic.Core
             switch (action.Type)
             {
                 case FarmActionType.Plant:
-                    if (Grid.CanPlace(action.Origin, action.Seed.Footprint) != PlacementResult.Ok) return false;
+                    if (Grid.CanPlace(action.Origin, action.Size) != PlacementResult.Ok) return false;
                     if (!_inventory.TryRemove(action.Seed, 1)) return false;
-                    return Grid.TryPlant(action.Seed, action.Origin, out _);
+                    return Grid.TryPlant(action.Seed, action.Origin, action.Facing, out _);
 
                 case FarmActionType.Water:
                     if (!UseWateringAction) return Grid.Water(action.Plot);

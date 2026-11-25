@@ -10,7 +10,11 @@ namespace VoxelMagic.Core
         RequestBoard,
         RequestDetail,
         /// <summary>초상화 대사창 (크리처 대화·수업, UI_SPEC 6장)</summary>
-        Dialogue
+        Dialogue,
+        /// <summary>크리처에게 전달할 의뢰 고르기 (QUEST_TIMER 7-7, 임시 UI)</summary>
+        DeliveryChoice,
+        /// <summary>예/아니요 확인 창 (포기 등, 임시 UI)</summary>
+        Confirm
     }
 
     public readonly struct ScreenPolicy
@@ -38,6 +42,9 @@ namespace VoxelMagic.Core
                 case GameScreen.Dialogue:
                     // 게임 시계만 멈춤(캐릭터 애니메이션은 계속, 13장·사용자 확인 2026-11-23). ESC·바깥 클릭으로 닫히지 않음(6-1).
                     return new ScreenPolicy(PauseLevel.GameClock, closesOnCancel: false, blocksInputBehind: false, blocksGameplay: true);
+                case GameScreen.DeliveryChoice:
+                    // 대화의 일부라 대화와 같게 게임 시계만 멈춤(QUEST_TIMER 7-7). ESC = 고르지 않고 대화 끝.
+                    return new ScreenPolicy(PauseLevel.GameClock, closesOnCancel: true, blocksInputBehind: true, blocksGameplay: true);
                 case GameScreen.None:
                     return default;
                 default: // 책, 가방, 의뢰 게시판, 자세히 패널: 전체 정지 + 입력 막기

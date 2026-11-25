@@ -13,9 +13,6 @@ namespace VoxelMagic.Core
         public const string DebugTimeFormat = "시간대: {0}";
         public const string DebugRespawn = "채집 자리 다시 뽑기";
         public const string DebugToggleTime = "방과후↔밤 (시각 이동)";
-        public const string DebugSwapRequest = "의뢰 교체";
-        public const string DebugDiscardKey = "우클릭";
-        public const string DebugDiscard = "인벤토리 칸 버리기";
         public const string Capture = "포획";
         public const string CapturedFormat = "{0} 포획!";
         public const string Missed = "놓쳤다";
@@ -28,7 +25,5 @@ namespace VoxelMagic.Core
         public static string ForcedName(ForcedCaptureResult forced)
             => forced == ForcedCaptureResult.Success ? "성공" : forced == ForcedCaptureResult.Fail ? "실패" : "없음";
 
-        public const string RequestSwappedFormat = "의뢰 교체: {0}";
-        public const string NoRequestToSwap = "바꿀 뒷산 의뢰가 없어요";
     }
 }

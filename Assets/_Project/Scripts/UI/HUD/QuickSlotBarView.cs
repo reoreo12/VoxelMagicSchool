@@ -1,6 +1,7 @@
 // 화면 아래 가운데 퀵슬롯 바(UI_SPEC 7-1): 어두운 칸 9-slice 바 안에 밝은 칸 5개, 선택 칸은 선택 프레임이 보간으로 따라간다.
 // 칸은 미리 만들어 두고 내용만 바꾼다(4-A-5). 인벤토리는 이벤트로만 읽고, 클릭은 "이 칸 선택" 요청만 보낸다.
 // 칸 수는 테마 값이라 나중에 확장 인벤토리(7-4)에서 같은 칸 프리팹을 더 늘려 쓸 수 있다.
+// 치트(에디터·개발 빌드만): 칸 우클릭 = 개수와 상관없이 그 칸 통째로 버리기(안내는 조작법 맨 아래 한 줄, ControlsHintView).
 // 마우스가 바 위에 있을 때 휠을 돌리면 칸을 바꾼다(아래로 = 다음 칸). 그동안 게임의 휠 줌은 쉰다(HudState).
 using System.Collections.Generic;
 using UnityEngine;
@@ -18,17 +19,33 @@ namespace VoxelMagic.UI
 
         private Inventory _inventory;
         private HudState _hud;
+        private GameMessages _messages;
         private int _selectedShown = -1;
 
         public void Bind(GameContext context)
         {
             _inventory = context.Inventory;
             _hud = context.Hud;
-            for (int i = 0; i < _slots.Count; i++) _slots[i].Setup(i, _inventory.Select);
+            _messages = context.Messages;
+            for (int i = 0; i < _slots.Count; i++) _slots[i].Setup(i, _inventory.Select, CheatDiscard);
             _inventory.SlotChanged += OnSlotChanged;
             _inventory.SelectionChanged += OnSelectionChanged;
             for (int i = 0; i < _slots.Count; i++) OnSlotChanged(i);
             MoveSelection(_inventory.SelectedIndex, animate: false);
+        }
+
+        // 우클릭 버리기는 치트라 정식 빌드에서는 연결하지 않는다.
+#if UNITY_EDITOR || DEVELOPMENT_BUILD
+        private System.Action<int> CheatDiscard => Discard;
+#else
+        private System.Action<int> CheatDiscard => null;
+#endif
+
+        private void Discard(int index)
+        {
+            var removed = _inventory.DiscardSlot(index);
+            if (!removed.IsEmpty)
+                _messages?.ShowToast(string.Format(GameTexts.DiscardedFormat, removed.Item.DisplayName, removed.Count));
         }
 
         public void OnPointerEnter(PointerEventData eventData) => _hud?.SetPointerOverScrollHud(true);

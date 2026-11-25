@@ -25,7 +25,7 @@ namespace VoxelMagic.Core
         [Tooltip("보통 의뢰가 게시되기 시작하는 날")]
         [SerializeField, Min(1)] private int _normalFromDay = 1;
         [Tooltip("어려움 의뢰가 게시되기 시작하는 날")]
-        [SerializeField, Min(1)] private int _hardFromDay = 3;
+        [SerializeField, Min(1)] private int _hardFromDay = 2;
         [Tooltip("튜토리얼 의뢰만 게시하는 날")]
         [SerializeField, Min(1)] private int _tutorialDay = 1;
         [SerializeField, Tooltip("1일 고정 튜토리얼 의뢰 (농작 1 + 낚시 1 + 채집 1)")] private RequestDefinition _tutorialRequest;
@@ -40,6 +40,10 @@ namespace VoxelMagic.Core
         [Tooltip("게시판·크리처 전달을 밤에만 허용 (끄면 아무 때나, 시험용)")]
         [SerializeField] private bool _onlyAtNight = true;
 
+        [Header("전달")]
+        [Tooltip("완료 가능한 의뢰가 하나뿐이면 고르기 창 없이 바로 전달 대사로")]
+        [SerializeField] private bool _skipChoiceWhenSingle = true;
+
         [Header("필기 점수 (재료 희귀도별, 의뢰 점수 = 필요 재료 점수 합)")]
         [SerializeField, Min(0)] private int _commonScore = 2;
         [SerializeField, Min(0)] private int _uncommonScore = 4;
@@ -52,6 +56,7 @@ namespace VoxelMagic.Core
         public int BoardClosedFromDay => _boardClosedFromDay;
         public int RepeatCooldownDays => _repeatCooldownDays;
         public bool OnlyAtNight => _onlyAtNight;
+        public bool SkipChoiceWhenSingle => _skipChoiceWhenSingle;
 
         /// <summary>그날 게시해도 마지막 전달 날까지 끝낼 수 있는 의뢰인지.</summary>
         public bool CanFinishInTime(RequestDefinition request, int day)

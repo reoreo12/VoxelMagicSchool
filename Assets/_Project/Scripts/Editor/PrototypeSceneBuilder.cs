@@ -89,7 +89,6 @@ namespace VoxelMagic.EditorTools
                 .SetRef("_catalog", SaveTools.FillCatalog())
                 .SetRef("_playerInteractor", interactor)
                 .SetRefList("_bindRoots", new Object[] { world, playerRoot, camera.gameObject, ui })
-                .SetRefList("_requests", data.Requests.ToArray())
                 .SetAmountList("_startingItems", new ItemDefinition[] { data.Wand }, new[] { 1 });
 
             EditorSceneManager.SaveScene(scene, ScenePath);
@@ -392,7 +391,6 @@ namespace VoxelMagic.EditorTools
             prompt.SetActive(false);
 
             BuildScoreHud(canvas, font);
-            BuildQuestTracker(canvas, font);
             BuildInventoryBar(canvas, font);
             BuildToast(canvas, font);
             BuildAcquisitionPopup(canvas, font);
@@ -449,20 +447,6 @@ namespace VoxelMagic.EditorTools
                 .SetRef("_line", line)
                 .SetRef("_hint", hint)
                 .SetRef("_nextButton", next);
-        }
-
-        private static void BuildQuestTracker(Transform canvas, TMP_FontAsset font)
-        {
-            var panel = Panel("QuestTracker", canvas, new Color(0f, 0f, 0f, 0.45f));
-            Place(panel, new Vector2(1f, 1f), new Vector2(1f, 1f), new Vector2(-24f, -24f), new Vector2(380f, 200f));
-            var header = Text("Header", panel, font, "", 24, TextAlignmentOptions.TopLeft);
-            Place(header.rectTransform, new Vector2(0f, 1f), new Vector2(0f, 1f), new Vector2(14f, -10f), new Vector2(352f, 36f));
-            var body = Text("Body", panel, font, "", 22, TextAlignmentOptions.TopLeft);
-            Place(body.rectTransform, new Vector2(0f, 1f), new Vector2(0f, 1f), new Vector2(14f, -52f), new Vector2(352f, 140f));
-
-            panel.gameObject.AddComponent<QuestTrackerPanel>()
-                .SetRef("_header", header)
-                .SetRef("_body", body);
         }
 
         private static void BuildInventoryBar(Transform canvas, TMP_FontAsset font)

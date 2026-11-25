@@ -60,6 +60,34 @@ namespace VoxelMagic.Core
             OffersChanged?.Invoke();
         }
 
+        /// <summary>반복 방지 기록 (저장용).</summary>
+        public IEnumerable<BoardHistoryEntry> History
+        {
+            get
+            {
+                foreach (var pair in _lastOfferedDay)
+                    yield return new BoardHistoryEntry(pair.Key, pair.Value, TimesOffered(pair.Key));
+            }
+        }
+
+        /// <summary>저장 파일에서 읽은 게시판으로 맞춘다 (만료 알림 없음).</summary>
+        public void Restore(int day, IEnumerable<RequestDefinition> offers, IEnumerable<BoardHistoryEntry> history)
+        {
+            Day = day;
+            _offers.Clear();
+            _lastOfferedDay.Clear();
+            _timesOffered.Clear();
+            if (offers != null) foreach (var r in offers) if (r != null && !_offers.Contains(r)) _offers.Add(r);
+            if (history != null)
+                foreach (var h in history)
+                {
+                    if (h.Request == null) continue;
+                    _lastOfferedDay[h.Request] = h.LastDay;
+                    _timesOffered[h.Request] = h.Times;
+                }
+            OffersChanged?.Invoke();
+        }
+
         /// <summary>치트: 특정 의뢰를 오늘 게시판에 올린다.</summary>
         public void Add(RequestDefinition request)
         {

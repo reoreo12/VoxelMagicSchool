@@ -23,6 +23,7 @@ namespace VoxelMagic.Core
     public sealed class DialogueChannel
     {
         private Action _onFinished;
+        private Action _onAborted;
 
         /// <summary>대사를 보여 줄 UI가 이 씬에 있는지 (없으면 Gameplay가 결과를 바로 반영한다).</summary>
         public bool HasPresenter { get; private set; }
@@ -43,12 +44,13 @@ namespace VoxelMagic.Core
             if (IsPlaying) PreviewExpressionRequested?.Invoke(step);
         }
 
-        /// <summary>대사를 시작한다. 이미 재생 중이거나 줄이 없으면 false(이때 onFinished는 부르지 않는다).</summary>
-        public bool Play(IReadOnlyList<DialogueLine> lines, Action onFinished)
+        /// <summary>대사를 시작한다. 이미 재생 중이거나 줄이 없으면 false(이때 콜백은 부르지 않는다). 도중에 버려지면 onAborted.</summary>
+        public bool Play(IReadOnlyList<DialogueLine> lines, Action onFinished, Action onAborted = null)
         {
             if (IsPlaying || lines == null || lines.Count == 0) return false;
             Lines = lines;
             _onFinished = onFinished;
+            _onAborted = onAborted;
             IsPlaying = true;
             Started?.Invoke();
             return true;
@@ -64,12 +66,19 @@ namespace VoxelMagic.Core
         }
 
         /// <summary>결과 없이 대사를 버린다(씬이 내려갈 때 등).</summary>
-        public void Abort() => Clear();
+        public void Abort()
+        {
+            if (!IsPlaying) return;
+            var aborted = _onAborted;
+            Clear();
+            aborted?.Invoke();
+        }
 
         private void Clear()
         {
             IsPlaying = false;
             _onFinished = null;
+            _onAborted = null;
             Lines = Array.Empty<DialogueLine>();
         }
     }

@@ -1,4 +1,5 @@
-// 텃밭 전체를 하나의 상호작용 대상으로 다룬다. 플레이어 앞 칸을 계산해 FarmService에 행동을 묻고 실행한다.
+// 텃밭 전체를 하나의 상호작용 대상으로 다룬다. 플레이어가 선 칸의 바로 앞 칸(바라보는 네 방향)을 계산해 FarmService에 행동을 묻고 실행한다.
+// 심기는 그 방향으로 모양을 돌려 앞 칸에서 바라보는 쪽으로 펼친다(옆으로 넓으면 플레이어가 선 쪽 절반으로 붙임).
 using UnityEngine;
 using VoxelMagic.Core;
 
@@ -60,10 +61,15 @@ namespace VoxelMagic.Gameplay
 
         private FarmAction ResolveAt(in InteractionContext context)
         {
-            var target = context.PlayerPosition + context.PlayerForward * Config.TargetForwardOffset;
-            var cell = WorldToCell(target);
+            var local = (context.PlayerPosition - Origin) / Config.CellSize;
+            var standing = new Vector2Int(Mathf.FloorToInt(local.x), Mathf.FloorToInt(local.z));
+            var facing = FarmPlacement.FromDirection(new Vector2(context.PlayerForward.x, context.PlayerForward.z));
+            var cell = standing + FarmPlacement.Step(facing);
+            // 옆으로 두 칸 이상인 작물은 플레이어가 선 칸의 어느 절반에 있는지로 붙일 쪽을 정한다.
+            float lateral = facing == FarmFacing.Up || facing == FarmFacing.Down ? local.x : local.z;
+            bool lateralPositive = lateral - Mathf.Floor(lateral) >= 0.5f;
             return Context.FarmGrid.IsInside(cell)
-                ? Context.Farm.Resolve(cell, context.SelectedItem)
+                ? Context.Farm.Resolve(cell, context.SelectedItem, facing, lateralPositive)
                 : FarmAction.None;
         }
     }

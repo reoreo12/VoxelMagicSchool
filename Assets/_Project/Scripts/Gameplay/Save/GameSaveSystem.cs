@@ -19,12 +19,12 @@ namespace VoxelMagic.Gameplay
         public static bool AutoSaveEnabled { get; set; } = true;
 
         /// <summary>이미 진행 중이면 그대로, 아니면 저장 파일에서 불러오고, 파일이 없으면 새로 만들어 onNewGame(시작 아이템 지급)을 부른다.</summary>
-        public static PlayerProgress GetOrCreateProgress(GameBalanceConfig balance, IEnumerable<RequestDefinition> requests,
+        public static PlayerProgress GetOrCreateProgress(GameBalanceConfig balance,
             DefinitionCatalog catalog, Action<PlayerProgress> onNewGame)
         {
             if (GameSession.HasProgress) return GameSession.Progress;
 
-            var progress = PlayerProgress.CreateNew(balance, requests);
+            var progress = PlayerProgress.CreateNew(balance);
             if (!TryLoadInto(progress, catalog)) onNewGame?.Invoke(progress);
             GameSession.Begin(progress);
             return progress;
@@ -65,6 +65,12 @@ namespace VoxelMagic.Gameplay
             {
                 var data = JsonUtility.FromJson<SaveData>(json);
                 if (data == null) return false;
+                if (data.Version < 2)
+                {
+                    // v1에는 시계·게시판·수락 목록이 없어 이어 갈 수 없다(설계 1장). 파일은 다음 저장 때 v2로 덮어쓴다.
+                    Debug.LogWarning($"[저장] 옛 형식(v{data.Version}) 저장 파일이라 새 게임으로 시작합니다.");
+                    return false;
+                }
                 if (data.Version > SaveData.CurrentVersion)
                     Debug.LogWarning($"[저장] 더 새 형식의 저장 파일입니다 (파일 {data.Version}, 게임 {SaveData.CurrentVersion}). 아는 부분만 불러옵니다.");
                 var unknown = SaveMapper.Apply(data, progress, catalog);

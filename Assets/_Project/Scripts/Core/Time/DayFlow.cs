@@ -87,6 +87,17 @@ namespace VoxelMagic.Core
             DayStarted?.Invoke(day, info.Kind);
         }
 
+        /// <summary>저장된 날·시각으로 이어 간다 (하루 시작 단계는 돌리지 않음 — 그날 상태는 저장본에서 되살린다).</summary>
+        public void ResumeDay(int day, float minute)
+        {
+            var info = _clock.Calendar.Get(day);
+            IsFinished = false;
+            _clock.Holds.Release(PauseCauses.GameOver);
+            _clock.BeginDay(day, info.Kind == DayKind.Story ? info.HeldMinute : minute);
+            _clock.Holds.Set(info.Kind == DayKind.Story, PauseLevel.GameClock, PauseCauses.Story);
+            DayStarted?.Invoke(day, info.Kind);
+        }
+
         /// <summary>다음 날 방과 후 시작을 minutes분 늦게(+)/일찍(−). 같은 원인은 덮어쓴다.</summary>
         public void RequestNextDayShift(string source, int minutes) => NextDayShift.Request(source, minutes);
 

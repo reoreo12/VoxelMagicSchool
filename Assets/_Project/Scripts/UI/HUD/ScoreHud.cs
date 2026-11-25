@@ -19,6 +19,8 @@ namespace VoxelMagic.UI
 
         [SerializeField] private Row _practical = new Row();
         [SerializeField] private Row _written = new Row();
+        [Tooltip("막대가 가득 차는 기준 점수 (점수 상한이 아님 — 상한은 없앴다. 옛 임시 HUD용)")]
+        [SerializeField, Min(1)] private int _barReference = 100;
 
         private ScoreBook _score;
         private float _fillSpeed;
@@ -61,8 +63,8 @@ namespace VoxelMagic.UI
 
         private void Draw(Row row, string label)
         {
-            row.Text.text = string.Format(GameTexts.ScoreFormat, label, Mathf.RoundToInt(row.Shown), _score.MaxScore);
-            row.Fill.anchorMax = new Vector2(row.Shown / _score.MaxScore, 1f);
+            row.Text.text = string.Format(GameTexts.ScoreFormat, label, Mathf.RoundToInt(row.Shown), _barReference);
+            row.Fill.anchorMax = new Vector2(Mathf.Clamp01(row.Shown / _barReference), 1f);
             row.Fill.offsetMax = Vector2.zero;
         }
     }

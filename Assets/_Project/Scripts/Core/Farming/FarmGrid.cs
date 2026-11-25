@@ -54,11 +54,15 @@ namespace VoxelMagic.Core
         }
 
         public bool TryPlant(SeedDefinition seed, Vector2Int origin, out FarmPlot plot)
+            => TryPlant(seed, origin, FarmFacing.Up, out plot);
+
+        /// <summary>방향대로 돌려 심는다 (옆을 보면 가로세로가 바뀐 크기로 차지).</summary>
+        public bool TryPlant(SeedDefinition seed, Vector2Int origin, FarmFacing facing, out FarmPlot plot)
         {
             plot = null;
-            if (seed == null || CanPlace(origin, seed.Footprint) != PlacementResult.Ok) return false;
+            if (seed == null || CanPlace(origin, FarmPlacement.RotatedSize(seed.Footprint, facing)) != PlacementResult.Ok) return false;
 
-            plot = new FarmPlot(_nextId++, seed, origin);
+            plot = new FarmPlot(_nextId++, seed, origin, facing);
             SetCells(plot, plot);
             _plots.Add(plot);
             PlotAdded?.Invoke(plot);
@@ -118,8 +122,11 @@ namespace VoxelMagic.Core
 
         /// <summary>저장본에서 작물을 상태 그대로 되살린다 (성장 규칙을 다시 적용하지 않음).</summary>
         public bool TryRestore(SeedDefinition seed, Vector2Int origin, bool watered, float wateredAt, bool grown, out FarmPlot plot)
+            => TryRestore(seed, origin, FarmFacing.Up, watered, wateredAt, grown, out plot);
+
+        public bool TryRestore(SeedDefinition seed, Vector2Int origin, FarmFacing facing, bool watered, float wateredAt, bool grown, out FarmPlot plot)
         {
-            if (!TryPlant(seed, origin, out plot)) return false;
+            if (!TryPlant(seed, origin, facing, out plot)) return false;
             if (watered) plot.MarkWatered(wateredAt);
             if (grown) plot.SetStage(GrowthStage.Grown);
             if (watered || grown) PlotChanged?.Invoke(plot);
