@@ -1,5 +1,13 @@
 # 변경 기록
 
+## 2026-11-26 — 확인 창(예/아니요) 텍스처로
+- 임시 도형 확인 창(`ConfirmDialog`, 1920×1080 늘어나는 HUD 캔버스) → `UI_Root` 팝업 층의 새 화면 `UI_Confirm`(`ConfirmScreen`, 픽셀 정수 배율). 빌더 메뉴 `VoxelMagic/UI/화면 만들기/확인 창`
+- 창 바탕 새 그림 `Art/UI/confirm_ui/confirm_panel.png`(24×24, 9-slice 8, 크림 종이 + 2px 진갈색 테두리 + 안쪽 밝은 줄·그늘, 모서리 1px 깎음). 버튼은 책 페이지 버튼(`btn_page_*`, `BookMenuButton`), 글자는 갈무리11 12px 가운데·낱말 줄바꿈
+- 배치(1배 px, 테마 `Confirm`): 안쪽 여백 12, 메시지 → 버튼 10, 버튼 56×20 두 개(사이 12), 창 폭 160~260에서 메시지에 맞춤, 화면 가운데. 뒤는 공용 입력 막기 판(딤 0.6)
+- 동작 그대로: `context.Confirm.Ask(문구, 예, 아니요)`, 아니요·ESC·바깥 클릭 = 아니요, 전체 정지
+- BackMountain·Creature_Cave·FarmPond 씬의 옛 `ConfirmDialog` 삭제. `Prototype_FarmFishing`은 `UI_Root`가 없어 옛 창을 남김(예비). 가져오기 규칙 `confirm_ui/confirm_panel.png` 8/8/8/8 추가
+- 확인(플레이 모드, 자동 저장 끔): 책 위에 포기 확인 창 표시, 예 → 예 콜백·책 유지, 아니요·ESC → 아니요 콜백
+
 ## 2026-11-26 — 퀵슬롯 휠: 끝 칸에서 멈춤
 - 퀵슬롯 위 휠로 칸을 바꿀 때 첫 칸에서 위로, 마지막 칸에서 아래로 돌려도 넘어가지 않고 멈춤(전에는 반대쪽 끝으로 돌아 넘어가 선택 틀이 바를 가로질러 되돌아갔음). `QuickSlotBarView.OnScroll`
 - 확인(플레이 모드, 휠 입력 흉내): 0에서 위 → 0, 아래로 7번 → 1·2·3·4·4·4·4, 위 → 3

@@ -101,6 +101,7 @@ namespace VoxelMagic.UI
         [SerializeField] private QuestListValues _questList = new QuestListValues();
         [SerializeField] private QuestToastValues _questToast = new QuestToastValues();
         [SerializeField] private BookValues _book = new BookValues();
+        [SerializeField] private ConfirmValues _confirm = new ConfirmValues();
         [SerializeField] private DialogueValues _dialogue = new DialogueValues();
         [SerializeField, Tooltip("화면 문구 표(키 → 문장)")] private TextTable _texts;
         [SerializeField] private List<TextStyleValues> _textStyles = new List<TextStyleValues>();
@@ -120,6 +121,7 @@ namespace VoxelMagic.UI
         public QuestListValues QuestList => _questList;
         public QuestToastValues QuestToast => _questToast;
         public BookValues Book => _book;
+        public ConfirmValues Confirm => _confirm;
         public DialogueValues Dialogue => _dialogue;
         public ITextSource Texts => _texts;
 

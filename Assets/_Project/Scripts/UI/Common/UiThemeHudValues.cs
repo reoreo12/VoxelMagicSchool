@@ -606,4 +606,27 @@ namespace VoxelMagic.UI
         public Vector2Int Label => _label;
         public Vector2Int Number => _number;
     }
+
+    /// <summary>확인 창(예/아니요, 포기·나가기 등): 깔끔한 종이 9-slice 바탕 + 책 페이지 버튼 두 개. 크기는 1배 px.</summary>
+    [System.Serializable]
+    public sealed class ConfirmValues
+    {
+        [SerializeField, Tooltip("창 바탕 (confirm_ui/confirm_panel.png, 9-slice 8)")] private Sprite _panel;
+        [SerializeField, Tooltip("창 안쪽 여백 (테두리 포함, 글자·버튼까지)")] private int _padding = 12;
+        [SerializeField, Tooltip("메시지 → 버튼 사이")] private int _messageGap = 10;
+        [SerializeField, Tooltip("예·아니요 버튼 크기 (책 페이지 버튼 그림)")] private Vector2Int _buttonSize = new Vector2Int(56, 20);
+        [SerializeField, Tooltip("두 버튼 사이")] private int _buttonGap = 12;
+        [SerializeField, Tooltip("창 폭 범위: 메시지 길이에 맞추되 이 안에서 (넘으면 낱말 단위 줄바꿈)")] private Vector2Int _widthRange = new Vector2Int(160, 260);
+        [SerializeField] private UiTextStyle _messageStyle = UiTextStyle.Body;
+
+        public Sprite Panel => _panel;
+        public int Padding => _padding;
+        public int MessageGap => _messageGap;
+        public Vector2Int ButtonSize => _buttonSize;
+        public int ButtonGap => _buttonGap;
+        public Vector2Int WidthRange => _widthRange;
+        public UiTextStyle MessageStyle => _messageStyle;
+
+        public void SetPanel(Sprite panel) => _panel = panel;
+    }
 }

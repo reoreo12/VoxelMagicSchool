@@ -243,6 +243,14 @@ MonoBehaviour:
     _checkboxOnHover: {fileID: 21300000, guid: d245453f3f0bd5f4c97ff8dde13ae73f, type: 3}
     _checkboxOff: {fileID: 21300000, guid: 1bf8e0cc64158d84e8fbdb0ed1f69092, type: 3}
     _checkboxOffHover: {fileID: 21300000, guid: 5fa9501c353bb554495016ed6df03d98, type: 3}
+  _confirm:
+    _panel: {fileID: 21300000, guid: 6decb39f86bac7e45a1d4444a9ad9b9c, type: 3}
+    _padding: 12
+    _messageGap: 10
+    _buttonSize: {x: 56, y: 20}
+    _buttonGap: 12
+    _widthRange: {x: 160, y: 260}
+    _messageStyle: 0
   _dialogue:
     _scale: 1.25
     _bottomMargin: 8

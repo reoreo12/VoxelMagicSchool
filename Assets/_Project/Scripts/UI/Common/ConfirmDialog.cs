@@ -1,5 +1,5 @@
 // 예/아니요 임시 확인 창. ConfirmChannel.Ask를 받으면 화면 스택에 Confirm을 열고, 답을 채널에 돌려준다(닫기·ESC = 아니요).
-// 포기에 처음 쓰고 책 메뉴 확인 창에도 재사용한다. 모양은 코드로 만든다(정식 디자인 전).
+// UI_Root가 없는 씬(Prototype_FarmFishing)에만 남은 예비 창. 정식 확인 창은 UI_Root의 ConfirmScreen(UI_Confirm)이다. 모양은 코드로 만든다.
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;

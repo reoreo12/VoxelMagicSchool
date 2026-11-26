@@ -62,7 +62,7 @@ GameBootstrap (씬마다, Gameplay)
 | UI가 읽는 창구 | `Core/Requests/IAcceptedRequestList`: `AcceptedCount`, `Accepted`(항목 목록), `event AcceptedListChanged`(수락·납품·포기·진행 변화), `event RequestBecameComplete(entry)`(조건을 다 채운 순간 → 완료 알림), `ExpectedReward(entry)`(지금 납품하면 받을 필기 점수 = 필요 재료 희귀도 점수 합, 보너스 없음) |
 | 항목(`AcceptedRequestEntry`) | `Request`(RequestDefinition), `Title`, `AcceptedOrder`(먼저 수락할수록 작음, = `Id` 포기 호출용), `Requirements`(아이템·현재·필요), `Progress`(0~1), `IsComplete`(납품 가능) |
 | 지금 (2026-11-25) | 구현은 `Core/Quest/RequestLog`(`context.Requests`). **최대 3개**(`QuestConfig`), 수락하면 씨앗 지급·게시판에서 빠짐. 규칙 메서드: `CanAccept/Accept(r)`, `Abandon(id)`, `CanDeliver/Deliver(id)`, `ReadyRequests()`, `RefillableSeeds()/GiveRefillSeeds()`, `BoardAccess()/DeliveryAccess()`(밤에만·닫힌 날), `RewardOf(r)` |
-| 포기 | `RequestLog.Abandon(id)`는 UI와 무관. 확인 창은 부르는 쪽이 `context.Confirm.Ask(문구, 예 콜백)`(Core `ConfirmChannel` → UI `ConfirmDialog`, `GameScreen.Confirm`). 지금은 책 의뢰 탭 오른쪽 아래 임시 `포기` 글자 버튼 |
+| 포기 | `RequestLog.Abandon(id)`는 UI와 무관. 확인 창은 부르는 쪽이 `context.Confirm.Ask(문구, 예 콜백)`(Core `ConfirmChannel` → UI `ConfirmScreen`(`UI_Root` 팝업 층 `UI_Confirm`, `GameScreen.Confirm`). 예·아니요 글자는 Ask의 yesLabel·noLabel로 바꿀 수 있음. `UI_Root`가 없는 씬만 예비 `ConfirmDialog`). 지금은 책 의뢰 탭 오른쪽 아래 임시 `포기` 글자 버튼 |
 | 전달 | `context.Delivery`(`DeliverySession`): `Begin()` → `Choosing`(둘 이상) / `Talking` → `Choose(id)` → `CompleteTalk()` / `Cancel()`. 크리처(`CreatureNpc`)가 단계에 따라 고르기 창(`GameScreen.DeliveryChoice`, 임시 `DeliveryChoiceWindow`, 게임 시계만 멈춤)과 대사창을 띄움 |
 | 정렬(UI가 함) | 완료 → 진행률 높은 순 → 먼저 수락한 순. 보상까지 받은 의뢰는 목록에서 빠진다 |
 | UI 코드 | `UI/Requests/QuestBarView`(바, X = 숨기기), `QuestListView`(드롭다운, 항목 클릭 = 책 의뢰 탭, 마우스 올림 표시는 `QuestListItemView`), `QuestToastView`(완료 알림), `UI/Book/QuestBookPage`(책 의뢰 탭) |
