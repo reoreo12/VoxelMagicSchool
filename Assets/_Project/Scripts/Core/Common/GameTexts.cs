@@ -45,9 +45,19 @@ namespace VoxelMagic.Core
         public const string SeedRefillGivenFormat = "씨앗 {0}개를 다시 받았다";
         public const string SeedRefillNone = "더 받을 씨앗이 없어요";
         public const string SeedRefillNoRoom = "씨앗을 넣을 칸이 부족해요";
-        public const string CreatureNotNight = "밤에 굴로 오면 의뢰를 받을게";
+        public const string CreatureNotNight = "밤에 굴로 오면 의뢰 재료를 받을게.";
         public const string CreatureTooLate = "이제 늦었어. 의뢰는 더 받을 수 없어";
         public const string DeliveryChoiceTitle = "어떤 의뢰를 전달할까?";
+        // 크리처 대화 메뉴 (대사창 선택지, UI_SPEC 6-4)
+        public const string CreatureMenuPrompt = "무슨 일이야?";
+        public const string MenuTalk = "이야기하기";
+        public const string MenuLesson = "과외 받기";
+        public const string MenuDeliver = "의뢰 전달하기";
+        public const string MenuLeave = "그만두기";
+        public const string ChoiceBack = "돌아가기";
+        public const string LessonNotReady = "과외는 다음에 하자.";
+        public const string SmallTalkFallback = "……";
+        public const string RewardShortFormat = "+{0}";
         public const string AbandonButton = "포기";
         public const string AbandonConfirmFormat = "'{0}' 의뢰를 포기할까요?\n받은 씨앗은 그대로 남아요.";
         public const string AbandonedFormat = "'{0}' 의뢰를 포기했다";

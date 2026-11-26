@@ -367,7 +367,7 @@ namespace VoxelMagic.UI
         [SerializeField, Tooltip("이름 글자 좌우 최소 여백")] private int _namePadding = 2;
         [SerializeField, Tooltip("이름이 길면 차례로 작은 글씨로 (갈무리11 Bold 12 → 갈무리9 10 → 갈무리7 8). 마지막에도 넘치면 … 으로 자른다")]
         private UiTextStyle[] _nameStyles = { UiTextStyle.BodyBold, UiTextStyle.Small, UiTextStyle.Tiny };
-        [SerializeField, Tooltip("패널 안 대사 글자 칸 (x, y, 폭, 높이). 12px·줄 16·최대 3줄")] private RectInt _textArea = new RectInt(14, 20, 292, 48);
+        [SerializeField, Tooltip("패널 안 대사 글자 칸 (x, y, 폭, 높이). 12px·줄 16·최대 3줄. 글자 모양이 칸 위 1px 아래에서 시작해, 크림색 글자판에서 왼쪽·위 여백이 9로 같다")] private RectInt _textArea = new RectInt(14, 13, 292, 48);
         [SerializeField, Min(1), Tooltip("최대 줄 수. 넘치면 콘솔 경고(대사를 나눌 것)")] private int _maxLines = 3;
         [SerializeField, Tooltip("패널 안 ▼ 위치. 글자판(크림색) 오른쪽·아래 끝에서 같은 여백 8")] private Vector2Int _arrowPosition = new Vector2Int(301, 80);
         [SerializeField, Min(1f), Tooltip("타이핑 속도(글자/초, 시간 정지와 무관)")] private float _charsPerSecond = 30f;
@@ -378,6 +378,21 @@ namespace VoxelMagic.UI
         [SerializeField] private Sprite _leftColumn;
         [SerializeField] private Sprite _nextArrow;
         [SerializeField, Tooltip("화자에 초상화가 없을 때 (테스트용)")] private Sprite _placeholderPortrait;
+
+        [Header("선택지 (6-4: 대사창 안 글자 버튼)")]
+        [SerializeField, Tooltip("선택지 화면의 질문 한 줄 칸 (패널 안 x, y, 폭, 높이)")] private RectInt _choicePromptArea = new RectInt(14, 12, 292, 16);
+        [SerializeField, Tooltip("첫 선택지 줄의 위 (패널 안 y)")] private int _choiceTop = 30;
+        [SerializeField, Tooltip("선택지 한 줄 높이")] private int _choiceRowHeight = 14;
+        [SerializeField, Tooltip("선택지 글자의 왼쪽 들여쓰기 (커서 ▶ 자리 포함, 글자 칸 왼쪽 기준)")] private int _choiceIndent = 10;
+        [SerializeField, Tooltip("커서 ▶ 위치 (선택지 줄 왼쪽 위 기준)")] private Vector2Int _choiceCursorOffset = new Vector2Int(0, 3);
+        [SerializeField, Min(1), Tooltip("한 번에 보이는 선택지 줄 수. 넘치면 콘솔 경고")] private int _maxChoices = 4;
+        [SerializeField] private UiTextStyle _choiceStyle = UiTextStyle.Body;
+        [SerializeField, Tooltip("오른쪽 작은 글자 (보상 +n)")] private UiTextStyle _choiceDetailStyle = UiTextStyle.Small;
+        [SerializeField, Tooltip("올려놓음·키보드로 고른 선택지 글자색")] private Color _choiceSelectedColor = new Color32(0xC0, 0x60, 0x3A, 0xFF);
+        [SerializeField, Tooltip("누르는 동안 글자색 (글자는 1px 내려감)")] private Color _choicePressedColor = new Color32(0x8E, 0x45, 0x27, 0xFF);
+        [SerializeField, Tooltip("지금은 안 되는 선택지 글자색 (그래도 고를 수 있음)")] private Color _choiceDimmedColor = new Color32(150, 120, 84, 255);
+        [SerializeField, Tooltip("누를 때 글자가 내려가는 거리")] private int _choicePressDrop = 1;
+        [SerializeField, Tooltip("커서 ▶ (오른쪽을 가리키는 4×7)")] private Sprite _choiceCursor;
 
         public float Scale => Mathf.Max(0.5f, Mathf.Round(_scale * 20f) / 20f);
         public int BottomMargin => _bottomMargin;
@@ -402,6 +417,20 @@ namespace VoxelMagic.UI
         public Sprite LeftColumn => _leftColumn;
         public Sprite NextArrow => _nextArrow;
         public Sprite PlaceholderPortrait => _placeholderPortrait;
+        public RectInt ChoicePromptArea => _choicePromptArea;
+        public int ChoiceTop => _choiceTop;
+        public int ChoiceRowHeight => Mathf.Max(1, _choiceRowHeight);
+        public int ChoiceIndent => _choiceIndent;
+        public Vector2Int ChoiceCursorOffset => _choiceCursorOffset;
+        public int MaxChoices => Mathf.Max(1, _maxChoices);
+        public UiTextStyle ChoiceStyle => _choiceStyle;
+        public UiTextStyle ChoiceDetailStyle => _choiceDetailStyle;
+        public Color ChoiceSelectedColor => _choiceSelectedColor;
+        public Color ChoicePressedColor => _choicePressedColor;
+        public Color ChoiceDimmedColor => _choiceDimmedColor;
+        public int ChoicePressDrop => _choicePressDrop;
+        public Sprite ChoiceCursor => _choiceCursor;
+        public void SetChoiceCursor(Sprite cursor) => _choiceCursor = cursor;
 
         public void SetSprites(Sprite panel, Sprite leftColumn, Sprite arrow, Sprite placeholder)
         {

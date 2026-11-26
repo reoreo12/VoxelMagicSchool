@@ -1,6 +1,6 @@
 // 초상화 대사창(UI_SPEC 6장): 화면 아래 가운데, 패널 위에 왼쪽 열(초상화 창 + 이름표)을 4px 겹쳐 그린다. 타이핑 → 전체 표시 → 다음 대사.
 // Space/E(화면 스택 Submit)나 대사창 클릭으로 진행하고, 같은 프레임에 두 번 들어온 입력은 한 번만 처리한다. ESC·바깥 클릭으로는 닫히지 않는다.
-// 마지막 대사 뒤에 화면을 닫고 DialogueChannel.Finish로 결과를 반영하게 한다. 연출은 모두 unscaled time.
+// 마지막 대사 뒤 DialogueChannel.Finish로 결과를 반영하고, 그 콜백이 다음 대사·선택지를 열지 않았으면 닫는다. 선택지(6-4)는 질문 한 줄 뒤 글자 버튼으로. 연출은 unscaled time.
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
@@ -22,6 +22,7 @@ namespace VoxelMagic.UI
         [SerializeField, Tooltip("작은 이름 글씨를 1px 겹쳐 굵게 보이게 하는 사본")] private ThemedText _nameBold;
         [SerializeField] private ThemedText _text;
         [SerializeField] private Image _nextArrow;
+        [SerializeField, Tooltip("선택지 한 줄 원본 (꺼 둔 채, 필요한 만큼 복제)")] private DialogueChoiceRow _choiceRowTemplate;
 
         private enum Phase { Typing, Complete }
 
@@ -37,6 +38,12 @@ namespace VoxelMagic.UI
         private float _arrowTime;
         private Vector2Int _framePosition;
         private int _previewExpression; // 개발용 표정 넘기기: 0 = 기본, 1~ = 화자의 표정 목록 순서
+        private readonly List<DialogueChoiceRow> _rows = new List<DialogueChoiceRow>();
+        private IReadOnlyList<DialogueOption> _options = System.Array.Empty<DialogueOption>();
+        private int _selected;
+        private bool _choicesShown;
+
+        private bool Asking => _options.Count > 0;
 
         public void Bind(GameContext context)
         {
@@ -46,6 +53,8 @@ namespace VoxelMagic.UI
             _channel.Started += OnStarted;
             _channel.PreviewExpressionRequested += OnPreviewExpression;
             _screens.Submitted += OnSubmit;
+            _screens.CancelIgnored += OnCancelIgnored;
+            _screens.Navigated += OnNavigated;
         }
 
         private void OnDestroy()
@@ -55,16 +64,28 @@ namespace VoxelMagic.UI
                 _channel.Started -= OnStarted;
                 _channel.PreviewExpressionRequested -= OnPreviewExpression;
             }
-            if (_screens != null) _screens.Submitted -= OnSubmit;
+            if (_screens != null)
+            {
+                _screens.Submitted -= OnSubmit;
+                _screens.CancelIgnored -= OnCancelIgnored;
+                _screens.Navigated -= OnNavigated;
+            }
         }
 
         private void OnStarted()
         {
             if (this == null) { OnDestroy(); return; } // 꺼진 채 씬이 내려간 구독자
             _lines = _channel.Lines;
+            _options = _channel.Options;
             _index = 0;
             _lastInputFrame = Time.frameCount; // 대사를 연 그 입력(E)이 바로 진행으로 이어지지 않게
-            _screens.Open(GameScreen.Dialogue);
+            // 이전 대사·선택지에서 이어지면 창은 열린 그대로 다음 내용만 보여 준다.
+            if (IsShown)
+            {
+                LayoutText();
+                ShowLine();
+            }
+            else _screens.Open(GameScreen.Dialogue);
         }
 
         protected override void OnShown()
@@ -83,7 +104,52 @@ namespace VoxelMagic.UI
 
         public void OnPointerClick(PointerEventData eventData)
         {
-            if (eventData.button == PointerEventData.InputButton.Left) Advance();
+            // 선택지가 떠 있을 때 패널 빈 곳 클릭은 무시한다(선택지 줄을 눌러야 고름).
+            if (eventData.button == PointerEventData.InputButton.Left && !_choicesShown) Advance();
+        }
+
+        // ESC: 대사창은 닫히지 않는다. 선택지에 "그만두기·돌아가기"가 정해져 있으면 그것을 고른다.
+        private void OnCancelIgnored()
+        {
+            if (this == null) { OnDestroy(); return; }
+            if (!IsShown || _screens.Top != GameScreen.Dialogue || !Asking || _channel.CancelOption < 0) return;
+            Choose(_channel.CancelOption);
+        }
+
+        // W/S·↑/↓: 선택지 사이를 한 칸씩 (끝에서 처음으로 돈다).
+        private void OnNavigated(int step)
+        {
+            if (this == null) { OnDestroy(); return; }
+            if (!IsShown || !_choicesShown || _screens.Top != GameScreen.Dialogue) return;
+            int count = _options.Count;
+            Select(((_selected + step) % count + count) % count);
+        }
+
+        private void Select(int index)
+        {
+            _selected = index;
+            for (int i = 0; i < _rows.Count; i++) _rows[i].SetSelected(i == index);
+        }
+
+        private void Choose(int index)
+        {
+            if (!Asking || index < 0 || index >= _options.Count) return;
+            _lastInputFrame = Time.frameCount;
+            HideChoices();
+            _lines = null;
+            _options = System.Array.Empty<DialogueOption>();
+            _channel.Choose(index); // 콜백이 다음 대사·선택지를 열면 OnStarted로 이어진다
+            if (!_channel.IsPlaying) _screens.Close(GameScreen.Dialogue);
+        }
+
+        private void OnRowHovered(DialogueChoiceRow row)
+        {
+            if (_choicesShown) Select(row.Index);
+        }
+
+        private void OnRowClicked(DialogueChoiceRow row)
+        {
+            if (_choicesShown && Time.frameCount != _lastInputFrame) Choose(row.Index);
         }
 
         // 개발용(치트 키): 지금 화자의 기본 → 표정 목록 순서로 초상화만 바꿔 본다. 다음 대사로 넘어가면 그 줄의 표정으로 돌아간다.
@@ -120,6 +186,11 @@ namespace VoxelMagic.UI
                 Complete();
                 return;
             }
+            if (Asking)
+            {
+                Choose(_selected); // Space/E = 지금 고른 선택지
+                return;
+            }
             _index++;
             if (_index < _lines.Count)
             {
@@ -127,8 +198,8 @@ namespace VoxelMagic.UI
                 return;
             }
             _lines = null;
-            _screens.Close(GameScreen.Dialogue);
-            _channel.Finish();
+            _channel.Finish(); // 결과 반영. 콜백이 다음 대사·선택지를 열면 창은 그대로 이어진다
+            if (!_channel.IsPlaying) _screens.Close(GameScreen.Dialogue);
         }
 
         private void ShowLine()
@@ -143,12 +214,15 @@ namespace VoxelMagic.UI
             _previewExpression = ExpressionIndex(line.Speaker, line.Expression);
             FitName(line.Speaker != null ? line.Speaker.DisplayName : string.Empty, values);
 
+            HideChoices();
+            var area = Asking ? values.ChoicePromptArea : values.TextArea;
+            int maxLines = Asking ? 1 : values.MaxLines;
             var label = _text.GetComponent<TMP_Text>();
-            string wrapped = UiTextWrap.ByWords(label, line.Text ?? string.Empty, values.TextArea.width);
+            string wrapped = UiTextWrap.ByWords(label, line.Text ?? string.Empty, area.width);
             _text.SetText(wrapped);
             label.ForceMeshUpdate();
-            if (label.textInfo.lineCount > values.MaxLines)
-                Debug.LogWarning($"[UI] 대사가 {values.MaxLines}줄을 넘습니다({label.textInfo.lineCount}줄). 대사를 나누세요: {line.Text}");
+            if (label.textInfo.lineCount > maxLines)
+                Debug.LogWarning($"[UI] {(Asking ? "선택지 질문" : "대사")}이 {maxLines}줄을 넘습니다({label.textInfo.lineCount}줄): {line.Text}");
             _total = label.textInfo.characterCount;
             _visible = 0f;
             label.maxVisibleCharacters = 0;
@@ -160,9 +234,59 @@ namespace VoxelMagic.UI
         {
             _phase = Phase.Complete;
             _text.GetComponent<TMP_Text>().maxVisibleCharacters = _total;
+            if (Asking)
+            {
+                _nextArrow.enabled = false;
+                ShowChoices();
+                return;
+            }
             _arrowTime = 0f;
             _nextArrow.enabled = _nextArrow.sprite != null;
             PlaceArrow(0);
+        }
+
+        // 질문을 다 보여 준 뒤 선택지 줄을 놓는다 (패널 기준 1배 px). 첫 줄을 고른 상태로 시작.
+        private void ShowChoices()
+        {
+            var values = _theme.Dialogue;
+            if (_options.Count > values.MaxChoices)
+                Debug.LogWarning($"[UI] 선택지가 {values.MaxChoices}줄을 넘습니다({_options.Count}개). 패널 밖으로 나갈 수 있습니다.");
+            int panelX = PanelX(values);
+            var prompt = values.ChoicePromptArea;
+            for (int i = 0; i < _options.Count; i++)
+            {
+                var row = Row(i);
+                row.Index = i;
+                row.gameObject.SetActive(true);
+                var option = _options[i];
+                var rect = new RectInt(panelX + prompt.x, values.ChoiceTop + i * values.ChoiceRowHeight, prompt.width, values.ChoiceRowHeight);
+                row.Setup(values, option.Label, option.Detail, option.Dimmed, rect);
+            }
+            _choicesShown = true;
+            Select(0);
+        }
+
+        private void HideChoices()
+        {
+            _choicesShown = false;
+            foreach (var row in _rows)
+            {
+                row.SetSelected(false);
+                row.gameObject.SetActive(false);
+            }
+        }
+
+        private DialogueChoiceRow Row(int index)
+        {
+            while (_rows.Count <= index)
+            {
+                var row = Instantiate(_choiceRowTemplate, _choiceRowTemplate.transform.parent);
+                row.name = $"Choice{_rows.Count}";
+                row.Hovered += OnRowHovered;
+                row.Clicked += OnRowClicked;
+                _rows.Add(row);
+            }
+            return _rows[index];
         }
 
         private void Update()
@@ -224,13 +348,23 @@ namespace VoxelMagic.UI
             }
             SetImage(_portrait, _portrait.sprite, values.PortraitPosition.x, values.PortraitPosition.y, values.PortraitSize, raycast: false);
             SetImage(_leftColumn, values.LeftColumn, 0, 0, column, raycast: true);
-            var area = values.TextArea;
-            PixelLayout.PlaceTopLeft((RectTransform)_text.transform, panelX + area.x, area.y, area.width, area.height);
+            LayoutText();
+            if (_choiceRowTemplate != null) _choiceRowTemplate.gameObject.SetActive(false);
             var arrow = Size(values.NextArrow, values.ArrowSize);
             _nextArrow.sprite = values.NextArrow;
             _nextArrow.raycastTarget = false;
             _nextArrow.rectTransform.sizeDelta = arrow;
         }
+
+        // 본문 칸: 대사면 3줄 칸, 선택지면 질문 한 줄 칸.
+        private void LayoutText()
+        {
+            var values = _theme.Dialogue;
+            var area = Asking ? values.ChoicePromptArea : values.TextArea;
+            PixelLayout.PlaceTopLeft((RectTransform)_text.transform, PanelX(values) + area.x, area.y, area.width, area.height);
+        }
+
+        private static int PanelX(DialogueValues values) => Size(values.LeftColumn, values.LeftColumnSize).x - values.Overlap;
 
         private void PlaceArrow(int bob)
         {

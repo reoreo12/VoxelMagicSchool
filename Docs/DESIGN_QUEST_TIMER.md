@@ -126,7 +126,7 @@
 | 이름 | 종류 | 역할 |
 |---|---|---|
 | `RequestBoardWindow`·`RequestEntryView` | 수정 | 오늘의 3개, 거절 이유, 씨앗 다시 받기 |
-| `DeliveryChoiceWindow` | 새로(임시) | 완료 가능 의뢰 고르기 창 (`GameScreen.DeliveryChoice`, 게임 시계만 멈춤) |
+| `DeliveryChoiceWindow` | 새로(임시) → **삭제(2026-11-26)** | 완료 가능 의뢰 고르기 창. 대사창 안 선택지(`DialogueChannel.Ask`, UI_SPEC 6-4)로 바뀜 |
 | `ConfirmDialog` | 새로(임시) | 예/아니요 확인 창 (`GameScreen.Confirm`). 포기에 처음 쓰고 책 메뉴 확인 창에도 재사용 |
 | `QuestBookPage` | 수정 | 임시 `포기` 버튼 |
 | `TimeHudView` | 수정 | Core 날짜·경고 구독 |
@@ -254,7 +254,7 @@ InteractableBase (기존 추상, IInteractable)
 | `RequestLog` | `RequestBecameComplete` (기존) | 완료 알림 `QuestToastView` |
 | `RequestLog` | `Delivered(DeliveryReport)` | 점수 연출, `DayFlow`(1일 튜토리얼 끝 판단) |
 | `RequestLog` | `Abandoned(AcceptedRequest)` | 토스트 |
-| `DeliverySession` | `StepChanged` (고르기 / 대사 / 끝) | `CreatureNpc`, `DeliveryChoiceWindow` |
+| `DeliverySession` | `StepChanged` (고르기 / 대사 / 끝) | `CreatureNpc`(고르기도 대사창 선택지로) |
 | `GatherDayState` | `Changed` | `GatherHabitat`/`GatherPickup` 보이기, `DebugOverlay` |
 | `FarmGrid` | `PlotChanged` (기존, 하루 성장 때도) | `FarmFieldView`·`CropView` |
 | `TutorialMode` | `Changed`, `StepChanged(허용 활동)` | `DayFlow`(시계 정지 원인), `FarmField`·`FishingDriver`·`GatherPickup`(잠금 안내) |

@@ -300,6 +300,8 @@ namespace VoxelMagic.UI
         // 포기 버튼(임시): 보상 글자를 복제해 버튼을 붙인다. 정식 디자인은 책 의뢰 상세 페이지 작업에서.
         private void EnsureAbandon()
         {
+            // 편집 모드에서 만들면 프리팹·씬을 저장할 때마다 복제본이 쌓인다 → 플레이 중에만 만든다.
+            if (!Application.isPlaying) return;
             if (_abandon == null && _rewardLabel != null)
             {
                 _abandon = Instantiate(_rewardLabel, _rewardLabel.transform.parent);

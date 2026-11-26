@@ -30,6 +30,7 @@ namespace VoxelMagic.Tools.EditorTools.UiWorkbench
             AddToAtlas();
             var theme = UiWidgetPresetBuilder.FillThemeDefaults();
             theme.Dialogue.SetSprites(Load("dialogue_panel.png"), Load("dialogue_left_column.png"), Load("dialogue_next_arrow.png"), Load("portrait_placeholder_56.png"));
+            theme.Dialogue.SetChoiceCursor(Load("dialogue_choice_cursor.png"));
             EditorUtility.SetDirty(theme);
             AssetDatabase.SaveAssets();
 
@@ -68,6 +69,7 @@ namespace VoxelMagic.Tools.EditorTools.UiWorkbench
             nameBold.gameObject.SetActive(false);
             var text = Text(frame.transform, "Text", UiTextStyle.Body, theme, TextAlignmentOptions.TopLeft, true);
             var arrow = NewImage(frame.transform, "NextArrow");
+            var choiceRow = BuildChoiceRow(frame.transform, theme);
 
             var window = root.AddComponent<DialogueWindow>();
             var so = new SerializedObject(window);
@@ -82,8 +84,30 @@ namespace VoxelMagic.Tools.EditorTools.UiWorkbench
             so.FindProperty("_nameBold").objectReferenceValue = nameBold;
             so.FindProperty("_text").objectReferenceValue = text;
             so.FindProperty("_nextArrow").objectReferenceValue = arrow;
+            so.FindProperty("_choiceRowTemplate").objectReferenceValue = choiceRow;
             so.ApplyModifiedPropertiesWithoutUndo();
             return root;
+        }
+
+        // 선택지 한 줄 원본(6-4): 묶음 전체를 덮는 빈 칸 안에 투명 판·글자·오른쪽 작은 글자·커서. 좌표는 묶음(패널 기준) 그대로 쓴다.
+        private static DialogueChoiceRow BuildChoiceRow(Transform parent, UiTheme theme)
+        {
+            var go = new GameObject("ChoiceRow", typeof(RectTransform));
+            go.transform.SetParent(parent, false);
+            PixelLayout.Stretch((RectTransform)go.transform);
+            var hit = NewImage(go.transform, "Hit");
+            var label = Text(go.transform, "Label", UiTextStyle.Body, theme, TextAlignmentOptions.TopLeft, false);
+            var detail = Text(go.transform, "Detail", UiTextStyle.Small, theme, TextAlignmentOptions.TopRight, false);
+            var cursor = NewImage(go.transform, "Cursor");
+            var row = go.AddComponent<DialogueChoiceRow>();
+            var so = new SerializedObject(row);
+            so.FindProperty("_hitArea").objectReferenceValue = hit;
+            so.FindProperty("_label").objectReferenceValue = label;
+            so.FindProperty("_detail").objectReferenceValue = detail;
+            so.FindProperty("_cursor").objectReferenceValue = cursor;
+            so.ApplyModifiedPropertiesWithoutUndo();
+            go.SetActive(false);
+            return row;
         }
 
         private static void InsertIntoRoot(GameObject prefab)

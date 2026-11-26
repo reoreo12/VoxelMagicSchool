@@ -20,15 +20,38 @@ namespace VoxelMagic.Core
         public string Expression { get; }
     }
 
+    /// <summary>대사창 안 선택지 하나: 글자, 오른쪽 작은 글자(보상 등, 비워도 됨), 흐리게(지금은 안 되는 것, 그래도 고를 수 있음).</summary>
+    public readonly struct DialogueOption
+    {
+        public DialogueOption(string label, string detail = null, bool dimmed = false)
+        {
+            Label = label;
+            Detail = detail;
+            Dimmed = dimmed;
+        }
+
+        public string Label { get; }
+        public string Detail { get; }
+        public bool Dimmed { get; }
+    }
+
     public sealed class DialogueChannel
     {
+        private static readonly DialogueOption[] NoOptions = Array.Empty<DialogueOption>();
+
         private Action _onFinished;
         private Action _onAborted;
+        private Action<int> _onChosen;
 
         /// <summary>대사를 보여 줄 UI가 이 씬에 있는지 (없으면 Gameplay가 결과를 바로 반영한다).</summary>
         public bool HasPresenter { get; private set; }
         public bool IsPlaying { get; private set; }
         public IReadOnlyList<DialogueLine> Lines { get; private set; } = Array.Empty<DialogueLine>();
+        /// <summary>선택지 (Ask일 때만, 대사만 있을 때는 빈 목록). 질문은 Lines[0].</summary>
+        public IReadOnlyList<DialogueOption> Options { get; private set; } = NoOptions;
+        /// <summary>ESC로 고를 선택지 (없으면 −1, ESC 무시).</summary>
+        public int CancelOption { get; private set; } = -1;
+        public bool IsAsking => IsPlaying && Options.Count > 0;
 
         /// <summary>새 대사가 시작될 때 (UI 대사창이 받아 화면을 연다).</summary>
         public event Action Started;
@@ -56,10 +79,36 @@ namespace VoxelMagic.Core
             return true;
         }
 
+        /// <summary>
+        /// 질문 한 줄 뒤에 선택지를 보여 준다(같은 대사창 안). 고르면 onChosen(번호). cancelOption은 ESC로 고를 번호(−1이면 ESC 무시).
+        /// 이전 대사의 끝 콜백 안에서 부르면 대사창이 닫히지 않고 이어진다. 이미 재생 중이거나 선택지가 없으면 false.
+        /// </summary>
+        public bool Ask(DialogueLine prompt, IReadOnlyList<DialogueOption> options, Action<int> onChosen, int cancelOption = -1, Action onAborted = null)
+        {
+            if (IsPlaying || options == null || options.Count == 0) return false;
+            Lines = new[] { prompt };
+            Options = options;
+            CancelOption = cancelOption >= 0 && cancelOption < options.Count ? cancelOption : -1;
+            _onChosen = onChosen;
+            _onAborted = onAborted;
+            IsPlaying = true;
+            Started?.Invoke();
+            return true;
+        }
+
+        /// <summary>UI가 선택지를 고르면 부른다. 콜백 안에서 다음 대사·선택지를 이어 열 수 있다.</summary>
+        public void Choose(int index)
+        {
+            if (!IsAsking || index < 0 || index >= Options.Count) return;
+            var chosen = _onChosen;
+            Clear();
+            chosen?.Invoke(index);
+        }
+
         /// <summary>마지막 대사까지 본 뒤 UI가 부른다. 여기서 대사 결과를 한 번에 반영한다.</summary>
         public void Finish()
         {
-            if (!IsPlaying) return;
+            if (!IsPlaying || IsAsking) return;
             var done = _onFinished;
             Clear();
             done?.Invoke();
@@ -79,7 +128,10 @@ namespace VoxelMagic.Core
             IsPlaying = false;
             _onFinished = null;
             _onAborted = null;
+            _onChosen = null;
             Lines = Array.Empty<DialogueLine>();
+            Options = NoOptions;
+            CancelOption = -1;
         }
     }
 }

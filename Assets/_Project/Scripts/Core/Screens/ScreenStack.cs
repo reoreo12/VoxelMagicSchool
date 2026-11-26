@@ -21,6 +21,10 @@ namespace VoxelMagic.Core
         public event Action MenuRequested;
         /// <summary>화면이 열린 상태에서 E/Space를 누름 (대사 넘기기 등).</summary>
         public event Action Submitted;
+        /// <summary>ESC를 눌렀지만 맨 위 화면이 ESC로 닫히지 않는 화면일 때 (대사창 선택지의 "그만두기" 등).</summary>
+        public event Action CancelIgnored;
+        /// <summary>화면이 열린 상태에서 위(−1)·아래(+1) 이동 키 (선택지 고르기).</summary>
+        public event Action<int> Navigated;
 
         public int Count => _stack.Count;
         public bool HasAny => _stack.Count > 0;
@@ -86,6 +90,7 @@ namespace VoxelMagic.Core
         {
             if (!HasAny) return false;
             if (PolicyOf(Top).ClosesOnCancel) Close(Top);
+            else CancelIgnored?.Invoke();
             return true;
         }
 
@@ -97,6 +102,11 @@ namespace VoxelMagic.Core
         public void Submit()
         {
             if (HasAny) Submitted?.Invoke();
+        }
+
+        public void Navigate(int step)
+        {
+            if (HasAny && step != 0) Navigated?.Invoke(step > 0 ? 1 : -1);
         }
     }
 }

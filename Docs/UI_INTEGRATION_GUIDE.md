@@ -110,7 +110,9 @@ GameBootstrap (씬마다, Gameplay)
 | 대사창 UI가 없는 씬 | `HasPresenter`가 false면 대사 없이 결과를 바로 반영한다. 초상화 없는 대사는 이 창이 아니라 머리 위 말풍선(아직 없음) |
 | UI 코드 | `UI/Dialog/DialogueWindow`(UiScreen, Popup 층 `UI_Dialogue`): 패널(320×96) → 초상화(72×72) → 왼쪽 열(80×96) → 이름 → 본문 → ▼. 4px 겹쳐 396×96, 1.25배(495×120, 사용자 결정), 화면 아래 가운데. ▼는 글자판 오른쪽·아래 여백 8 타이핑 `maxVisibleCharacters`(초당 30자, unscaled), 같은 프레임 중복 입력 무시, 클릭·Space·E로 진행. 본문 낱말 단위 줄바꿈, 3줄 넘으면 콘솔 경고 |
 | 이름 맞춤 | 갈무리11 Bold 12px(4자) → 갈무리9 10px(5자) → 갈무리7 8px(7자) 순으로 이름표 폭 72에 맞추고(6자 / 7자 / 9자까지), 세로는 실제 글자 모양(글리프) 기준으로 크림색 줄(4,79,72×13) 가운데, 작은 글씨는 1px 겹쳐 굵게. 그래도 넘치면 `…`. 테마 `Dialogue › Name Styles` |
-| 테마 | `Dialogue`(배수, 아래 여백, 겹침 4, 초상화 위치·**크기**, 이름표·본문·▼ 위치, 그림이 없을 때 쓸 왼쪽 열·패널·▼ 크기, 타이핑 속도, 열기 페이드 0.12초·6px). 그림 크기를 바꾸면 이 값들을 함께 고치고 메뉴 `화면 만들기/대사창`을 다시 실행 |
+| 선택지(6-4) | `context.Dialogue.Ask(질문 줄, DialogueOption 목록, 고른 뒤(번호), ESC 번호)`. `DialogueOption(글자, 오른쪽 작은 글자, 흐리게)`. 고른 뒤 콜백·대사 끝 콜백 안에서 다음 `Play`/`Ask`를 부르면 대사창이 닫히지 않고 이어진다. 아무것도 열지 않으면 닫힌다. 입력: 화면이 열려 있으면 `GameInputReader`가 이동 키를 `Screens.Navigate(±1)`로, 닫히지 않는 화면의 ESC는 `Screens.CancelIgnored`로 보낸다 |
+| 크리처 대화 | `CreatureNpc`(Gameplay): 메뉴 → 이야기(화자 `SmallTalk`)·과외(임시 대사, **과외 시스템이 생기면 `Conversation.OnMenu`의 MenuLesson에서 연다**)·의뢰 전달(`DeliverySession` 단계를 `Ask`/`Play`로)·그만두기. 대사창·화자가 없는 씬은 메뉴 없이 바로 전달. 치트 `CreatureNpc.StartDelivery`는 메뉴 없이 전달부터 |
+| 테마 | `Dialogue`(배수, 아래 여백, 겹침 4, 초상화 위치·**크기**, 이름표·본문·▼ 위치, 그림이 없을 때 쓸 왼쪽 열·패널·▼ 크기, 타이핑 속도, 열기 페이드 0.12초·6px, 선택지 칸·줄 간격·들여쓰기·커서·색). 그림 크기를 바꾸면 이 값들을 함께 고치고 메뉴 `화면 만들기/대사창`을 다시 실행 |
 | 옛 코드 | `CreatureDialogView`는 아무것도 하지 않게 비워 둠(씬에 남아 있음, 옛 UI 정리 때 삭제). `GameMessages.CreatureSpeechRequested`는 더 쓰지 않음 |
 
 ### 2-9. 그 밖의 HUD
