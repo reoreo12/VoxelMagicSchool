@@ -90,7 +90,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _theme: {fileID: 11400000, guid: f6db092f61fdbe44cb90182b19acc88f, type: 2}
   _skin: 5
-  _raycastTarget: 0
+  _raycastTarget: 1
 --- !u!1 &7860665983263631765
 GameObject:
   m_ObjectHideFlags: 0
@@ -183,7 +183,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _theme: {fileID: 11400000, guid: f6db092f61fdbe44cb90182b19acc88f, type: 2}
   _skin: 4
-  _raycastTarget: 0
+  _raycastTarget: 1
 --- !u!114 &8427966576507473865
 MonoBehaviour:
   m_ObjectHideFlags: 0

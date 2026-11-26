@@ -1,5 +1,5 @@
 // 책의 의뢰 목록 탭(사용자 결정 2026-11-20, UI_SPEC 10-5를 대신함): 왼쪽 페이지는 수락한 의뢰 버튼 목록 + "화면에 의뢰 목록 표시" 토글,
-// 오른쪽 페이지는 고른 의뢰의 제목·크리처 대사·필요한 재료·보상 한 줄 + 임시 "포기" 버튼(확인 창 뒤 RequestLog.Abandon). 정렬과 완료 색은 HUD 드롭다운과 같다.
+// 오른쪽 페이지는 고른 의뢰의 제목·구분선·크리처 대사·필요한 재료·보상 한 줄 + 임시 "포기" 버튼(확인 창 뒤 RequestLog.Abandon). 정렬과 완료 색은 HUD 드롭다운과 같다.
 using System.Collections.Generic;
 using System.Text;
 using TMPro;
@@ -23,13 +23,13 @@ namespace VoxelMagic.UI
 
         [Header("오른쪽 페이지")]
         [SerializeField] private ThemedText _title;
+        [SerializeField, Tooltip("제목 아래 구분선")] private Image _titleLine;
         [SerializeField] private ThemedText _line;
         [SerializeField] private ThemedText _needsLabel;
         [SerializeField] private ThemedText _needs;
         [SerializeField] private ThemedText _rewardLabel;
         [SerializeField] private ThemedText _reward;
-        [Tooltip("비우면 보상 글자를 복제해 오른쪽 아래에 만든다 (임시)")]
-        [SerializeField] private ThemedText _abandon;
+        private BookTextButton _abandon; // 플레이 중에 보상 글자를 복제해 오른쪽 아래에 만든다 (임시)
 
         private static readonly StringBuilder Lines = new StringBuilder();
         private readonly List<AcceptedRequestEntry> _sorted = new List<AcceptedRequestEntry>();
@@ -87,6 +87,7 @@ namespace VoxelMagic.UI
         {
             if (_scrollbar != null)
             {
+                ThemedPanel.EnableScrollbarInput(_scrollbar);
                 _scrollbar.onValueChanged.RemoveListener(OnScrollbar);
                 _scrollbar.onValueChanged.AddListener(OnScrollbar);
             }
@@ -222,43 +223,50 @@ namespace VoxelMagic.UI
             SetScroll(_scroll - steps * Theme.Book.RowHeight);
         }
 
-        // 오른쪽 페이지: 제목(굵게) → 대사(줄바꿈) → "필요한 재료" + 재료 줄 → "보상 필기 점수 +n".
+        // 오른쪽 페이지: 제목(12 굵게) → 구분선 → 대사(내용 글자, 둘째 줄부터 여는 따옴표만큼 들여씀) → 소제목 "필요한 재료" + 재료 줄 → "보상" + 값.
+        // 글자 크기는 테마 Book: 제목 > 소제목(10, 1px 겹쳐 굵게) > 내용(8).
         private void LayoutRight(UiTheme theme)
         {
             var values = theme.Book;
             bool has = _selected != null;
             EnsureAbandon();
-            foreach (var t in new[] { _title, _line, _needsLabel, _needs, _rewardLabel, _reward, _abandon })
+            foreach (var t in new[] { _title, _line, _needsLabel, _needs, _rewardLabel, _reward })
                 if (t != null && t.gameObject.activeSelf != has) t.gameObject.SetActive(has);
+            if (_abandon != null && _abandon.gameObject.activeSelf != has) _abandon.gameObject.SetActive(has);
+            if (_titleLine != null && _titleLine.gameObject.activeSelf != has) _titleLine.gameObject.SetActive(has);
             if (!has) return;
 
             var texts = theme.Texts;
             int width = RightSize.x;
-            int bold = LineOf(theme, UiTextStyle.BodyBold);
-            int body = LineOf(theme, UiTextStyle.Body);
+            int titleLine = LineOf(theme, values.DetailTitleStyle);
+            int labelLine = LineOf(theme, values.DetailLabelStyle);
+            int body = LineOf(theme, values.DetailBodyStyle);
             var completed = theme.QuestList.CompletedColor;
             int y = 0;
 
-            _title.SetStyle(UiTextStyle.BodyBold);
+            _title.SetStyle(values.DetailTitleStyle);
             _title.SetText(_selected.Title);
             _title.SetColorOverride(_selected.IsComplete, completed);
-            PixelLayout.PlaceTopLeft((RectTransform)_title.transform, 0, y, width, bold);
-            y += bold + values.TitleGap;
+            PixelLayout.PlaceTopLeft((RectTransform)_title.transform, 0, y, width, titleLine);
+            y += titleLine + values.TitleLineGap;
+            SetLine(_titleLine, values.LineColor, 0, y, width);
+            y += 1 + values.TitleGap;
 
-            _line.SetStyle(UiTextStyle.Body);
+            _line.SetStyle(values.DetailBodyStyle);
             string line = _selected.Request != null ? _selected.Request.CreatureLine : string.Empty;
             var lineLabel = _line.GetComponent<TMP_Text>();
-            string quoted = texts != null ? string.Format(texts.Get(UiTextKeys.BookQuestLine), line) : line;
-            _line.SetText(UiTextWrap.ByWords(lineLabel, quoted, width)); // 낱말 단위 줄바꿈
+            _line.SetText(HangingQuote(lineLabel, texts, line, width));
             int lineHeight = Mathf.Max(body, Mathf.CeilToInt(lineLabel.GetPreferredValues(lineLabel.text, width, 0f).y));
             lineHeight = Mathf.CeilToInt(lineHeight / (float)body) * body; // 줄 높이의 정수 배
             PixelLayout.PlaceTopLeft((RectTransform)_line.transform, 0, y, width, lineHeight);
             y += lineHeight + values.SectionGap;
 
-            _needsLabel.SetStyle(UiTextStyle.BodyBold);
-            if (texts != null) _needsLabel.SetText(texts.Get(UiTextKeys.BookQuestNeeds));
-            PixelLayout.PlaceTopLeft((RectTransform)_needsLabel.transform, 0, y, width, bold);
-            y += bold;
+            string needsText = texts != null ? texts.Get(UiTextKeys.BookQuestNeeds) : "필요한 재료";
+            _needsLabel.SetStyle(values.DetailLabelStyle);
+            _needsLabel.SetText(PixelBold(needsText, values.DetailLabelPixelBold));
+            int section = values.SectionIndent;
+            PixelLayout.PlaceTopLeft((RectTransform)_needsLabel.transform, section, y, width - section, labelLine);
+            y += labelLine + values.LabelGap;
 
             Lines.Clear();
             string format = texts != null ? texts.Get(UiTextKeys.QuestRequirement) : "{0} {1}/{2}";
@@ -268,49 +276,69 @@ namespace VoxelMagic.UI
                 if (i > 0) Lines.Append('\n');
                 Lines.AppendFormat(format, r.Item != null ? r.Item.DisplayName : "?", Mathf.Min(r.Current, r.Required), r.Required);
             }
-            _needs.SetStyle(UiTextStyle.Body);
+            _needs.SetStyle(values.DetailBodyStyle);
             _needs.SetText(Lines.ToString());
             _needs.SetColorOverride(_selected.IsComplete, completed);
             int needsHeight = Mathf.Max(1, _selected.Requirements.Count) * body;
-            PixelLayout.PlaceTopLeft((RectTransform)_needs.transform, values.RequirementIndent, y, width - values.RequirementIndent, needsHeight);
+            int needsX = section + values.RequirementIndent; // 재료 줄은 소제목 기준으로 더 들여씀
+            PixelLayout.PlaceTopLeft((RectTransform)_needs.transform, needsX, y, width - needsX, needsHeight);
             y += needsHeight + values.SectionGap;
 
-            _rewardLabel.SetStyle(UiTextStyle.BodyBold);
-            if (texts != null) _rewardLabel.SetText(texts.Get(UiTextKeys.BookQuestReward));
+            // "보상"과 값은 한 줄: 크기가 달라 아래 끝을 맞춘다.
+            string rewardText = texts != null ? texts.Get(UiTextKeys.BookQuestReward) : "보상";
+            _rewardLabel.SetStyle(values.DetailLabelStyle);
+            _rewardLabel.SetText(PixelBold(rewardText, values.DetailLabelPixelBold));
             var rewardLabel = _rewardLabel.GetComponent<TMP_Text>();
-            int labelWidth = Mathf.CeilToInt(rewardLabel.GetPreferredValues(rewardLabel.text).x);
-            PixelLayout.PlaceTopLeft((RectTransform)_rewardLabel.transform, 0, y, labelWidth, bold);
-            _reward.SetStyle(UiTextStyle.Body);
+            int labelWidth = Mathf.CeilToInt(rewardLabel.GetPreferredValues(rewardText).x) + (values.DetailLabelPixelBold ? 1 : 0);
+            PixelLayout.PlaceTopLeft((RectTransform)_rewardLabel.transform, section, y, labelWidth, labelLine);
+            _reward.SetStyle(values.DetailBodyStyle);
             int reward = _requests != null ? _requests.ExpectedReward(_selected) : 0;
             _reward.SetText(texts != null ? string.Format(texts.Get(UiTextKeys.BookQuestRewardValue), reward) : reward.ToString());
-            int rewardX = labelWidth + values.RewardGap;
-            PixelLayout.PlaceTopLeft((RectTransform)_reward.transform, rewardX, y, width - rewardX, body);
+            int rewardX = section + labelWidth + values.RewardGap;
+            PixelLayout.PlaceTopLeft((RectTransform)_reward.transform, rewardX, y + Mathf.Max(0, labelLine - body), width - rewardX, body);
 
-            if (_abandon != null)
-            {
-                _abandon.SetStyle(UiTextStyle.BodyBold);
-                _abandon.SetText($"<u>{GameTexts.AbandonButton}</u>");
-                var label = _abandon.GetComponent<TMP_Text>();
-                label.raycastTarget = true; // 글자 자체가 버튼
-                int abandonWidth = Mathf.CeilToInt(label.GetPreferredValues(GameTexts.AbandonButton).x) + 4;
-                PixelLayout.PlaceTopLeft((RectTransform)_abandon.transform, width - abandonWidth, RightSize.y - bold, abandonWidth, bold);
-            }
+            if (_abandon != null) _abandon.Layout(GameTexts.AbandonButton, theme, width, RightSize.y);
         }
 
-        // 포기 버튼(임시): 보상 글자를 복제해 버튼을 붙인다. 정식 디자인은 책 의뢰 상세 페이지 작업에서.
+        // 대사를 따옴표로 감싸고 낱말 단위로 줄바꿈한다. 둘째 줄부터는 여는 따옴표 폭만큼 들여써 글자가 첫 줄 글자 아래에 온다.
+        private static string HangingQuote(TMP_Text label, ITextSource texts, string line, int width)
+        {
+            string format = texts != null ? texts.Get(UiTextKeys.BookQuestLine) : "“{0}”";
+            int at = format.IndexOf("{0}", System.StringComparison.Ordinal);
+            if (at < 0) return UiTextWrap.ByWords(label, string.Format(format, line), width);
+            string open = format.Substring(0, at);
+            string close = format.Substring(at + 3);
+            int indent = open.Length > 0 ? Mathf.CeilToInt(label.GetPreferredValues(open).x) : 0;
+            string wrapped = UiTextWrap.ByWords(label, line + close, width - indent);
+            return indent > 0 ? $"{open}<indent={indent}>{wrapped}</indent>" : wrapped;
+        }
+
+        // 굵은체가 없는 픽셀 글꼴: 같은 글자를 높이 0인 줄 + 1px 들여쓴 줄로 겹쳐 그려 굵게 보이게 한다.
+        private static string PixelBold(string text, bool on) =>
+            on ? $"<line-height=0>{text}\n</line-height><indent=1>{text}</indent>" : text;
+
+        // 포기 버튼(임시): 책 글자 버튼(평소 글자만, 마우스 올림·누름에 바탕)을 만든다. 정식 디자인은 책 의뢰 상세 페이지 작업에서.
         private void EnsureAbandon()
         {
             // 편집 모드에서 만들면 프리팹·씬을 저장할 때마다 복제본이 쌓인다 → 플레이 중에만 만든다.
-            if (!Application.isPlaying) return;
-            if (_abandon == null && _rewardLabel != null)
-            {
-                _abandon = Instantiate(_rewardLabel, _rewardLabel.transform.parent);
-                _abandon.name = "AbandonButton";
-            }
-            if (_abandon == null || _abandon.GetComponent<Button>() != null) return;
-            var button = _abandon.gameObject.AddComponent<Button>();
-            button.targetGraphic = _abandon.GetComponent<TMP_Text>();
-            button.onClick.AddListener(OnAbandonClicked);
+            if (!Application.isPlaying || _abandon != null || _rewardLabel == null || Theme == null) return;
+            var go = new GameObject("AbandonButton", typeof(RectTransform), typeof(CanvasRenderer), typeof(Image));
+            go.transform.SetParent(_rewardLabel.transform.parent, false);
+            var hit = go.GetComponent<Image>();
+            hit.color = new Color(1f, 1f, 1f, 0f); // 누르기 영역(보이지 않음)
+            hit.raycastTarget = true;
+            var backgroundGo = new GameObject("Background", typeof(RectTransform), typeof(CanvasRenderer), typeof(Image));
+            backgroundGo.transform.SetParent(go.transform, false);
+            backgroundGo.GetComponent<Image>().raycastTarget = false;
+            var background = backgroundGo.AddComponent<ThemedPanel>();
+            background.SetTheme(Theme);
+            var label = Instantiate(_rewardLabel, go.transform);
+            label.name = "Label";
+            label.gameObject.SetActive(true); // 원본이 꺼져 있을 때 복제하면 꺼진 채로 온다
+            label.SetColorOverride(false, Color.clear);
+            _abandon = go.AddComponent<BookTextButton>();
+            _abandon.Init(background, label);
+            _abandon.Clicked += OnAbandonClicked;
         }
 
         private void OnAbandonClicked()

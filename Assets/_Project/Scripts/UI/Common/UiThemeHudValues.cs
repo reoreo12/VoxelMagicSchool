@@ -159,6 +159,10 @@ namespace VoxelMagic.UI
         [SerializeField, Tooltip("갈무리9에는 굵은체가 없어 제목을 1px 오른쪽에 한 번 더 그려 굵게 보이게 한다")] private bool _titlePixelBold = true;
         [SerializeField, Tooltip("재료 줄 글자 (갈무리9 10px)")] private UiTextStyle _requirementStyle = UiTextStyle.Small;
         [SerializeField, Tooltip("완료(납품 가능)한 의뢰 글자색 (13장 임시 #4A90C8)")] private Color _completedColor = new Color32(0x4A, 0x90, 0xC8, 0xFF);
+        [Header("마우스 올림 (누르면 책이 열린다)")]
+        [SerializeField, Tooltip("마우스를 올린 의뢰 글자색 (대사창 선택지와 같은 강조색)")] private Color _hoverColor = new Color32(0xC0, 0x60, 0x3A, 0xFF);
+        [SerializeField, Tooltip("누르는 동안 글자색")] private Color _pressedColor = new Color32(0x8E, 0x45, 0x27, 0xFF);
+        [SerializeField, Tooltip("마우스를 올린 의뢰 뒤 옅은 바탕 (반투명)")] private Color _hoverBacking = new Color32(191, 160, 112, 80);
 
         public int BarGap => _barGap;
         public int PaddingX => _paddingX;
@@ -173,6 +177,9 @@ namespace VoxelMagic.UI
         public bool TitlePixelBold => _titlePixelBold;
         public UiTextStyle RequirementStyle => _requirementStyle;
         public Color CompletedColor => _completedColor;
+        public Color HoverColor => _hoverColor;
+        public Color PressedColor => _pressedColor;
+        public Color HoverBacking => _hoverBacking;
     }
 
     /// <summary>의뢰 완료 알림 창(UI_SPEC 10-6, 13장 임시: 3초, 페이드, 여러 건은 하나씩).</summary>
@@ -229,9 +236,18 @@ namespace VoxelMagic.UI
         [SerializeField, Tooltip("칸 안 글자 왼쪽 여백")] private int _rowTextInset = 5;
         [SerializeField, Tooltip("머리(수락한 의뢰(n)) 아래 구분선까지")] private int _headerGap = 4;
         [SerializeField, Tooltip("체크 상자와 글자 사이")] private int _checkboxGap = 4;
-        [SerializeField, Tooltip("본문 제목 → 대사 사이")] private int _titleGap = 6;
+        [SerializeField, Tooltip("본문 제목 → 구분선 사이")] private int _titleLineGap = 3;
+        [SerializeField, Tooltip("구분선 → 대사 사이")] private int _titleGap = 6;
+        [SerializeField, Tooltip("오른쪽 본문 제목 글자 (갈무리11 굵게 12px)")] private UiTextStyle _detailTitleStyle = UiTextStyle.BodyBold;
+        [SerializeField, Tooltip("소제목 글자: 필요한 재료·보상 (갈무리9 10px)")] private UiTextStyle _detailLabelStyle = UiTextStyle.Small;
+        [SerializeField, Tooltip("갈무리9에는 굵은체가 없어 소제목을 1px 오른쪽에 한 번 더 그려 굵게 보이게 한다")] private bool _detailLabelPixelBold = true;
+        [SerializeField, Tooltip("내용 글자: 대사·재료·보상 값 (갈무리9 10px, 소제목과는 굵기로만 구분)")] private UiTextStyle _detailBodyStyle = UiTextStyle.Small;
+        [SerializeField, Tooltip("소제목 → 내용 사이")] private int _labelGap = 4;
+        [SerializeField, Tooltip("소제목·보상 줄 왼쪽 들여쓰기 (제목·대사 기준)")] private int _sectionIndent = 6;
+        [SerializeField, Tooltip("책 글자 버튼(포기 등) 글자")] private UiTextStyle _textButtonStyle = UiTextStyle.BodyBold;
+        [SerializeField, Tooltip("책 글자 버튼 바탕 안 글자 둘레 여백 (x 좌우, y 위아래, 테두리 1px 제외). 목록 칸과 같게 위아래 4")] private Vector2Int _textButtonPadding = new Vector2Int(5, 4);
         [SerializeField, Tooltip("본문 묶음 사이 (대사 → 재료 → 보상)")] private int _sectionGap = 10;
-        [SerializeField, Tooltip("재료 줄 들여쓰기")] private int _requirementIndent = 8;
+        [SerializeField, Tooltip("재료 줄 들여쓰기 (소제목 기준)")] private int _requirementIndent = 1;
         [SerializeField, Tooltip("'보상'과 값 사이")] private int _rewardGap = 8;
         [Header("장 표지 (고를 것이 없는 탭의 왼쪽 페이지)")]
         [SerializeField, Min(1), Tooltip("탭 아이콘 배수 (12×12 × 정수 배)")] private int _coverIconScale = 4;
@@ -290,6 +306,15 @@ namespace VoxelMagic.UI
         public int HeaderGap => _headerGap;
         public int CheckboxGap => _checkboxGap;
         public int TitleGap => _titleGap;
+        public int TitleLineGap => _titleLineGap;
+        public UiTextStyle DetailTitleStyle => _detailTitleStyle;
+        public UiTextStyle DetailLabelStyle => _detailLabelStyle;
+        public bool DetailLabelPixelBold => _detailLabelPixelBold;
+        public UiTextStyle DetailBodyStyle => _detailBodyStyle;
+        public int SectionIndent => _sectionIndent;
+        public UiTextStyle TextButtonStyle => _textButtonStyle;
+        public Vector2Int TextButtonPadding => _textButtonPadding;
+        public int LabelGap => _labelGap;
         public int SectionGap => _sectionGap;
         public int RequirementIndent => _requirementIndent;
         public int RewardGap => _rewardGap;

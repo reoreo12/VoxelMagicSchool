@@ -65,14 +65,14 @@ GameBootstrap (씬마다, Gameplay)
 | 포기 | `RequestLog.Abandon(id)`는 UI와 무관. 확인 창은 부르는 쪽이 `context.Confirm.Ask(문구, 예 콜백)`(Core `ConfirmChannel` → UI `ConfirmDialog`, `GameScreen.Confirm`). 지금은 책 의뢰 탭 오른쪽 아래 임시 `포기` 글자 버튼 |
 | 전달 | `context.Delivery`(`DeliverySession`): `Begin()` → `Choosing`(둘 이상) / `Talking` → `Choose(id)` → `CompleteTalk()` / `Cancel()`. 크리처(`CreatureNpc`)가 단계에 따라 고르기 창(`GameScreen.DeliveryChoice`, 임시 `DeliveryChoiceWindow`, 게임 시계만 멈춤)과 대사창을 띄움 |
 | 정렬(UI가 함) | 완료 → 진행률 높은 순 → 먼저 수락한 순. 보상까지 받은 의뢰는 목록에서 빠진다 |
-| UI 코드 | `UI/Requests/QuestBarView`(바, X = 숨기기), `QuestListView`(드롭다운, 항목 클릭 = 책 의뢰 탭), `QuestToastView`(완료 알림), `UI/Book/QuestBookPage`(책 의뢰 탭) |
+| UI 코드 | `UI/Requests/QuestBarView`(바, X = 숨기기), `QuestListView`(드롭다운, 항목 클릭 = 책 의뢰 탭, 마우스 올림 표시는 `QuestListItemView`), `QuestToastView`(완료 알림), `UI/Book/QuestBookPage`(책 의뢰 탭) |
 | 의뢰 게시판 | 임시 `RequestBoardWindow`: 오늘 게시판(`context.Board.Offers`), 못 받는 이유, 받은 수 n/3, `씨앗 다시 받기`. 새 디자인 [미정] |
 
 ### 2-5. 퀵슬롯 (화면 아래 가운데)
 | 항목 | 내용 |
 |---|---|
 | UI가 읽는 창구 | `Core/Inventory/Inventory`: `SlotCount`, `GetSlot(i)`, `SelectedIndex`, `Select(i)`, `event SlotChanged(i)`, `event SelectionChanged(i)`. 아이콘은 `ItemDefinition.Icon`(16×16 도트, 없으면 글자 대체) |
-| 입력 | 1~5 키·클릭·퀵슬롯 위 휠 = 칸 선택. 게임 화면 위 휠 = 카메라 줌(`HudState.IsPointerOverScrollHud`로 구분, `GameInputReader`) |
+| 입력 | 1~5 키·클릭·퀵슬롯 위 휠 = 칸 선택(휠은 끝 칸에서 멈춤, 돌아 넘어가지 않음). 게임 화면 위 휠 = 카메라 줌(`HudState.IsPointerOverScrollHud`로 구분, `GameInputReader`) |
 | 치트 (에디터·개발 빌드만, 2026-11-25) | 칸 **우클릭** = 개수와 상관없이 그 칸 통째로 버리기(`Inventory.DiscardSlot` + 토스트). `QuickSlotView.Setup(index, onClick, onRightClick)`, 정식 빌드에서는 우클릭을 연결하지 않음. 안내는 `ControlsHintView` 맨 아래 한 줄(`GameTexts.CheatDiscardHint`, 개발 빌드만). 정식 버리기 UI는 [미정] |
 | UI 코드 | `UI/HUD/QuickSlotBarView.cs`, `QuickSlotView.cs`. 테마 `Quick Slots` |
 | 남은 일 | 확장 인벤토리(가방, 7-4): 패널·칸 그림 없음, [미정] 많음 |
@@ -169,6 +169,8 @@ GameBootstrap (씬마다, Gameplay)
 
 ### 3-6. 리스트·성능
 - 개수 제한이 없는 목록은 보이는 만큼만 항목을 만들어 재사용(가상 스크롤, `QuestListView`·`QuestBookPage` 참고). 정렬·높이 계산은 목록이 바뀔 때만.
+- 픽셀 글꼴 글자를 칸·바탕 안 세로 가운데에 둘 때는 줄 높이가 아니라 `UiTextInk.CenterVertically(글자, 칸 위, 칸 높이)`를 쓴다(글자 모양이 줄 위쪽에 붙어 있어 줄 높이로 맞추면 위로 치우침). 책 안 글자 버튼은 `BookTextButton`.
+- 스크롤바(`W_Scrollbar`)를 쓰는 화면은 연결할 때 `ThemedPanel.EnableScrollbarInput(scrollbar)`를 부른다. 테마 패널은 기본으로 마우스를 받지 않아, 이것이 없으면 손잡이를 끌 수 없다(휠만 됨).
 - 같은 값이면 다시 그리지 않는다(`ThemedText.SetText`도 같은 글자면 무시).
 - LayoutGroup·ContentSizeFitter 대신 코드로 정수 px 계산.
 

@@ -154,6 +154,9 @@ MonoBehaviour:
     _titlePixelBold: 1
     _requirementStyle: 3
     _completedColor: {r: 0.2901961, g: 0.5647059, b: 0.78431374, a: 1}
+    _hoverColor: {r: 0.7529412, g: 0.3764706, b: 0.22745098, a: 1}
+    _pressedColor: {r: 0.5568628, g: 0.27058825, b: 0.15294118, a: 1}
+    _hoverBacking: {r: 0.7490196, g: 0.627451, b: 0.4392157, a: 0.3137255}
   _questToast:
     _margin: 8
     _padding: {x: 7, y: 5}
@@ -212,9 +215,18 @@ MonoBehaviour:
     _rowTextInset: 5
     _headerGap: 4
     _checkboxGap: 4
+    _titleLineGap: 3
     _titleGap: 6
+    _detailTitleStyle: 1
+    _detailLabelStyle: 3
+    _detailLabelPixelBold: 1
+    _detailBodyStyle: 3
+    _labelGap: 4
+    _sectionIndent: 6
+    _textButtonStyle: 1
+    _textButtonPadding: {x: 5, y: 4}
     _sectionGap: 10
-    _requirementIndent: 8
+    _requirementIndent: 1
     _rewardGap: 8
     _coverIconScale: 4
     _coverIconGap: 12
@@ -379,3 +391,9 @@ MonoBehaviour:
   - _id: 10
     _sprite: {fileID: 21300000, guid: 5c1af70882c7dd04eabb6073c0faa3d2, type: 3}
     _imageType: 2
+  - _id: 11
+    _sprite: {fileID: 21300000, guid: c75c1ae03f4b99b4f9f9a222456086b2, type: 3}
+    _imageType: 1
+  - _id: 12
+    _sprite: {fileID: 21300000, guid: 63db010cca66b1c4d824af394379e55a, type: 3}
+    _imageType: 1

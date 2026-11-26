@@ -17,6 +17,21 @@ namespace VoxelMagic.UI
             ApplyTheme();
         }
 
+        /// <summary>입력을 받을지 바꾼다(예: 스크롤바 트랙·손잡이는 끌기·누르기를 받아야 한다).</summary>
+        public void SetRaycastTarget(bool on)
+        {
+            _raycastTarget = on;
+            ApplyTheme();
+        }
+
+        /// <summary>스크롤바 트랙·손잡이가 마우스를 받게 한다. 패널은 기본으로 입력을 받지 않아 손잡이를 끌 수 없었다.</summary>
+        public static void EnableScrollbarInput(Scrollbar scrollbar)
+        {
+            if (scrollbar == null) return;
+            foreach (var panel in scrollbar.GetComponentsInChildren<ThemedPanel>(true))
+                if (!panel._raycastTarget) panel.SetRaycastTarget(true);
+        }
+
         protected override void Apply(UiTheme theme)
         {
             var values = theme.Panel(_skin);

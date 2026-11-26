@@ -408,7 +408,7 @@ namespace VoxelMagic.UI
             label.alignment = TextAlignmentOptions.Center;
             label.ForceMeshUpdate();
             var bounds = label.textBounds;
-            if (bounds.size.x > 0f && TryInkRows(label, out float inkTop, out float inkBottom))
+            if (bounds.size.x > 0f && UiTextInk.TryInkRows(label, out float inkTop, out float inkBottom))
             {
                 // 세로는 textBounds(줄 높이 포함)가 아니라 실제 글자 모양 위·아래로 가운데 맞춤.
                 int w = Mathf.RoundToInt(bounds.size.x) + (pixelBold ? 1 : 0), h = Mathf.RoundToInt(inkTop - inkBottom);
@@ -424,24 +424,6 @@ namespace VoxelMagic.UI
                 copy.anchoredPosition = rect.anchoredPosition + new Vector2(1f, 0f);
                 _nameBold.GetComponent<TMP_Text>().alignment = TextAlignmentOptions.Center;
             }
-        }
-
-        // 보이는 글자들의 글리프 모양 맨 위·맨 아래 (글자 칸 기준 y, 위가 +).
-        private static bool TryInkRows(TMP_Text label, out float top, out float bottom)
-        {
-            top = float.MinValue;
-            bottom = float.MaxValue;
-            var info = label.textInfo;
-            for (int i = 0; i < info.characterCount; i++)
-            {
-                var ch = info.characterInfo[i];
-                if (!ch.isVisible || ch.textElement == null || ch.textElement.glyph == null) continue;
-                var metrics = ch.textElement.glyph.metrics;
-                float glyphTop = ch.baseLine + metrics.horizontalBearingY * ch.scale;
-                top = Mathf.Max(top, glyphTop);
-                bottom = Mathf.Min(bottom, glyphTop - metrics.height * ch.scale);
-            }
-            return top > bottom;
         }
 
         private static void SetImage(Image image, Sprite sprite, int x, int y, Vector2Int size, bool raycast)
