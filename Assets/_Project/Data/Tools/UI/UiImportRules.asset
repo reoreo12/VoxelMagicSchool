@@ -317,3 +317,11 @@ MonoBehaviour:
       _top: 0
       _right: 0
       _bottom: 0
+  - _pathPattern: confirm_ui/confirm_panel.png
+    _left: 8
+    _top: 8
+    _right: 8
+    _bottom: 8
+    _sliceGrid: 0
+    _cellSize: {x: 0, y: 0}
+    _slices: []

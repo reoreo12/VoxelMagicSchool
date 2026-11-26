@@ -2,7 +2,7 @@
 // 칸은 미리 만들어 두고 내용만 바꾼다(4-A-5). 인벤토리는 이벤트로만 읽고, 클릭은 "이 칸 선택" 요청만 보낸다.
 // 칸 수는 테마 값이라 나중에 확장 인벤토리(7-4)에서 같은 칸 프리팹을 더 늘려 쓸 수 있다.
 // 치트(에디터·개발 빌드만): 칸 우클릭 = 개수와 상관없이 그 칸 통째로 버리기(안내는 조작법 맨 아래 한 줄, ControlsHintView).
-// 마우스가 바 위에 있을 때 휠을 돌리면 칸을 바꾼다(아래로 = 다음 칸). 그동안 게임의 휠 줌은 쉰다(HudState).
+// 마우스가 바 위에 있을 때 휠을 돌리면 칸을 바꾼다(아래로 = 다음 칸, 끝 칸에서는 멈춤). 그동안 게임의 휠 줌은 쉰다(HudState).
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.EventSystems;
@@ -57,7 +57,9 @@ namespace VoxelMagic.UI
             int count = Mathf.Min(_slots.Count, _inventory.SlotCount);
             if (count <= 0) return;
             int step = eventData.scrollDelta.y < 0f ? 1 : -1;
-            _inventory.Select(((_inventory.SelectedIndex + step) % count + count) % count);
+            // 끝 칸에서는 넘어가지 않고 멈춘다(첫 칸에서 위로, 마지막 칸에서 아래로). 돌아 넘어가면 선택 틀이 바를 가로질러 되돌아가 어지럽다.
+            int next = Mathf.Clamp(_inventory.SelectedIndex + step, 0, count - 1);
+            if (next != _inventory.SelectedIndex) _inventory.Select(next);
         }
 
         protected override void OnDisable()

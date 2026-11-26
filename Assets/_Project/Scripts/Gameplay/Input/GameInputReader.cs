@@ -16,6 +16,7 @@ namespace VoxelMagic.Gameplay
         private InputAction _run;
         private InputAction[] _slots;
         private GameContext _context;
+        private int _navigateHeld; // 화면이 열려 있을 때 위·아래 키를 한 번 누를 때 한 칸만 움직이게
 
         public event Action InteractPressed;
         /// <summary>마우스 스크롤 방향 (+1 = 위로 굴림 = 확대).</summary>
@@ -45,6 +46,9 @@ namespace VoxelMagic.Gameplay
             _map.FindAction("Cancel", true).performed += _ => OnCancel();
             // Space: 열린 화면 진행(대사 넘기기 등, UI_SPEC 6-1). E는 PlayerInteractor가 같은 Submit으로 보낸다.
             _map.FindAction("Submit", true).performed += _ => { if (_context != null && _context.Screens.HasAny) _context.Screens.Submit(); };
+            // 화면이 열려 있으면 W/S·↑/↓ = 선택지 위·아래 (대사창 선택지 등). 누른 방향이 바뀔 때만 한 칸.
+            _move.performed += OnMoveForScreens;
+            _move.canceled += OnMoveForScreens;
         }
 
         private void OnEnable()
@@ -74,6 +78,15 @@ namespace VoxelMagic.Gameplay
             if (_context.Fishing.State == FishingState.Minigame) _context.Fishing.Scroll(Mathf.Sign(value));
             // 마우스가 퀵슬롯 같은 HUD 위에 있으면 휠은 그 HUD가 쓴다(칸 바꾸기). 게임 화면 위일 때만 카메라 줌.
             else if (!_context.Screens.HasAny && !_context.Hud.IsPointerOverScrollHud) ZoomRequested?.Invoke(Mathf.Sign(value));
+        }
+
+        private void OnMoveForScreens(InputAction.CallbackContext ctx)
+        {
+            float y = ctx.ReadValue<Vector2>().y;
+            int dir = y > 0.5f ? -1 : y < -0.5f ? 1 : 0; // 위 = 이전 선택지
+            if (dir == _navigateHeld) return;
+            _navigateHeld = dir;
+            if (dir != 0 && _context != null && _context.Screens.HasAny) _context.Screens.Navigate(dir);
         }
 
         private void OnCancel()

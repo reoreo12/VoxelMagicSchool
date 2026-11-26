@@ -41,7 +41,7 @@ namespace VoxelMagic.EditorTools
 
         private static readonly MaterialSpec[] Materials =
         {
-            M("ShadeMushroom", "그늘버섯", "축축한 그늘에서 자라는 갈색 버섯.", ShadeHint, GatherHabitatKind.TreeShade, true, false, "Cylinder", new Vector3(0.18f, 0.08f, 0.18f), new Color(0.55f, 0.38f, 0.25f)),
+            M("ShadeMushroom", "그늘버섯", "축축한 그늘에서 자라는 잿빛 버섯.", ShadeHint, GatherHabitatKind.TreeShade, true, false, "Cylinder", new Vector3(0.18f, 0.08f, 0.18f), new Color(0.55f, 0.38f, 0.25f)),
             M("MossDrop", "이끼방울", "이슬을 머금은 둥근 이끼 덩이.", ShadeHint, GatherHabitatKind.TreeShade, true, false, "Sphere", new Vector3(0.18f, 0.14f, 0.18f), new Color(0.35f, 0.55f, 0.3f)),
             M("MoonMushroom", "달빛버섯", "밤에만 은은하게 빛나는 버섯.", ShadeHint, GatherHabitatKind.TreeShade, false, true, "Cylinder", new Vector3(0.18f, 0.1f, 0.18f), new Color(0.75f, 0.85f, 1f)),
             M("WildBerry", "산딸기", "덤불에 열린 새콤한 빨간 열매.", BushHint, GatherHabitatKind.Bush, true, false, "Sphere", new Vector3(0.14f, 0.14f, 0.14f), new Color(0.85f, 0.15f, 0.2f)),
@@ -49,10 +49,10 @@ namespace VoxelMagic.EditorTools
             M("FireflyFruit", "반딧불열매", "밤이 되면 노랗게 빛나는 열매.", BushHint, GatherHabitatKind.Bush, false, true, "Sphere", new Vector3(0.14f, 0.14f, 0.14f), new Color(1f, 0.9f, 0.3f)),
             M("RockMoss", "돌이끼", "바위에 붙어 자라는 납작한 이끼.", RockHint, GatherHabitatKind.RockCrevice, true, false, "Cube", new Vector3(0.24f, 0.05f, 0.2f), new Color(0.4f, 0.5f, 0.35f)),
             M("SparkPowder", "반짝돌가루", "부서진 바위에서 나온 반짝이는 가루 덩이.", RockHint, GatherHabitatKind.RockCrevice, true, false, "Cube", new Vector3(0.14f, 0.14f, 0.14f), new Color(0.8f, 0.8f, 0.85f)),
-            M("StarShard", "별조각돌", "밤하늘 빛을 닮은 푸른 돌 조각.", RockHint, GatherHabitatKind.RockCrevice, false, true, "Capsule", new Vector3(0.1f, 0.1f, 0.1f), new Color(0.3f, 0.4f, 0.95f)),
-            M("Dandelion", "민들레", "평지에 흔한 노란 꽃.", ClearingHint, GatherHabitatKind.Clearing, true, false, "Capsule", new Vector3(0.1f, 0.12f, 0.1f), new Color(1f, 0.8f, 0.1f)),
+            M("StarShard", "별조각돌", "별빛을 닮아 노랗게 빛나는 돌 조각.", RockHint, GatherHabitatKind.RockCrevice, false, true, "Capsule", new Vector3(0.1f, 0.1f, 0.1f), new Color(0.3f, 0.4f, 0.95f)),
+            M("WildGinseng", "산삼", "깊은 산에서 드물게 자라는 귀한 뿌리 약초.", ClearingHint, GatherHabitatKind.Clearing, true, false, "Capsule", new Vector3(0.1f, 0.12f, 0.1f), new Color(0.85f, 0.7f, 0.45f)),
             M("Mugwort", "쑥", "향이 진한 약초 잎.", ClearingHint, GatherHabitatKind.Clearing, true, false, "Cylinder", new Vector3(0.14f, 0.1f, 0.14f), new Color(0.5f, 0.6f, 0.45f)),
-            M("DewFlower", "이슬꽃", "밤이슬이 맺힐 때만 피는 하얀 꽃.", ClearingHint, GatherHabitatKind.Clearing, false, true, "Capsule", new Vector3(0.1f, 0.12f, 0.1f), new Color(0.95f, 0.95f, 1f)),
+            M("DewFlower", "섬초롱꽃", "초롱을 매단 듯 아래를 향해 피는 꽃.", ClearingHint, GatherHabitatKind.Clearing, false, true, "Capsule", new Vector3(0.1f, 0.12f, 0.1f), new Color(0.95f, 0.95f, 1f)),
         };
 
         // A1(z 0~16) → A3(z 32~48)에 골고루, 같은 종류가 한쪽에 몰리지 않게 좌우를 섞는다.

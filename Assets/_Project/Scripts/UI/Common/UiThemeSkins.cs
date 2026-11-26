@@ -33,7 +33,11 @@ namespace VoxelMagic.UI
         /// <summary>세로 상태 바 프레임 (7-2)</summary>
         StatusBarFrame,
         /// <summary>마우스를 올렸을 때 뜨는 툴팁 배경 (종이, 8-1)</summary>
-        Tooltip
+        Tooltip,
+        /// <summary>책 의뢰 목록에서 고른 칸 바탕 (찢김 없는 깔끔한 종이, 9-slice)</summary>
+        BookRowSelected,
+        /// <summary>책 의뢰 목록에서 마우스를 올린 칸 바탕 (고른 칸보다 옅게)</summary>
+        BookRowHover
     }
 
     public enum UiTextStyle

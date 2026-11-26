@@ -73,6 +73,7 @@ namespace VoxelMagic.UI
             if (_itemTemplate != null) _itemTemplate.gameObject.SetActive(false);
             if (_scrollbar != null)
             {
+                ThemedPanel.EnableScrollbarInput(_scrollbar);
                 _scrollbar.onValueChanged.RemoveListener(OnScrollbar);
                 _scrollbar.onValueChanged.AddListener(OnScrollbar);
             }

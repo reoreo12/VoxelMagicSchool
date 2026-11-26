@@ -16,11 +16,11 @@ MonoBehaviour:
   _displayName: "\uC465"
   _description: "\uD5A5\uC774 \uC9C4\uD55C \uC57D\uCD08."
   _iconColor: {r: 0.5, g: 0.6, b: 0.45, a: 1}
-  _icon: {fileID: 0}
+  _icon: {fileID: 21300000, guid: 090dbe6cfa8c76f4bab4844149066e40, type: 3}
   _maxStack: 99
   _creatureNote: "\uC465\uC740 \uB9C8\uB825\uC744 \uAC00\uB77C\uC549\uD600\u2026
     \uADF8\uB798\uC11C \uC57D\uC5D0 \uAF2D \uB123\uC5B4."
-  _rarity: 1
+  _rarity: 0
   _source: 3
   _habitat: 3
   _appearsAfterSchool: 1
@@ -29,5 +29,8 @@ MonoBehaviour:
   _sizeRangeCm:
     _min: 3
     _max: 8
-  _worldMesh: {fileID: 10203, guid: 0000000000000000e000000000000000, type: 0}
-  _worldScale: {x: 0.14, y: 0.1, z: 0.14}
+  _worldMesh: {fileID: -4421296435035449740, guid: ccaa95ff05654434ea7946ac48db2536, type: 3}
+  _worldMaterial: {fileID: 2100000, guid: d8f578bc5ab2bfa43a64a66b6e2a23b7, type: 2}
+  _worldScale: {x: 1.5, y: 1.5, z: 1.5}
+  _worldRotation: {x: -90, y: 0, z: 0}
+  _acquireModel: {fileID: 0}

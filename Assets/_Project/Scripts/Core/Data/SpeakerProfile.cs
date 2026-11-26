@@ -18,10 +18,14 @@ namespace VoxelMagic.Core
         [SerializeField, Tooltip("이름표에 보일 이름 (6자까지 12px 굵게, 더 길면 자동으로 작은 글씨)")] private string _displayName;
         [SerializeField, Tooltip("72×72 기본 초상화")] private Sprite _defaultPortrait;
         [SerializeField] private List<Expression> _expressions = new List<Expression>();
+        [SerializeField, TextArea, Tooltip("'이야기하기'를 고르면 이 중 하나를 말한다 (한 줄씩, 대사창 3줄 이내)")]
+        private List<string> _smallTalk = new List<string>();
 
         public string DisplayName => _displayName;
         public int ExpressionCount => _expressions.Count;
         public string ExpressionKey(int index) => _expressions[index].Key;
+        public int SmallTalkCount => _smallTalk.Count;
+        public string SmallTalk(int index) => _smallTalk[index];
 
         /// <summary>표정 키에 맞는 초상화. 비었거나 없는 키면 기본 초상화.</summary>
         public Sprite Portrait(string expression)

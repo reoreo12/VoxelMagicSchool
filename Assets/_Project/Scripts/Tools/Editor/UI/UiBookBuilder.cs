@@ -51,6 +51,11 @@ namespace VoxelMagic.Tools.EditorTools.UiWorkbench
             theme.Book.SetTurnSprites(new[] { Load("book_ui/page_turn/leaf_0.png"), Load("book_ui/page_turn/leaf_1.png"), Load("book_ui/page_turn/leaf_2.png") },
                 Load("book_ui/page_turn/leaf_edge.png"), Load("book_ui/page_turn/shadow_strip.png"));
             theme.Book.SetPageButtonSprites(Load("book_ui/buttons/btn_page_normal.png"), Load("book_ui/buttons/btn_page_hover.png"), Load("book_ui/buttons/btn_page_pressed.png"));
+            theme.AddMissing(new TextStyleValues[0], new ButtonSkinValues[0], new[]
+            {
+                new PanelSkinValues(UiPanelSkin.BookRowSelected, Load("book_ui/buttons/row_selected.png"), Image.Type.Sliced),
+                new PanelSkinValues(UiPanelSkin.BookRowHover, Load("book_ui/buttons/row_hover.png"), Image.Type.Sliced),
+            });
             EditorUtility.SetDirty(theme);
             AssetDatabase.SaveAssets();
         }
@@ -179,6 +184,8 @@ namespace VoxelMagic.Tools.EditorTools.UiWorkbench
             var checkboxLabel = Text(left, "ShowHudLabel", UiTextStyle.Body, theme, TextOverflowModes.Overflow, false);
 
             var title = Text(right, "Title", UiTextStyle.BodyBold, theme, TextOverflowModes.Ellipsis, false);
+            var titleLine = NewImage(right, "TitleLine");
+            titleLine.enabled = true;
             var line = Text(right, "Line", UiTextStyle.Body, theme, TextOverflowModes.Overflow, true);
             var needsLabel = Text(right, "NeedsLabel", UiTextStyle.BodyBold, theme, TextOverflowModes.Overflow, false);
             var needs = Text(right, "Needs", UiTextStyle.Body, theme, TextOverflowModes.Overflow, false);
@@ -195,6 +202,7 @@ namespace VoxelMagic.Tools.EditorTools.UiWorkbench
             UiHudBuilder.Assign(page, "_showHud", checkbox);
             UiHudBuilder.Assign(page, "_showHudLabel", checkboxLabel);
             UiHudBuilder.Assign(page, "_title", title);
+            UiHudBuilder.Assign(page, "_titleLine", titleLine);
             UiHudBuilder.Assign(page, "_line", line);
             UiHudBuilder.Assign(page, "_needsLabel", needsLabel);
             UiHudBuilder.Assign(page, "_needs", needs);
@@ -267,7 +275,7 @@ namespace VoxelMagic.Tools.EditorTools.UiWorkbench
             hit.color = new Color(1f, 1f, 1f, 0f);
             hit.raycastTarget = true;
             var selection = UiHudBuilder.Instantiate("W_PaperPanel", go.transform, "Selection").GetComponent<ThemedPanel>();
-            selection.SetSkin(UiPanelSkin.QuestBar);
+            selection.SetSkin(UiPanelSkin.BookRowSelected);
             selection.SetTheme(theme);
             var title = Text(go.transform, "Title", UiTextStyle.Body, theme, TextOverflowModes.Ellipsis, false);
             var line = NewImage(go.transform, "Line");

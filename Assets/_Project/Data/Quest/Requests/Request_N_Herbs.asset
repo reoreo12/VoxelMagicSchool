@@ -13,18 +13,17 @@ MonoBehaviour:
   m_Name: Request_N_Herbs
   m_EditorClassIdentifier: 
   _title: "\uC57D\uCD08 \uC138 \uAC00\uC9C0"
-  _creatureLine: "\uC465\uC774\uB791 \uBBFC\uB4E4\uB808\uB791 \uB3CC\uC774\uB07C.
+  _creatureLine: "\uC465\uC774\uB791 \uC12C\uCD08\uB871\uAF43\uC774\uB791 \uB3CC\uC774\uB07C.
     \uC57D\uC744 \uB2EC\uC77C \uAC70\uC57C."
-  _habitatHint: "\uC465\uACFC \uBBFC\uB4E4\uB808\uB294 \uCD08\uC785 \uD3C9\uC9C0\uC5D0,
+  _habitatHint: "\uC465\uACFC \uC12C\uCD08\uB871\uAF43\uC740 \uCD08\uC785 \uD3C9\uC9C0\uC5D0,
     \uB3CC\uC774\uB07C\uB294 \uBC14\uC704\uD2C8\uC5D0"
   _difficulty: 1
   _requirements:
   - _item: {fileID: 11400000, guid: 3b887b5f92518984294697151943f6f0, type: 2}
     _amount: 1
-  - _item: {fileID: 11400000, guid: ba50b8e8f541aa74897cbe737d121c41, type: 2}
+  - _item: {fileID: 11400000, guid: 5c9cd669a4c24764d99d91e9e0f7270e, type: 2}
     _amount: 1
   - _item: {fileID: 11400000, guid: 04a05f7c9cf0e1f42874b7fe6c679e14, type: 2}
     _amount: 1
   _givenItems: []
-  _baseReward: 8
   _completionLine: "\uC4F0\uB2E4\u2026 \uC57D\uC740 \uC6D0\uB798 \uC368."

@@ -134,8 +134,6 @@ MonoBehaviour:
     _frame: {fileID: 952465741, guid: 455ad42b9a35d634b91e1fece7fc4f7d, type: 3}
     _roulette: {fileID: -754629294, guid: 614c8de0451911a46ab3ff85fedbdb54, type: 3}
     _arrow: {fileID: 2124064162, guid: 614c8de0451911a46ab3ff85fedbdb54, type: 3}
-    _arrowFrames: []
-    _arrowFrameStep: 3
     _afterSchoolIcon: {fileID: 1392401110, guid: 60e5e2e9af0bfd34cb3f3de36510f709, type: 3}
     _nightIcon: {fileID: -245857414, guid: 60e5e2e9af0bfd34cb3f3de36510f709, type: 3}
   _tooltip:
@@ -156,6 +154,9 @@ MonoBehaviour:
     _titlePixelBold: 1
     _requirementStyle: 3
     _completedColor: {r: 0.2901961, g: 0.5647059, b: 0.78431374, a: 1}
+    _hoverColor: {r: 0.7529412, g: 0.3764706, b: 0.22745098, a: 1}
+    _pressedColor: {r: 0.5568628, g: 0.27058825, b: 0.15294118, a: 1}
+    _hoverBacking: {r: 0.7490196, g: 0.627451, b: 0.4392157, a: 0.3137255}
   _questToast:
     _margin: 8
     _padding: {x: 7, y: 5}
@@ -214,9 +215,18 @@ MonoBehaviour:
     _rowTextInset: 5
     _headerGap: 4
     _checkboxGap: 4
+    _titleLineGap: 3
     _titleGap: 6
+    _detailTitleStyle: 1
+    _detailLabelStyle: 3
+    _detailLabelPixelBold: 1
+    _detailBodyStyle: 3
+    _labelGap: 4
+    _sectionIndent: 6
+    _textButtonStyle: 1
+    _textButtonPadding: {x: 5, y: 4}
     _sectionGap: 10
-    _requirementIndent: 8
+    _requirementIndent: 1
     _rewardGap: 8
     _coverIconScale: 4
     _coverIconGap: 12
@@ -233,6 +243,29 @@ MonoBehaviour:
     _checkboxOnHover: {fileID: 21300000, guid: d245453f3f0bd5f4c97ff8dde13ae73f, type: 3}
     _checkboxOff: {fileID: 21300000, guid: 1bf8e0cc64158d84e8fbdb0ed1f69092, type: 3}
     _checkboxOffHover: {fileID: 21300000, guid: 5fa9501c353bb554495016ed6df03d98, type: 3}
+  _confirm:
+    _panel: {fileID: 21300000, guid: 6decb39f86bac7e45a1d4444a9ad9b9c, type: 3}
+    _padding: 12
+    _messageGap: 10
+    _buttonSize: {x: 56, y: 20}
+    _buttonGap: 12
+    _widthRange: {x: 160, y: 260}
+    _messageStyle: 0
+  _requestBoard:
+    _width: 320
+    _padding: 12
+    _lineGap: 6
+    _entryHeight: 56
+    _entryGap: 7
+    _rightColumn: 64
+    _acceptSize: {x: 56, y: 20}
+    _refillSize: {x: 100, y: 20}
+    _titleStyle: 1
+    _bodyStyle: 3
+    _smallStyle: 4
+    _mutedColor: {r: 0.5882353, g: 0.47058824, b: 0.32941177, a: 1}
+    _rewardColor: {r: 0.7529412, g: 0.3764706, b: 0.22745098, a: 1}
+    _warnColor: {r: 0.54901963, g: 0.18431373, b: 0.16470589, a: 1}
   _dialogue:
     _scale: 1.25
     _bottomMargin: 8
@@ -252,7 +285,7 @@ MonoBehaviour:
     _nameStyles: 010000000300000004000000
     _textArea:
       x: 14
-      y: 20
+      y: 13
       width: 292
       height: 48
     _maxLines: 3
@@ -265,6 +298,23 @@ MonoBehaviour:
     _leftColumn: {fileID: 21300000, guid: 552fb6e930242144faa71a1b2336e0d2, type: 3}
     _nextArrow: {fileID: 21300000, guid: 6652cb695a410794bac0f75bb9e501f7, type: 3}
     _placeholderPortrait: {fileID: 21300000, guid: 302d068a784b4fe41aa433243622765c, type: 3}
+    _choicePromptArea:
+      x: 14
+      y: 12
+      width: 292
+      height: 16
+    _choiceTop: 30
+    _choiceRowHeight: 14
+    _choiceIndent: 10
+    _choiceCursorOffset: {x: 0, y: 3}
+    _maxChoices: 4
+    _choiceStyle: 3
+    _choiceDetailStyle: 3
+    _choiceSelectedColor: {r: 0.7529412, g: 0.3764706, b: 0.22745098, a: 1}
+    _choicePressedColor: {r: 0.5568628, g: 0.27058825, b: 0.15294118, a: 1}
+    _choiceDimmedColor: {r: 0.5882353, g: 0.47058824, b: 0.32941177, a: 1}
+    _choicePressDrop: 1
+    _choiceCursor: {fileID: 21300000, guid: 6f781ba6ea660f24b90109e2dc96656b, type: 3}
   _texts: {fileID: 11400000, guid: 352cc08e03e545b4c8f802b1ffd4165f, type: 2}
   _textStyles:
   - _id: 0
@@ -364,3 +414,9 @@ MonoBehaviour:
   - _id: 10
     _sprite: {fileID: 21300000, guid: 5c1af70882c7dd04eabb6073c0faa3d2, type: 3}
     _imageType: 2
+  - _id: 11
+    _sprite: {fileID: 21300000, guid: c75c1ae03f4b99b4f9f9a222456086b2, type: 3}
+    _imageType: 1
+  - _id: 12
+    _sprite: {fileID: 21300000, guid: 63db010cca66b1c4d824af394379e55a, type: 3}
+    _imageType: 1

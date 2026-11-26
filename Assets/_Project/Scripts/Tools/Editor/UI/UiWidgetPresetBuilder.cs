@@ -129,6 +129,8 @@ namespace VoxelMagic.Tools.EditorTools.UiWorkbench
             scrollbar.targetGraphic = handleImage;
             scrollbar.transition = Selectable.Transition.None;
             handleImage.raycastTarget = true; // 핸들은 끌 수 있어야 한다
+            track.SetRaycastTarget(true); // 트랙을 누르면 그쪽으로 넘어간다
+            handlePanel.SetRaycastTarget(true); // 패널은 기본으로 입력을 받지 않아 손잡이를 끌 수 없었다
             return root;
         }
 

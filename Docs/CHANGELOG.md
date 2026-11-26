@@ -1,5 +1,72 @@
 # 변경 기록
 
+## 2026-11-26 — 채집 확률·슬롯 도구·재료 아이콘 (브랜치 `Back-mountain-map`)
+- 채집 확률(`GatheringConfig`): 켜지는 자리 4 → 5, 희귀도 60/30/10 → 45/30/25. 희귀 재료 하나가 하루에 나올 확률 약 34% → 76%(이틀 약 94%). 시연 중 한 번씩은 보이게
+- `채집 밸런스 › 슬롯 수 적용`: 누르기 전부터 있던 슬롯은 위치를 그대로 두고, **새로 생긴 슬롯만** 지면에 맞춤(전에는 모든 슬롯을 지면으로 내려 덤불 표면 슬롯이 묻혔음). `GatheringBalanceTool.ApplySlotCounts`
+- 채집 재료 아이콘 12종 `Art/UI/item_icons/gather/item_Gather_*.png`: 16×16, 지팡이 아이콘처럼 진갈색 1px 외곽선(상하좌우), 7색 이하, 산삼은 뿌리까지 있는 모델. 재료 `Icon`에 연결해 퀵슬롯에 보임. 확인용 시트 `gather/_preview/gather_icons_preview.png`
+- 굽기 도구 `VoxelMagic/뒷산/채집 재료 아이콘 굽기`(`Editor/Mountain/GatherIconBaker`, 설정 `Data/Tools/GatherIconSettings`): 메시를 C# 코드로 직접 그림(팔레트 칸 색 × 주변광 + 해 밝기) → 칸마다 덮인 비율 40% 이상만 칠함 → k-평균 색 줄이기 → 외곽선. **`PreviewRenderUtility`는 이 프로젝트(URP, MCP 실행)에서 만들자마자 에디터가 크래시(RenderSettings NULL)해서 쓰지 않음** — 같은 방식 도구를 만들 때 주의
+- 설명을 모델 색에 맞춤(사용자 결정): 그늘버섯 "갈색 버섯" → "잿빛 버섯", 별조각돌 "밤하늘 빛을 닮은 푸른 돌 조각" → "별빛을 닮아 노랗게 빛나는 돌 조각", 두 재료의 아이콘 대체 색(`IconColor`)도 회색·노랑으로. 의뢰 `Request_H_StarShard` 힌트 "푸른 조각" → "노란 조각"
+- 확인(플레이 모드): 재료 4종 줍기 → 퀵슬롯에 지팡이와 같은 크기로 아이콘 표시, 채집 자리 종류마다 5곳·희귀 재료 출현. EditMode 201개 통과
+
+## 2026-11-26 — 뒷산 채집 재료 FBX 적용 (브랜치 `Back-mountain-map`, UI 브랜치 머지 후)
+- 땅에 놓인 재료 12종을 기본 도형 → FBX(`Art/Objects/Gather_Items/fbx/`)로. FBX는 Blender Z-up이라 메시만 쓰면 누움 → 재료 데이터에 `_worldRotation`(-90,0,0) 추가 (Bake Axis Conversion은 루트 회전이 꼬여 쓰지 않음)
+- 공용 머티리얼 2장 `Art/Objects/Gather_Items/M_Gather_Items`(URP Lit + 팔레트, 매끈함 0.1)·`M_Gather_Items_Glow`(+팔레트 발광 0.6, 달빛버섯·별조각돌). `GatherPickup`은 공용 머티리얼이면 MaterialPropertyBlock을 쓰지 않음(SRP Batcher 묶음 유지), 없으면 예전처럼 기본 도형 + 아이콘 색. 바닥 맞춤은 회전·크기 적용한 경계 상자 기준
+- 임포트 설정: `gather_items_palette.png` Point·무압축·밉맵 끔(뒷산 팔레트와 같게), FBX 13종 애니메이션·카메라·라이트 가져오기 끔
+- 데이터: `GatherMaterialDefinition`에 `_worldMaterial`·`_worldRotation`·`_acquireModel`(획득 UI용 모델, 참조만) 추가. 새 재료 **산삼** `Gather_WildGinseng`(평지·희귀, 땅 `Wild_Ginseng_Top`, 획득 모델 `Wild_Ginseng`), 세이브 정의 목록에 등록. 이슬꽃 → **섬초롱꽃**(이름·설명·크리처 설명). 희귀도: 쑥 보통 → 흔함, 섬초롱꽃 희귀 → 보통
+- 채집 목록(`GatheringConfig`)에서 민들레 → 산삼. 민들레 에셋은 옛 세이브 호환을 위해 남김
+- 의뢰(난이도 유지): 튜토리얼 민들레 → 쑥, `붕어와 민들레` → `붕어와 쑥`, `민들레 꽃다발`(민들레 2) → `쑥 한 아름`(쑥 2), `약초 세 가지` 쑥·민들레·돌이끼 → 쑥·섬초롱꽃·돌이끼, `밤이슬 꽃차` 대사·힌트의 이슬꽃 → 섬초롱꽃. 대사·힌트·전달 대사도 맞춰 고침
+- 편집기 도구 `BackMountainGatheringBuilder`의 재료 표도 산삼·섬초롱꽃으로 맞춤(없을 때만 만드는 도구라 기존 에셋은 건드리지 않음)
+- 크기: 재료 12종 `_worldScale` 1 → 1.5 (사용자 의견 "좀 더 크게")
+- 덤불 슬롯 복원: 11-25 의뢰·타이머 1·2단계 때 `채집 밸런스 › 슬롯 수 적용`이 **모든 슬롯을 지면으로 내리는 바람에** 사용자가 덤불 표면에 올려 둔 슬롯 6개(Mountain_Bush_Berry·Mountain_Bush_Wide·SM_Bush_Wild의 Slot_0·1)가 바닥(덤불 속)으로 내려가 있었음 → 11-24 커밋 높이로 되돌림. 그때 새로 생긴 Slot_2 3개는 덤불 메시 표면 높이로 올림(Wide·Berry는 덤불 안쪽으로 조금 옮김). 나무·바위 슬롯은 원래 지면이라 변화 없음
+- 확인(플레이 모드, BackMountain): 스폰된 재료 모두 똑바로 서고 바닥 틈 0, 덤불 3곳 9칸 모두 표면에 보임, 산삼 줍기 → `산삼 획득!` 팝업(아이콘은 임시 색 칸)·퀵슬롯 들어감, 달빛버섯 발광 확인. EditMode 201개 통과
+
+## 2026-11-26 — 의뢰 게시판 UI (낡은 종이 창)
+- 임시 도형 게시판(`RequestBoardWindow`, HUDCanvas) → `UI_Root` 팝업 층의 새 화면 `UI_RequestBoard`(`RequestBoardScreen` + 칸 `RequestBoardEntryView`). 빌더 메뉴 `VoxelMagic/UI/화면 만들기/의뢰 게시판`. 설계 그림 `Art/UI/board_ui/_preview/`
+- 창: 낡은 종이 `quest_detail_paper`(Tiled), 폭 320, 화면 가운데, 딤 0.6. 머리 `의뢰 게시판` 12px 굵게 + X(`close_*`) + 구분선
+- 의뢰 칸: 왼쪽 제목 12px 굵게 → 크리처 대사 10px(길면 낱말 줄바꿈, 칸이 그만큼 높아짐) → `모아 올 것`(옅게) + 재료 → 서식지 힌트 8px(옅게). 오른쪽 `수락`(책 페이지 버튼 56×20, 못 받으면 흐림) → `필기 +n`(#C0603A) → 짧은 이유(`받을 칸이 없어요`·`씨앗 칸 부족`, #8C2F2A). 칸 사이 1px 구분선
+- 아래: `씨앗 다시 받기`(받은 의뢰가 없으면 흐림) + 오른쪽 안내(낮·닫힌 날·빈 게시판·씨앗 결과는 경고색, 없으면 `받은 의뢰 n/m`, 길면 8px로 줄임)
+- `BookMenuButton.SetInteractable`(누를 수 없을 때 흐린 글자, 올림·누름·클릭 무시). 테마 `RequestBoard` 값, 문구 `NeedsLabel`·`RequestNoRoomShort`·`RewardShortWritten`
+- BackMountain·Creature_Cave·FarmPond 씬의 옛 게시판 삭제. `Prototype_FarmFishing`은 `UI_Root`가 없어 남김(예비)
+- 확인(플레이 모드, 자동 저장 끔): 낮 = 수락 흐림 + `게시판은 밤에만 열려요`, 밤(시험용으로 시간 연결 끊음) = 수락 → 목록에서 빠짐·`받은 의뢰 1/3`·씨앗 버튼 켜짐, 두 줄 대사, 마우스 올림, X·ESC 닫기
+
+## 2026-11-26 — 확인 창(예/아니요) 텍스처로
+- 임시 도형 확인 창(`ConfirmDialog`, 1920×1080 늘어나는 HUD 캔버스) → `UI_Root` 팝업 층의 새 화면 `UI_Confirm`(`ConfirmScreen`, 픽셀 정수 배율). 빌더 메뉴 `VoxelMagic/UI/화면 만들기/확인 창`
+- 창 바탕 새 그림 `Art/UI/confirm_ui/confirm_panel.png`(24×24, 9-slice 8, 크림 종이 + 2px 진갈색 테두리 + 안쪽 밝은 줄·그늘, 모서리 1px 깎음). 버튼은 책 페이지 버튼(`btn_page_*`, `BookMenuButton`), 글자는 갈무리11 12px 가운데·낱말 줄바꿈
+- 배치(1배 px, 테마 `Confirm`): 안쪽 여백 12, 메시지 → 버튼 10, 버튼 56×20 두 개(사이 12), 창 폭 160~260에서 메시지에 맞춤, 화면 가운데. 뒤는 공용 입력 막기 판(딤 0.6)
+- 동작 그대로: `context.Confirm.Ask(문구, 예, 아니요)`, 아니요·ESC·바깥 클릭 = 아니요, 전체 정지
+- BackMountain·Creature_Cave·FarmPond 씬의 옛 `ConfirmDialog` 삭제. `Prototype_FarmFishing`은 `UI_Root`가 없어 옛 창을 남김(예비). 가져오기 규칙 `confirm_ui/confirm_panel.png` 8/8/8/8 추가
+- 확인(플레이 모드, 자동 저장 끔): 책 위에 포기 확인 창 표시, 예 → 예 콜백·책 유지, 아니요·ESC → 아니요 콜백
+
+## 2026-11-26 — 퀵슬롯 휠: 끝 칸에서 멈춤
+- 퀵슬롯 위 휠로 칸을 바꿀 때 첫 칸에서 위로, 마지막 칸에서 아래로 돌려도 넘어가지 않고 멈춤(전에는 반대쪽 끝으로 돌아 넘어가 선택 틀이 바를 가로질러 되돌아갔음). `QuickSlotBarView.OnScroll`
+- 확인(플레이 모드, 휠 입력 흉내): 0에서 위 → 0, 아래로 7번 → 1·2·3·4·4·4·4, 위 → 3
+
+## 2026-11-26 — 의뢰 목록·책 의뢰 탭 다듬기
+- 스크롤바 손잡이를 끌어도 움직이지 않던 문제: 테마 패널(`ThemedPanel`)은 기본으로 마우스를 받지 않아 트랙·손잡이도 입력을 받지 못했음. `ThemedPanel.SetRaycastTarget`·`EnableScrollbarInput`을 추가해 HUD 의뢰 목록·책 목록 스크롤바의 트랙·손잡이가 입력을 받게 함(손잡이 끌기, 트랙 누르기). `W_Scrollbar.prefab`·빌더도 켬
+- HUD 의뢰 목록: 마우스를 올린 의뢰는 옅은 바탕 + 강조색 #C0603A, 누르는 동안 #8E4527 (테마 `QuestList › 마우스 올림`)
+- 책 의뢰 목록 칸: 고른 칸 바탕을 낡은 종이(`quest_bar_paper`)에서 새 그림 `book_ui/buttons/row_selected.png`(12×12, 9-slice 4, 찢김 없는 진한 크림 + 1px 테두리)로. 마우스를 올린 칸은 옅은 `row_hover.png`. 패널 모양 `BookRowSelected`·`BookRowHover` 추가
+- 책 오른쪽 페이지: 제목 12px 굵게 → 1px 구분선 → 대사·재료·보상 값 10px(갈무리9), 소제목(필요한 재료·보상) 10px(1px 겹쳐 굵게). 내용은 처음 8px로 했다가 너무 작다는 의견으로 10px로 올림(12와 10 사이 크기가 없어 소제목과는 굵기로만 구분). 대사 둘째 줄부터 여는 따옴표 폭만큼 들여씀. 재료 들여쓰기 8 → 3. "보상"과 값은 아래 끝을 맞춤. 테마 `Book › 의뢰 탭`(제목·소제목·내용 스타일, 제목↔구분선 3, 소제목↔내용 2)
+- 확인(플레이 모드, 자동 저장 끔): 책 오른쪽 페이지 표시, 두 목록 마우스 올림, HUD 목록 스크롤바 끌기(맨 아래까지 이동). EditMode 201개 통과
+- 사용자 시안에 맞춘 배치: 소제목·보상 줄을 6px 들여씀(`Book › Section Indent`), 재료 줄은 소제목보다 1px 더(`Requirement Indent` 1), 소제목 → 재료 4px(`Label Gap`). 제목·구분선·대사 위치는 그대로
+- `포기`: 밑줄 글자 → 책 글자 버튼(`BookTextButton`, 새 스크립트). 평소 글자만, 마우스 올림 `row_hover` 바탕, 누르는 동안 `row_selected` 바탕 + 글자 1px 내려감. 바탕 = 글자 모양 + 좌우 5·위아래 4 + 테두리(`Text Button Padding`), 글자 끝은 내용 오른쪽 끝에 맞춤
+- 책 목록 칸 글자: 줄 높이로 가운데 맞추면 픽셀 글꼴 모양이 위로 붙어(위 2·아래 5) 보여, 글자 모양 기준으로 바탕 테두리 안 세로 가운데(위아래 4)로. 글리프 측정은 `UiTextInk`(새, 대사창 이름표와 같은 계산을 옮김)
+
+## 2026-11-26 — 대사 글자 여백, 문구 온점
+- 대사 글자 칸 (14,20) → **(14,13)**: 위 여백이 넓었음(위 16·왼쪽 9). 크림색 글자판에서 실제 글자 모양까지 왼쪽·위 모두 9. 선택지 화면(질문 (14,12))은 그대로
+- `밤에 굴로 오면 의뢰를 받을게.` 끝에 온점
+- 선택지 글자 크기는 그대로 둠: 픽셀 폰트라 12px(갈무리11) 다음 작은 크기가 10px(갈무리9)뿐이고, 11px 같은 중간 크기는 확대하면 도트가 깨짐. 테마 `Dialogue › Choice Style`을 Small로 바꾸면 10px
+- 확인(플레이 모드, 자동 저장 끔): 낮에 의뢰 전달 → 이유 대사의 첫 글자가 글자판 왼쪽·위에서 9px
+
+## 2026-11-26 — 크리처 대화 메뉴: 대사창 안 선택지 (UI_SPEC 6-4)
+- 크리처에게 말을 걸면 대사창 안에 "무슨 일이야?" + 선택지 `이야기하기`·`과외 받기`·`의뢰 전달하기`·`그만두기`. 이야기하기 = 화자 잡담 한 줄(+ 반응 동작), 과외 = 임시 대사 "과외는 다음에 하자."(시스템 없음), 전달할 수 없으면 `의뢰 전달하기`는 흐리게 표시하고 고르면 이유를 대사로 말함. 대사 뒤에는 메뉴로 돌아옴
+- 완료 가능 의뢰가 둘 이상이면 같은 대사창에서 "어떤 의뢰를 전달할까?" + 의뢰 제목(오른쪽 `+n` 보상) + `돌아가기`. 고르면 전달 대사 → 전달 → 남았으면 다시 목록(재료가 겹쳐 빠진 의뢰는 사라짐) → 메뉴. 하나뿐이면 바로 대사(설정 그대로)
+- 선택지 모양: 배경 없는 글자 버튼. 고른 줄(마우스 올림·키보드) = 주황 #C0603A + 왼쪽 ▶(`dialogue_choice_cursor.png`, ▼를 돌린 흰 그림에 색을 입힘), 누르는 동안 1px 내려가며 #8E4527, 안 되는 것 = #967854. 질문 칸 (14,12) 292×16, 선택지 줄 y 30부터 14px씩 최대 4줄, 들여쓰기 10. 테마 `Dialogue › 선택지`
+- 조작: 마우스 올림·클릭, W/S·↑/↓ 이동(끝에서 처음으로), Space/E 결정, ESC = 그만두기·돌아가기. 대사창 빈 곳 클릭은 선택지 중에는 무시
+- 코드: Core `DialogueChannel.Ask(질문, 선택지, 고른 뒤, ESC 번호)`·`Choose`·`DialogueOption`, 대사 끝 콜백 안에서 다음 대사·선택지를 열면 대사창이 닫히지 않고 이어짐. `ScreenStack.CancelIgnored`(닫히지 않는 화면의 ESC)·`Navigated`(위·아래), `GameInputReader`가 화면이 열려 있을 때 이동 키를 위·아래로 보냄. `SpeakerProfile` 잡담 목록(`Speaker_It` 3줄 임시). UI `DialogueChoiceRow`(새), `DialogueWindow` 선택지 모드, 빌더가 선택지 줄 원본을 만듦. Gameplay `CreatureNpc`가 메뉴 → 이야기/과외/전달 진행(대사창·화자가 없으면 예전처럼 바로 전달)
+- 임시 고르기 창 `DeliveryChoiceWindow` 삭제(네 씬 HUDCanvas의 오브젝트 포함). `GameScreen.DeliveryChoice`는 뒤 번호가 밀리지 않게 남김(쓰지 않음)
+- 고침: 책 의뢰 탭 `QuestBookPage.EnsureAbandon`이 편집 모드에서도 `AbandonButton`을 만들어, 씬·UI_Root를 저장할 때마다 복제본이 쌓였음(FarmPond·BackMountain·Creature_Cave에 이미 1개씩 저장돼 있었음). 플레이 중에만 만들게 하고, 씬·프리팹에 저장된 복제본을 지움. 플레이에서 포기 버튼 1개만 생기는 것 확인
+- 확인(플레이 모드, 자동 저장 끔): 메뉴 표시, 키 이동·ESC·마우스 올림/누름/클릭, 낮에 전달 → 이유 대사 → 메뉴, 밤에 민들레가 겹친 의뢰 2개 → 하나 전달(필기 +8) → 남은 하나 빠짐 → 메뉴. EditMode 201개 통과(선택지 테스트 3개 추가)
+
 ## 2026-11-25 — 밭: 앞 칸·방향 돌려 심기·물 주기 미리보기, 치트: 맵 이동
 - **앞 칸 기준**: 심기·물 주기·뽑기 대상은 플레이어가 선 칸의 바로 앞 칸(바라보는 네 방향). `FarmConfig.Target Forward Offset` 삭제(에셋 값은 남음, 읽지 않음)
 - **방향 돌려 심기**(사용자 결정, 자동): 바라보는 방향으로 모양을 돌림(옆이면 1×2 → 2×1, 정사각형도 모델이 그 방향), 앞 칸에서 바라보는 쪽으로 펼치고 옆으로 넓으면 선 칸의 절반 쪽으로 붙임. Core `FarmFacing`·`FarmPlacement`, `FarmPlot.Facing`, `FarmGrid.TryPlant/TryRestore(…, facing, …)`, `FarmService.Resolve(cell, item, facing, lateralPositive)`, `FarmFieldView`가 모델을 돌림. 저장 `FarmPlotRecord.Facing`(예전 기록은 0 = 안 돌림, 버전 그대로)

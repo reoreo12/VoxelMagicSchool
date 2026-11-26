@@ -17,7 +17,7 @@ MonoBehaviour:
   _description: "\uB2EC\uBE5B\uC744 \uBA38\uAE08\uC5B4 \uD478\uB974\uAC8C \uBE5B\uB098\uB294
     \uBC84\uC12F."
   _iconColor: {r: 0.75, g: 0.85, b: 1, a: 1}
-  _icon: {fileID: 0}
+  _icon: {fileID: 21300000, guid: 116575b58f9dd2146b2b7c02c71d4529, type: 3}
   _maxStack: 99
   _creatureNote: "\uB2EC\uBE5B\uBC84\uC12F\uC740 \uB2EC\uBE5B\uC744 \uBAA8\uC544
     \uB450\uC5C8\uB2E4\uAC00 \uBC24\uC5D0 \uB0B4\uBCF4\uB0B4."
@@ -31,5 +31,8 @@ MonoBehaviour:
   _sizeRangeCm:
     _min: 3
     _max: 8
-  _worldMesh: {fileID: 10203, guid: 0000000000000000e000000000000000, type: 0}
-  _worldScale: {x: 0.18, y: 0.1, z: 0.18}
+  _worldMesh: {fileID: -4046519645804639432, guid: 4f3c9132cb0ad4b4fbc731d21b291487, type: 3}
+  _worldMaterial: {fileID: 2100000, guid: f3bc14957d813c1438d968dbfbba764e, type: 2}
+  _worldScale: {x: 1.5, y: 1.5, z: 1.5}
+  _worldRotation: {x: -90, y: 0, z: 0}
+  _acquireModel: {fileID: 0}

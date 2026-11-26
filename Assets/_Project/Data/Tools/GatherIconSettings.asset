@@ -1,0 +1,28 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d5cbb1e9ab37e514ea12f921a7171d5b, type: 3}
+  m_Name: GatherIconSettings
+  m_EditorClassIdentifier: 
+  _iconSize: 16
+  _margin: 1
+  _supersample: 16
+  _pitch: 30
+  _yaw: 35
+  _lightEuler: {x: 40, y: -30, z: 0}
+  _lightIntensity: 1.1
+  _ambient: {r: 0.55, g: 0.55, b: 0.55, a: 1}
+  _coverage: 0.4
+  _colors: 7
+  _outline:
+    serializedVersion: 2
+    rgba: 4280425771
+  _outputFolder: Assets/_Project/Art/UI/item_icons/gather

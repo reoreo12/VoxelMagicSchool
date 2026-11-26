@@ -15,6 +15,8 @@
 | `page_turn/leaf_edge.png` | 6×16 | 페이지가 완전히 세워진 순간의 얇은 단면 |
 | `page_turn/shadow_strip.png` | 8×16 | 넘어가는 페이지가 아래 페이지에 드리우는 그림자 |
 | `page_turn/page_turn_timeline.json` | | 프레임별 폭 비율·변형·들림 값 |
+| `buttons/row_selected.png` | 12×12 | 책 의뢰 목록에서 고른 칸 바탕 (9-slice 4, 찢김 없는 진한 크림 + 1px 테두리, 2026-11-26) |
+| `buttons/row_hover.png` | 12×12 | 같은 목록에서 마우스를 올린 칸 바탕 (고른 칸보다 옅게) |
 
 탭 색상은 cream, red, amber, green, blue, purple 6종입니다.
 `page_turn/page_turn_preview.gif`, `frames_1x/`, `page_turn_frames_sheet_2x.png`은 미리보기용이며 게임에는 쓰지 않습니다. 프리뷰 속 페이지 내용(막대, 칸)은 설명용 가짜 내용입니다.

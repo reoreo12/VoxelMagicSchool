@@ -72,6 +72,12 @@ namespace VoxelMagic.EditorTools
         {
             int changed = 0;
             var itemMaterial = AssetDatabase.LoadAssetAtPath<Material>(ItemMaterialPath);
+            var scene = EditorSceneManager.GetActiveScene();
+
+            // 이미 있던 슬롯은 사용자가 정한 자리(덤불 표면 등)라 건드리지 않는다. 새로 생긴 슬롯만 지면에 맞춘다.
+            var existing = new HashSet<GatherPickup>();
+            foreach (var habitat in Object.FindObjectsByType<GatherHabitat>(FindObjectsInactive.Include, FindObjectsSortMode.None))
+                if (habitat.gameObject.scene == scene) existing.UnionWith(Slots(habitat));
 
             // 1) 기본 도형 프리팹 → 씬의 프리팹 인스턴스도 따라온다
             foreach (GatherHabitatKind kind in System.Enum.GetValues(typeof(GatherHabitatKind)))
@@ -88,8 +94,7 @@ namespace VoxelMagic.EditorTools
                 PrefabUtility.UnloadPrefabContents(contents);
             }
 
-            // 2) 씬의 서식지: 프리팹이 아닌 것(기능 붙이기로 만든 FBX 서식지)은 직접 맞추고, 모든 슬롯을 지면 높이로
-            var scene = EditorSceneManager.GetActiveScene();
+            // 2) 씬의 서식지: 프리팹이 아닌 것(기능 붙이기로 만든 FBX 서식지)은 직접 맞추고, 새로 생긴 슬롯만 지면 높이로
             foreach (var habitat in Object.FindObjectsByType<GatherHabitat>(FindObjectsInactive.Include, FindObjectsSortMode.None))
             {
                 if (habitat.gameObject.scene != scene) continue;
@@ -97,6 +102,7 @@ namespace VoxelMagic.EditorTools
                 if (!isPrefabInstance && Resize(habitat, config.For(habitat.Kind), itemMaterial, inScene: true)) changed++;
                 foreach (var pickup in Slots(habitat))
                 {
+                    if (existing.Contains(pickup)) continue;
                     var grounded = BackMountainAttachTool.Ground(pickup.transform.position, habitat.transform);
                     if (Mathf.Abs(grounded.y - pickup.transform.position.y) < 0.001f) continue;
                     Undo.RecordObject(pickup.transform, "슬롯 지면 맞추기");

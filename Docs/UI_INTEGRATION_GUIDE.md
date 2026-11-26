@@ -62,19 +62,20 @@ GameBootstrap (씬마다, Gameplay)
 | UI가 읽는 창구 | `Core/Requests/IAcceptedRequestList`: `AcceptedCount`, `Accepted`(항목 목록), `event AcceptedListChanged`(수락·납품·포기·진행 변화), `event RequestBecameComplete(entry)`(조건을 다 채운 순간 → 완료 알림), `ExpectedReward(entry)`(지금 납품하면 받을 필기 점수 = 필요 재료 희귀도 점수 합, 보너스 없음) |
 | 항목(`AcceptedRequestEntry`) | `Request`(RequestDefinition), `Title`, `AcceptedOrder`(먼저 수락할수록 작음, = `Id` 포기 호출용), `Requirements`(아이템·현재·필요), `Progress`(0~1), `IsComplete`(납품 가능) |
 | 지금 (2026-11-25) | 구현은 `Core/Quest/RequestLog`(`context.Requests`). **최대 3개**(`QuestConfig`), 수락하면 씨앗 지급·게시판에서 빠짐. 규칙 메서드: `CanAccept/Accept(r)`, `Abandon(id)`, `CanDeliver/Deliver(id)`, `ReadyRequests()`, `RefillableSeeds()/GiveRefillSeeds()`, `BoardAccess()/DeliveryAccess()`(밤에만·닫힌 날), `RewardOf(r)` |
-| 포기 | `RequestLog.Abandon(id)`는 UI와 무관. 확인 창은 부르는 쪽이 `context.Confirm.Ask(문구, 예 콜백)`(Core `ConfirmChannel` → UI `ConfirmDialog`, `GameScreen.Confirm`). 지금은 책 의뢰 탭 오른쪽 아래 임시 `포기` 글자 버튼 |
+| 포기 | `RequestLog.Abandon(id)`는 UI와 무관. 확인 창은 부르는 쪽이 `context.Confirm.Ask(문구, 예 콜백)`(Core `ConfirmChannel` → UI `ConfirmScreen`(`UI_Root` 팝업 층 `UI_Confirm`, `GameScreen.Confirm`). 예·아니요 글자는 Ask의 yesLabel·noLabel로 바꿀 수 있음. `UI_Root`가 없는 씬만 예비 `ConfirmDialog`). 지금은 책 의뢰 탭 오른쪽 아래 임시 `포기` 글자 버튼 |
 | 전달 | `context.Delivery`(`DeliverySession`): `Begin()` → `Choosing`(둘 이상) / `Talking` → `Choose(id)` → `CompleteTalk()` / `Cancel()`. 크리처(`CreatureNpc`)가 단계에 따라 고르기 창(`GameScreen.DeliveryChoice`, 임시 `DeliveryChoiceWindow`, 게임 시계만 멈춤)과 대사창을 띄움 |
 | 정렬(UI가 함) | 완료 → 진행률 높은 순 → 먼저 수락한 순. 보상까지 받은 의뢰는 목록에서 빠진다 |
-| UI 코드 | `UI/Requests/QuestBarView`(바, X = 숨기기), `QuestListView`(드롭다운, 항목 클릭 = 책 의뢰 탭), `QuestToastView`(완료 알림), `UI/Book/QuestBookPage`(책 의뢰 탭) |
-| 의뢰 게시판 | 임시 `RequestBoardWindow`: 오늘 게시판(`context.Board.Offers`), 못 받는 이유, 받은 수 n/3, `씨앗 다시 받기`. 새 디자인 [미정] |
+| UI 코드 | `UI/Requests/QuestBarView`(바, X = 숨기기), `QuestListView`(드롭다운, 항목 클릭 = 책 의뢰 탭, 마우스 올림 표시는 `QuestListItemView`), `QuestToastView`(완료 알림), `UI/Book/QuestBookPage`(책 의뢰 탭) |
+| 의뢰 게시판 | `UI/Requests/RequestBoardScreen`(`UI_Root` 팝업 층 `UI_RequestBoard`, `GameScreen.RequestBoard`) + 칸 `RequestBoardEntryView`: 오늘 게시판(`context.Board.Offers`), 칸별 짧은 이유, 아래 안내 한 줄(게시판 전체 이유·씨앗 결과, 없으면 받은 수 n/3), `씨앗 다시 받기`. 여는 쪽은 `Screens.Open(GameScreen.RequestBoard)`만. 값은 테마 `RequestBoard`. `UI_Root`가 없는 씬만 예비 `RequestBoardWindow` |
 
 ### 2-5. 퀵슬롯 (화면 아래 가운데)
 | 항목 | 내용 |
 |---|---|
 | UI가 읽는 창구 | `Core/Inventory/Inventory`: `SlotCount`, `GetSlot(i)`, `SelectedIndex`, `Select(i)`, `event SlotChanged(i)`, `event SelectionChanged(i)`. 아이콘은 `ItemDefinition.Icon`(16×16 도트, 없으면 글자 대체) |
-| 입력 | 1~5 키·클릭·퀵슬롯 위 휠 = 칸 선택. 게임 화면 위 휠 = 카메라 줌(`HudState.IsPointerOverScrollHud`로 구분, `GameInputReader`) |
+| 입력 | 1~5 키·클릭·퀵슬롯 위 휠 = 칸 선택(휠은 끝 칸에서 멈춤, 돌아 넘어가지 않음). 게임 화면 위 휠 = 카메라 줌(`HudState.IsPointerOverScrollHud`로 구분, `GameInputReader`) |
 | 치트 (에디터·개발 빌드만, 2026-11-25) | 칸 **우클릭** = 개수와 상관없이 그 칸 통째로 버리기(`Inventory.DiscardSlot` + 토스트). `QuickSlotView.Setup(index, onClick, onRightClick)`, 정식 빌드에서는 우클릭을 연결하지 않음. 안내는 `ControlsHintView` 맨 아래 한 줄(`GameTexts.CheatDiscardHint`, 개발 빌드만). 정식 버리기 UI는 [미정] |
 | UI 코드 | `UI/HUD/QuickSlotBarView.cs`, `QuickSlotView.cs`. 테마 `Quick Slots` |
+| 채집 재료 아이콘 (2026-11-26) | 12종 `Art/UI/item_icons/gather/item_Gather_*.png`(16×16, 진갈색 #2B1D22 1px 외곽선, 지팡이 아이콘과 같은 규칙, Point·무압축·PPU 16)이 재료의 `Icon`에 연결됨 → 퀵슬롯에 바로 보임. FBX에서 굽는 메뉴 `VoxelMagic/뒷산/채집 재료 아이콘 굽기`(설정 `Data/Tools/GatherIconSettings`: 각도·조명·색 수·덮임 기준), 확인용 8배 시트 `gather/_preview/`. 산삼은 뿌리까지 있는 획득 모델로 찍음. **인벤토리 창 칸(`InventorySlotView`)과 획득 팝업(`AcquisitionPopup`)은 아직 `Icon`을 안 쓰고 색만 칠함** → UI 작업에서 연결 |
 | 남은 일 | 확장 인벤토리(가방, 7-4): 패널·칸 그림 없음, [미정] 많음 |
 
 ### 2-6. 책(메뉴) 화면
@@ -110,7 +111,9 @@ GameBootstrap (씬마다, Gameplay)
 | 대사창 UI가 없는 씬 | `HasPresenter`가 false면 대사 없이 결과를 바로 반영한다. 초상화 없는 대사는 이 창이 아니라 머리 위 말풍선(아직 없음) |
 | UI 코드 | `UI/Dialog/DialogueWindow`(UiScreen, Popup 층 `UI_Dialogue`): 패널(320×96) → 초상화(72×72) → 왼쪽 열(80×96) → 이름 → 본문 → ▼. 4px 겹쳐 396×96, 1.25배(495×120, 사용자 결정), 화면 아래 가운데. ▼는 글자판 오른쪽·아래 여백 8 타이핑 `maxVisibleCharacters`(초당 30자, unscaled), 같은 프레임 중복 입력 무시, 클릭·Space·E로 진행. 본문 낱말 단위 줄바꿈, 3줄 넘으면 콘솔 경고 |
 | 이름 맞춤 | 갈무리11 Bold 12px(4자) → 갈무리9 10px(5자) → 갈무리7 8px(7자) 순으로 이름표 폭 72에 맞추고(6자 / 7자 / 9자까지), 세로는 실제 글자 모양(글리프) 기준으로 크림색 줄(4,79,72×13) 가운데, 작은 글씨는 1px 겹쳐 굵게. 그래도 넘치면 `…`. 테마 `Dialogue › Name Styles` |
-| 테마 | `Dialogue`(배수, 아래 여백, 겹침 4, 초상화 위치·**크기**, 이름표·본문·▼ 위치, 그림이 없을 때 쓸 왼쪽 열·패널·▼ 크기, 타이핑 속도, 열기 페이드 0.12초·6px). 그림 크기를 바꾸면 이 값들을 함께 고치고 메뉴 `화면 만들기/대사창`을 다시 실행 |
+| 선택지(6-4) | `context.Dialogue.Ask(질문 줄, DialogueOption 목록, 고른 뒤(번호), ESC 번호)`. `DialogueOption(글자, 오른쪽 작은 글자, 흐리게)`. 고른 뒤 콜백·대사 끝 콜백 안에서 다음 `Play`/`Ask`를 부르면 대사창이 닫히지 않고 이어진다. 아무것도 열지 않으면 닫힌다. 입력: 화면이 열려 있으면 `GameInputReader`가 이동 키를 `Screens.Navigate(±1)`로, 닫히지 않는 화면의 ESC는 `Screens.CancelIgnored`로 보낸다 |
+| 크리처 대화 | `CreatureNpc`(Gameplay): 메뉴 → 이야기(화자 `SmallTalk`)·과외(임시 대사, **과외 시스템이 생기면 `Conversation.OnMenu`의 MenuLesson에서 연다**)·의뢰 전달(`DeliverySession` 단계를 `Ask`/`Play`로)·그만두기. 대사창·화자가 없는 씬은 메뉴 없이 바로 전달. 치트 `CreatureNpc.StartDelivery`는 메뉴 없이 전달부터 |
+| 테마 | `Dialogue`(배수, 아래 여백, 겹침 4, 초상화 위치·**크기**, 이름표·본문·▼ 위치, 그림이 없을 때 쓸 왼쪽 열·패널·▼ 크기, 타이핑 속도, 열기 페이드 0.12초·6px, 선택지 칸·줄 간격·들여쓰기·커서·색). 그림 크기를 바꾸면 이 값들을 함께 고치고 메뉴 `화면 만들기/대사창`을 다시 실행 |
 | 옛 코드 | `CreatureDialogView`는 아무것도 하지 않게 비워 둠(씬에 남아 있음, 옛 UI 정리 때 삭제). `GameMessages.CreatureSpeechRequested`는 더 쓰지 않음 |
 
 ### 2-9. 그 밖의 HUD
@@ -167,6 +170,8 @@ GameBootstrap (씬마다, Gameplay)
 
 ### 3-6. 리스트·성능
 - 개수 제한이 없는 목록은 보이는 만큼만 항목을 만들어 재사용(가상 스크롤, `QuestListView`·`QuestBookPage` 참고). 정렬·높이 계산은 목록이 바뀔 때만.
+- 픽셀 글꼴 글자를 칸·바탕 안 세로 가운데에 둘 때는 줄 높이가 아니라 `UiTextInk.CenterVertically(글자, 칸 위, 칸 높이)`를 쓴다(글자 모양이 줄 위쪽에 붙어 있어 줄 높이로 맞추면 위로 치우침). 책 안 글자 버튼은 `BookTextButton`.
+- 스크롤바(`W_Scrollbar`)를 쓰는 화면은 연결할 때 `ThemedPanel.EnableScrollbarInput(scrollbar)`를 부른다. 테마 패널은 기본으로 마우스를 받지 않아, 이것이 없으면 손잡이를 끌 수 없다(휠만 됨).
 - 같은 값이면 다시 그리지 않는다(`ThemedText.SetText`도 같은 글자면 무시).
 - LayoutGroup·ContentSizeFitter 대신 코드로 정수 px 계산.
 

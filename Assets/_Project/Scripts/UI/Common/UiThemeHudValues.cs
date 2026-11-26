@@ -159,6 +159,10 @@ namespace VoxelMagic.UI
         [SerializeField, Tooltip("갈무리9에는 굵은체가 없어 제목을 1px 오른쪽에 한 번 더 그려 굵게 보이게 한다")] private bool _titlePixelBold = true;
         [SerializeField, Tooltip("재료 줄 글자 (갈무리9 10px)")] private UiTextStyle _requirementStyle = UiTextStyle.Small;
         [SerializeField, Tooltip("완료(납품 가능)한 의뢰 글자색 (13장 임시 #4A90C8)")] private Color _completedColor = new Color32(0x4A, 0x90, 0xC8, 0xFF);
+        [Header("마우스 올림 (누르면 책이 열린다)")]
+        [SerializeField, Tooltip("마우스를 올린 의뢰 글자색 (대사창 선택지와 같은 강조색)")] private Color _hoverColor = new Color32(0xC0, 0x60, 0x3A, 0xFF);
+        [SerializeField, Tooltip("누르는 동안 글자색")] private Color _pressedColor = new Color32(0x8E, 0x45, 0x27, 0xFF);
+        [SerializeField, Tooltip("마우스를 올린 의뢰 뒤 옅은 바탕 (반투명)")] private Color _hoverBacking = new Color32(191, 160, 112, 80);
 
         public int BarGap => _barGap;
         public int PaddingX => _paddingX;
@@ -173,6 +177,9 @@ namespace VoxelMagic.UI
         public bool TitlePixelBold => _titlePixelBold;
         public UiTextStyle RequirementStyle => _requirementStyle;
         public Color CompletedColor => _completedColor;
+        public Color HoverColor => _hoverColor;
+        public Color PressedColor => _pressedColor;
+        public Color HoverBacking => _hoverBacking;
     }
 
     /// <summary>의뢰 완료 알림 창(UI_SPEC 10-6, 13장 임시: 3초, 페이드, 여러 건은 하나씩).</summary>
@@ -229,9 +236,18 @@ namespace VoxelMagic.UI
         [SerializeField, Tooltip("칸 안 글자 왼쪽 여백")] private int _rowTextInset = 5;
         [SerializeField, Tooltip("머리(수락한 의뢰(n)) 아래 구분선까지")] private int _headerGap = 4;
         [SerializeField, Tooltip("체크 상자와 글자 사이")] private int _checkboxGap = 4;
-        [SerializeField, Tooltip("본문 제목 → 대사 사이")] private int _titleGap = 6;
+        [SerializeField, Tooltip("본문 제목 → 구분선 사이")] private int _titleLineGap = 3;
+        [SerializeField, Tooltip("구분선 → 대사 사이")] private int _titleGap = 6;
+        [SerializeField, Tooltip("오른쪽 본문 제목 글자 (갈무리11 굵게 12px)")] private UiTextStyle _detailTitleStyle = UiTextStyle.BodyBold;
+        [SerializeField, Tooltip("소제목 글자: 필요한 재료·보상 (갈무리9 10px)")] private UiTextStyle _detailLabelStyle = UiTextStyle.Small;
+        [SerializeField, Tooltip("갈무리9에는 굵은체가 없어 소제목을 1px 오른쪽에 한 번 더 그려 굵게 보이게 한다")] private bool _detailLabelPixelBold = true;
+        [SerializeField, Tooltip("내용 글자: 대사·재료·보상 값 (갈무리9 10px, 소제목과는 굵기로만 구분)")] private UiTextStyle _detailBodyStyle = UiTextStyle.Small;
+        [SerializeField, Tooltip("소제목 → 내용 사이")] private int _labelGap = 4;
+        [SerializeField, Tooltip("소제목·보상 줄 왼쪽 들여쓰기 (제목·대사 기준)")] private int _sectionIndent = 6;
+        [SerializeField, Tooltip("책 글자 버튼(포기 등) 글자")] private UiTextStyle _textButtonStyle = UiTextStyle.BodyBold;
+        [SerializeField, Tooltip("책 글자 버튼 바탕 안 글자 둘레 여백 (x 좌우, y 위아래, 테두리 1px 제외). 목록 칸과 같게 위아래 4")] private Vector2Int _textButtonPadding = new Vector2Int(5, 4);
         [SerializeField, Tooltip("본문 묶음 사이 (대사 → 재료 → 보상)")] private int _sectionGap = 10;
-        [SerializeField, Tooltip("재료 줄 들여쓰기")] private int _requirementIndent = 8;
+        [SerializeField, Tooltip("재료 줄 들여쓰기 (소제목 기준)")] private int _requirementIndent = 1;
         [SerializeField, Tooltip("'보상'과 값 사이")] private int _rewardGap = 8;
         [Header("장 표지 (고를 것이 없는 탭의 왼쪽 페이지)")]
         [SerializeField, Min(1), Tooltip("탭 아이콘 배수 (12×12 × 정수 배)")] private int _coverIconScale = 4;
@@ -290,6 +306,15 @@ namespace VoxelMagic.UI
         public int HeaderGap => _headerGap;
         public int CheckboxGap => _checkboxGap;
         public int TitleGap => _titleGap;
+        public int TitleLineGap => _titleLineGap;
+        public UiTextStyle DetailTitleStyle => _detailTitleStyle;
+        public UiTextStyle DetailLabelStyle => _detailLabelStyle;
+        public bool DetailLabelPixelBold => _detailLabelPixelBold;
+        public UiTextStyle DetailBodyStyle => _detailBodyStyle;
+        public int SectionIndent => _sectionIndent;
+        public UiTextStyle TextButtonStyle => _textButtonStyle;
+        public Vector2Int TextButtonPadding => _textButtonPadding;
+        public int LabelGap => _labelGap;
         public int SectionGap => _sectionGap;
         public int RequirementIndent => _requirementIndent;
         public int RewardGap => _rewardGap;
@@ -367,7 +392,7 @@ namespace VoxelMagic.UI
         [SerializeField, Tooltip("이름 글자 좌우 최소 여백")] private int _namePadding = 2;
         [SerializeField, Tooltip("이름이 길면 차례로 작은 글씨로 (갈무리11 Bold 12 → 갈무리9 10 → 갈무리7 8). 마지막에도 넘치면 … 으로 자른다")]
         private UiTextStyle[] _nameStyles = { UiTextStyle.BodyBold, UiTextStyle.Small, UiTextStyle.Tiny };
-        [SerializeField, Tooltip("패널 안 대사 글자 칸 (x, y, 폭, 높이). 12px·줄 16·최대 3줄")] private RectInt _textArea = new RectInt(14, 20, 292, 48);
+        [SerializeField, Tooltip("패널 안 대사 글자 칸 (x, y, 폭, 높이). 12px·줄 16·최대 3줄. 글자 모양이 칸 위 1px 아래에서 시작해, 크림색 글자판에서 왼쪽·위 여백이 9로 같다")] private RectInt _textArea = new RectInt(14, 13, 292, 48);
         [SerializeField, Min(1), Tooltip("최대 줄 수. 넘치면 콘솔 경고(대사를 나눌 것)")] private int _maxLines = 3;
         [SerializeField, Tooltip("패널 안 ▼ 위치. 글자판(크림색) 오른쪽·아래 끝에서 같은 여백 8")] private Vector2Int _arrowPosition = new Vector2Int(301, 80);
         [SerializeField, Min(1f), Tooltip("타이핑 속도(글자/초, 시간 정지와 무관)")] private float _charsPerSecond = 30f;
@@ -378,6 +403,21 @@ namespace VoxelMagic.UI
         [SerializeField] private Sprite _leftColumn;
         [SerializeField] private Sprite _nextArrow;
         [SerializeField, Tooltip("화자에 초상화가 없을 때 (테스트용)")] private Sprite _placeholderPortrait;
+
+        [Header("선택지 (6-4: 대사창 안 글자 버튼)")]
+        [SerializeField, Tooltip("선택지 화면의 질문 한 줄 칸 (패널 안 x, y, 폭, 높이)")] private RectInt _choicePromptArea = new RectInt(14, 12, 292, 16);
+        [SerializeField, Tooltip("첫 선택지 줄의 위 (패널 안 y)")] private int _choiceTop = 30;
+        [SerializeField, Tooltip("선택지 한 줄 높이")] private int _choiceRowHeight = 14;
+        [SerializeField, Tooltip("선택지 글자의 왼쪽 들여쓰기 (커서 ▶ 자리 포함, 글자 칸 왼쪽 기준)")] private int _choiceIndent = 10;
+        [SerializeField, Tooltip("커서 ▶ 위치 (선택지 줄 왼쪽 위 기준)")] private Vector2Int _choiceCursorOffset = new Vector2Int(0, 3);
+        [SerializeField, Min(1), Tooltip("한 번에 보이는 선택지 줄 수. 넘치면 콘솔 경고")] private int _maxChoices = 4;
+        [SerializeField] private UiTextStyle _choiceStyle = UiTextStyle.Body;
+        [SerializeField, Tooltip("오른쪽 작은 글자 (보상 +n)")] private UiTextStyle _choiceDetailStyle = UiTextStyle.Small;
+        [SerializeField, Tooltip("올려놓음·키보드로 고른 선택지 글자색")] private Color _choiceSelectedColor = new Color32(0xC0, 0x60, 0x3A, 0xFF);
+        [SerializeField, Tooltip("누르는 동안 글자색 (글자는 1px 내려감)")] private Color _choicePressedColor = new Color32(0x8E, 0x45, 0x27, 0xFF);
+        [SerializeField, Tooltip("지금은 안 되는 선택지 글자색 (그래도 고를 수 있음)")] private Color _choiceDimmedColor = new Color32(150, 120, 84, 255);
+        [SerializeField, Tooltip("누를 때 글자가 내려가는 거리")] private int _choicePressDrop = 1;
+        [SerializeField, Tooltip("커서 ▶ (오른쪽을 가리키는 4×7)")] private Sprite _choiceCursor;
 
         public float Scale => Mathf.Max(0.5f, Mathf.Round(_scale * 20f) / 20f);
         public int BottomMargin => _bottomMargin;
@@ -402,6 +442,20 @@ namespace VoxelMagic.UI
         public Sprite LeftColumn => _leftColumn;
         public Sprite NextArrow => _nextArrow;
         public Sprite PlaceholderPortrait => _placeholderPortrait;
+        public RectInt ChoicePromptArea => _choicePromptArea;
+        public int ChoiceTop => _choiceTop;
+        public int ChoiceRowHeight => Mathf.Max(1, _choiceRowHeight);
+        public int ChoiceIndent => _choiceIndent;
+        public Vector2Int ChoiceCursorOffset => _choiceCursorOffset;
+        public int MaxChoices => Mathf.Max(1, _maxChoices);
+        public UiTextStyle ChoiceStyle => _choiceStyle;
+        public UiTextStyle ChoiceDetailStyle => _choiceDetailStyle;
+        public Color ChoiceSelectedColor => _choiceSelectedColor;
+        public Color ChoicePressedColor => _choicePressedColor;
+        public Color ChoiceDimmedColor => _choiceDimmedColor;
+        public int ChoicePressDrop => _choicePressDrop;
+        public Sprite ChoiceCursor => _choiceCursor;
+        public void SetChoiceCursor(Sprite cursor) => _choiceCursor = cursor;
 
         public void SetSprites(Sprite panel, Sprite leftColumn, Sprite arrow, Sprite placeholder)
         {
@@ -551,5 +605,63 @@ namespace VoxelMagic.UI
         public Vector2Int Group => _group;
         public Vector2Int Label => _label;
         public Vector2Int Number => _number;
+    }
+
+    /// <summary>확인 창(예/아니요, 포기·나가기 등): 깔끔한 종이 9-slice 바탕 + 책 페이지 버튼 두 개. 크기는 1배 px.</summary>
+    [System.Serializable]
+    public sealed class ConfirmValues
+    {
+        [SerializeField, Tooltip("창 바탕 (confirm_ui/confirm_panel.png, 9-slice 8)")] private Sprite _panel;
+        [SerializeField, Tooltip("창 안쪽 여백 (테두리 포함, 글자·버튼까지)")] private int _padding = 12;
+        [SerializeField, Tooltip("메시지 → 버튼 사이")] private int _messageGap = 10;
+        [SerializeField, Tooltip("예·아니요 버튼 크기 (책 페이지 버튼 그림)")] private Vector2Int _buttonSize = new Vector2Int(56, 20);
+        [SerializeField, Tooltip("두 버튼 사이")] private int _buttonGap = 12;
+        [SerializeField, Tooltip("창 폭 범위: 메시지 길이에 맞추되 이 안에서 (넘으면 낱말 단위 줄바꿈)")] private Vector2Int _widthRange = new Vector2Int(160, 260);
+        [SerializeField] private UiTextStyle _messageStyle = UiTextStyle.Body;
+
+        public Sprite Panel => _panel;
+        public int Padding => _padding;
+        public int MessageGap => _messageGap;
+        public Vector2Int ButtonSize => _buttonSize;
+        public int ButtonGap => _buttonGap;
+        public Vector2Int WidthRange => _widthRange;
+        public UiTextStyle MessageStyle => _messageStyle;
+
+        public void SetPanel(Sprite panel) => _panel = panel;
+    }
+
+    /// <summary>의뢰 게시판 창(낡은 종이 Tiled 바탕): 머리·의뢰 칸(왼쪽 글자 4줄 + 오른쪽 수락·보상·이유)·아래 씨앗 버튼과 안내. 크기는 1배 px.</summary>
+    [System.Serializable]
+    public sealed class RequestBoardValues
+    {
+        [SerializeField, Tooltip("창 폭 (높이는 의뢰 수에 맞춰 계산)")] private int _width = 320;
+        [SerializeField, Tooltip("창 안쪽 여백 (찢긴 가장자리 6 + 4)")] private int _padding = 12;
+        [SerializeField, Tooltip("구분선 위아래 간격")] private int _lineGap = 6;
+        [SerializeField, Tooltip("의뢰 한 칸 높이 (제목 16 + 대사 + 재료 + 힌트)")] private int _entryHeight = 56;
+        [SerializeField, Tooltip("의뢰 칸 사이 (가운데에 1px 구분선)")] private int _entryGap = 7;
+        [SerializeField, Tooltip("오른쪽 칸(수락·보상·이유) 폭")] private int _rightColumn = 64;
+        [SerializeField] private Vector2Int _acceptSize = new Vector2Int(56, 20);
+        [SerializeField] private Vector2Int _refillSize = new Vector2Int(100, 20);
+        [SerializeField] private UiTextStyle _titleStyle = UiTextStyle.BodyBold;
+        [SerializeField] private UiTextStyle _bodyStyle = UiTextStyle.Small;
+        [SerializeField, Tooltip("서식지 힌트·못 받는 이유 (갈무리7 8px)")] private UiTextStyle _smallStyle = UiTextStyle.Tiny;
+        [SerializeField, Tooltip("옅은 글자: '모아 올 것'·힌트·흐린 버튼")] private Color _mutedColor = new Color32(150, 120, 84, 255);
+        [SerializeField, Tooltip("보상 '필기 +n'")] private Color _rewardColor = new Color32(0xC0, 0x60, 0x3A, 0xFF);
+        [SerializeField, Tooltip("못 받는 이유·게시판 안내")] private Color _warnColor = new Color32(0x8C, 0x2F, 0x2A, 0xFF);
+
+        public int Width => _width;
+        public int Padding => _padding;
+        public int LineGap => _lineGap;
+        public int EntryHeight => _entryHeight;
+        public int EntryGap => _entryGap;
+        public int RightColumn => _rightColumn;
+        public Vector2Int AcceptSize => _acceptSize;
+        public Vector2Int RefillSize => _refillSize;
+        public UiTextStyle TitleStyle => _titleStyle;
+        public UiTextStyle BodyStyle => _bodyStyle;
+        public UiTextStyle SmallStyle => _smallStyle;
+        public Color MutedColor => _mutedColor;
+        public Color RewardColor => _rewardColor;
+        public Color WarnColor => _warnColor;
     }
 }

@@ -13,13 +13,13 @@ MonoBehaviour:
   m_Name: GatheringConfig
   m_EditorClassIdentifier: 
   _spotsPerKind: 8
-  _activeSpotsPerKind: 4
+  _activeSpotsPerKind: 5
   _rarity:
-    _common: 60
+    _common: 45
     _uncommon: 30
-    _rare: 10
+    _rare: 25
   _materials:
-  - {fileID: 11400000, guid: ba50b8e8f541aa74897cbe737d121c41, type: 2}
+  - {fileID: 11400000, guid: 71002fb596447024f98fd90abffde3b9, type: 2}
   - {fileID: 11400000, guid: 5c9cd669a4c24764d99d91e9e0f7270e, type: 2}
   - {fileID: 11400000, guid: 8456a0ef65b8d454e8b7dacdafe297fd, type: 2}
   - {fileID: 11400000, guid: f671480368ed82f4d9e3d1dc217eb429, type: 2}

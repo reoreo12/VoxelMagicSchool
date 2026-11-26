@@ -11,7 +11,7 @@ namespace VoxelMagic.Core
         RequestDetail,
         /// <summary>초상화 대사창 (크리처 대화·수업, UI_SPEC 6장)</summary>
         Dialogue,
-        /// <summary>크리처에게 전달할 의뢰 고르기 (QUEST_TIMER 7-7, 임시 UI)</summary>
+        /// <summary>쓰지 않음(2026-11-26): 의뢰 고르기는 대사창 선택지로 옮김. 뒤 번호(Confirm)가 밀리지 않게 남겨 둔다.</summary>
         DeliveryChoice,
         /// <summary>예/아니요 확인 창 (포기 등, 임시 UI)</summary>
         Confirm

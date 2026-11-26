@@ -17,7 +17,7 @@ MonoBehaviour:
   _description: "\uBFB0\uC871\uD55C \uAC00\uC2DC\uB97C \uB450\uB978 \uC7A3. \uBCBC\uB77D\uB2E4\uB78C\uC950\uC758
     \uC8FC\uC2DD."
   _iconColor: {r: 0.5, g: 0.35, b: 0.2, a: 1}
-  _icon: {fileID: 0}
+  _icon: {fileID: 21300000, guid: 6232074b677bf554a9e75ce28c1c4692, type: 3}
   _maxStack: 99
   _creatureNote: "\uAC00\uC2DC\uC7A3\uC740 \uBCBC\uB77D\uB2E4\uB78C\uC950\uAC00 \uC81C\uC77C
     \uC88B\uC544\uD574\u2026 \uAE4C\uB2E4\uAC00 \uC190 \uCC14\uB9AC\uC9C0 \uB9C8."
@@ -31,5 +31,8 @@ MonoBehaviour:
   _sizeRangeCm:
     _min: 3
     _max: 8
-  _worldMesh: {fileID: 10200, guid: 0000000000000000e000000000000000, type: 0}
-  _worldScale: {x: 0.18, y: 0.14, z: 0.18}
+  _worldMesh: {fileID: 4072503542502507323, guid: 1c3d1f97b9ed27b45943a47e2cb09a4b, type: 3}
+  _worldMaterial: {fileID: 2100000, guid: d8f578bc5ab2bfa43a64a66b6e2a23b7, type: 2}
+  _worldScale: {x: 1.5, y: 1.5, z: 1.5}
+  _worldRotation: {x: -90, y: 0, z: 0}
+  _acquireModel: {fileID: 0}
