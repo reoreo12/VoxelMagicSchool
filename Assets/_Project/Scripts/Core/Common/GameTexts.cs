@@ -36,6 +36,9 @@ namespace VoxelMagic.Core
 
         public const string RequestSlotsFullFormat = "의뢰는 {0}개까지 받을 수 있어요. 크리처에게 전달하거나 포기해서 칸을 비우자";
         public const string RequestSlotsFullShort = "받을 칸이 없어요";
+        public const string RequestNoRoomShort = "씨앗 칸 부족";
+        public const string NeedsLabel = "모아 올 것";
+        public const string RewardShortWritten = "필기 +{0}";
         public const string RequestNotNight = "게시판은 밤에만 열려요";
         public const string RequestBoardClosed = "이제 게시판에 새 의뢰가 올라오지 않아요";
         public const string RequestNotOnBoard = "오늘 게시판에 없는 의뢰예요";

@@ -66,7 +66,7 @@ GameBootstrap (씬마다, Gameplay)
 | 전달 | `context.Delivery`(`DeliverySession`): `Begin()` → `Choosing`(둘 이상) / `Talking` → `Choose(id)` → `CompleteTalk()` / `Cancel()`. 크리처(`CreatureNpc`)가 단계에 따라 고르기 창(`GameScreen.DeliveryChoice`, 임시 `DeliveryChoiceWindow`, 게임 시계만 멈춤)과 대사창을 띄움 |
 | 정렬(UI가 함) | 완료 → 진행률 높은 순 → 먼저 수락한 순. 보상까지 받은 의뢰는 목록에서 빠진다 |
 | UI 코드 | `UI/Requests/QuestBarView`(바, X = 숨기기), `QuestListView`(드롭다운, 항목 클릭 = 책 의뢰 탭, 마우스 올림 표시는 `QuestListItemView`), `QuestToastView`(완료 알림), `UI/Book/QuestBookPage`(책 의뢰 탭) |
-| 의뢰 게시판 | 임시 `RequestBoardWindow`: 오늘 게시판(`context.Board.Offers`), 못 받는 이유, 받은 수 n/3, `씨앗 다시 받기`. 새 디자인 [미정] |
+| 의뢰 게시판 | `UI/Requests/RequestBoardScreen`(`UI_Root` 팝업 층 `UI_RequestBoard`, `GameScreen.RequestBoard`) + 칸 `RequestBoardEntryView`: 오늘 게시판(`context.Board.Offers`), 칸별 짧은 이유, 아래 안내 한 줄(게시판 전체 이유·씨앗 결과, 없으면 받은 수 n/3), `씨앗 다시 받기`. 여는 쪽은 `Screens.Open(GameScreen.RequestBoard)`만. 값은 테마 `RequestBoard`. `UI_Root`가 없는 씬만 예비 `RequestBoardWindow` |
 
 ### 2-5. 퀵슬롯 (화면 아래 가운데)
 | 항목 | 내용 |

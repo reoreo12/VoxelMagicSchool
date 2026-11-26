@@ -251,6 +251,21 @@ MonoBehaviour:
     _buttonGap: 12
     _widthRange: {x: 160, y: 260}
     _messageStyle: 0
+  _requestBoard:
+    _width: 320
+    _padding: 12
+    _lineGap: 6
+    _entryHeight: 56
+    _entryGap: 7
+    _rightColumn: 64
+    _acceptSize: {x: 56, y: 20}
+    _refillSize: {x: 100, y: 20}
+    _titleStyle: 1
+    _bodyStyle: 3
+    _smallStyle: 4
+    _mutedColor: {r: 0.5882353, g: 0.47058824, b: 0.32941177, a: 1}
+    _rewardColor: {r: 0.7529412, g: 0.3764706, b: 0.22745098, a: 1}
+    _warnColor: {r: 0.54901963, g: 0.18431373, b: 0.16470589, a: 1}
   _dialogue:
     _scale: 1.25
     _bottomMargin: 8

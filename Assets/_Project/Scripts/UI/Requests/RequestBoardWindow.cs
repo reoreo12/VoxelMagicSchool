@@ -1,4 +1,4 @@
-// 의뢰 게시판 창(임시 UI). 화면 스택이 게시판을 열면 오늘 게시판(RequestBoardState)의 의뢰를 보여 주고, 수락은 RequestLog에 요청한다.
+// 의뢰 게시판 창(임시 UI, UI_Root가 없는 Prototype_FarmFishing에만 남은 예비. 정식은 RequestBoardScreen). 화면 스택이 게시판을 열면 오늘 게시판(RequestBoardState)의 의뢰를 보여 주고, 수락은 RequestLog에 요청한다.
 // 못 받는 이유(칸이 꽉 참·씨앗 자리·밤에만·닫힌 날)와 "씨앗 다시 받기" 버튼을 함께 둔다. 수락한 의뢰는 게시판에서 빠진다.
 using System.Collections.Generic;
 using TMPro;

@@ -17,9 +17,20 @@ namespace VoxelMagic.UI
         private Vector2Int _baseSize;
         private bool _hover;
         private bool _pressed;
+        private bool _interactable = true;
+        private Color _disabledColor;
 
         public RectTransform Rect => (RectTransform)transform;
         public event Action Clicked;
+
+        /// <summary>누를 수 없으면 평상시 그림 + 흐린 글자, 마우스 올림·누름·클릭을 받지 않는다.</summary>
+        public void SetInteractable(bool interactable, Color disabledColor)
+        {
+            _interactable = interactable;
+            _disabledColor = disabledColor;
+            if (!interactable) { _hover = false; _pressed = false; }
+            Refresh();
+        }
 
         /// <summary>부모 왼쪽 위 기준 정수 px에 놓고 글자를 넣는다.</summary>
         public void Show(string text, BookValues values, int x, int y, int width, int height)
@@ -40,6 +51,7 @@ namespace VoxelMagic.UI
             _background.raycastTarget = true;
             PixelLayout.Stretch(_background.rectTransform);
             _label.SetStyle(_hover ? UiTextStyle.BodyBold : UiTextStyle.Body);
+            _label.SetColorOverride(!_interactable, _disabledColor);
             CenterLabel();
         }
 
@@ -68,14 +80,14 @@ namespace VoxelMagic.UI
             rect.anchoredPosition = new Vector2(wantLeft - bounds.min.x, -(wantTop - (-bounds.max.y)));
         }
 
-        public void OnPointerEnter(PointerEventData eventData) { _hover = true; Refresh(); }
+        public void OnPointerEnter(PointerEventData eventData) { if (!_interactable) return; _hover = true; Refresh(); }
         public void OnPointerExit(PointerEventData eventData) { _hover = false; _pressed = false; Refresh(); }
-        public void OnPointerDown(PointerEventData eventData) { if (eventData.button == PointerEventData.InputButton.Left) { _pressed = true; Refresh(); } }
+        public void OnPointerDown(PointerEventData eventData) { if (_interactable && eventData.button == PointerEventData.InputButton.Left) { _pressed = true; Refresh(); } }
         public void OnPointerUp(PointerEventData eventData) { _pressed = false; Refresh(); }
 
         public void OnPointerClick(PointerEventData eventData)
         {
-            if (eventData.button == PointerEventData.InputButton.Left) Clicked?.Invoke();
+            if (_interactable && eventData.button == PointerEventData.InputButton.Left) Clicked?.Invoke();
         }
     }
 }

@@ -629,4 +629,39 @@ namespace VoxelMagic.UI
 
         public void SetPanel(Sprite panel) => _panel = panel;
     }
+
+    /// <summary>의뢰 게시판 창(낡은 종이 Tiled 바탕): 머리·의뢰 칸(왼쪽 글자 4줄 + 오른쪽 수락·보상·이유)·아래 씨앗 버튼과 안내. 크기는 1배 px.</summary>
+    [System.Serializable]
+    public sealed class RequestBoardValues
+    {
+        [SerializeField, Tooltip("창 폭 (높이는 의뢰 수에 맞춰 계산)")] private int _width = 320;
+        [SerializeField, Tooltip("창 안쪽 여백 (찢긴 가장자리 6 + 4)")] private int _padding = 12;
+        [SerializeField, Tooltip("구분선 위아래 간격")] private int _lineGap = 6;
+        [SerializeField, Tooltip("의뢰 한 칸 높이 (제목 16 + 대사 + 재료 + 힌트)")] private int _entryHeight = 56;
+        [SerializeField, Tooltip("의뢰 칸 사이 (가운데에 1px 구분선)")] private int _entryGap = 7;
+        [SerializeField, Tooltip("오른쪽 칸(수락·보상·이유) 폭")] private int _rightColumn = 64;
+        [SerializeField] private Vector2Int _acceptSize = new Vector2Int(56, 20);
+        [SerializeField] private Vector2Int _refillSize = new Vector2Int(100, 20);
+        [SerializeField] private UiTextStyle _titleStyle = UiTextStyle.BodyBold;
+        [SerializeField] private UiTextStyle _bodyStyle = UiTextStyle.Small;
+        [SerializeField, Tooltip("서식지 힌트·못 받는 이유 (갈무리7 8px)")] private UiTextStyle _smallStyle = UiTextStyle.Tiny;
+        [SerializeField, Tooltip("옅은 글자: '모아 올 것'·힌트·흐린 버튼")] private Color _mutedColor = new Color32(150, 120, 84, 255);
+        [SerializeField, Tooltip("보상 '필기 +n'")] private Color _rewardColor = new Color32(0xC0, 0x60, 0x3A, 0xFF);
+        [SerializeField, Tooltip("못 받는 이유·게시판 안내")] private Color _warnColor = new Color32(0x8C, 0x2F, 0x2A, 0xFF);
+
+        public int Width => _width;
+        public int Padding => _padding;
+        public int LineGap => _lineGap;
+        public int EntryHeight => _entryHeight;
+        public int EntryGap => _entryGap;
+        public int RightColumn => _rightColumn;
+        public Vector2Int AcceptSize => _acceptSize;
+        public Vector2Int RefillSize => _refillSize;
+        public UiTextStyle TitleStyle => _titleStyle;
+        public UiTextStyle BodyStyle => _bodyStyle;
+        public UiTextStyle SmallStyle => _smallStyle;
+        public Color MutedColor => _mutedColor;
+        public Color RewardColor => _rewardColor;
+        public Color WarnColor => _warnColor;
+    }
 }

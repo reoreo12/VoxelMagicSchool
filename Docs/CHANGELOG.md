@@ -1,5 +1,14 @@
 # 변경 기록
 
+## 2026-11-26 — 의뢰 게시판 UI (낡은 종이 창)
+- 임시 도형 게시판(`RequestBoardWindow`, HUDCanvas) → `UI_Root` 팝업 층의 새 화면 `UI_RequestBoard`(`RequestBoardScreen` + 칸 `RequestBoardEntryView`). 빌더 메뉴 `VoxelMagic/UI/화면 만들기/의뢰 게시판`. 설계 그림 `Art/UI/board_ui/_preview/`
+- 창: 낡은 종이 `quest_detail_paper`(Tiled), 폭 320, 화면 가운데, 딤 0.6. 머리 `의뢰 게시판` 12px 굵게 + X(`close_*`) + 구분선
+- 의뢰 칸: 왼쪽 제목 12px 굵게 → 크리처 대사 10px(길면 낱말 줄바꿈, 칸이 그만큼 높아짐) → `모아 올 것`(옅게) + 재료 → 서식지 힌트 8px(옅게). 오른쪽 `수락`(책 페이지 버튼 56×20, 못 받으면 흐림) → `필기 +n`(#C0603A) → 짧은 이유(`받을 칸이 없어요`·`씨앗 칸 부족`, #8C2F2A). 칸 사이 1px 구분선
+- 아래: `씨앗 다시 받기`(받은 의뢰가 없으면 흐림) + 오른쪽 안내(낮·닫힌 날·빈 게시판·씨앗 결과는 경고색, 없으면 `받은 의뢰 n/m`, 길면 8px로 줄임)
+- `BookMenuButton.SetInteractable`(누를 수 없을 때 흐린 글자, 올림·누름·클릭 무시). 테마 `RequestBoard` 값, 문구 `NeedsLabel`·`RequestNoRoomShort`·`RewardShortWritten`
+- BackMountain·Creature_Cave·FarmPond 씬의 옛 게시판 삭제. `Prototype_FarmFishing`은 `UI_Root`가 없어 남김(예비)
+- 확인(플레이 모드, 자동 저장 끔): 낮 = 수락 흐림 + `게시판은 밤에만 열려요`, 밤(시험용으로 시간 연결 끊음) = 수락 → 목록에서 빠짐·`받은 의뢰 1/3`·씨앗 버튼 켜짐, 두 줄 대사, 마우스 올림, X·ESC 닫기
+
 ## 2026-11-26 — 확인 창(예/아니요) 텍스처로
 - 임시 도형 확인 창(`ConfirmDialog`, 1920×1080 늘어나는 HUD 캔버스) → `UI_Root` 팝업 층의 새 화면 `UI_Confirm`(`ConfirmScreen`, 픽셀 정수 배율). 빌더 메뉴 `VoxelMagic/UI/화면 만들기/확인 창`
 - 창 바탕 새 그림 `Art/UI/confirm_ui/confirm_panel.png`(24×24, 9-slice 8, 크림 종이 + 2px 진갈색 테두리 + 안쪽 밝은 줄·그늘, 모서리 1px 깎음). 버튼은 책 페이지 버튼(`btn_page_*`, `BookMenuButton`), 글자는 갈무리11 12px 가운데·낱말 줄바꿈
