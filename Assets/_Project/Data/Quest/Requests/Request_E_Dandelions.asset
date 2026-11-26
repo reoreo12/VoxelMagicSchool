@@ -12,15 +12,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6e2e2f20d9b88964fa16d99bbf67be48, type: 3}
   m_Name: Request_E_Dandelions
   m_EditorClassIdentifier: 
-  _title: "\uBBFC\uB4E4\uB808 \uAF43\uB2E4\uBC1C"
-  _creatureLine: "\uBBFC\uB4E4\uB808 \uB450 \uC1A1\uC774. \uAD74\uC774 \uB108\uBB34
-    \uCE59\uCE59\uD574\uC11C."
-  _habitatHint: "\uCD08\uC785 \uD3C9\uC9C0\uC5D0 \uD754\uD558\uAC8C \uD53C\uC5B4
+  _title: "\uC465 \uD55C \uC544\uB984"
+  _creatureLine: "\uC465 \uB450 \uC90C. \uAD74\uC5D0\uC11C \uD034\uD034\uD55C \uB0C4\uC0C8\uAC00
+    \uB098\uC11C."
+  _habitatHint: "\uCD08\uC785 \uD3C9\uC9C0\uC5D0 \uD754\uD558\uAC8C \uC790\uB77C
     \uC788\uC5B4"
   _difficulty: 0
   _requirements:
-  - _item: {fileID: 11400000, guid: ba50b8e8f541aa74897cbe737d121c41, type: 2}
+  - _item: {fileID: 11400000, guid: 3b887b5f92518984294697151943f6f0, type: 2}
     _amount: 2
   _givenItems: []
-  _baseReward: 4
-  _completionLine: "\uB178\uB797\uB2E4\u2026 \uAD74\uC774 \uC870\uAE08 \uBC1D\uC544\uC84C\uC5B4."
+  _completionLine: "\uC465 \uD5A5\uC774 \uB09C\uB2E4\u2026 \uAD74\uC774 \uC870\uAE08
+    \uC0C1\uCF8C\uD574\uC84C\uC5B4."

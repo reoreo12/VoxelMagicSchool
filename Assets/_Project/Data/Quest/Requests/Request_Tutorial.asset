@@ -24,11 +24,10 @@ MonoBehaviour:
     _amount: 1
   - _item: {fileID: 11400000, guid: 22a9aaf902f918b46996f13b7ed2ff1b, type: 2}
     _amount: 1
-  - _item: {fileID: 11400000, guid: ba50b8e8f541aa74897cbe737d121c41, type: 2}
+  - _item: {fileID: 11400000, guid: 3b887b5f92518984294697151943f6f0, type: 2}
     _amount: 1
   _givenItems:
   - _item: {fileID: 11400000, guid: a65f704237085b34fb7ac9c7c6fbdb1d, type: 2}
     _amount: 1
-  _baseReward: 6
   _completionLine: "\uC798\uD588\uC5B4\u2026 \uC774\uB807\uAC8C \uD558\uB098\uC529
     \uBAA8\uC73C\uBA74 \uD544\uAE30 \uC2DC\uD5D8\uB3C4 \uBB34\uC12D\uC9C0 \uC54A\uC544."

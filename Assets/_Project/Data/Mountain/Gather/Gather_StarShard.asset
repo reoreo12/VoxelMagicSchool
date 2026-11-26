@@ -14,10 +14,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _id: gather_StarShard
   _displayName: "\uBCC4\uC870\uAC01\uB3CC"
-  _description: "\uBC24\uD558\uB298 \uBE5B\uC744 \uB2EE\uC740 \uD478\uB978 \uB3CC
-    \uC870\uAC01."
-  _iconColor: {r: 0.3, g: 0.4, b: 0.95, a: 1}
-  _icon: {fileID: 0}
+  _description: "\uBCC4\uBE5B\uC744 \uB2EE\uC544 \uB178\uB797\uAC8C \uBE5B\uB098\uB294
+    \uB3CC \uC870\uAC01."
+  _iconColor: {r: 0.95, g: 0.88, b: 0.45, a: 1}
+  _icon: {fileID: 21300000, guid: f586e255f938a8a4bb9d9f9ba865bd07, type: 3}
   _maxStack: 99
   _creatureNote: "\uBCC4\uC870\uAC01\uB3CC\uC740 \uBC24\uD558\uB298\uC774 \uB5A8\uC5B4\uB728\uB9B0
     \uC870\uAC01\uC774\uB798\u2026 \uC950\uACE0 \uC788\uC73C\uBA74 \uAE38\uC744 \uC548
@@ -31,5 +31,8 @@ MonoBehaviour:
   _sizeRangeCm:
     _min: 3
     _max: 8
-  _worldMesh: {fileID: 10205, guid: 0000000000000000e000000000000000, type: 0}
-  _worldScale: {x: 0.1, y: 0.1, z: 0.1}
+  _worldMesh: {fileID: 2245623419786884139, guid: 1ace8d5807b76e643a86b0896a8bcfd1, type: 3}
+  _worldMaterial: {fileID: 2100000, guid: f3bc14957d813c1438d968dbfbba764e, type: 2}
+  _worldScale: {x: 1.5, y: 1.5, z: 1.5}
+  _worldRotation: {x: -90, y: 0, z: 0}
+  _acquireModel: {fileID: 0}

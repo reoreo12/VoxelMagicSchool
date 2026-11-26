@@ -1,5 +1,25 @@
 # 변경 기록
 
+## 2026-11-26 — 채집 확률·슬롯 도구·재료 아이콘 (브랜치 `Back-mountain-map`)
+- 채집 확률(`GatheringConfig`): 켜지는 자리 4 → 5, 희귀도 60/30/10 → 45/30/25. 희귀 재료 하나가 하루에 나올 확률 약 34% → 76%(이틀 약 94%). 시연 중 한 번씩은 보이게
+- `채집 밸런스 › 슬롯 수 적용`: 누르기 전부터 있던 슬롯은 위치를 그대로 두고, **새로 생긴 슬롯만** 지면에 맞춤(전에는 모든 슬롯을 지면으로 내려 덤불 표면 슬롯이 묻혔음). `GatheringBalanceTool.ApplySlotCounts`
+- 채집 재료 아이콘 12종 `Art/UI/item_icons/gather/item_Gather_*.png`: 16×16, 지팡이 아이콘처럼 진갈색 1px 외곽선(상하좌우), 7색 이하, 산삼은 뿌리까지 있는 모델. 재료 `Icon`에 연결해 퀵슬롯에 보임. 확인용 시트 `gather/_preview/gather_icons_preview.png`
+- 굽기 도구 `VoxelMagic/뒷산/채집 재료 아이콘 굽기`(`Editor/Mountain/GatherIconBaker`, 설정 `Data/Tools/GatherIconSettings`): 메시를 C# 코드로 직접 그림(팔레트 칸 색 × 주변광 + 해 밝기) → 칸마다 덮인 비율 40% 이상만 칠함 → k-평균 색 줄이기 → 외곽선. **`PreviewRenderUtility`는 이 프로젝트(URP, MCP 실행)에서 만들자마자 에디터가 크래시(RenderSettings NULL)해서 쓰지 않음** — 같은 방식 도구를 만들 때 주의
+- 설명을 모델 색에 맞춤(사용자 결정): 그늘버섯 "갈색 버섯" → "잿빛 버섯", 별조각돌 "밤하늘 빛을 닮은 푸른 돌 조각" → "별빛을 닮아 노랗게 빛나는 돌 조각", 두 재료의 아이콘 대체 색(`IconColor`)도 회색·노랑으로. 의뢰 `Request_H_StarShard` 힌트 "푸른 조각" → "노란 조각"
+- 확인(플레이 모드): 재료 4종 줍기 → 퀵슬롯에 지팡이와 같은 크기로 아이콘 표시, 채집 자리 종류마다 5곳·희귀 재료 출현. EditMode 201개 통과
+
+## 2026-11-26 — 뒷산 채집 재료 FBX 적용 (브랜치 `Back-mountain-map`, UI 브랜치 머지 후)
+- 땅에 놓인 재료 12종을 기본 도형 → FBX(`Art/Objects/Gather_Items/fbx/`)로. FBX는 Blender Z-up이라 메시만 쓰면 누움 → 재료 데이터에 `_worldRotation`(-90,0,0) 추가 (Bake Axis Conversion은 루트 회전이 꼬여 쓰지 않음)
+- 공용 머티리얼 2장 `Art/Objects/Gather_Items/M_Gather_Items`(URP Lit + 팔레트, 매끈함 0.1)·`M_Gather_Items_Glow`(+팔레트 발광 0.6, 달빛버섯·별조각돌). `GatherPickup`은 공용 머티리얼이면 MaterialPropertyBlock을 쓰지 않음(SRP Batcher 묶음 유지), 없으면 예전처럼 기본 도형 + 아이콘 색. 바닥 맞춤은 회전·크기 적용한 경계 상자 기준
+- 임포트 설정: `gather_items_palette.png` Point·무압축·밉맵 끔(뒷산 팔레트와 같게), FBX 13종 애니메이션·카메라·라이트 가져오기 끔
+- 데이터: `GatherMaterialDefinition`에 `_worldMaterial`·`_worldRotation`·`_acquireModel`(획득 UI용 모델, 참조만) 추가. 새 재료 **산삼** `Gather_WildGinseng`(평지·희귀, 땅 `Wild_Ginseng_Top`, 획득 모델 `Wild_Ginseng`), 세이브 정의 목록에 등록. 이슬꽃 → **섬초롱꽃**(이름·설명·크리처 설명). 희귀도: 쑥 보통 → 흔함, 섬초롱꽃 희귀 → 보통
+- 채집 목록(`GatheringConfig`)에서 민들레 → 산삼. 민들레 에셋은 옛 세이브 호환을 위해 남김
+- 의뢰(난이도 유지): 튜토리얼 민들레 → 쑥, `붕어와 민들레` → `붕어와 쑥`, `민들레 꽃다발`(민들레 2) → `쑥 한 아름`(쑥 2), `약초 세 가지` 쑥·민들레·돌이끼 → 쑥·섬초롱꽃·돌이끼, `밤이슬 꽃차` 대사·힌트의 이슬꽃 → 섬초롱꽃. 대사·힌트·전달 대사도 맞춰 고침
+- 편집기 도구 `BackMountainGatheringBuilder`의 재료 표도 산삼·섬초롱꽃으로 맞춤(없을 때만 만드는 도구라 기존 에셋은 건드리지 않음)
+- 크기: 재료 12종 `_worldScale` 1 → 1.5 (사용자 의견 "좀 더 크게")
+- 덤불 슬롯 복원: 11-25 의뢰·타이머 1·2단계 때 `채집 밸런스 › 슬롯 수 적용`이 **모든 슬롯을 지면으로 내리는 바람에** 사용자가 덤불 표면에 올려 둔 슬롯 6개(Mountain_Bush_Berry·Mountain_Bush_Wide·SM_Bush_Wild의 Slot_0·1)가 바닥(덤불 속)으로 내려가 있었음 → 11-24 커밋 높이로 되돌림. 그때 새로 생긴 Slot_2 3개는 덤불 메시 표면 높이로 올림(Wide·Berry는 덤불 안쪽으로 조금 옮김). 나무·바위 슬롯은 원래 지면이라 변화 없음
+- 확인(플레이 모드, BackMountain): 스폰된 재료 모두 똑바로 서고 바닥 틈 0, 덤불 3곳 9칸 모두 표면에 보임, 산삼 줍기 → `산삼 획득!` 팝업(아이콘은 임시 색 칸)·퀵슬롯 들어감, 달빛버섯 발광 확인. EditMode 201개 통과
+
 ## 2026-11-26 — 의뢰 게시판 UI (낡은 종이 창)
 - 임시 도형 게시판(`RequestBoardWindow`, HUDCanvas) → `UI_Root` 팝업 층의 새 화면 `UI_RequestBoard`(`RequestBoardScreen` + 칸 `RequestBoardEntryView`). 빌더 메뉴 `VoxelMagic/UI/화면 만들기/의뢰 게시판`. 설계 그림 `Art/UI/board_ui/_preview/`
 - 창: 낡은 종이 `quest_detail_paper`(Tiled), 폭 320, 화면 가운데, 딤 0.6. 머리 `의뢰 게시판` 12px 굵게 + X(`close_*`) + 구분선

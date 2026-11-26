@@ -13,10 +13,10 @@ MonoBehaviour:
   m_Name: Request_H_DewFlower
   m_EditorClassIdentifier: 
   _title: "\uBC24\uC774\uC2AC \uAF43\uCC28"
-  _creatureLine: "\uC774\uC2AC\uAF43\uC774\uB791 \uC465\uC73C\uB85C \uCC28\uB97C
+  _creatureLine: "\uC12C\uCD08\uB871\uAF43\uC774\uB791 \uC465\uC73C\uB85C \uCC28\uB97C
     \uB053\uC77C \uAC70\uC57C."
-  _habitatHint: "\uCD08\uC785 \uD3C9\uC9C0\uC5D0\uC11C \uD754\uCE58 \uC54A\uC740
-    \uD558\uC580 \uAF43\uC744 \uCC3E\uC544 \uBD10"
+  _habitatHint: "\uCD08\uC785 \uD3C9\uC9C0\uC5D0\uC11C \uC544\uB798\uB97C \uD5A5\uD574
+    \uD540 \uD558\uC580 \uAF43\uC744 \uCC3E\uC544 \uBD10"
   _difficulty: 2
   _requirements:
   - _item: {fileID: 11400000, guid: 5c9cd669a4c24764d99d91e9e0f7270e, type: 2}
@@ -24,6 +24,5 @@ MonoBehaviour:
   - _item: {fileID: 11400000, guid: 3b887b5f92518984294697151943f6f0, type: 2}
     _amount: 1
   _givenItems: []
-  _baseReward: 12
   _completionLine: "\uD5A5\uC774 \uC88B\uC544\u2026 \uACF5\uBD80\uAC00 \uC798\uB420
     \uAC83 \uAC19\uC544."

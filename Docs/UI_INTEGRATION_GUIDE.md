@@ -75,6 +75,7 @@ GameBootstrap (씬마다, Gameplay)
 | 입력 | 1~5 키·클릭·퀵슬롯 위 휠 = 칸 선택(휠은 끝 칸에서 멈춤, 돌아 넘어가지 않음). 게임 화면 위 휠 = 카메라 줌(`HudState.IsPointerOverScrollHud`로 구분, `GameInputReader`) |
 | 치트 (에디터·개발 빌드만, 2026-11-25) | 칸 **우클릭** = 개수와 상관없이 그 칸 통째로 버리기(`Inventory.DiscardSlot` + 토스트). `QuickSlotView.Setup(index, onClick, onRightClick)`, 정식 빌드에서는 우클릭을 연결하지 않음. 안내는 `ControlsHintView` 맨 아래 한 줄(`GameTexts.CheatDiscardHint`, 개발 빌드만). 정식 버리기 UI는 [미정] |
 | UI 코드 | `UI/HUD/QuickSlotBarView.cs`, `QuickSlotView.cs`. 테마 `Quick Slots` |
+| 채집 재료 아이콘 (2026-11-26) | 12종 `Art/UI/item_icons/gather/item_Gather_*.png`(16×16, 진갈색 #2B1D22 1px 외곽선, 지팡이 아이콘과 같은 규칙, Point·무압축·PPU 16)이 재료의 `Icon`에 연결됨 → 퀵슬롯에 바로 보임. FBX에서 굽는 메뉴 `VoxelMagic/뒷산/채집 재료 아이콘 굽기`(설정 `Data/Tools/GatherIconSettings`: 각도·조명·색 수·덮임 기준), 확인용 8배 시트 `gather/_preview/`. 산삼은 뿌리까지 있는 획득 모델로 찍음. **인벤토리 창 칸(`InventorySlotView`)과 획득 팝업(`AcquisitionPopup`)은 아직 `Icon`을 안 쓰고 색만 칠함** → UI 작업에서 연결 |
 | 남은 일 | 확장 인벤토리(가방, 7-4): 패널·칸 그림 없음, [미정] 많음 |
 
 ### 2-6. 책(메뉴) 화면

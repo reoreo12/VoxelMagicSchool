@@ -12,18 +12,17 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6e2e2f20d9b88964fa16d99bbf67be48, type: 3}
   m_Name: Request_E_CrucianDandelion
   m_EditorClassIdentifier: 
-  _title: "\uBD95\uC5B4\uC640 \uBBFC\uB4E4\uB808"
-  _creatureLine: "\uBD95\uC5B4 \uD55C \uB9C8\uB9AC\uB791 \uBBFC\uB4E4\uB808 \uD55C
-    \uC1A1\uC774. \uC624\uB298 \uC800\uB141 \uBA54\uB274\uC57C."
-  _habitatHint: "\uBD95\uC5B4\uB294 \uC5F0\uBABB\uC5D0\uC11C, \uBBFC\uB4E4\uB808\uB294
-    \uCD08\uC785 \uD3C9\uC9C0\uC5D0 \uD53C\uC5B4 \uC788\uC5B4"
+  _title: "\uBD95\uC5B4\uC640 \uC465"
+  _creatureLine: "\uBD95\uC5B4 \uD55C \uB9C8\uB9AC\uB791 \uC465 \uD55C \uC90C. \uC624\uB298
+    \uC800\uB141 \uBA54\uB274\uC57C."
+  _habitatHint: "\uBD95\uC5B4\uB294 \uC5F0\uBABB\uC5D0\uC11C, \uC465\uC740 \uCD08\uC785
+    \uD3C9\uC9C0\uC5D0 \uD754\uD574"
   _difficulty: 0
   _requirements:
   - _item: {fileID: 11400000, guid: 22a9aaf902f918b46996f13b7ed2ff1b, type: 2}
     _amount: 1
-  - _item: {fileID: 11400000, guid: ba50b8e8f541aa74897cbe737d121c41, type: 2}
+  - _item: {fileID: 11400000, guid: 3b887b5f92518984294697151943f6f0, type: 2}
     _amount: 1
   _givenItems: []
-  _baseReward: 4
-  _completionLine: "\uBBFC\uB4E4\uB808\uB97C \uACC1\uB4E4\uC778 \uBD95\uC5B4\u2026
-    \uC774\uAC74 \uC0C1\uC2DD\uC774\uC57C. \uB9C8\uBC95 \uC0C1\uC2DD."
+  _completionLine: "\uC465\uC744 \uACC1\uB4E4\uC778 \uBD95\uC5B4\u2026 \uC774\uAC74
+    \uC0C1\uC2DD\uC774\uC57C. \uB9C8\uBC95 \uC0C1\uC2DD."

@@ -15,7 +15,7 @@ MonoBehaviour:
   _title: "\uBCC4\uC758 \uC870\uAC01"
   _creatureLine: "\uBCC4\uC870\uAC01\uB3CC\uC774\uB791 \uBC18\uC9DD\uB3CC\uAC00\uB8E8.
     \uB9C8\uBC95\uC9C4\uC5D0 \uC4F8 \uAC70\uC57C."
-  _habitatHint: "\uBC14\uC704\uD2C8\uC744 \uC798 \uC0B4\uD3B4\uBD10. \uD478\uB978
+  _habitatHint: "\uBC14\uC704\uD2C8\uC744 \uC798 \uC0B4\uD3B4\uBD10. \uB178\uB780
     \uC870\uAC01\uC774 \uC228\uC5B4 \uC788\uC5B4"
   _difficulty: 2
   _requirements:
@@ -24,6 +24,5 @@ MonoBehaviour:
   - _item: {fileID: 11400000, guid: 3cbc4b2484feb4343b448fadac6f576a, type: 2}
     _amount: 1
   _givenItems: []
-  _baseReward: 12
   _completionLine: "\uC774\uAC78\uB85C \uB9C8\uBC95\uC9C4\uC744 \uADF8\uB9AC\uBA74
     \uBCC4\uCC98\uB7FC \uBE5B\uB098."
