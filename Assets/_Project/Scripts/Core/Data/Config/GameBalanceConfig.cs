@@ -8,6 +8,7 @@ namespace VoxelMagic.Core
     {
         [SerializeField, Min(1)] private int _inventorySlotCount = 5;
         [SerializeField, Min(0.1f)] private float _acquiredInfoSeconds = 3f;
+        [SerializeField, Min(0f), Tooltip("획득 창은 움직여도 최소 이 시간(초)은 보인다. 그 뒤에 움직이면 바로 닫힌다")] private float _acquiredInfoMinSeconds = 1.5f;
         [SerializeField, Min(0.1f)] private float _toastSeconds = 2f;
         [Tooltip("점수 바가 차오르는 속도 (점/초)")]
         [SerializeField, Min(1f)] private float _scoreFillSpeed = 40f;
@@ -16,6 +17,7 @@ namespace VoxelMagic.Core
 
         public int InventorySlotCount => _inventorySlotCount;
         public float AcquiredInfoSeconds => _acquiredInfoSeconds;
+        public float AcquiredInfoMinSeconds => Mathf.Min(_acquiredInfoMinSeconds, _acquiredInfoSeconds);
         public float ToastSeconds => _toastSeconds;
         public float ScoreFillSpeed => _scoreFillSpeed;
         public float QuestCompleteDisplaySeconds => _questCompleteDisplaySeconds;

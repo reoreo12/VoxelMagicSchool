@@ -13,8 +13,8 @@ MonoBehaviour:
   m_Name: GameBalanceConfig
   m_EditorClassIdentifier: 
   _inventorySlotCount: 5
-  _maxScore: 100
-  _newItemKindBonus: 5
   _acquiredInfoSeconds: 3
+  _acquiredInfoMinSeconds: 2
   _toastSeconds: 2
   _scoreFillSpeed: 40
+  _questCompleteDisplaySeconds: 2

@@ -46,6 +46,7 @@ MonoBehaviour:
     _bottomMargin: 8
     _iconSize: 24
     _selectionOutset: 2
+    _tooltipOffset: {x: 0, y: 6}
     _selectionMoveSeconds: 0.08
     _selectionTopLeft: {fileID: 2095984601, guid: 85acf4bfda616c04fbbbea6d820019a9, type: 3}
     _selectionTopRight: {fileID: 635226595, guid: 85acf4bfda616c04fbbbea6d820019a9, type: 3}
@@ -266,6 +267,29 @@ MonoBehaviour:
     _mutedColor: {r: 0.5882353, g: 0.47058824, b: 0.32941177, a: 1}
     _rewardColor: {r: 0.7529412, g: 0.3764706, b: 0.22745098, a: 1}
     _warnColor: {r: 0.54901963, g: 0.18431373, b: 0.16470589, a: 1}
+  _acquire:
+    _size: {x: 208, y: 68}
+    _top: 56
+    _cellPosition: {x: 8, y: 6}
+    _cellSize: 56
+    _textGap: 6
+    _textRight: 10
+    _titleTop: 12
+    _descriptionGap: 3
+    _titleStyle: 1
+    _descriptionStyle: 3
+    _iconScale: 3
+    _spinDegreesPerSecond: 150
+    _cameraPitch: 25
+    _fit: 1
+    _stagePosition: {x: 0, y: -2000, z: 0}
+    _lightDirection: {x: -0.45, y: 0.75, z: -0.5}
+    _thresholds: {x: 0.45, y: 0.05}
+    _levels: {x: 1, y: 0.82, z: 0.64}
+    _outlineWidth: 1
+    _outlineColor: {r: 0.16862746, g: 0.11372549, b: 0.13333334, a: 1}
+    _toonShader: {fileID: 4800000, guid: 5d550d0cf29b75b4e91ac50d3b75fd44, type: 3}
+    _outlineShader: {fileID: 4800000, guid: 4de6cab9e5460ad4bb73a4e4c60fdb36, type: 3}
   _dialogue:
     _scale: 1.25
     _bottomMargin: 8
