@@ -1,4 +1,4 @@
-// 뽑거나 낚은 아이템의 이름·설명·크기를 화면 위쪽에 잠시 보여 준다. 정해진 시간이 지나거나 닫기 요청이 오면 사라진다.
+// 옛 임시 획득 창(이름·설명·크기). UI_Root가 없는 Prototype_FarmFishing에만 남은 예비. 정식은 AcquireView(UI_Acquire).
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;

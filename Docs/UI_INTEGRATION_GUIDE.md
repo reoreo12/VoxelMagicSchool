@@ -72,7 +72,7 @@ GameBootstrap (씬마다, Gameplay)
 | 항목 | 내용 |
 |---|---|
 | UI가 읽는 창구 | `Core/Inventory/Inventory`: `SlotCount`, `GetSlot(i)`, `SelectedIndex`, `Select(i)`, `event SlotChanged(i)`, `event SelectionChanged(i)`. 아이콘은 `ItemDefinition.Icon`(16×16 도트, 없으면 글자 대체) |
-| 입력 | 1~5 키·클릭·퀵슬롯 위 휠 = 칸 선택(휠은 끝 칸에서 멈춤, 돌아 넘어가지 않음). 게임 화면 위 휠 = 카메라 줌(`HudState.IsPointerOverScrollHud`로 구분, `GameInputReader`) |
+| 입력 | 1~5 키·클릭·퀵슬롯 위 휠 = 칸 선택(휠은 끝 칸에서 멈춤, 돌아 넘어가지 않음). 칸에 마우스를 올리면 아이템 이름 툴팁(공용 `UiTooltipView`, `Show(..., above: true, centered: true)`, 칸 위 가운데). 게임 화면 위 휠 = 카메라 줌(`HudState.IsPointerOverScrollHud`로 구분, `GameInputReader`) |
 | 치트 (에디터·개발 빌드만, 2026-11-25) | 칸 **우클릭** = 개수와 상관없이 그 칸 통째로 버리기(`Inventory.DiscardSlot` + 토스트). `QuickSlotView.Setup(index, onClick, onRightClick)`, 정식 빌드에서는 우클릭을 연결하지 않음. 안내는 `ControlsHintView` 맨 아래 한 줄(`GameTexts.CheatDiscardHint`, 개발 빌드만). 정식 버리기 UI는 [미정] |
 | UI 코드 | `UI/HUD/QuickSlotBarView.cs`, `QuickSlotView.cs`. 테마 `Quick Slots` |
 | 채집 재료 아이콘 (2026-11-26) | 12종 `Art/UI/item_icons/gather/item_Gather_*.png`(16×16, 진갈색 #2B1D22 1px 외곽선, 지팡이 아이콘과 같은 규칙, Point·무압축·PPU 16)이 재료의 `Icon`에 연결됨 → 퀵슬롯에 바로 보임. FBX에서 굽는 메뉴 `VoxelMagic/뒷산/채집 재료 아이콘 굽기`(설정 `Data/Tools/GatherIconSettings`: 각도·조명·색 수·덮임 기준), 확인용 8배 시트 `gather/_preview/`. 산삼은 뿌리까지 있는 획득 모델로 찍음. **인벤토리 창 칸(`InventorySlotView`)과 획득 팝업(`AcquisitionPopup`)은 아직 `Icon`을 안 쓰고 색만 칠함** → UI 작업에서 연결 |
@@ -118,7 +118,7 @@ GameBootstrap (씬마다, Gameplay)
 
 ### 2-9. 그 밖의 HUD
 - `HudState`(`context.Hud`): 의뢰 목록 펼침(`IsQuestListExpanded`), 의뢰 바 보이기(`IsQuestBarVisible`), 휠 쓰는 HUD 위 마우스(`IsPointerOverScrollHud`).
-- 아이템 획득 창·토스트: 옛 `AcquisitionPopup`·`ToastView`(`GameMessages`). 새 지침으로 아직 안 바꿈.
+- 아이템 획득 창: `UI/HUD/AcquireView`(`UI_Root` HudAnimated 층 `UI_Acquire`)가 `GameMessages.ItemAcquired`·`AcquiredDismissed`를 받음. 모델은 `GatherMaterialDefinition.AcquireModel` → 없으면 `WorldMesh`+`WorldMaterial`, 둘 다 없거나 채집 재료가 아니면 `Icon`(3배). 새 재료는 FBX만 연결하면 자동으로 툰·외곽선으로 돈다. 크기(`AcquiredInfo.SizeCm`)는 화면에 쓰지 않음. `DismissAcquired`(움직임)는 최소 표시 시간(`GameBalanceConfig.AcquiredInfoMinSeconds`, 1.5초)이 지난 뒤에만 닫음. 토스트는 아직 옛 `ToastView`. `UI_Root`가 없는 씬만 예비 `AcquisitionPopup`.
 - 옛 프로토타입(`InventoryBar`, `ScoreHud`, `QuestTrackerPanel`)은 세 씬에서 꺼 둠. `ControlsHintView`(왼쪽 아래 조작 안내)는 최종에 지움(사용자 결정). 지금은 개발 빌드에서 치트 안내 한 줄(우클릭 버리기)을 덧붙임.
 
 ---

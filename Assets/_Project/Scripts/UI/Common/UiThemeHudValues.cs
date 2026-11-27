@@ -17,6 +17,7 @@ namespace VoxelMagic.UI
         [SerializeField, Tooltip("화면 아래에서 바까지")] private int _bottomMargin = 8;
         [SerializeField, Tooltip("아이템 아이콘 크기(px, 16×16 도트)")] private int _iconSize = 16;
         [SerializeField, Tooltip("선택 프레임을 슬롯 바깥으로 내미는 정도")] private int _selectionOutset = 2;
+        [SerializeField, Tooltip("칸에 마우스를 올렸을 때 아이템 이름 툴팁 위치: 칸 위 끝 가운데에서 (x +오른쪽, y = 칸 위로 띄우는 거리)")] private Vector2Int _tooltipOffset = new Vector2Int(0, 6);
         [SerializeField, Tooltip("선택 프레임이 다음 칸으로 옮겨 가는 시간(초, 시간 정지와 무관)")] private float _selectionMoveSeconds = 0.08f;
         [SerializeField] private Sprite _selectionTopLeft;
         [SerializeField] private Sprite _selectionTopRight;
@@ -32,6 +33,7 @@ namespace VoxelMagic.UI
         public int BottomMargin => _bottomMargin;
         public int IconSize => _iconSize;
         public int SelectionOutset => _selectionOutset;
+        public Vector2Int TooltipOffset => _tooltipOffset;
         public float SelectionMoveSeconds => _selectionMoveSeconds;
         public Sprite SelectionTopLeft => _selectionTopLeft;
         public Sprite SelectionTopRight => _selectionTopRight;
@@ -663,5 +665,67 @@ namespace VoxelMagic.UI
         public Color MutedColor => _mutedColor;
         public Color RewardColor => _rewardColor;
         public Color WarnColor => _warnColor;
+    }
+
+    /// <summary>획득 창: 밝은 종이 창 왼쪽에 도는 재료 모델(툰 3단 + 도트 외곽선), 오른쪽에 "○○ 획득!"과 설명. 크기는 1배 px.</summary>
+    [System.Serializable]
+    public sealed class AcquireValues
+    {
+        [Header("창")]
+        [SerializeField, Tooltip("창 크기 (밝은 종이 QuestToast, Tiled)")] private Vector2Int _size = new Vector2Int(208, 68);
+        [SerializeField, Tooltip("화면 위 끝에서 창까지 (점수 HUD 아래)")] private int _top = 56;
+        [SerializeField, Tooltip("모델 칸 왼쪽 위 (창 기준)")] private Vector2Int _cellPosition = new Vector2Int(8, 6);
+        [SerializeField, Tooltip("모델 칸 크기 = 렌더 텍스처 크기 (정수 px)")] private int _cellSize = 56;
+        [SerializeField, Tooltip("모델 칸과 글자 사이")] private int _textGap = 6;
+        [SerializeField, Tooltip("글자 오른쪽 여백")] private int _textRight = 10;
+        [SerializeField, Tooltip("제목 위 (창 기준)")] private int _titleTop = 12;
+        [SerializeField, Tooltip("제목 → 설명 사이")] private int _descriptionGap = 3;
+        [SerializeField] private UiTextStyle _titleStyle = UiTextStyle.BodyBold;
+        [SerializeField] private UiTextStyle _descriptionStyle = UiTextStyle.Small;
+        [SerializeField, Min(1), Tooltip("모델이 없는 아이템은 아이콘(16px)을 이 배수로")] private int _iconScale = 3;
+
+        [Header("모델 회전·촬영")]
+        [SerializeField, Tooltip("세로축 회전 속도 (도/초, 시간 정지와 무관)")] private float _spinDegreesPerSecond = 150f;
+        [SerializeField, Tooltip("내려다보는 각도")] private float _cameraPitch = 25f;
+        [SerializeField, Tooltip("모델을 감싸는 구 반지름 × 이 값 = 카메라 직교 크기 (작을수록 모델이 크게)")] private float _fit = 1f;
+        [SerializeField, Tooltip("촬영 무대 위치 (게임 화면에 안 보이는 먼 곳)")] private Vector3 _stagePosition = new Vector3(0f, -2000f, 0f);
+
+        [Header("툰 3단 · 외곽선")]
+        [SerializeField, Tooltip("빛이 오는 방향 (월드, 고정 → 낮·밤 같은 모습)")] private Vector3 _lightDirection = new Vector3(-0.45f, 0.75f, -0.5f);
+        [SerializeField, Tooltip("N·L이 이 값보다 크면 밝음, 둘째 값보다 크면 중간, 아니면 그늘")] private Vector2 _thresholds = new Vector2(0.45f, 0.05f);
+        [SerializeField, Tooltip("밝음·중간·그늘 밝기 배수")] private Vector3 _levels = new Vector3(1f, 0.82f, 0.64f);
+        [SerializeField, Range(0, 4), Tooltip("외곽선 두께 (px)")] private int _outlineWidth = 1;
+        [SerializeField, Tooltip("외곽선 색 (아이템 아이콘과 같은 진갈색)")] private Color _outlineColor = new Color32(0x2B, 0x1D, 0x22, 0xFF);
+        [SerializeField, Tooltip("모델용 툰 셰이더 (VoxelMagic/ToonPreview)")] private Shader _toonShader;
+        [SerializeField, Tooltip("모델 그림용 외곽선 셰이더 (VoxelMagic/UI/PixelOutline)")] private Shader _outlineShader;
+
+        public Vector2Int Size => _size;
+        public int Top => _top;
+        public Vector2Int CellPosition => _cellPosition;
+        public int CellSize => Mathf.Max(8, _cellSize);
+        public int TextGap => _textGap;
+        public int TextRight => _textRight;
+        public int TitleTop => _titleTop;
+        public int DescriptionGap => _descriptionGap;
+        public UiTextStyle TitleStyle => _titleStyle;
+        public UiTextStyle DescriptionStyle => _descriptionStyle;
+        public int IconScale => Mathf.Max(1, _iconScale);
+        public float SpinDegreesPerSecond => _spinDegreesPerSecond;
+        public float CameraPitch => _cameraPitch;
+        public float Fit => Mathf.Max(0.1f, _fit);
+        public Vector3 StagePosition => _stagePosition;
+        public Vector3 LightDirection => _lightDirection;
+        public Vector2 Thresholds => _thresholds;
+        public Vector3 Levels => _levels;
+        public int OutlineWidth => _outlineWidth;
+        public Color OutlineColor => _outlineColor;
+        public Shader ToonShader => _toonShader;
+        public Shader OutlineShader => _outlineShader;
+
+        public void SetShaders(Shader toon, Shader outline)
+        {
+            _toonShader = toon;
+            _outlineShader = outline;
+        }
     }
 }

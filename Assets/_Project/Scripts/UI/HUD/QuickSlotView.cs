@@ -1,5 +1,5 @@
 // 퀵슬롯 한 칸(UI_SPEC 7-1): 밝은 칸 배경 + 아이템 아이콘(16×16, 정수 px 가운데). 아이콘이 없는 아이템은 단색 칸 + 첫 글자로 보인다(아이콘 제작 전 임시).
-// 클릭하면 이 칸 선택을, 우클릭하면(연결돼 있을 때, 치트) 이 칸 버리기를 요청한다. 개수는 2개 이상일 때만 작은 글씨로 오른쪽 아래에 보인다(표시 방식은 [미정], 임시).
+// 클릭하면 이 칸 선택을, 우클릭하면(연결돼 있을 때, 치트) 이 칸 버리기를 요청한다. 마우스를 올리면 바에 알린다(아이템 이름 툴팁). 개수는 2개 이상일 때만 작은 글씨로 오른쪽 아래에 보인다(표시 방식은 [미정], 임시).
 using System;
 using UnityEngine;
 using UnityEngine.EventSystems;
@@ -8,7 +8,7 @@ using VoxelMagic.Core;
 
 namespace VoxelMagic.UI
 {
-    public sealed class QuickSlotView : MonoBehaviour, IPointerClickHandler
+    public sealed class QuickSlotView : MonoBehaviour, IPointerClickHandler, IPointerEnterHandler, IPointerMoveHandler, IPointerExitHandler
     {
         [SerializeField] private ThemedPanel _background;
         [SerializeField] private Image _icon;
@@ -19,6 +19,8 @@ namespace VoxelMagic.UI
         private int _index;
         private Action<int> _onClick;
         private Action<int> _onRightClick;
+        private Action<int, Vector2> _onHover;
+        private Action<int> _onExit;
         private ItemStack _shown;
         private bool _hasShown;
 
@@ -30,6 +32,18 @@ namespace VoxelMagic.UI
             _onClick = onClick;
             _onRightClick = onRightClick;
         }
+
+        /// <summary>마우스 올림(칸 번호, 화면 위치)·나감을 알릴 곳.</summary>
+        public void SetHover(Action<int, Vector2> onHover, Action<int> onExit)
+        {
+            _onHover = onHover;
+            _onExit = onExit;
+        }
+
+        public void OnPointerEnter(PointerEventData eventData) => _onHover?.Invoke(_index, eventData.position);
+        public void OnPointerMove(PointerEventData eventData) => _onHover?.Invoke(_index, eventData.position);
+        public void OnPointerExit(PointerEventData eventData) => _onExit?.Invoke(_index);
+        private void OnDisable() => _onExit?.Invoke(_index);
 
         public void OnPointerClick(PointerEventData eventData)
         {

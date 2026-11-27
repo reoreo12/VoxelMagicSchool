@@ -3,6 +3,7 @@
 // 칸 수는 테마 값이라 나중에 확장 인벤토리(7-4)에서 같은 칸 프리팹을 더 늘려 쓸 수 있다.
 // 치트(에디터·개발 빌드만): 칸 우클릭 = 개수와 상관없이 그 칸 통째로 버리기(안내는 조작법 맨 아래 한 줄, ControlsHintView).
 // 마우스가 바 위에 있을 때 휠을 돌리면 칸을 바꾼다(아래로 = 다음 칸, 끝 칸에서는 멈춤). 그동안 게임의 휠 줌은 쉰다(HudState).
+// 아이템이 든 칸에 마우스를 올리면 공용 툴팁(시간대 HUD와 같은 것)으로 아이템 이름을 그 칸 바로 위 가운데에 띄운다(칸 아이콘을 가리지 않게).
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.EventSystems;
@@ -16,18 +17,29 @@ namespace VoxelMagic.UI
         [SerializeField] private ThemedPanel _background;
         [SerializeField] private List<QuickSlotView> _slots = new List<QuickSlotView>();
         [SerializeField] private SelectionFrameView _selection;
+        [SerializeField, Tooltip("UI_Root의 Overlay 층 툴팁 (비우면 같은 UI_Root에서 찾는다)")] private UiTooltipView _tooltip;
 
         private Inventory _inventory;
         private HudState _hud;
         private GameMessages _messages;
         private int _selectedShown = -1;
+        private int _hovered = -1;
 
         public void Bind(GameContext context)
         {
             _inventory = context.Inventory;
             _hud = context.Hud;
             _messages = context.Messages;
-            for (int i = 0; i < _slots.Count; i++) _slots[i].Setup(i, _inventory.Select, CheatDiscard);
+            for (int i = 0; i < _slots.Count; i++)
+            {
+                _slots[i].Setup(i, _inventory.Select, CheatDiscard);
+                _slots[i].SetHover(OnSlotHover, OnSlotExit);
+            }
+            if (_tooltip == null)
+            {
+                var canvas = GetComponentInParent<Canvas>();
+                if (canvas != null) _tooltip = canvas.rootCanvas.GetComponentInChildren<UiTooltipView>(true);
+            }
             _inventory.SlotChanged += OnSlotChanged;
             _inventory.SelectionChanged += OnSelectionChanged;
             for (int i = 0; i < _slots.Count; i++) OnSlotChanged(i);
@@ -81,6 +93,34 @@ namespace VoxelMagic.UI
             if (this == null) { OnDestroy(); return; } // 꺼진 채 씬이 내려가 OnDestroy가 불리지 않은 구독자: 여기서 구독을 푼다
             if (index < 0 || index >= _slots.Count || index >= _inventory.SlotCount) return;
             _slots[index].Show(_inventory.GetSlot(index));
+            if (index == _hovered) ShowSlotTooltip(); // 올려 둔 칸 내용이 바뀌면 이름도 바꾼다
+        }
+
+        private void OnSlotHover(int index, Vector2 screenPosition)
+        {
+            _hovered = index;
+            ShowSlotTooltip();
+        }
+
+        private void OnSlotExit(int index)
+        {
+            if (index != _hovered) return;
+            _hovered = -1;
+            if (_tooltip != null) _tooltip.Hide();
+        }
+
+        // 빈 칸이면 숨긴다.
+        private void ShowSlotTooltip()
+        {
+            if (_tooltip == null || Theme == null || _inventory == null || _hovered < 0 || _hovered >= _inventory.SlotCount) return;
+            var stack = _inventory.GetSlot(_hovered);
+            if (stack.IsEmpty) { _tooltip.Hide(); return; }
+            // 칸 위 끝 가운데(화면 좌표) 기준으로 위쪽 가운데에 띄운다.
+            var rect = _slots[_hovered].Rect;
+            var canvas = rect.GetComponentInParent<Canvas>();
+            var camera = canvas != null && canvas.renderMode != RenderMode.ScreenSpaceOverlay ? canvas.worldCamera : null;
+            var corner = RectTransformUtility.WorldToScreenPoint(camera, rect.TransformPoint(new Vector3(rect.rect.center.x, rect.rect.yMax, 0f)));
+            _tooltip.Show(stack.Item.DisplayName, corner, Theme.QuickSlots.TooltipOffset, above: true, centered: true);
         }
 
         private void OnSelectionChanged(int index)
